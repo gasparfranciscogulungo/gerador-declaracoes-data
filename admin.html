@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Gerador de Declarações</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="bg-gray-100" x-data="adminApp()">
+    
+    <!-- Loading Overlay -->
+    <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+            <div class="spinner mb-4"></div>
+            <p class="text-gray-700 font-medium" x-text="loadingMessage"></p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="bi bi-shield-check text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Painel Administrativo</h1>
+                        <p class="text-blue-200 text-sm">Gerador de Declarações</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-blue-200">Administrador</p>
+                        <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
+                    </div>
+                    <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-white">
+                    <button @click="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
+                        <i class="bi bi-box-arrow-right mr-2"></i>Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Alert System -->
+    <div x-show="alert.show" 
+         x-transition
+         class="container mx-auto px-4 mt-4">
+        <div :class="alert.type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700'"
+             class="border-l-4 p-4 rounded shadow-md" role="alert">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i :class="alert.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'" class="text-xl mr-3"></i>
+                    <p x-text="alert.message"></p>
+                </div>
+                <button @click="alert.show = false" class="text-lg">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Empresas</p>
+                        <p class="text-3xl font-bold text-blue-600" x-text="stats.empresas"></p>
+                    </div>
+                    <i class="bi bi-building text-4xl text-blue-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Modelos</p>
+                        <p class="text-3xl font-bold text-green-600" x-text="stats.modelos"></p>
+                    </div>
+                    <i class="bi bi-file-earmark-text text-4xl text-green-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Users Ativos</p>
+                        <p class="text-3xl font-bold text-purple-600" x-text="stats.users"></p>
+                    </div>
+                    <i class="bi bi-people text-4xl text-purple-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Declarações Hoje</p>
+                        <p class="text-3xl font-bold text-orange-600" x-text="stats.declaracoesHoje"></p>
+                    </div>
+                    <i class="bi bi-graph-up text-4xl text-orange-200"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex border-b">
+                <button @click="activeTab = 'empresas'" 
+                        :class="activeTab === 'empresas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
+                        class="px-6 py-3 border-b-2 font-medium transition-colors">
+                    <i class="bi bi-building mr-2"></i>Empresas
+                </button>
+                <button @click="activeTab = 'modelos'" 
+                        :class="activeTab === 'modelos' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
+                        class="px-6 py-3 border-b-2 font-medium transition-colors">
+                    <i class="bi bi-file-earmark-richtext mr-2"></i>Modelos
+                </button>
+                <button @click="activeTab = 'clientes'" 
+                        :class="activeTab === 'clientes' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
+                        class="px-6 py-3 border-b-2 font-medium transition-colors">
+                    <i class="bi bi-people mr-2"></i>Clientes (Todos)
+                </button>
+                <button @click="activeTab = 'config'" 
+                        :class="activeTab === 'config' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
+                        class="px-6 py-3 border-b-2 font-medium transition-colors">
+                    <i class="bi bi-gear mr-2"></i>Configurações
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB: Empresas -->
+        <div x-show="activeTab === 'empresas'" class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="bi bi-building mr-2 text-blue-600"></i>Gestão de Empresas
+                </h2>
+                <button @click="modalNovaEmpresa = true" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <i class="bi bi-plus-circle mr-2"></i>Adicionar Empresa
+                </button>
+            </div>
+
+            <!-- Lista de Empresas -->
+            <div class="space-y-4">
+                <template x-for="empresa in empresas" :key="empresa.id">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <img :src="empresa.logo" :alt="empresa.nome" class="w-16 h-16 object-contain rounded border border-gray-200">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800" x-text="empresa.nome"></h3>
+                                    <p class="text-sm text-gray-600">NIF: <span x-text="empresa.nif"></span></p>
+                                    <p class="text-xs text-gray-500" x-text="empresa.morada"></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="text-right mr-4">
+                                    <p class="text-sm text-gray-600">Declarações</p>
+                                    <p class="text-2xl font-bold" :class="getContador(empresa.id) >= 5 ? 'text-red-600' : 'text-green-600'">
+                                        <span x-text="getContador(empresa.id)"></span> / 5
+                                    </p>
+                                </div>
+                                <button @click="editarEmpresa(empresa)" class="text-blue-600 hover:text-blue-800 p-2">
+                                    <i class="bi bi-pencil text-xl"></i>
+                                </button>
+                                <button @click="resetarContador(empresa.id)" class="text-orange-600 hover:text-orange-800 p-2" title="Resetar contador">
+                                    <i class="bi bi-arrow-clockwise text-xl"></i>
+                                </button>
+                                <button @click="deletarEmpresa(empresa.id)" class="text-red-600 hover:text-red-800 p-2">
+                                    <i class="bi bi-trash text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="empresas.length === 0" class="text-center py-12 text-gray-500">
+                    <i class="bi bi-building text-6xl mb-4"></i>
+                    <p>Nenhuma empresa cadastrada ainda.</p>
+                    <p class="text-sm">Clique em "Adicionar Empresa" para começar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Modelos -->
+        <div x-show="activeTab === 'modelos'" class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="bi bi-file-earmark-richtext mr-2 text-green-600"></i>Gestão de Modelos
+                </h2>
+                <button @click="modalNovoModelo = true" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <i class="bi bi-plus-circle mr-2"></i>Criar Modelo
+                </button>
+            </div>
+
+            <!-- Lista de Modelos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <template x-for="modelo in modelos" :key="modelo.id">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800" x-text="modelo.nome"></h3>
+                                <p class="text-sm text-gray-600 mt-1" x-text="modelo.descricao"></p>
+                                <div class="flex items-center mt-3 space-x-3">
+                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                        <i :class="modelo.icone"></i> <span x-text="modelo.categoria"></span>
+                                    </span>
+                                    <span class="text-xs text-gray-500">ID: <span x-text="modelo.id"></span></span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col space-y-2">
+                                <button @click="editarModelo(modelo)" class="text-blue-600 hover:text-blue-800">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button @click="deletarModelo(modelo.id)" class="text-red-600 hover:text-red-800">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="modelos.length === 0" class="col-span-2 text-center py-12 text-gray-500">
+                    <i class="bi bi-file-earmark-text text-6xl mb-4"></i>
+                    <p>Nenhum modelo criado ainda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Clientes (Todos) -->
+        <div x-show="activeTab === 'clientes'" class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                <i class="bi bi-people mr-2 text-purple-600"></i>Todos os Clientes
+            </h2>
+            <p class="text-gray-600 mb-4">Visualização de todos os clientes cadastrados pelos usuários.</p>
+            <div class="text-center py-12 text-gray-500">
+                <i class="bi bi-hourglass-split text-6xl mb-4"></i>
+                <p>Funcionalidade em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <!-- TAB: Configurações -->
+        <div x-show="activeTab === 'config'" class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                <i class="bi bi-gear mr-2 text-gray-600"></i>Configurações do Sistema
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="border-b pb-4">
+                    <h3 class="font-bold text-lg mb-2">Informações do Repositório</h3>
+                    <p><strong>Owner:</strong> <span x-text="config.owner"></span></p>
+                    <p><strong>Repo:</strong> <span x-text="config.repo"></span></p>
+                    <button @click="verificarRepo()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
+                        <i class="bi bi-check-circle mr-2"></i>Verificar Conexão
+                    </button>
+                </div>
+
+                <div class="border-b pb-4">
+                    <h3 class="font-bold text-lg mb-2">Sincronização</h3>
+                    <button @click="sincronizarDados()" class="bg-green-600 text-white px-4 py-2 rounded">
+                        <i class="bi bi-arrow-repeat mr-2"></i>Sincronizar Agora
+                    </button>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Rate Limit GitHub API</h3>
+                    <button @click="verificarRateLimit()" class="bg-orange-600 text-white px-4 py-2 rounded">
+                        <i class="bi bi-speedometer2 mr-2"></i>Verificar Limite
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Nova Empresa -->
+    <div x-show="modalNovaEmpresa" 
+         x-transition
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+            <h3 class="text-2xl font-bold mb-4">➕ Adicionar Nova Empresa</h3>
+            <p class="text-gray-600 mb-4 text-sm">Esta funcionalidade será implementada no próximo passo.</p>
+            <button @click="modalNovaEmpresa = false" class="bg-gray-500 text-white px-4 py-2 rounded">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/admin-controller.js"></script>
+    <script src="js/dark-mode.js"></script>
+
+</body>
+</html>

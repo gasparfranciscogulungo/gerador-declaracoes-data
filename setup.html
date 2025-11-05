@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração Inicial - Gerador de Declarações</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="bg-gray-100">
+    
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-block bg-blue-600 rounded-full p-4 mb-4">
+                    <i class="bi bi-gear text-white text-4xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Configuração Inicial</h1>
+                <p class="text-gray-600">Configure o sistema para começar a usar</p>
+            </div>
+
+            <!-- Steps -->
+            <div class="bg-white rounded-lg shadow-md p-8 mb-6">
+                
+                <!-- PASSO 1: GitHub OAuth App -->
+                <div class="mb-12">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">1</div>
+                        <h2 class="text-xl font-bold text-gray-800">Criar GitHub OAuth App</h2>
+                    </div>
+                    
+                    <div class="ml-11 space-y-4">
+                        <p class="text-gray-700">Para permitir login via GitHub, você precisa criar um OAuth App:</p>
+                        
+                        <ol class="list-decimal list-inside space-y-3 text-gray-700 bg-blue-50 p-4 rounded">
+                            <li>Acesse: <a href="https://github.com/settings/developers" target="_blank" class="text-blue-600 hover:underline font-mono">github.com/settings/developers</a></li>
+                            <li>Clique em <strong>"New OAuth App"</strong></li>
+                            <li>Preencha:
+                                <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+                                    <li><strong>Application name:</strong> Gerador de Declarações</li>
+                                    <li><strong>Homepage URL:</strong> <code class="bg-white px-2 py-1 rounded">http://localhost:8000</code></li>
+                                    <li><strong>Authorization callback URL:</strong> <code class="bg-white px-2 py-1 rounded">http://localhost:8000/callback.html</code></li>
+                                </ul>
+                            </li>
+                            <li>Clique em <strong>"Register application"</strong></li>
+                            <li>Copie o <strong>Client ID</strong></li>
+                            <li>Clique em <strong>"Generate a new client secret"</strong></li>
+                            <li>Copie o <strong>Client Secret</strong> (você não verá novamente!)</li>
+                        </ol>
+
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <p class="text-sm text-yellow-800">
+                                <i class="bi bi-exclamation-triangle mr-2"></i>
+                                <strong>Importante:</strong> Guarde o Client Secret em local seguro! Você não conseguirá vê-lo novamente.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Client ID</label>
+                                <input type="text" id="clientId" placeholder="Xxxxxxxxxxxxxxxx" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Client Secret</label>
+                                <input type="password" id="clientSecret" placeholder="••••••••••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASSO 2: Personal Access Token -->
+                <div class="mb-12">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</div>
+                        <h2 class="text-xl font-bold text-gray-800">Personal Access Token (Desenvolvimento)</h2>
+                    </div>
+                    
+                    <div class="ml-11 space-y-4">
+                        <p class="text-gray-700">Para desenvolvimento local, crie um Personal Access Token:</p>
+                        
+                        <ol class="list-decimal list-inside space-y-3 text-gray-700 bg-green-50 p-4 rounded">
+                            <li>Acesse: <a href="https://github.com/settings/tokens" target="_blank" class="text-green-600 hover:underline font-mono">github.com/settings/tokens</a></li>
+                            <li>Clique em <strong>"Generate new token"</strong> → <strong>"Generate new token (classic)"</strong></li>
+                            <li>Configurações:
+                                <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+                                    <li><strong>Note:</strong> Gerador Declarações - Dev</li>
+                                    <li><strong>Expiration:</strong> 90 days</li>
+                                    <li><strong>Scopes:</strong> Marque <code class="bg-white px-1 rounded">repo</code> e <code class="bg-white px-1 rounded">user</code></li>
+                                </ul>
+                            </li>
+                            <li>Clique em <strong>"Generate token"</strong></li>
+                            <li>Copie o token (começa com <code>ghp_</code>)</li>
+                        </ol>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Personal Access Token</label>
+                            <input type="password" id="accessToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASSO 3: Configurar Repositório -->
+                <div class="mb-12">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">3</div>
+                        <h2 class="text-xl font-bold text-gray-800">Configurar Repositório de Dados</h2>
+                    </div>
+                    
+                    <div class="ml-11 space-y-4">
+                        <p class="text-gray-700">Onde os dados serão armazenados:</p>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Owner (Seu username)</label>
+                                <input type="text" id="repoOwner" placeholder="seu-username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Repositório</label>
+                                <input type="text" id="repoName" placeholder="gerador-declaracoes-data" value="gerador-declaracoes-data" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 border-l-4 border-purple-400 p-4">
+                            <p class="text-sm text-purple-800">
+                                <i class="bi bi-info-circle mr-2"></i>
+                                O repositório deve ser <strong>PRIVADO</strong> para proteger os dados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASSO 4: Admins -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">4</div>
+                        <h2 class="text-xl font-bold text-gray-800">Definir Administradores</h2>
+                    </div>
+                    
+                    <div class="ml-11 space-y-4">
+                        <p class="text-gray-700">Usernames do GitHub que terão acesso administrativo:</p>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Admins (um por linha)</label>
+                            <textarea id="admins" rows="4" placeholder="gaspargulungo&#10;outro-admin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex items-center justify-between pt-6 border-t">
+                    <a href="/index.html" class="text-gray-600 hover:text-gray-800">
+                        <i class="bi bi-arrow-left mr-2"></i>Cancelar
+                    </a>
+                    <button onclick="salvarConfiguracao()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
+                        <i class="bi bi-check-circle mr-2"></i>Salvar Configuração
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded">
+                <h3 class="font-bold text-blue-900 mb-2">
+                    <i class="bi bi-lightbulb mr-2"></i>Dica
+                </h3>
+                <p class="text-sm text-blue-800">
+                    Estas configurações serão salvas no arquivo <code class="bg-white px-2 py-1 rounded">js/config.js</code>. 
+                    Você pode editá-las manualmente mais tarde se necessário.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dark-mode.js"></script>
+    <script>
+        function salvarConfiguracao() {
+            const config = {
+                clientId: document.getElementById('clientId').value.trim(),
+                clientSecret: document.getElementById('clientSecret').value.trim(),
+                accessToken: document.getElementById('accessToken').value.trim(),
+                repoOwner: document.getElementById('repoOwner').value.trim(),
+                repoName: document.getElementById('repoName').value.trim() || 'gerador-declaracoes-data',
+                admins: document.getElementById('admins').value.trim().split('\n').filter(a => a.trim())
+            };
+
+            // Validações
+            if (!config.repoOwner) {
+                alert('❌ Por favor, informe o owner do repositório (seu username do GitHub)');
+                return;
+            }
+
+            if (!config.accessToken && !config.clientId) {
+                alert('❌ Por favor, configure o Personal Access Token OU o OAuth App');
+                return;
+            }
+
+            if (config.admins.length === 0) {
+                alert('❌ Por favor, adicione pelo menos um administrador');
+                return;
+            }
+
+            // Gerar código do config.js
+            const configCode = `// ============================================
+// CONFIG.JS
+// Configurações do sistema (GERADO AUTOMATICAMENTE)
+// ============================================
+
+const CONFIG = {
+    // ========== GITHUB ==========
+    github: {
+        clientId: '${config.clientId}',
+        owner: '${config.repoOwner}',
+        repo: '${config.repoName}'
+    },
+
+    // ========== ADMINISTRADORES ==========
+    admins: [
+        ${config.admins.map(a => `'${a}'`).join(',\n        ')}
+    ],
+
+    // ========== LIMITES ==========
+    limites: {
+        maxDeclaracoesPorEmpresa: 5,
+        maxClientesPorUser: 100,
+        maxUploadSizeMB: 2
+    },
+
+    // ========== CAMINHOS NO REPOSITÓRIO ==========
+    paths: {
+        empresas: 'data/empresas.json',
+        modelos: 'data/modelos.json',
+        contador: 'data/contador.json',
+        clientesDir: 'data/clientes',
+        modelosDir: 'models/types',
+        logosDir: 'assets/logos',
+        carimbosDir: 'assets/carimbos'
+    },
+
+    // ========== SINCRONIZAÇÃO ==========
+    sync: {
+        pollingInterval: 5000,
+        enableAutoSync: true
+    },
+
+    // ========== UI ==========
+    ui: {
+        itemsPorPagina: 20,
+        animacoes: true,
+        darkMode: false
+    },
+
+    // ========== VERSÃO ==========
+    versao: '1.0.0'
+};
+
+// ========== INICIALIZAR SISTEMA ==========
+async function inicializarSistema() {
+    console.log(\`
+╔═══════════════════════════════════════╗
+║  GERADOR DE DECLARAÇÕES v\${CONFIG.versao}    ║
+║  Sistema Admin + GitHub API           ║
+╚═══════════════════════════════════════╝
+    \`);
+
+    authManager.configurar(CONFIG.github.clientId);
+    githubAPI.configurar({
+        owner: CONFIG.github.owner,
+        repo: CONFIG.github.repo
+    });
+
+    console.log('✅ Sistema inicializado');
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarSistema);
+} else {
+    inicializarSistema();
+}`;
+
+            // Mostrar código gerado
+            const blob = new Blob([configCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.js';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            // Se tem access token, salvar também
+            if (config.accessToken) {
+                localStorage.setItem('github_auth', JSON.stringify({
+                    token: config.accessToken,
+                    timestamp: Date.now()
+                }));
+            }
+
+            alert('✅ Configuração salva!\n\n1. Substitua o arquivo js/config.js pelo arquivo baixado\n2. Recarregue a página\n3. Faça login');
+            
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>
