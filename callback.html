@@ -78,6 +78,44 @@
 
     </div>
 
+    <!-- Modal para Personal Access Token -->
+    <div id="tokenModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937;">
+                🔑 Personal Access Token
+            </h3>
+            <p style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                Cole seu Personal Access Token do GitHub abaixo:
+            </p>
+            
+            <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                <p style="font-size: 0.875rem; color: #1e40af; margin: 0;">
+                    <strong>Como gerar:</strong><br>
+                    1. Acesse: <a href="https://github.com/settings/tokens" target="_blank" style="text-decoration: underline;">github.com/settings/tokens</a><br>
+                    2. Generate new token (classic)<br>
+                    3. Selecione: <strong>repo</strong> + <strong>user</strong><br>
+                    4. Copie e cole aqui
+                </p>
+            </div>
+
+            <input 
+                type="text" 
+                id="tokenInput" 
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                style="width: 100%; padding: 0.75rem; border: 2px solid #d1d5db; border-radius: 0.5rem; font-family: monospace; font-size: 0.875rem; margin-bottom: 1rem;"
+            >
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button onclick="cancelarToken()" style="padding: 0.5rem 1.5rem; background: #e5e7eb; color: #374151; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">
+                    Cancelar
+                </button>
+                <button onclick="confirmarToken()" style="padding: 0.5rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
@@ -85,6 +123,42 @@
     <script src="js/dark-mode.js"></script>
 
     <script>
+        let tokenResolve;
+        
+        // Mostrar modal de token
+        function mostrarModalToken() {
+            document.getElementById('tokenModal').style.display = 'flex';
+            document.getElementById('tokenInput').focus();
+            
+            return new Promise((resolve) => {
+                tokenResolve = resolve;
+            });
+        }
+        
+        // Confirmar token
+        function confirmarToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (!token) {
+                alert('⚠️ Por favor, cole o token!');
+                return;
+            }
+            document.getElementById('tokenModal').style.display = 'none';
+            tokenResolve(token);
+        }
+        
+        // Cancelar
+        function cancelarToken() {
+            document.getElementById('tokenModal').style.display = 'none';
+            tokenResolve(null);
+        }
+        
+        // Enter para confirmar
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('tokenInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') confirmarToken();
+            });
+        });
+        
         // Processar callback OAuth
         async function processarCallback() {
             const statusMsg = document.getElementById('status-message');
@@ -104,17 +178,8 @@
                 if (!code) {
                     statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Aguardando Personal Access Token...';
                     
-                    // Modo desenvolvimento: pedir token manualmente
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    const token = prompt(
-                        '🔑 MODO DESENVOLVIMENTO\n\n' +
-                        'Cole seu Personal Access Token do GitHub:\n\n' +
-                        '1. Acesse: https://github.com/settings/tokens\n' +
-                        '2. Generate new token (classic)\n' +
-                        '3. Selecione: repo + user\n' +
-                        '4. Cole o token abaixo:'
-                    );
+                    // Mostrar modal para colar token
+                    const token = await mostrarModalToken();
 
                     if (!token) {
                         throw new Error('Token não fornecido');
