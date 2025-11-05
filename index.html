@@ -58,13 +58,13 @@
 
         <!-- Quick Access -->
         <div class="space-y-3">
-            <a href="./admin.html" 
+            <a href="admin.html" 
                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                 <i class="bi bi-shield-check"></i>
                 <span>Painel Admin</span>
             </a>
             
-            <a href="./user.html" 
+            <a href="user.html" 
                class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                 <i class="bi bi-person-circle"></i>
                 <span>Painel Usuário</span>
@@ -103,10 +103,10 @@
                 // Redirecionar baseado no tipo de usuário
                 if (authManager.isAdmin()) {
                     console.log('✅ Admin autenticado - Redirecionando...');
-                    window.location.href = './admin.html';
+                    window.location.href = 'admin.html';
                 } else {
                     console.log('✅ User autenticado - Redirecionando...');
-                    window.location.href = './user.html';
+                    window.location.href = 'user.html';
                 }
             }
         });
@@ -115,7 +115,7 @@
             // Verificar se está configurado
             if (!CONFIG.github.owner || !CONFIG.github.repo || CONFIG.github.owner === 'SEU_USERNAME') {
                 if (confirm('⚠️ Sistema não configurado!\n\nDeseja abrir o assistente de configuração?')) {
-                    window.location.href = './setup.html';
+                    window.location.href = 'setup.html';
                 }
                 return;
             }
