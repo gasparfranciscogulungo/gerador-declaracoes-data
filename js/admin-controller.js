@@ -239,6 +239,10 @@ function adminApp() {
                 const usersAtivos = this.usersData?.users.filter(u => u.status === 'active') || [];
                 this.stats.users = usersAtivos.length;
                 
+                console.log('👥 Total de users no arquivo:', this.usersData?.users.length);
+                console.log('✅ Users ATIVOS:', usersAtivos.length);
+                console.log('📋 Users:', this.usersData?.users.map(u => `${u.username} (${u.status})`));
+                
                 // Declarações HOJE + Total de Clientes + Total de Declarações
                 const hoje = new Date().toISOString().split('T')[0];
                 let declaracoesHoje = 0;
@@ -277,7 +281,7 @@ function adminApp() {
                 this.stats.totalClientes = totalClientes;
                 this.stats.totalDeclaracoes = totalDeclaracoes;
                 
-                console.log('📊 Stats atualizadas:', this.stats);
+                console.log('📊 Stats FINAIS atualizadas:', this.stats);
                 
             } catch (error) {
                 console.error('❌ Erro ao atualizar stats:', error);
