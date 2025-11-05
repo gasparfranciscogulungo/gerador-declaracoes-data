@@ -1,18 +1,18 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762375181969",
-      "nome": "Gasjadajslkdjçdsaj",
-      "nif": "jlçjlçjlçjçlkj",
+      "id": "empresa_1762376136810",
+      "nome": "GADHKJAÇDHAJÇDHÇLA",
+      "nif": "HLÇHLÇH H ÇHLÇ HÇL HÇ",
       "endereco": {
-        "rua": "jlkjlçjlj",
-        "edificio": "jljçlkjçlj",
-        "andar": "jlkjlçjj",
-        "sala": "jlkjçjçj",
-        "bairro": "jlkçjlkçjljl",
-        "municipio": "jljçlkjlkjkçljkçjçj",
-        "provincia": "jlkçjlçjljljç",
-        "pais": "jlkçjlçjçljçljçljçjçlj"
+        "rua": " ÇL HLÇ HÇL HÇL HLJÇ",
+        "edificio": " HJÇL HÇLJ HÇ ",
+        "andar": "H LÇ HÇL HÇLJ",
+        "sala": "HJL HÇJ HJÇ H",
+        "bairro": "Ç HLÇ HJÇ HÇ",
+        "municipio": " HÇ HJÇ HÇJ HÇ",
+        "provincia": " HJÇ HÇ HÇJ",
+        "pais": " Ç HJÇ HJÇ HJ ÇHÇ"
       },
       "telefone": "",
       "email": "",
@@ -22,8 +22,8 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T20:39:41.969Z",
-      "updatedAt": "2025-11-05T20:39:41.969Z",
+      "createdAt": "2025-11-05T20:55:36.811Z",
+      "updatedAt": "2025-11-05T20:55:36.811Z",
       "contador": 0
     }
   ]
