@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "gasparfranciscogulungo",
+      "name": "Gaspar Gulungo",
+      "avatar": "https://github.com/gasparfranciscogulungo.png",
+      "token": "",
+      "role": "admin",
+      "status": "active",
+      "stats": {
+        "clientes": 0,
+        "declaracoes": 0,
+        "ultimoAcesso": null
+      },
+      "createdAt": "2025-11-05T00:00:00Z",
+      "authorizedBy": "system"
+    }
+  ],
+  "metadata": {
+    "lastId": 1,
+    "totalUsers": 1,
+    "totalActive": 1,
+    "totalPending": 0,
+    "totalBlocked": 0
+  }
+}

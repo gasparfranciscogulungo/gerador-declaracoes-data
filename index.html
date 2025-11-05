@@ -100,7 +100,8 @@
 
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
-    <script src="js/auth-manager.js"></script>
+    <parameter name="auth-manager.js"></script>
+    <script src="js/user-manager.js"></script>
     
     <script>
         function toggleToken() {
@@ -173,25 +174,69 @@
                 });
                 
                 // Obter usuário
+                btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Autenticando...';
                 const user = await githubAPI.getAuthenticatedUser();
                 
                 if (!user || !user.login) {
                     throw new Error('Token inválido');
                 }
                 
+                // Verificar autorização
+                btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Verificando autorização...';
+                const autorizacao = await userManager.verificarAutorizacao(user.login);
+                
+                // Se não encontrado, adicionar como pendente
+                if (autorizacao.status === 'not_found') {
+                    await userManager.adicionarPendente({
+                        username: user.login,
+                        name: user.name || user.login,
+                        avatar: user.avatar_url,
+                        token: token
+                    });
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('⏳ Seu acesso está pendente de aprovação. O administrador foi notificado e você receberá acesso em breve.');
+                    return;
+                }
+                
+                // Se pendente
+                if (autorizacao.status === 'pending') {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('⏳ Seu acesso está aguardando aprovação do administrador.');
+                    return;
+                }
+                
+                // Se bloqueado
+                if (autorizacao.status === 'blocked') {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('🚫 Seu acesso foi bloqueado. Entre em contato com o administrador.');
+                    return;
+                }
+                
+                // Se autorizado (active)
+                if (!autorizacao.autorizado) {
+                    throw new Error('Erro na verificação de autorização');
+                }
+                
                 // Salvar token
                 authManager.salvarToken(token);
                 localStorage.setItem('username', user.login);
                 
-                // Verificar se é admin
-                const isAdmin = CONFIG.admins.includes(user.login);
+                // Atualizar último acesso
+                await userManager.atualizarAcesso(user.login);
+                
+                // Verificar role
+                const isAdmin = autorizacao.user.role === 'admin';
                 
                 // Sucesso
                 btn.innerHTML = '<i class="bi bi-check-circle mr-2"></i>Sucesso!';
                 btn.classList.remove('from-purple-600', 'to-indigo-600');
                 btn.classList.add('from-green-600', 'to-emerald-600');
                 
-                mostrarSucesso(`Bem-vindo, ${user.login}! ${isAdmin ? '(Admin)' : ''}`);
+                mostrarSucesso(`Bem-vindo, ${user.login}! ${isAdmin ? '👑 Admin' : '👤 User'}`);
                 
                 // Redirecionar
                 setTimeout(() => {
@@ -200,7 +245,7 @@
                 
             } catch (error) {
                 console.error('Erro:', error);
-                mostrarErro('Token inválido ou sem permissões. Verifique seu token.');
+                mostrarErro(error.message || 'Token inválido ou sem permissões. Verifique seu token.');
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
             }
