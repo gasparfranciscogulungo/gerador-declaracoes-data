@@ -70,9 +70,9 @@ class UserManager {
                 return { autorizado: false, status: 'not_found', user: null };
             }
             
-            // Atualizar token se fornecido e diferente
+            // Atualizar token APENAS se fornecido e DIFERENTE (CORRIGIDO)
             if (token && user.token !== token) {
-                console.log('🔄 Atualizando token do usuário...');
+                console.log('🔄 Token mudou, atualizando...');
                 user.token = token;
                 const loaded = await this.carregarUsers();
                 await this.salvarUsers(loaded.sha);

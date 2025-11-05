@@ -53,8 +53,8 @@ function adminApp() {
             this.loading = true;
             this.loadingMessage = 'Verificando autenticação...';
             
-            // Verificar se tem token
-            const token = localStorage.getItem('github_token');
+            // Verificar se tem token (USAR A MESMA CHAVE DO AUTH-MANAGER)
+            const token = authManager.carregarToken();
             if (!token) {
                 console.log('❌ Token não encontrado, redirecionando...');
                 window.location.href = 'index.html';
@@ -73,10 +73,7 @@ function adminApp() {
             } catch (error) {
                 console.error('❌ Erro ao obter usuário:', error);
                 this.showAlert('error', 'Erro ao carregar perfil. Token inválido?');
-                localStorage.removeItem('github_token');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+                authManager.logout(); // USA O MÉTODO DO AUTH-MANAGER
                 return;
             }
             

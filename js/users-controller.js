@@ -42,11 +42,17 @@ function usersApp() {
         async init() {
             console.log('🎯 Iniciando Users Controller...');
             
-            // Verifica autenticação
-            if (!authManager.isAuthenticated()) {
+            // Verifica autenticação (CORRIGIDO)
+            const token = authManager.carregarToken();
+            if (!token) {
+                console.log('❌ Não autenticado, redirecionando...');
                 window.location.href = 'index.html';
                 return;
             }
+            
+            // Configurar GitHub API
+            githubAPI.setToken(token);
+            githubAPI.configurar(CONFIG.github);
             
             // Inicializa managers
             this.userManager = new UserManager();
@@ -136,8 +142,8 @@ function usersApp() {
             this.loadingMessage = 'Aprovando usuário...';
             
             try {
-                // Obter username do admin do GitHub API
-                const adminUser = await githubAPI.getUser();
+                // Obter username do admin do GitHub API (CORRIGIDO)
+                const adminUser = await githubAPI.getAuthenticatedUser();
                 const adminUsername = adminUser.login;
                 
                 await this.userManager.aprovarUser(userId, adminUsername);

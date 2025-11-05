@@ -416,6 +416,18 @@ class GitHubAPI {
             user: this.user ? this.user.login : 'Não autenticado'
         });
     }
+
+    // ========== ALIASES PARA COMPATIBILIDADE ==========
+    // Alguns códigos usam readJSON/writeJSON, outros lerJSON/salvarJSON
+    // Criando aliases para funcionar com ambos
+    
+    async readJSON(path) {
+        return await this.lerJSON(path);
+    }
+
+    async writeJSON(path, data, message, sha = null) {
+        return await this.salvarJSON(path, data, message, sha);
+    }
 }
 
 // Exportar instância global
