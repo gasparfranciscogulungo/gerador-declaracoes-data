@@ -156,7 +156,7 @@ function adminApp() {
         // ========== CARREGAR EMPRESAS ==========
         async carregarEmpresas() {
             try {
-                const empresasData = await githubAPI.readJSON('data/empresas.json');
+                const empresasData = await githubAPI.lerJSON('data/empresas.json');
                 this.empresas = empresasData.empresas || [];
                 console.log(`✅ ${this.empresas.length} empresas carregadas`);
             } catch (error) {
@@ -180,7 +180,7 @@ function adminApp() {
                 }
             };
             
-            await githubAPI.writeJSON(
+            await githubAPI.salvarJSON(
                 'data/empresas.json',
                 estruturaInicial,
                 '🏢 Inicializar arquivo de empresas'
@@ -193,7 +193,7 @@ function adminApp() {
         // ========== CARREGAR MODELOS ==========
         async carregarModelos() {
             try {
-                const modelosData = await githubAPI.readJSON('data/modelos.json');
+                const modelosData = await githubAPI.lerJSON('data/modelos.json');
                 this.modelos = modelosData.modelos || [];
                 console.log(`✅ ${this.modelos.length} modelos carregados`);
             } catch (error) {
@@ -728,6 +728,13 @@ function adminApp() {
         validarEmail(email) {
             const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return regex.test(email);
+        },
+
+        // ========== MODELOS ==========
+        
+        visualizarModelo(modelo) {
+            this.showAlert('success', `🎨 Modelo "${modelo.nome}" selecionado!\n\nEm breve: Preview completo com dados de exemplo.`);
+            console.log('📄 Modelo selecionado:', modelo);
         }
     }
 }

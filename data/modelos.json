@@ -1,18 +1,59 @@
 {
   "modelos": [
     {
-      "id": "type2",
-      "nome": "DeclaraÃ§Ã£o de VÃ­nculo Laboral",
-      "descricao": "DeclaraÃ§Ã£o de existÃªncia de vÃ­nculo laboral ativo",
-      "categoria": "DeclaraÃ§Ãµes",
-      "icone": "bi-briefcase"
+      "id": "modelo_executivo",
+      "nome": "Executivo",
+      "descricao": "Layout profissional com marca d'água diagonal",
+      "categoria": "Declaração",
+      "icone": "bi-briefcase-fill",
+      "estilo": "corporativo",
+      "tiposSuportados": ["declaracao", "combo"],
+      "ativo": true
     },
     {
-      "id": "type3",
-      "nome": "Recibo de Vencimento",
-      "descricao": "Recibo mensal de pagamento de salÃ¡rio",
-      "categoria": "Recibos",
-      "icone": "bi-receipt"
+      "id": "modelo_classico",
+      "nome": "Clássico",
+      "descricao": "Design tradicional e limpo para documentos formais",
+      "categoria": "Declaração",
+      "icone": "bi-file-text",
+      "estilo": "tradicional",
+      "tiposSuportados": ["declaracao", "combo"],
+      "ativo": true
+    },
+    {
+      "id": "modelo_corporativo",
+      "nome": "Corporativo",
+      "descricao": "Layout moderno com tabelas para recibos",
+      "categoria": "Recibo",
+      "icone": "bi-receipt",
+      "estilo": "moderno",
+      "tiposSuportados": ["recibo", "combo"],
+      "ativo": true
+    },
+    {
+      "id": "modelo_minimalista",
+      "nome": "Minimalista",
+      "descricao": "Design clean com muito espaço em branco",
+      "categoria": "Declaração",
+      "icone": "bi-exclude",
+      "estilo": "minimalista",
+      "tiposSuportados": ["declaracao", "combo"],
+      "ativo": true
+    },
+    {
+      "id": "modelo_moderno",
+      "nome": "Moderno",
+      "descricao": "Layout com faixa lateral colorida",
+      "categoria": "Declaração",
+      "icone": "bi-lightning-charge",
+      "estilo": "arrojado",
+      "tiposSuportados": ["declaracao", "combo"],
+      "ativo": true
     }
-  ]
+  ],
+  "metadata": {
+    "totalModelos": 5,
+    "versao": "1.0",
+    "atualizadoEm": "2025-11-05T20:30:00.000Z"
+  }
 }
