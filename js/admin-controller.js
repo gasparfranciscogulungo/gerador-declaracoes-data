@@ -228,7 +228,7 @@ function adminApp() {
             console.log('✅ Contador inicializado');
         },
 
-        // ========== ESTATÍSTICAS REAIS ==========
+        // ========== ESTATÍSTICAS REAIS (OTIMIZADO - SEM LOOP) ==========
         async atualizarStatsReais() {
             try {
                 // Stats básicas
@@ -239,49 +239,30 @@ function adminApp() {
                 const usersAtivos = this.usersData?.users.filter(u => u.status === 'active') || [];
                 this.stats.users = usersAtivos.length;
                 
-                console.log('👥 Total de users no arquivo:', this.usersData?.users.length);
-                console.log('✅ Users ATIVOS:', usersAtivos.length);
-                console.log('📋 Users:', this.usersData?.users.map(u => `${u.username} (${u.status})`));
-                
-                // Declarações HOJE + Total de Clientes + Total de Declarações
-                const hoje = new Date().toISOString().split('T')[0];
-                let declaracoesHoje = 0;
+                // Total de Clientes e Declarações (USA OS STATS JÁ SALVOS EM users.json)
+                // Isso é MUITO mais rápido que ler arquivo de cada usuário!
                 let totalClientes = 0;
                 let totalDeclaracoes = 0;
                 
-                // Percorre cada usuário ativo
                 for (const user of usersAtivos) {
-                    try {
-                        // Lê arquivo de clientes do usuário
-                        const clientesData = await githubAPI.readJSON(`data/clientes/${user.username}/clientes.json`);
-                        
-                        // Conta clientes
-                        const clientes = clientesData.clientes || [];
-                        totalClientes += clientes.length;
-                        
-                        // Conta declarações de hoje e total
-                        for (const cliente of clientes) {
-                            const totalDeclaracoesCliente = cliente.stats?.totalDeclaracoes || 0;
-                            totalDeclaracoes += totalDeclaracoesCliente;
-                            
-                            const ultimaDeclaracao = cliente.stats?.ultimaDeclaracao;
-                            if (ultimaDeclaracao && ultimaDeclaracao.startsWith(hoje)) {
-                                declaracoesHoje++;
-                            }
-                        }
-                    } catch (error) {
-                        // Se arquivo não existe, ignora
-                        if (!error.message.includes('404')) {
-                            console.warn(`⚠️ Erro ao ler clientes de ${user.username}:`, error);
-                        }
-                    }
+                    totalClientes += user.stats?.clientes || 0;
+                    totalDeclaracoes += user.stats?.declaracoes || 0;
                 }
                 
-                this.stats.declaracoesHoje = declaracoesHoje;
                 this.stats.totalClientes = totalClientes;
                 this.stats.totalDeclaracoes = totalDeclaracoes;
                 
-                console.log('📊 Stats FINAIS atualizadas:', this.stats);
+                // PDFs HOJE: Para isso seria necessário ler arquivos, então deixamos 0 por padrão
+                // Será atualizado quando implementarmos histórico de declarações
+                this.stats.declaracoesHoje = 0;
+                
+                console.log('📊 Stats atualizadas:', {
+                    empresas: this.stats.empresas,
+                    modelos: this.stats.modelos,
+                    usersAtivos: this.stats.users,
+                    totalClientes: this.stats.totalClientes,
+                    totalDeclaracoes: this.stats.totalDeclaracoes
+                });
                 
             } catch (error) {
                 console.error('❌ Erro ao atualizar stats:', error);
