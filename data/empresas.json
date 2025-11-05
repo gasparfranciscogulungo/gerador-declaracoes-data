@@ -1,18 +1,18 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762373126992",
-      "nome": "Gasoaçosdhalçds ad hi",
-      "nif": "090809808080",
+      "id": "empresa_1762373590940",
+      "nome": "Gaspar ",
+      "nif": "kçjkçjºkjº",
       "endereco": {
-        "rua": "hjlakjdhkjalskjda da k",
-        "edificio": " hlhjklhlkjhdjh alkjd h",
-        "andar": "hjlk hjlk hlj hjl hjl",
-        "sala": "hlkjhlkjhlkjhjh",
-        "bairro": "hklhlkj hjl h",
-        "municipio": "h lhlkj ",
-        "provincia": "hjlhlhjlkhljhj",
-        "pais": "ljkjklhdkjlklhjdsklhlkd"
+        "rua": "nlçhdçahlçdhaç",
+        "edificio": "çlkhlkçhkhlçkhç",
+        "andar": "adad",
+        "sala": "çlhkhkhç",
+        "bairro": "adadsad",
+        "municipio": "dada",
+        "provincia": "dadada",
+        "pais": "Angoladad"
       },
       "telefone": "",
       "email": "",
@@ -22,8 +22,8 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T20:05:26.992Z",
-      "updatedAt": "2025-11-05T20:05:26.992Z",
+      "createdAt": "2025-11-05T20:13:10.940Z",
+      "updatedAt": "2025-11-05T20:13:10.940Z",
       "contador": 0
     }
   ]
