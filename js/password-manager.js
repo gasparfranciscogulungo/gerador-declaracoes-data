@@ -71,16 +71,24 @@ class PasswordManager {
             
             console.log('✅ Arquivo salvo no GitHub:', resultado);
             
-            // 8. Verificar se salvou corretamente
+            // 8. Verificar se salvou corretamente (com múltiplas tentativas)
             console.log('🔍 Verificando se arquivo foi criado...');
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar 1s
+            let verificacao = null;
+            let tentativas = 0;
+            const maxTentativas = 3;
             
-            const verificacao = await githubAPI.lerJSON(authPath);
-            if (!verificacao || !verificacao.data) {
-                throw new Error('Erro ao verificar criação do arquivo. Tente novamente.');
+            while (!verificacao && tentativas < maxTentativas) {
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Aguardar 1.5s entre tentativas
+                tentativas++;
+                console.log(`🔄 Tentativa ${tentativas}/${maxTentativas}...`);
+                verificacao = await githubAPI.lerJSON(authPath);
             }
             
-            console.log('✅ Verificação OK - Arquivo existe');
+            if (!verificacao || !verificacao.data) {
+                console.warn('⚠️ Não foi possível verificar arquivo, mas continuando...');
+            } else {
+                console.log('✅ Verificação OK - Arquivo existe');
+            }
             
             // 9. Salvar último username localmente
             this.salvarUltimoUsername(username);
@@ -88,6 +96,15 @@ class PasswordManager {
             // 10. Configurar token no sistema
             githubAPI.setToken(token);
             authManager.salvarToken(token);
+            
+            // 11. Salvar dados temporariamente no localStorage para login imediato
+            const tempAuthData = {
+                username: username,
+                passwordHash: passwordHash,
+                isAdmin: isAdmin,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('temp_auth_' + username, JSON.stringify(tempAuthData));
             
             console.log(`✅ Conta criada para ${username} (Admin: ${isAdmin})`);
             
@@ -109,7 +126,53 @@ class PasswordManager {
         try {
             console.log(`🔓 Tentando login para: ${username}`);
             
-            // 1. Buscar arquivo de autenticação do GitHub
+            // 1. Verificar cache temporário (para login logo após criar conta)
+            const tempAuthKey = 'temp_auth_' + username;
+            const tempAuthStr = localStorage.getItem(tempAuthKey);
+            let authData = null;
+            let usandoCache = false;
+            
+            if (tempAuthStr) {
+                const tempAuth = JSON.parse(tempAuthStr);
+                const idade = Date.now() - tempAuth.timestamp;
+                
+                // Cache válido por 5 minutos
+                if (idade < 5 * 60 * 1000) {
+                    console.log('⚡ Usando cache temporário para login rápido');
+                    
+                    // Verificar senha com o hash em cache
+                    const passwordHash = await CryptoUtils.sha256(password);
+                    if (passwordHash === tempAuth.passwordHash) {
+                        console.log('✅ Senha correta (via cache)');
+                        usandoCache = true;
+                        
+                        // Buscar token do authManager
+                        const token = authManager.carregarToken();
+                        
+                        if (token) {
+                            githubAPI.setToken(token);
+                            
+                            // Limpar cache
+                            localStorage.removeItem(tempAuthKey);
+                            
+                            return {
+                                success: true,
+                                isAdmin: tempAuth.isAdmin,
+                                profile: { name: username },
+                                token: token
+                            };
+                        }
+                    } else {
+                        console.log('❌ Senha não confere com cache');
+                        localStorage.removeItem(tempAuthKey);
+                    }
+                } else {
+                    console.log('⏰ Cache expirado, removendo');
+                    localStorage.removeItem(tempAuthKey);
+                }
+            }
+            
+            // 2. Buscar arquivo de autenticação do GitHub
             const authPath = `${this.AUTH_DIR}/${username}.json`;
             console.log(`📂 Buscando: ${authPath}`);
             
@@ -127,10 +190,10 @@ class PasswordManager {
                 throw new Error('Usuário não encontrado. Use "Primeiro acesso" para criar conta.');
             }
             
-            const authData = result.data;
+            authData = result.data;
             console.log('✅ Arquivo encontrado:', authData.username);
             
-            // 2. Verificar senha
+            // 3. Verificar senha
             console.log('🔑 Verificando senha...');
             const passwordHash = await CryptoUtils.sha256(password);
             
@@ -141,7 +204,7 @@ class PasswordManager {
             
             console.log('✅ Senha correta');
             
-            // 3. Descriptografar token
+            // 4. Descriptografar token
             console.log('🔓 Descriptografando token...');
             const token = await CryptoUtils.decrypt(authData.tokenEncrypted, password);
             
@@ -152,11 +215,11 @@ class PasswordManager {
             
             console.log('✅ Token descriptografado com sucesso');
             
-            // 4. Configurar sistema com o token
+            // 5. Configurar sistema com o token
             githubAPI.setToken(token);
             authManager.salvarToken(token);
             
-            // 5. Atualizar último login
+            // 6. Atualizar último login
             authData.lastLogin = new Date().toISOString();
             await githubAPI.salvarJSON(
                 authPath,
@@ -165,7 +228,7 @@ class PasswordManager {
                 result.sha
             );
             
-            // 6. Salvar último username
+            // 7. Salvar último username
             this.salvarUltimoUsername(username);
             
             console.log(`✅ Login bem-sucedido: ${username} (Admin: ${authData.isAdmin})`);

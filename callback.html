@@ -88,9 +88,9 @@
     <!-- Modal Senha -->
     <div id="passwordModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
         <div style="background:white;border-radius:1rem;padding:2rem;max-width:500px;width:90%;box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);">
-            <h3 style="font-size:1.5rem;font-weight:bold;margin-bottom:1rem;color:#1f2937;">🔐 Criar Senha</h3>
+            <h3 id="modalTitle" style="font-size:1.5rem;font-weight:bold;margin-bottom:1rem;color:#1f2937;">🔐 Criar Senha</h3>
             <p style="color:#6b7280;margin-bottom:1.5rem;font-size:0.875rem;">
-                <span id="modalUsername" style="font-weight:600;color:#1f2937;"></span>, crie sua senha:
+                <span id="modalUsername" style="font-weight:600;color:#1f2937;"></span><span id="modalAction">, crie sua senha:</span>
             </p>
             
             <!-- Senha -->
@@ -163,6 +163,41 @@
         </div>
     </div>
 
+    <!-- Modal Conta Existente -->
+    <div id="accountExistsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:1rem;padding:2rem;max-width:500px;width:90%;box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="display:inline-block;background:#fef3c7;border-radius:50%;padding:1rem;margin-bottom:1rem;">
+                    <i class="bi bi-person-check-fill" style="font-size:3rem;color:#f59e0b;"></i>
+                </div>
+                <h3 style="font-size:1.5rem;font-weight:bold;color:#1f2937;margin-bottom:0.5rem;">Conta Encontrada</h3>
+                <p style="color:#6b7280;font-size:0.875rem;">
+                    Já existe uma conta para <strong id="existingUsername" style="color:#1f2937;"></strong>
+                </p>
+            </div>
+
+            <div style="background:#fffbeb;border:2px solid #fbbf24;border-radius:0.75rem;padding:1rem;margin-bottom:1.5rem;">
+                <p style="font-size:0.875rem;color:#92400e;margin:0 0 0.75rem 0;">
+                    <i class="bi bi-info-circle-fill mr-1"></i>
+                    <strong>Escolha uma opção:</strong>
+                </p>
+                <ul style="margin:0;padding-left:1.25rem;font-size:0.875rem;color:#92400e;">
+                    <li style="margin-bottom:0.25rem;"><strong>Redefinir Senha:</strong> Criar nova senha (apaga a antiga)</li>
+                    <li><strong>Fazer Login:</strong> Usar senha existente na página inicial</li>
+                </ul>
+            </div>
+
+            <div style="display:flex;gap:0.75rem;">
+                <button onclick="irParaLogin()" style="flex:1;padding:0.75rem;background:#e5e7eb;color:#374151;border:none;border-radius:0.5rem;cursor:pointer;font-weight:500;transition:all 0.3s;">
+                    <i class="bi bi-box-arrow-in-right mr-1"></i>Fazer Login
+                </button>
+                <button onclick="confirmarRedefinicao()" style="flex:1;padding:0.75rem;background:#f59e0b;color:white;border:none;border-radius:0.5rem;cursor:pointer;font-weight:500;transition:all 0.3s;">
+                    <i class="bi bi-key-fill mr-1"></i>Redefinir Senha
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
     <script src="js/auth-manager.js"></script>
@@ -195,8 +230,20 @@ function cancelarToken() {
     tokenResolve(null);
 }
 
-function mostrarModalSenha(username) {
+function mostrarModalSenha(username, isRedefinicao = false) {
     document.getElementById('modalUsername').textContent = username;
+    
+    // Alterar título e texto baseado no contexto
+    if (isRedefinicao) {
+        document.getElementById('modalTitle').innerHTML = '🔑 Redefinir Senha';
+        document.getElementById('modalAction').textContent = ', defina sua nova senha:';
+        document.getElementById('confirmPasswordBtn').innerHTML = '<i class="bi bi-key-fill mr-1"></i>Redefinir Senha';
+    } else {
+        document.getElementById('modalTitle').innerHTML = '🔐 Criar Senha';
+        document.getElementById('modalAction').textContent = ', crie sua senha:';
+        document.getElementById('confirmPasswordBtn').innerHTML = '<i class="bi bi-check-circle mr-1"></i>Criar Conta';
+    }
+    
     document.getElementById('passwordModal').style.display = 'flex';
     document.getElementById('newPassword').focus();
     
@@ -204,6 +251,25 @@ function mostrarModalSenha(username) {
     setupPasswordValidation();
     
     return new Promise(resolve => passwordResolve = resolve);
+}
+
+// ========== MODAL CONTA EXISTENTE ==========
+let accountExistsResolve;
+
+function mostrarModalContaExistente(username) {
+    document.getElementById('existingUsername').textContent = username;
+    document.getElementById('accountExistsModal').style.display = 'flex';
+    return new Promise(resolve => accountExistsResolve = resolve);
+}
+
+function irParaLogin() {
+    document.getElementById('accountExistsModal').style.display = 'none';
+    accountExistsResolve('login');
+}
+
+function confirmarRedefinicao() {
+    document.getElementById('accountExistsModal').style.display = 'none';
+    accountExistsResolve('redefinir');
 }
 
 // ========== TOGGLE SENHA ==========
@@ -460,10 +526,11 @@ async function processarCallback() {
         const recuperarUsername = sessionStorage.getItem('recuperar_senha_username');
         
         if (recuperarUsername && recuperarUsername === profile.login) {
-            statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Nova senha...';
+            // Fluxo de recuperação de senha
+            statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Redefinindo senha...';
             sessionStorage.removeItem('recuperar_senha_username');
             
-            const novaSenha = await mostrarModalSenha(profile.login);
+            const novaSenha = await mostrarModalSenha(profile.login, true); // true = redefinição
             statusMsg.innerHTML = '<i class="bi bi-shield-check mr-2"></i>Salvando...';
             
             const result = await passwordManager.recuperarSenha(profile.login, novaSenha, token, profile);
@@ -475,25 +542,29 @@ async function processarCallback() {
             const existe = await passwordManager.usuarioExiste(profile.login);
             
             if (existe) {
-                // Conta existe - perguntar se quer recriar ou usar login
-                const recriar = confirm(
-                    `⚠️ Já existe uma conta para ${profile.login}\n\n` +
-                    `Clique em:\n` +
-                    `• OK para RECRIAR a conta (apaga a senha antiga)\n` +
-                    `• CANCELAR para usar o login com senha`
-                );
+                // Mostrar modal de decisão
+                statusMsg.innerHTML = '<i class="bi bi-info-circle mr-2"></i>Aguardando decisão...';
+                const decisao = await mostrarModalContaExistente(profile.login);
                 
-                if (!recriar) {
-                    throw new Error(`Conta já existe. Use o login com senha na página inicial.`);
+                if (decisao === 'login') {
+                    // Usuário escolheu fazer login
+                    statusMsg.innerHTML = '<i class="bi bi-box-arrow-in-right mr-2"></i>Redirecionando...';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    return;
+                } else {
+                    // Usuário escolheu redefinir senha
+                    console.log('🔄 Usuário optou por redefinir a senha');
                 }
-                
-                console.log('🔄 Usuário optou por recriar a conta');
             }
             
-            statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Crie sua senha...';
-            const senha = await mostrarModalSenha(profile.login);
+            // Criar conta ou redefinir senha
+            const isRedefinicao = existe;
+            statusMsg.innerHTML = `<i class="bi bi-key mr-2"></i>${isRedefinicao ? 'Redefinindo' : 'Criando'} senha...`;
+            const senha = await mostrarModalSenha(profile.login, isRedefinicao);
             
-            statusMsg.innerHTML = '<i class="bi bi-shield-check mr-2"></i>Criando conta...';
+            statusMsg.innerHTML = '<i class="bi bi-shield-check mr-2"></i>Salvando...';
             const result = await passwordManager.criarConta(profile.login, senha, token, profile);
             
             finalizarComSucesso(profile.login, result.isAdmin);
