@@ -92,32 +92,72 @@
             <p style="color:#6b7280;margin-bottom:1.5rem;font-size:0.875rem;">
                 <span id="modalUsername" style="font-weight:600;color:#1f2937;"></span>, crie sua senha:
             </p>
-            <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:1rem;margin-bottom:1rem;border-radius:0.5rem;">
-                <p style="font-size:0.875rem;color:#92400e;margin:0;">
-                    <strong>Requisitos:</strong><br>
-                    • Mínimo 8 caracteres<br>
-                    • Pelo menos 1 número
-                </p>
-            </div>
+            
+            <!-- Senha -->
             <div style="margin-bottom:1rem;">
                 <label style="display:block;font-weight:500;color:#374151;margin-bottom:0.5rem;font-size:0.875rem;">
                     <i class="bi bi-lock mr-1"></i> Senha
                 </label>
-                <input type="password" id="newPassword" placeholder="Digite sua senha" style="width:100%;padding:0.75rem;border:2px solid #d1d5db;border-radius:0.5rem;font-size:0.875rem;">
+                <div style="position:relative;">
+                    <input type="password" id="newPassword" placeholder="Digite sua senha" style="width:100%;padding:0.75rem 3rem 0.75rem 0.75rem;border:2px solid #d1d5db;border-radius:0.5rem;font-size:0.875rem;">
+                    <button type="button" onclick="toggleModalPassword('newPassword', 'toggleNew')" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b7280;">
+                        <i id="toggleNew" class="bi bi-eye" style="font-size:1.125rem;"></i>
+                    </button>
+                </div>
             </div>
-            <div style="margin-bottom:1.5rem;">
+
+            <!-- Indicador de Força -->
+            <div id="passwordStrength" style="margin-bottom:1rem;display:none;">
+                <div style="display:flex;gap:0.25rem;margin-bottom:0.5rem;">
+                    <div id="bar1" style="height:4px;flex:1;background:#e5e7eb;border-radius:2px;transition:all 0.3s;"></div>
+                    <div id="bar2" style="height:4px;flex:1;background:#e5e7eb;border-radius:2px;transition:all 0.3s;"></div>
+                    <div id="bar3" style="height:4px;flex:1;background:#e5e7eb;border-radius:2px;transition:all 0.3s;"></div>
+                    <div id="bar4" style="height:4px;flex:1;background:#e5e7eb;border-radius:2px;transition:all 0.3s;"></div>
+                </div>
+                <p id="strengthText" style="font-size:0.75rem;color:#6b7280;margin:0;"></p>
+            </div>
+
+            <!-- Requisitos -->
+            <div style="background:#f9fafb;border:1px solid #e5e7eb;padding:0.75rem;margin-bottom:1rem;border-radius:0.5rem;">
+                <p style="font-size:0.75rem;font-weight:600;color:#374151;margin:0 0 0.5rem 0;">Requisitos:</p>
+                <div style="display:flex;flex-direction:column;gap:0.25rem;">
+                    <div id="req-length" style="font-size:0.75rem;color:#6b7280;">
+                        <i class="bi bi-circle" style="font-size:0.5rem;margin-right:0.5rem;"></i>Mínimo 8 caracteres
+                    </div>
+                    <div id="req-number" style="font-size:0.75rem;color:#6b7280;">
+                        <i class="bi bi-circle" style="font-size:0.5rem;margin-right:0.5rem;"></i>Pelo menos 1 número
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmar Senha -->
+            <div style="margin-bottom:1rem;">
                 <label style="display:block;font-weight:500;color:#374151;margin-bottom:0.5rem;font-size:0.875rem;">
-                    <i class="bi bi-lock-fill mr-1"></i> Confirmar
+                    <i class="bi bi-lock-fill mr-1"></i> Confirmar Senha
                 </label>
-                <input type="password" id="confirmPassword" placeholder="Digite novamente" style="width:100%;padding:0.75rem;border:2px solid #d1d5db;border-radius:0.5rem;font-size:0.875rem;">
+                <div style="position:relative;">
+                    <input type="password" id="confirmPassword" placeholder="Digite novamente" style="width:100%;padding:0.75rem 3rem 0.75rem 0.75rem;border:2px solid #d1d5db;border-radius:0.5rem;font-size:0.875rem;">
+                    <button type="button" onclick="toggleModalPassword('confirmPassword', 'toggleConfirm')" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b7280;">
+                        <i id="toggleConfirm" class="bi bi-eye" style="font-size:1.125rem;"></i>
+                    </button>
+                </div>
             </div>
+
+            <!-- Match Indicator -->
+            <div id="passwordMatch" style="display:none;padding:0.5rem;margin-bottom:1rem;border-radius:0.5rem;font-size:0.75rem;">
+                <i class="bi mr-1"></i><span id="matchText"></span>
+            </div>
+
+            <!-- Erro -->
             <div id="passwordError" style="display:none;background:#fee2e2;border-left:4px solid #ef4444;padding:0.75rem;margin-bottom:1rem;border-radius:0.5rem;">
                 <p style="font-size:0.875rem;color:#991b1b;margin:0;">
                     <i class="bi bi-exclamation-triangle mr-1"></i>
                     <span id="passwordErrorText"></span>
                 </p>
             </div>
-            <button id="confirmPasswordBtn" onclick="confirmarSenha()" style="width:100%;padding:0.75rem;background:#3b82f6;color:white;border:none;border-radius:0.5rem;cursor:pointer;font-weight:500;">
+
+            <!-- Botão -->
+            <button id="confirmPasswordBtn" onclick="confirmarSenha()" style="width:100%;padding:0.75rem;background:#3b82f6;color:white;border:none;border-radius:0.5rem;cursor:pointer;font-weight:500;transition:all 0.3s;" disabled>
                 <i class="bi bi-check-circle mr-1"></i>Criar Conta
             </button>
         </div>
@@ -159,7 +199,173 @@ function mostrarModalSenha(username) {
     document.getElementById('modalUsername').textContent = username;
     document.getElementById('passwordModal').style.display = 'flex';
     document.getElementById('newPassword').focus();
+    
+    // Adicionar listeners de validação em tempo real
+    setupPasswordValidation();
+    
     return new Promise(resolve => passwordResolve = resolve);
+}
+
+// ========== TOGGLE SENHA ==========
+function toggleModalPassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+
+// ========== VALIDAÇÃO DINÂMICA ==========
+function setupPasswordValidation() {
+    const newPass = document.getElementById('newPassword');
+    const confirmPass = document.getElementById('confirmPassword');
+    const btn = document.getElementById('confirmPasswordBtn');
+    
+    // Limpar campos
+    newPass.value = '';
+    confirmPass.value = '';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+    
+    // Validar ao digitar na senha
+    newPass.addEventListener('input', () => {
+        const senha = newPass.value;
+        
+        // Mostrar indicadores
+        document.getElementById('passwordStrength').style.display = 'block';
+        
+        // Verificar requisitos
+        const hasLength = senha.length >= 8;
+        const hasNumber = /\d/.test(senha);
+        
+        // Atualizar requisitos visualmente
+        updateRequirement('req-length', hasLength);
+        updateRequirement('req-number', hasNumber);
+        
+        // Calcular força
+        let strength = 0;
+        if (senha.length >= 8) strength++;
+        if (senha.length >= 12) strength++;
+        if (/\d/.test(senha)) strength++;
+        if (/[a-z]/.test(senha) && /[A-Z]/.test(senha)) strength++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(senha)) strength++;
+        
+        updateStrengthBar(Math.min(strength, 4));
+        
+        // Verificar match
+        checkPasswordMatch();
+    });
+    
+    // Validar ao digitar na confirmação
+    confirmPass.addEventListener('input', checkPasswordMatch);
+}
+
+function updateRequirement(id, met) {
+    const el = document.getElementById(id);
+    const icon = el.querySelector('i');
+    
+    if (met) {
+        el.style.color = '#10b981';
+        icon.classList.remove('bi-circle');
+        icon.classList.add('bi-check-circle-fill');
+    } else {
+        el.style.color = '#6b7280';
+        icon.classList.remove('bi-check-circle-fill');
+        icon.classList.add('bi-circle');
+    }
+}
+
+function updateStrengthBar(level) {
+    const colors = ['#ef4444', '#f59e0b', '#eab308', '#10b981'];
+    const texts = ['Fraca', 'Razoável', 'Boa', 'Forte'];
+    const textColors = ['#991b1b', '#92400e', '#854d0e', '#065f46'];
+    
+    // Resetar barras
+    for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById(`bar${i}`);
+        if (i <= level) {
+            bar.style.background = colors[level - 1];
+        } else {
+            bar.style.background = '#e5e7eb';
+        }
+    }
+    
+    // Atualizar texto
+    const strengthText = document.getElementById('strengthText');
+    if (level > 0) {
+        strengthText.textContent = `Força: ${texts[level - 1]}`;
+        strengthText.style.color = textColors[level - 1];
+        strengthText.style.fontWeight = '600';
+    } else {
+        strengthText.textContent = '';
+    }
+}
+
+function checkPasswordMatch() {
+    const senha = document.getElementById('newPassword').value;
+    const confirmar = document.getElementById('confirmPassword').value;
+    const matchDiv = document.getElementById('passwordMatch');
+    const matchText = document.getElementById('matchText');
+    const matchIcon = matchDiv.querySelector('i');
+    const btn = document.getElementById('confirmPasswordBtn');
+    
+    ocultarErroSenha();
+    
+    if (!confirmar) {
+        matchDiv.style.display = 'none';
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        return;
+    }
+    
+    const hasLength = senha.length >= 8;
+    const hasNumber = /\d/.test(senha);
+    const isValid = hasLength && hasNumber;
+    const isMatch = senha === confirmar;
+    
+    matchDiv.style.display = 'block';
+    
+    if (isMatch && isValid) {
+        matchDiv.style.background = '#d1fae5';
+        matchDiv.style.borderLeft = '4px solid #10b981';
+        matchDiv.style.color = '#065f46';
+        matchIcon.className = 'bi bi-check-circle-fill mr-1';
+        matchText.textContent = 'Senhas conferem!';
+        
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.style.background = '#10b981';
+    } else if (isMatch && !isValid) {
+        matchDiv.style.background = '#fef3c7';
+        matchDiv.style.borderLeft = '4px solid #f59e0b';
+        matchDiv.style.color = '#92400e';
+        matchIcon.className = 'bi bi-exclamation-triangle-fill mr-1';
+        matchText.textContent = 'Senha não atende aos requisitos';
+        
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+    } else {
+        matchDiv.style.background = '#fee2e2';
+        matchDiv.style.borderLeft = '4px solid #ef4444';
+        matchDiv.style.color = '#991b1b';
+        matchIcon.className = 'bi bi-x-circle-fill mr-1';
+        matchText.textContent = 'Senhas não conferem';
+        
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+    }
 }
 
 function mostrarErroSenha(msg) {
@@ -174,6 +380,7 @@ function ocultarErroSenha() {
 async function confirmarSenha() {
     const senha = document.getElementById('newPassword').value;
     const confirmar = document.getElementById('confirmPassword').value;
+    const btn = document.getElementById('confirmPasswordBtn');
     
     ocultarErroSenha();
     
@@ -184,7 +391,6 @@ async function confirmarSenha() {
     
     if (senha !== confirmar) {
         mostrarErroSenha('As senhas não conferem');
-        document.getElementById('confirmPassword').value = '';
         return;
     }
     
@@ -194,12 +400,19 @@ async function confirmarSenha() {
         return;
     }
     
-    const btn = document.getElementById('confirmPasswordBtn');
     btn.disabled = true;
+    btn.style.opacity = '0.5';
     btn.innerHTML = '<i class="bi bi-hourglass-split mr-1"></i>Criando...';
     
-    document.getElementById('passwordModal').style.display = 'none';
-    passwordResolve(senha);
+    try {
+        document.getElementById('passwordModal').style.display = 'none';
+        passwordResolve(senha);
+    } catch (error) {
+        mostrarErroSenha('Erro ao processar senha');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = '<i class="bi bi-check-circle mr-1"></i>Criar Conta';
+    }
 }
 
 async function processarCallback() {
