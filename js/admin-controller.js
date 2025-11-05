@@ -730,5 +730,4 @@ function adminApp() {
             return regex.test(email);
         }
     }
-};
 }
