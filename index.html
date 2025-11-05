@@ -30,21 +30,58 @@
             <p class="text-gray-600">Sistema Profissional Online</p>
         </div>
 
-        <!-- Info Box -->
-        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6 rounded">
-            <p class="text-sm text-blue-800">
-                <i class="bi bi-info-circle mr-2"></i>
-                <strong>Sistema integrado com GitHub</strong><br>
-                Faça login com sua conta do GitHub para acessar o painel.
-            </p>
-        </div>
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="fazerLogin(event)" class="space-y-4">
+            <!-- Username -->
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="bi bi-person mr-1"></i>Username do GitHub
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username"
+                    placeholder="seu-username"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    autocomplete="username"
+                >
+            </div>
 
-        <!-- Login Button -->
-        <button onclick="iniciarLogin()" 
-                class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-3 mb-4">
-            <i class="bi bi-github text-2xl"></i>
-            <span>Entrar com GitHub</span>
-        </button>
+            <!-- Senha -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="bi bi-lock mr-1"></i>Senha
+                </label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password"
+                        placeholder="••••••••"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button 
+                        type="button"
+                        onclick="togglePassword()"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                        <i id="toggleIcon" class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botão Entrar -->
+            <button 
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Entrar</span>
+            </button>
+        </form>
 
         <!-- Separador -->
         <div class="relative my-6">
@@ -52,67 +89,135 @@
                 <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-                <span class="px-4 bg-white text-gray-500">Ou acesse diretamente</span>
+                <span class="px-4 bg-white text-gray-500">Ou</span>
             </div>
         </div>
 
-        <!-- Quick Access -->
-        <div class="space-y-3">
-            <a href="admin.html" 
-               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                <i class="bi bi-shield-check"></i>
-                <span>Painel Admin</span>
-            </a>
-            
-            <a href="user.html" 
-               class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                <i class="bi bi-person-circle"></i>
-                <span>Painel Usuário</span>
-            </a>
+        <!-- Primeiro Acesso -->
+        <button 
+            onclick="primeiroAcesso()" 
+            class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+        >
+            <i class="bi bi-github"></i>
+            <span>Primeiro acesso com GitHub</span>
+        </button>
+
+        <!-- Esqueci Senha -->
+        <div class="text-center mt-4">
+            <button 
+                onclick="esqueciSenha()" 
+                class="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+                <i class="bi bi-question-circle mr-1"></i>Esqueci minha senha
+            </button>
         </div>
 
         <!-- Footer Info -->
         <div class="mt-8 pt-6 border-t text-center text-sm text-gray-500">
             <p class="mb-2">
                 <i class="bi bi-shield-check text-green-600"></i>
-                Sistema seguro e privado
+                Sistema seguro e criptografado
             </p>
             <p class="text-xs">
-                Seus dados são armazenados em repositório privado do GitHub.<br>
-                Apenas usuários autorizados têm acesso.
+                Seus dados são protegidos com criptografia AES-256.<br>
+                Apenas você tem acesso com sua senha.
             </p>
         </div>
 
         <!-- Version -->
         <div class="text-center mt-6 text-xs text-gray-400">
-            v1.0.0 - Sistema Offline/Online
+            v1.0.0 - Sistema com Autenticação Segura
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
     <script src="js/auth-manager.js"></script>
+    <script src="js/crypto-utils.js"></script>
+    <script src="js/password-manager.js"></script>
     <script src="js/dark-mode.js"></script>
     
     <script>
-        // Verificar se já está autenticado
-        window.addEventListener('load', async () => {
-            const autenticado = await authManager.verificarAutenticacao();
-            
-            if (autenticado) {
-                // Redirecionar baseado no tipo de usuário
-                if (authManager.isAdmin()) {
-                    console.log('✅ Admin autenticado - Redirecionando...');
-                    window.location.href = 'admin.html';
-                } else {
-                    console.log('✅ User autenticado - Redirecionando...');
-                    window.location.href = 'user.html';
-                }
+        // ========== INICIALIZAÇÃO ==========
+        
+        window.addEventListener('load', () => {
+            // Preencher último username usado
+            const ultimoUsername = passwordManager.obterUltimoUsername();
+            if (ultimoUsername) {
+                document.getElementById('username').value = ultimoUsername;
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
             }
         });
 
-        function iniciarLogin() {
-            // Verificar se está configurado
+        // ========== TOGGLE SENHA ==========
+        
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
+
+        // ========== LOGIN COM SENHA ==========
+        
+        async function fazerLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('⚠️ Preencha todos os campos!');
+                return;
+            }
+            
+            // Desabilitar botão
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Entrando...';
+            
+            try {
+                // Fazer login
+                const result = await passwordManager.loginComSenha(username, password);
+                
+                // Sucesso!
+                console.log('✅ Login bem-sucedido:', result);
+                
+                // Redirecionar
+                if (result.isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'user.html';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro no login:', error);
+                alert(`❌ ${error.message}`);
+                
+                // Reabilitar botão
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                
+                // Focar na senha
+                document.getElementById('password').select();
+            }
+        }
+
+        // ========== PRIMEIRO ACESSO ==========
+        
+        function primeiroAcesso() {
             if (!CONFIG.github.owner || !CONFIG.github.repo || CONFIG.github.owner === 'SEU_USERNAME') {
                 if (confirm('⚠️ Sistema não configurado!\n\nDeseja abrir o assistente de configuração?')) {
                     window.location.href = 'setup.html';
@@ -120,7 +225,33 @@
                 return;
             }
             
+            // Redirecionar para GitHub OAuth
             authManager.login();
+        }
+
+        // ========== ESQUECI SENHA ==========
+        
+        function esqueciSenha() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (!username) {
+                alert('⚠️ Digite seu username primeiro!');
+                document.getElementById('username').focus();
+                return;
+            }
+            
+            if (confirm(
+                `🔑 Recuperar senha para: ${username}\n\n` +
+                'Você será redirecionado para autenticar com GitHub.\n' +
+                'Após a autenticação, poderá criar uma nova senha.\n\n' +
+                'Deseja continuar?'
+            )) {
+                // Salvar username para usar no callback
+                sessionStorage.setItem('recuperar_senha_username', username);
+                
+                // Ir para GitHub OAuth
+                authManager.login();
+            }
         }
     </script>
 

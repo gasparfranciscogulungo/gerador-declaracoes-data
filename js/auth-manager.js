@@ -213,13 +213,8 @@ class AuthManager {
     isAdmin() {
         if (!this.currentUser) return false;
 
-        // Lista de admins (usernames do GitHub)
-        const ADMINS = [
-            'gaspargulungo',  // Seu username
-            // Adicione outros admins aqui
-        ];
-
-        return ADMINS.includes(this.currentUser.login);
+        // Usar lista de admins do CONFIG
+        return CONFIG.admins.includes(this.currentUser.login);
     }
 
     // ========== OBTER USUÁRIO ATUAL ==========
