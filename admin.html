@@ -182,41 +182,120 @@
             <!-- Lista de Empresas -->
             <div class="space-y-4">
                 <template x-for="empresa in empresas" :key="empresa.id">
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <img :src="empresa.logo" :alt="empresa.nome" class="w-16 h-16 object-contain rounded border border-gray-200">
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-800" x-text="empresa.nome"></h3>
-                                    <p class="text-sm text-gray-600">NIF: <span x-text="empresa.nif"></span></p>
-                                    <p class="text-xs text-gray-500" x-text="empresa.morada"></p>
+                    <div class="border-2 border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all hover:border-blue-300">
+                        <div class="flex items-start justify-between">
+                            <!-- Lado Esquerdo: Logo + Dados -->
+                            <div class="flex items-start space-x-6 flex-1">
+                                <!-- Logo -->
+                                <div class="flex-shrink-0">
+                                    <img :src="empresa.logo" 
+                                         :alt="empresa.nome" 
+                                         class="w-24 h-24 object-contain rounded-lg border-2 border-gray-200 bg-white p-2">
+                                </div>
+
+                                <!-- Dados Principais -->
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-800 mb-2" x-text="empresa.nome"></h3>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                        <div>
+                                            <p class="text-gray-600">
+                                                <i class="bi bi-credit-card text-blue-600 mr-2"></i>
+                                                <strong>NIF:</strong> <span x-text="empresa.nif"></span>
+                                            </p>
+                                        </div>
+                                        
+                                        <div>
+                                            <p class="text-gray-600">
+                                                <i class="bi bi-geo-alt text-green-600 mr-2"></i>
+                                                <strong>Município:</strong> <span x-text="empresa.endereco.municipio"></span>
+                                            </p>
+                                        </div>
+
+                                        <div class="col-span-2">
+                                            <p class="text-gray-600">
+                                                <i class="bi bi-building text-purple-600 mr-2"></i>
+                                                <strong>Sede:</strong> 
+                                                <span x-text="empresa.endereco.rua"></span>
+                                                <span x-show="empresa.endereco.edificio" x-text="', ' + empresa.endereco.edificio"></span>
+                                                <span x-show="empresa.endereco.bairro" x-text="', ' + empresa.endereco.bairro"></span>
+                                            </p>
+                                        </div>
+
+                                        <div x-show="empresa.telefone">
+                                            <p class="text-gray-600">
+                                                <i class="bi bi-telephone text-orange-600 mr-2"></i>
+                                                <span x-text="empresa.telefone"></span>
+                                            </p>
+                                        </div>
+
+                                        <div x-show="empresa.email">
+                                            <p class="text-gray-600">
+                                                <i class="bi bi-envelope text-red-600 mr-2"></i>
+                                                <span x-text="empresa.email"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tags de Cores -->
+                                    <div class="flex items-center space-x-2 mt-3">
+                                        <div class="w-6 h-6 rounded border-2 border-gray-300" 
+                                             :style="'background-color: ' + empresa.corPrimaria"
+                                             :title="'Cor Primária: ' + empresa.corPrimaria"></div>
+                                        <div class="w-6 h-6 rounded border-2 border-gray-300" 
+                                             :style="'background-color: ' + empresa.corSecundaria"
+                                             :title="'Cor Secundária: ' + empresa.corSecundaria"></div>
+                                        <span x-show="empresa.marcaDagua" class="text-xs text-gray-500 ml-2">
+                                            <i class="bi bi-water"></i> Marca d'água
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <div class="text-right mr-4">
-                                    <p class="text-sm text-gray-600">Declarações</p>
-                                    <p class="text-2xl font-bold" :class="getContador(empresa.id) >= 5 ? 'text-red-600' : 'text-green-600'">
-                                        <span x-text="getContador(empresa.id)"></span> / 5
+
+                            <!-- Lado Direito: Ações -->
+                            <div class="flex flex-col items-end space-y-3 ml-6">
+                                <!-- Contador de Declarações -->
+                                <div class="text-center bg-gray-50 rounded-lg p-3 min-w-[120px]">
+                                    <p class="text-xs text-gray-600 mb-1">Declarações</p>
+                                    <p class="text-3xl font-bold" :class="getContador(empresa.id) >= 5 ? 'text-red-600' : 'text-green-600'">
+                                        <span x-text="getContador(empresa.id)"></span><span class="text-lg text-gray-400"> / 5</span>
                                     </p>
                                 </div>
-                                <button @click="editarEmpresa(empresa)" class="text-blue-600 hover:text-blue-800 p-2">
-                                    <i class="bi bi-pencil text-xl"></i>
-                                </button>
-                                <button @click="resetarContador(empresa.id)" class="text-orange-600 hover:text-orange-800 p-2" title="Resetar contador">
-                                    <i class="bi bi-arrow-clockwise text-xl"></i>
-                                </button>
-                                <button @click="deletarEmpresa(empresa.id)" class="text-red-600 hover:text-red-800 p-2">
-                                    <i class="bi bi-trash text-xl"></i>
-                                </button>
+
+                                <!-- Carimbo Thumbnail -->
+                                <div class="bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                    <img :src="empresa.carimbo" 
+                                         alt="Carimbo" 
+                                         class="w-16 h-16 object-contain">
+                                </div>
+
+                                <!-- Botões de Ação -->
+                                <div class="flex items-center space-x-2">
+                                    <button @click="editarEmpresa(empresa)" 
+                                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"
+                                            title="Editar">
+                                        <i class="bi bi-pencil text-lg"></i>
+                                    </button>
+                                    <button @click="resetarContador(empresa.id)" 
+                                            class="bg-orange-100 text-orange-700 hover:bg-orange-200 p-2 rounded-lg transition-colors" 
+                                            title="Resetar contador">
+                                        <i class="bi bi-arrow-clockwise text-lg"></i>
+                                    </button>
+                                    <button @click="deletarEmpresa(empresa.id)" 
+                                            class="bg-red-100 text-red-700 hover:bg-red-200 p-2 rounded-lg transition-colors"
+                                            title="Excluir">
+                                        <i class="bi bi-trash text-lg"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </template>
 
-                <div x-show="empresas.length === 0" class="text-center py-12 text-gray-500">
-                    <i class="bi bi-building text-6xl mb-4"></i>
-                    <p>Nenhuma empresa cadastrada ainda.</p>
-                    <p class="text-sm">Clique em "Adicionar Empresa" para começar.</p>
+                <div x-show="empresas.length === 0" class="text-center py-16 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    <i class="bi bi-building text-7xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium mb-2">Nenhuma empresa cadastrada ainda</p>
+                    <p class="text-sm text-gray-400">Clique em "Adicionar Empresa" para começar a criar documentos profissionais</p>
                 </div>
             </div>
         </div>
@@ -310,16 +389,376 @@
             </div>
         </div>
 
-    </main>d
+    </main>
 
     <!-- Modal: Nova Empresa -->
     <div x-show="modalNovaEmpresa" 
          x-transition
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
-        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
-            <h3 class="text-2xl font-bold mb-4">➕ Adicionar Nova Empresa</h3>
-            <p class="text-gray-600 mb-4 text-sm">Esta funcionalidade será implementada no próximo passo.</p>
-            <button @click="modalNovaEmpresa = false" class="bg-gray-500 text-white px-4 py-2 rounded">Fechar</button>
+         @click.self="modalNovaEmpresa = false"
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex">
+            
+            <!-- FORMULÁRIO (Lado Esquerdo) -->
+            <div class="w-full lg:w-3/5 overflow-y-auto p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-3xl font-bold text-gray-800">
+                        <i class="bi bi-building-add mr-3 text-blue-600"></i>
+                        <span x-text="empresaForm.id ? 'Editar Empresa' : 'Nova Empresa'"></span>
+                    </h3>
+                    <button @click="fecharModalEmpresa()" class="text-gray-400 hover:text-gray-600 text-3xl">
+                        &times;
+                    </button>
+                </div>
+
+                <form @submit.prevent="salvarEmpresa()">
+                    
+                    <!-- SEÇÃO 1: Identificação -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-blue-600">
+                            <i class="bi bi-info-circle mr-2"></i>Identificação
+                        </h4>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nome da Empresa <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       x-model="empresaForm.nome"
+                                       required
+                                       placeholder="Ex: EMFC Consulting, S.A."
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    NIF/CC <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       x-model="empresaForm.nif"
+                                       required
+                                       placeholder="Ex: 5480023446"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 2: Endereço Completo -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-green-600">
+                            <i class="bi bi-geo-alt mr-2"></i>Endereço da Sede
+                        </h4>
+                        
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Rua/Avenida <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.rua"
+                                           required
+                                           placeholder="Ex: Avenida 4 de Fevereiro"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Edifício</label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.edificio"
+                                           placeholder="Ex: Edifício Summit Tower"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Andar</label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.andar"
+                                           placeholder="Ex: 5.º andar"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sala</label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.sala"
+                                           placeholder="Ex: Sala 502"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Bairro <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.bairro"
+                                           required
+                                           placeholder="Ex: Kinaxixe"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Município <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.municipio"
+                                           required
+                                           placeholder="Ex: Luanda"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Província <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.provincia"
+                                           required
+                                           placeholder="Ex: Luanda"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        País <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           x-model="empresaForm.endereco.pais"
+                                           required
+                                           placeholder="Ex: Angola"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 3: Contatos (Opcional) -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-purple-600">
+                            <i class="bi bi-telephone mr-2"></i>Contatos <span class="text-sm text-gray-500 font-normal">(Opcional)</span>
+                        </h4>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                                <input type="tel" 
+                                       x-model="empresaForm.telefone"
+                                       placeholder="Ex: +244 XXX XXX XXX"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" 
+                                       x-model="empresaForm.email"
+                                       placeholder="Ex: contato@empresa.ao"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                                <input type="url" 
+                                       x-model="empresaForm.website"
+                                       placeholder="Ex: www.empresa.ao"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 4: Elementos Visuais -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-orange-600">
+                            <i class="bi bi-image mr-2"></i>Elementos Visuais
+                        </h4>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    URL do Logo <span class="text-red-500">*</span>
+                                </label>
+                                <input type="url" 
+                                       x-model="empresaForm.logo"
+                                       @input="validarImagemURL('logo', empresaForm.logo)"
+                                       required
+                                       placeholder="https://exemplo.com/logo.png"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Cole o link direto da imagem (PNG, JPG, SVG)</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    URL do Carimbo <span class="text-red-500">*</span>
+                                </label>
+                                <input type="url" 
+                                       x-model="empresaForm.carimbo"
+                                       @input="validarImagemURL('carimbo', empresaForm.carimbo)"
+                                       required
+                                       placeholder="https://exemplo.com/carimbo.png"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Imagem do carimbo com assinatura (fundo transparente recomendado)</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cor Primária</label>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="color" 
+                                               x-model="empresaForm.corPrimaria"
+                                               class="h-12 w-20 rounded cursor-pointer">
+                                        <input type="text" 
+                                               x-model="empresaForm.corPrimaria"
+                                               placeholder="#1e40af"
+                                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cor Secundária</label>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="color" 
+                                               x-model="empresaForm.corSecundaria"
+                                               class="h-12 w-20 rounded cursor-pointer">
+                                        <input type="text" 
+                                               x-model="empresaForm.corSecundaria"
+                                               placeholder="#64748b"
+                                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Marca d'água <span class="text-sm text-gray-500">(Opcional)</span></label>
+                                <input type="text" 
+                                       x-model="empresaForm.marcaDagua"
+                                       placeholder="Ex: CONSULTING, S.A."
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Texto que aparecerá em diagonal no fundo do documento</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="flex items-center justify-between pt-6 border-t">
+                        <button type="button" 
+                                @click="fecharModalEmpresa()"
+                                class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                            <i class="bi bi-x-circle mr-2"></i>Cancelar
+                        </button>
+                        <button type="submit"
+                                class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg">
+                            <i class="bi bi-check-circle mr-2"></i>
+                            <span x-text="empresaForm.id ? 'Salvar Alterações' : 'Cadastrar Empresa'"></span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- PREVIEW (Lado Direito) -->
+            <div class="hidden lg:block lg:w-2/5 bg-gradient-to-br from-gray-50 to-gray-100 p-8 overflow-y-auto border-l">
+                <h4 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="bi bi-eye mr-2 text-purple-600"></i>Preview
+                </h4>
+
+                <!-- Preview Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <!-- Logo Preview -->
+                        <div class="w-24 h-24 border-2 border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
+                            <img x-show="empresaForm.logo" 
+                                 :src="empresaForm.logo" 
+                                 alt="Logo"
+                                 class="max-w-full max-h-full object-contain"
+                                 @error="$el.src = 'https://via.placeholder.com/100x100?text=Logo'">
+                            <i x-show="!empresaForm.logo" class="bi bi-image text-4xl text-gray-300"></i>
+                        </div>
+                    </div>
+
+                    <!-- Dados da Empresa -->
+                    <div class="space-y-2 mb-4">
+                        <h5 class="font-bold text-lg" 
+                            :style="'color: ' + (empresaForm.corPrimaria || '#1e40af')"
+                            x-text="empresaForm.nome || 'Nome da Empresa'"></h5>
+                        <p class="text-sm text-gray-600">
+                            <strong>NIF:</strong> <span x-text="empresaForm.nif || 'XXXXXXXXXX'"></span>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>Sede:</strong> 
+                            <span x-text="empresaForm.endereco.rua || 'Endereço'"></span>
+                            <span x-show="empresaForm.endereco.edificio" x-text="', ' + empresaForm.endereco.edificio"></span>
+                            <span x-show="empresaForm.endereco.andar" x-text="', ' + empresaForm.endereco.andar"></span>
+                            <span x-show="empresaForm.endereco.sala" x-text="', ' + empresaForm.endereco.sala"></span>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <span x-text="empresaForm.endereco.bairro || 'Bairro'"></span> — 
+                            <span x-text="empresaForm.endereco.municipio || 'Município'"></span>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <span x-text="empresaForm.endereco.provincia || 'Província'"></span> — 
+                            <span x-text="empresaForm.endereco.pais || 'País'"></span>
+                        </p>
+                        
+                        <div x-show="empresaForm.telefone || empresaForm.email || empresaForm.website" class="pt-2 mt-2 border-t">
+                            <p x-show="empresaForm.telefone" class="text-xs text-gray-500">
+                                <i class="bi bi-telephone mr-1"></i><span x-text="empresaForm.telefone"></span>
+                            </p>
+                            <p x-show="empresaForm.email" class="text-xs text-gray-500">
+                                <i class="bi bi-envelope mr-1"></i><span x-text="empresaForm.email"></span>
+                            </p>
+                            <p x-show="empresaForm.website" class="text-xs text-gray-500">
+                                <i class="bi bi-globe mr-1"></i><span x-text="empresaForm.website"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Carimbo Preview -->
+                    <div class="pt-4 border-t">
+                        <p class="text-xs text-gray-500 mb-2 font-medium">Carimbo:</p>
+                        <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                            <img x-show="empresaForm.carimbo" 
+                                 :src="empresaForm.carimbo" 
+                                 alt="Carimbo"
+                                 class="max-w-full max-h-full object-contain"
+                                 @error="$el.src = 'https://via.placeholder.com/100x100?text=Carimbo'">
+                            <i x-show="!empresaForm.carimbo" class="bi bi-stamp text-4xl text-gray-300"></i>
+                        </div>
+                    </div>
+
+                    <!-- Cores -->
+                    <div x-show="empresaForm.corPrimaria || empresaForm.corSecundaria" class="pt-4 border-t mt-4">
+                        <p class="text-xs text-gray-500 mb-2 font-medium">Cores:</p>
+                        <div class="flex space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded border border-gray-300" 
+                                     :style="'background-color: ' + (empresaForm.corPrimaria || '#1e40af')"></div>
+                                <span class="text-xs text-gray-600">Primária</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 rounded border border-gray-300" 
+                                     :style="'background-color: ' + (empresaForm.corSecundaria || '#64748b')"></div>
+                                <span class="text-xs text-gray-600">Secundária</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Marca d'água -->
+                    <div x-show="empresaForm.marcaDagua" class="pt-4 border-t mt-4">
+                        <p class="text-xs text-gray-500 mb-2 font-medium">Marca d'água:</p>
+                        <p class="text-2xl font-bold text-gray-200 transform -rotate-45 text-center" 
+                           x-text="empresaForm.marcaDagua"></p>
+                    </div>
+                </div>
+
+                <!-- Dica -->
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
+                    <p class="text-sm text-blue-800">
+                        <i class="bi bi-lightbulb mr-2"></i>
+                        <strong>Dica:</strong> Este preview mostra como sua empresa aparecerá nos documentos PDF gerados.
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
 

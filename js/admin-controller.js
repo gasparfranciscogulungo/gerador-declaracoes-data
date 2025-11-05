@@ -42,6 +42,31 @@ function adminApp() {
         modalNovaEmpresa: false,
         modalNovoModelo: false,
         
+        // Forms
+        empresaForm: {
+            id: null,
+            nome: '',
+            nif: '',
+            endereco: {
+                rua: '',
+                edificio: '',
+                andar: '',
+                sala: '',
+                bairro: '',
+                municipio: '',
+                provincia: '',
+                pais: 'Angola'
+            },
+            telefone: '',
+            email: '',
+            website: '',
+            logo: '',
+            carimbo: '',
+            corPrimaria: '#1e40af',
+            corSecundaria: '#64748b',
+            marcaDagua: ''
+        },
+        
         // Managers
         userManager: null,
 
@@ -480,7 +505,7 @@ function adminApp() {
             }
         },
 
-        // ========== UTILIDADES ==========
+                // ========== UTILIDADES ==========
         logout() {
             if (confirm('Tem certeza que deseja sair?')) {
                 authManager.logout();
@@ -493,11 +518,217 @@ function adminApp() {
                 type: type,
                 message: message
             };
-
-            // Auto-esconde após 5 segundos
+            
+            // Auto-fechar após 5 segundos
             setTimeout(() => {
                 this.alert.show = false;
             }, 5000);
+        },
+
+        // ========== EMPRESAS - CRUD ==========
+        
+        async salvarEmpresa() {
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Salvando empresa...';
+
+                // Validações básicas
+                if (!this.empresaForm.nome || !this.empresaForm.nif) {
+                    this.showAlert('error', 'Preencha todos os campos obrigatórios');
+                    this.loading = false;
+                    return;
+                }
+
+                // Validar URLs de imagens
+                if (!this.empresaForm.logo || !this.empresaForm.carimbo) {
+                    this.showAlert('error', 'Logo e carimbo são obrigatórios');
+                    this.loading = false;
+                    return;
+                }
+
+                // Validar email se fornecido
+                if (this.empresaForm.email && !this.validarEmail(this.empresaForm.email)) {
+                    this.showAlert('error', 'Email inválido');
+                    this.loading = false;
+                    return;
+                }
+
+                // Carregar empresas existentes
+                const empresasData = await githubAPI.lerJSON('data/empresas.json').catch(() => ({
+                    empresas: [],
+                    sha: null
+                }));
+
+                let empresas = empresasData.empresas || [];
+                const sha = empresasData.sha;
+
+                // Novo ou edição?
+                if (this.empresaForm.id) {
+                    // EDITAR
+                    const index = empresas.findIndex(e => e.id === this.empresaForm.id);
+                    if (index !== -1) {
+                        empresas[index] = {
+                            ...this.empresaForm,
+                            updatedAt: new Date().toISOString()
+                        };
+                    }
+                } else {
+                    // CRIAR NOVO
+                    const novaEmpresa = {
+                        ...this.empresaForm,
+                        id: `empresa_${Date.now()}`,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        contador: 0 // Contador de declarações
+                    };
+                    empresas.push(novaEmpresa);
+                }
+
+                // Salvar no GitHub
+                await githubAPI.salvarJSON(
+                    'data/empresas.json',
+                    { empresas },
+                    `${this.empresaForm.id ? 'Atualizar' : 'Adicionar'} empresa: ${this.empresaForm.nome}`,
+                    sha
+                );
+
+                this.showAlert('success', `✅ Empresa ${this.empresaForm.id ? 'atualizada' : 'cadastrada'} com sucesso!`);
+                
+                // Recarregar empresas
+                await this.carregarEmpresas();
+                await this.atualizarStatsReais();
+                
+                // Fechar modal
+                this.fecharModalEmpresa();
+
+            } catch (error) {
+                console.error('❌ Erro ao salvar empresa:', error);
+                this.showAlert('error', 'Erro ao salvar empresa: ' + error.message);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        editarEmpresa(empresa) {
+            // Preencher formulário com dados da empresa
+            this.empresaForm = {
+                id: empresa.id,
+                nome: empresa.nome,
+                nif: empresa.nif,
+                endereco: { ...empresa.endereco },
+                telefone: empresa.telefone || '',
+                email: empresa.email || '',
+                website: empresa.website || '',
+                logo: empresa.logo,
+                carimbo: empresa.carimbo,
+                corPrimaria: empresa.corPrimaria || '#1e40af',
+                corSecundaria: empresa.corSecundaria || '#64748b',
+                marcaDagua: empresa.marcaDagua || ''
+            };
+            
+            this.modalNovaEmpresa = true;
+        },
+
+        async deletarEmpresa(empresaId) {
+            if (!confirm('Tem certeza que deseja excluir esta empresa?\n\nEsta ação não pode ser desfeita!')) {
+                return;
+            }
+
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Excluindo empresa...';
+
+                // Carregar empresas
+                const empresasData = await githubAPI.lerJSON('data/empresas.json');
+                let empresas = empresasData.empresas || [];
+                
+                const empresaIndex = empresas.findIndex(e => e.id === empresaId);
+                const empresaNome = empresas[empresaIndex]?.nome;
+                
+                // Remover empresa
+                empresas = empresas.filter(e => e.id !== empresaId);
+
+                // Salvar
+                await githubAPI.salvarJSON(
+                    'data/empresas.json',
+                    { empresas },
+                    `Excluir empresa: ${empresaNome}`,
+                    empresasData.sha
+                );
+
+                this.showAlert('success', '✅ Empresa excluída com sucesso!');
+                
+                // Recarregar
+                await this.carregarEmpresas();
+                await this.atualizarStatsReais();
+
+            } catch (error) {
+                console.error('❌ Erro ao excluir empresa:', error);
+                this.showAlert('error', 'Erro ao excluir empresa: ' + error.message);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        fecharModalEmpresa() {
+            this.modalNovaEmpresa = false;
+            
+            // Resetar formulário após animação
+            setTimeout(() => {
+                this.empresaForm = {
+                    id: null,
+                    nome: '',
+                    nif: '',
+                    endereco: {
+                        rua: '',
+                        edificio: '',
+                        andar: '',
+                        sala: '',
+                        bairro: '',
+                        municipio: '',
+                        provincia: '',
+                        pais: 'Angola'
+                    },
+                    telefone: '',
+                    email: '',
+                    website: '',
+                    logo: '',
+                    carimbo: '',
+                    corPrimaria: '#1e40af',
+                    corSecundaria: '#64748b',
+                    marcaDagua: ''
+                };
+            }, 300);
+        },
+
+        validarImagemURL(tipo, url) {
+            if (!url) return false;
+            
+            // Testar se é URL válida
+            try {
+                new URL(url);
+                
+                // Testar se imagem carrega
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`✅ ${tipo} válido:`, url);
+                };
+                img.onerror = () => {
+                    console.warn(`⚠️ ${tipo} pode estar inválido:`, url);
+                    this.showAlert('error', `A URL do ${tipo} pode não estar acessível. Verifique o link.`);
+                };
+                img.src = url;
+                
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+
+        validarEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
         }
-    };
+    }
+};
 }
