@@ -523,9 +523,9 @@ async function processarCallback() {
         // ✅ CONFIGURAR GitHub API com o repositório
         console.log('⚙️ Configurando GitHub API...');
         githubAPI.configurar({
-            owner: CONFIG.owner,
-            repo: CONFIG.repo,
-            branch: CONFIG.branch
+            owner: CONFIG.github.owner,
+            repo: CONFIG.github.repo,
+            branch: CONFIG.github.branch
         });
         
         currentToken = token;
