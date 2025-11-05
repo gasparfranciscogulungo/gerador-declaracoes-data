@@ -1,18 +1,18 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762376136810",
-      "nome": "GADHKJAÇDHAJÇDHÇLA",
-      "nif": "HLÇHLÇH H ÇHLÇ HÇL HÇ",
+      "id": "empresa_1762376215587",
+      "nome": "SADSASdA",
+      "nif": "SADSASDASd",
       "endereco": {
-        "rua": " ÇL HLÇ HÇL HÇL HLJÇ",
-        "edificio": " HJÇL HÇLJ HÇ ",
-        "andar": "H LÇ HÇL HÇLJ",
-        "sala": "HJL HÇJ HJÇ H",
-        "bairro": "Ç HLÇ HJÇ HÇ",
-        "municipio": " HÇ HJÇ HÇJ HÇ",
-        "provincia": " HJÇ HÇ HÇJ",
-        "pais": " Ç HJÇ HJÇ HJ ÇHÇ"
+        "rua": "dsSADASdADS",
+        "edificio": "SADdASD",
+        "andar": "ASdASD",
+        "sala": "ASdASD",
+        "bairro": "ASd",
+        "municipio": "DASd",
+        "provincia": "DDAS",
+        "pais": "Angola"
       },
       "telefone": "",
       "email": "",
@@ -22,8 +22,8 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T20:55:36.811Z",
-      "updatedAt": "2025-11-05T20:55:36.811Z",
+      "createdAt": "2025-11-05T20:56:55.587Z",
+      "updatedAt": "2025-11-05T20:56:55.588Z",
       "contador": 0
     }
   ]
