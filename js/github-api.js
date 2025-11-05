@@ -75,6 +75,8 @@ class GitHubAPI {
         try {
             const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/contents/${path}`;
             
+            console.log(`📂 Lendo arquivo: ${path}`);
+            
             const response = await fetch(url, {
                 headers: this.getHeaders()
             });
@@ -85,13 +87,17 @@ class GitHubAPI {
             }
 
             if (!response.ok) {
-                throw new Error(`GitHub API Error: ${response.status}`);
+                const errorText = await response.text();
+                console.error(`❌ Erro HTTP ${response.status}:`, errorText);
+                throw new Error(`GitHub API Error: ${response.status} - ${errorText}`);
             }
 
             const data = await response.json();
 
             // Decodificar conteúdo Base64
             const content = atob(data.content);
+
+            console.log(`✅ Arquivo lido: ${path} (${data.size} bytes)`);
 
             return {
                 content: content,
@@ -177,8 +183,11 @@ class GitHubAPI {
     // ========== SALVAR JSON ==========
 
     async salvarJSON(path, data, message, sha = null) {
+        console.log(`💾 Salvando JSON: ${path}${sha ? ' (atualizando)' : ' (novo)'}`);
         const content = JSON.stringify(data, null, 2);
-        return await this.salvarArquivo(path, content, message, sha);
+        const result = await this.salvarArquivo(path, content, message, sha);
+        console.log(`✅ JSON salvo com sucesso: ${path}`);
+        return result;
     }
 
     // ========== UPLOAD DE IMAGEM (BASE64) ==========

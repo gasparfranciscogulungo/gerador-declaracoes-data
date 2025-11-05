@@ -14,6 +14,8 @@ class PasswordManager {
     
     async criarConta(username, password, token, profile) {
         try {
+            console.log(`🔐 Iniciando criação de conta para: ${username}`);
+            
             // 1. Validar senha
             const validacao = CryptoUtils.validarSenha(password);
             if (!validacao.valida) {
@@ -21,13 +23,16 @@ class PasswordManager {
             }
 
             // 2. Criptografar token com a senha
+            console.log('🔒 Criptografando token...');
             const tokenEncrypted = await CryptoUtils.encrypt(token, password);
             
             // 3. Hash da senha (para verificação)
+            console.log('🔑 Gerando hash da senha...');
             const passwordHash = await CryptoUtils.sha256(password);
             
             // 4. Verificar se é admin
             const isAdmin = CONFIG.admins.includes(username);
+            console.log(`👤 Admin: ${isAdmin}`);
             
             // 5. Montar objeto de autenticação
             const authData = {
@@ -45,15 +50,44 @@ class PasswordManager {
                 lastLogin: new Date().toISOString()
             };
             
-            // 6. Salvar no GitHub
-            await githubAPI.salvarJSON(
-                `${this.AUTH_DIR}/${username}.json`,
+            // 6. Verificar se arquivo já existe
+            const authPath = `${this.AUTH_DIR}/${username}.json`;
+            console.log(`📝 Salvando em: ${authPath}`);
+            
+            const existente = await githubAPI.lerJSON(authPath);
+            const sha = existente ? existente.sha : null;
+            
+            if (existente) {
+                console.log('⚠️ Conta já existe, sobrescrevendo...');
+            }
+            
+            // 7. Salvar no GitHub
+            const resultado = await githubAPI.salvarJSON(
+                authPath,
                 authData,
-                `🔐 Criar conta para ${username}`
+                `🔐 Criar conta para ${username}`,
+                sha
             );
             
-            // 7. Salvar último username localmente
+            console.log('✅ Arquivo salvo no GitHub:', resultado);
+            
+            // 8. Verificar se salvou corretamente
+            console.log('🔍 Verificando se arquivo foi criado...');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar 1s
+            
+            const verificacao = await githubAPI.lerJSON(authPath);
+            if (!verificacao || !verificacao.data) {
+                throw new Error('Erro ao verificar criação do arquivo. Tente novamente.');
+            }
+            
+            console.log('✅ Verificação OK - Arquivo existe');
+            
+            // 9. Salvar último username localmente
             this.salvarUltimoUsername(username);
+            
+            // 10. Configurar token no sistema
+            githubAPI.setToken(token);
+            authManager.salvarToken(token);
             
             console.log(`✅ Conta criada para ${username} (Admin: ${isAdmin})`);
             
@@ -73,28 +107,50 @@ class PasswordManager {
     
     async loginComSenha(username, password) {
         try {
+            console.log(`🔓 Tentando login para: ${username}`);
+            
             // 1. Buscar arquivo de autenticação do GitHub
-            const result = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
+            const authPath = `${this.AUTH_DIR}/${username}.json`;
+            console.log(`📂 Buscando: ${authPath}`);
+            
+            let result = await githubAPI.lerJSON(authPath);
+            
+            // Retry se não encontrar (pode ser delay do GitHub)
+            if (!result || !result.data) {
+                console.log('⏳ Arquivo não encontrado, aguardando e tentando novamente...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                result = await githubAPI.lerJSON(authPath);
+            }
             
             if (!result || !result.data) {
+                console.error('❌ Usuário não encontrado após retry');
                 throw new Error('Usuário não encontrado. Use "Primeiro acesso" para criar conta.');
             }
             
             const authData = result.data;
+            console.log('✅ Arquivo encontrado:', authData.username);
             
             // 2. Verificar senha
+            console.log('🔑 Verificando senha...');
             const passwordHash = await CryptoUtils.sha256(password);
             
             if (passwordHash !== authData.passwordHash) {
+                console.error('❌ Senha incorreta');
                 throw new Error('Senha incorreta');
             }
             
+            console.log('✅ Senha correta');
+            
             // 3. Descriptografar token
+            console.log('🔓 Descriptografando token...');
             const token = await CryptoUtils.decrypt(authData.tokenEncrypted, password);
             
             if (!token || !token.startsWith('ghp_')) {
+                console.error('❌ Token inválido após descriptografia');
                 throw new Error('Token inválido. Por favor, refaça o login com GitHub.');
             }
+            
+            console.log('✅ Token descriptografado com sucesso');
             
             // 4. Configurar sistema com o token
             githubAPI.setToken(token);
@@ -103,7 +159,7 @@ class PasswordManager {
             // 5. Atualizar último login
             authData.lastLogin = new Date().toISOString();
             await githubAPI.salvarJSON(
-                `${this.AUTH_DIR}/${username}.json`,
+                authPath,
                 authData,
                 `🔓 Login de ${username}`,
                 result.sha
@@ -112,7 +168,7 @@ class PasswordManager {
             // 6. Salvar último username
             this.salvarUltimoUsername(username);
             
-            console.log(`✅ Login bem-sucedido: ${username}`);
+            console.log(`✅ Login bem-sucedido: ${username} (Admin: ${authData.isAdmin})`);
             
             return {
                 success: true,
