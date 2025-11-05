@@ -148,6 +148,10 @@ function confirmarToken() {
 
 function cancelarToken() {
     document.getElementById('tokenModal').style.display = 'none';
+    // Redirecionar para a página de login
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 100);
     tokenResolve(null);
 }
 
@@ -206,20 +210,30 @@ async function processarCallback() {
         const code = urlParams.get('code');
         const error = urlParams.get('error');
 
-        if (error) throw new Error(`GitHub error: ${error}`);
+        if (error) throw new Error(`GitHub OAuth error: ${error}`);
 
         let token, profile;
 
         if (!code) {
+            // Não há código OAuth, solicitar token manual
             statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Aguardando token...';
-            await new Promise(r => setTimeout(r, 500));
             
             token = await mostrarModalToken();
-            if (!token) throw new Error('Token não fornecido');
+            if (!token) {
+                throw new Error('Token não fornecido. Operação cancelada.');
+            }
             
             githubAPI.setToken(token);
         } else {
-            throw new Error('OAuth não implementado. Use Personal Token.');
+            // Código OAuth presente mas não implementado ainda
+            statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Aguardando token...';
+            
+            token = await mostrarModalToken();
+            if (!token) {
+                throw new Error('Token não fornecido. Operação cancelada.');
+            }
+            
+            githubAPI.setToken(token);
         }
 
         statusMsg.innerHTML = '<i class="bi bi-person mr-2"></i>Carregando perfil...';
