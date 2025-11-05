@@ -145,7 +145,7 @@ function adminApp() {
         // ========== CARREGAR USUÁRIOS ==========
         async carregarUsuarios() {
             try {
-                this.usersData = await githubAPI.readJSON('data/users.json');
+                this.usersData = await githubAPI.lerJSON('data/users.json');
                 console.log(`✅ ${this.usersData.users.length} usuários carregados`);
             } catch (error) {
                 console.error('❌ Erro ao carregar users.json:', error);
@@ -216,7 +216,7 @@ function adminApp() {
                 }
             };
             
-            await githubAPI.writeJSON(
+            await githubAPI.salvarJSON(
                 'data/modelos.json',
                 estruturaInicial,
                 '📄 Inicializar arquivo de modelos'
@@ -229,7 +229,7 @@ function adminApp() {
         // ========== CARREGAR CONTADOR ==========
         async carregarContador() {
             try {
-                const contadorData = await githubAPI.readJSON('data/contador.json');
+                const contadorData = await githubAPI.lerJSON('data/contador.json');
                 this.contador = contadorData.contadores || {};
                 console.log('✅ Contador carregado');
             } catch (error) {
@@ -249,10 +249,10 @@ function adminApp() {
                 ultima_atualizacao: new Date().toISOString()
             };
             
-            await githubAPI.writeJSON(
+            await githubAPI.salvarJSON(
                 'data/contador.json',
                 contadorInicial,
-                '� Inicializar contador do sistema'
+                '📊 Inicializar contador do sistema'
             );
             
             this.contador = {};
@@ -318,7 +318,7 @@ function adminApp() {
                 this.contador[empresaId] = 0;
                 
                 // Carregar dados atuais
-                const contadorData = await githubAPI.readJSON('data/contador.json');
+                const contadorData = await githubAPI.lerJSON('data/contador.json');
                 
                 // Atualizar
                 contadorData.contadores[empresaId] = 0;
@@ -334,10 +334,11 @@ function adminApp() {
                 });
                 
                 // Salvar
-                await githubAPI.writeJSON(
+                await githubAPI.salvarJSON(
                     'data/contador.json',
                     contadorData,
-                    `🔄 Admin ${this.usuario.login} resetou contador da empresa ${empresaId}`
+                    `🔄 Admin ${this.usuario.login} resetou contador da empresa ${empresaId}`,
+                    contadorData.sha
                 );
                 
                 this.showAlert('success', '✅ Contador resetado com sucesso!');
@@ -369,16 +370,17 @@ function adminApp() {
                 this.empresas = this.empresas.filter(e => e.id !== empresaId);
                 
                 // Carregar dados atuais
-                const empresasData = await githubAPI.readJSON('data/empresas.json');
+                const empresasData = await githubAPI.lerJSON('data/empresas.json');
                 empresasData.empresas = this.empresas;
                 empresasData.metadata.totalEmpresas = this.empresas.length;
                 empresasData.metadata.atualizadoEm = new Date().toISOString();
                 
                 // Salvar
-                await githubAPI.writeJSON(
+                await githubAPI.salvarJSON(
                     'data/empresas.json',
                     empresasData,
-                    `🗑️ Admin deletou empresa: ${empresaRemovida?.nome || empresaId}`
+                    `🗑️ Admin deletou empresa: ${empresaRemovida?.nome || empresaId}`,
+                    empresasData.sha
                 );
                 
                 this.showAlert('success', '✅ Empresa deletada com sucesso!');
@@ -413,16 +415,17 @@ function adminApp() {
                 this.modelos = this.modelos.filter(m => m.id !== modeloId);
                 
                 // Carregar dados atuais
-                const modelosData = await githubAPI.readJSON('data/modelos.json');
+                const modelosData = await githubAPI.lerJSON('data/modelos.json');
                 modelosData.modelos = this.modelos;
                 modelosData.metadata.totalModelos = this.modelos.length;
                 modelosData.metadata.atualizadoEm = new Date().toISOString();
                 
                 // Salvar
-                await githubAPI.writeJSON(
+                await githubAPI.salvarJSON(
                     'data/modelos.json',
                     modelosData,
-                    `🗑️ Admin deletou modelo: ${modeloRemovido?.nome || modeloId}`
+                    `🗑️ Admin deletou modelo: ${modeloRemovido?.nome || modeloId}`,
+                    modelosData.sha
                 );
                 
                 this.showAlert('success', '✅ Modelo deletado com sucesso!');
@@ -444,7 +447,7 @@ function adminApp() {
                 this.loadingMessage = 'Verificando repositório...';
                 
                 // Tenta ler um arquivo qualquer
-                await githubAPI.readJSON('data/users.json');
+                await githubAPI.lerJSON('data/users.json');
                 
                 this.showAlert('success', '✅ Repositório conectado com sucesso!\n' + 
                     `Owner: ${this.config.owner}\n` +
