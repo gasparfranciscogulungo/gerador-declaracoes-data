@@ -46,14 +46,15 @@ class AuthManager {
 
     logout() {
         localStorage.removeItem(this.STORAGE_KEY);
+        localStorage.removeItem('username');
         sessionStorage.clear();
         this.isAuthenticated = false;
         this.currentUser = null;
 
         console.log('👋 Logout realizado');
 
-        // Redirecionar para página inicial
-        window.location.href = '/index.html';
+        // Redirecionar para página inicial (caminho relativo)
+        window.location.href = 'index.html';
     }
 
     // ========== PROCESSAR CALLBACK (depois do redirect) ==========
