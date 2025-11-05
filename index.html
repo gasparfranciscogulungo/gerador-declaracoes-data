@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerador de Declarações e Recibos Profissional">
+    <meta name="theme-color" content="#1e40af">
+    
+    <title>Gerador de Declarações e Recibos</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/logos/icon-192.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Alpine.js (Reatividade) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="bg-gray-50" x-data="appData()">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="bi bi-file-earmark-text text-4xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Gerador de Declarações</h1>
+                        <p class="text-blue-200 text-sm">Sistema Profissional de Documentos</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="toggleTheme()" class="btn-icon" title="Alternar tema">
+                        <i class="bi bi-moon-stars text-xl"></i>
+                    </button>
+                    <button @click="showHelp()" class="btn-icon" title="Ajuda">
+                        <i class="bi bi-question-circle text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Alert System -->
+        <div x-show="alert.show" 
+             x-transition
+             :class="alert.type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700'"
+             class="border-l-4 p-4 mb-6 rounded" 
+             role="alert">
+            <div class="flex items-center">
+                <i :class="alert.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'" class="text-xl mr-3"></i>
+                <p x-text="alert.message"></p>
+            </div>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="bi bi-gear-fill mr-2 text-blue-600"></i>
+                Configuração do Documento
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Select Empresa -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-building"></i> Empresa
+                    </label>
+                    <select x-model="selectedEmpresa" 
+                            @change="onEmpresaChange()"
+                            class="form-select w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Selecione uma empresa...</option>
+                        <template x-for="empresa in empresas" :key="empresa.id">
+                            <option :value="empresa.id" x-text="empresa.nome"></option>
+                        </template>
+                    </select>
+                    <p x-show="selectedEmpresa" class="text-xs text-gray-500 mt-1">
+                        <span x-text="getEmpresaInfo()"></span>
+                    </p>
+                </div>
+
+                <!-- Select Trabalhador -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-person-fill"></i> Trabalhador
+                    </label>
+                    <select x-model="selectedTrabalhador" 
+                            @change="onTrabalhadorChange()"
+                            class="form-select w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="">Selecione um trabalhador...</option>
+                        <template x-for="trab in trabalhadores" :key="trab.id">
+                            <option :value="trab.id" x-text="trab.nome"></option>
+                        </template>
+                    </select>
+                    <p x-show="selectedTrabalhador" class="text-xs text-gray-500 mt-1">
+                        <span x-text="getTrabalhadorInfo()"></span>
+                    </p>
+                </div>
+
+                <!-- Select Modelo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="bi bi-file-earmark-richtext"></i> Tipo de Documento
+                    </label>
+                    <select x-model="selectedModelo" 
+                            @change="onModeloChange()"
+                            :disabled="!selectedEmpresa"
+                            class="form-select w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100">
+                        <option value="">Selecione o tipo...</option>
+                        <template x-for="modelo in modelosDisponiveis" :key="modelo.id">
+                            <option :value="modelo.id" x-text="modelo.nome"></option>
+                        </template>
+                    </select>
+                </div>
+                
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between mt-6 pt-6 border-t">
+                <div class="flex items-center space-x-4">
+                    <button @click="gerarPreview()" 
+                            :disabled="!isFormValid()"
+                            :class="isFormValid() ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'"
+                            class="px-6 py-2 text-white rounded-lg font-medium transition-colors flex items-center">
+                        <i class="bi bi-eye mr-2"></i>
+                        Visualizar
+                    </button>
+                    
+                    <button @click="gerarPDF()" 
+                            :disabled="!previewGerado"
+                            :class="previewGerado ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-300 cursor-not-allowed'"
+                            class="px-6 py-2 text-white rounded-lg font-medium transition-colors flex items-center">
+                        <i class="bi bi-file-pdf mr-2"></i>
+                        Gerar PDF
+                    </button>
+                </div>
+
+                <!-- Contador -->
+                <div x-show="selectedEmpresa" class="text-right">
+                    <p class="text-sm text-gray-600">Declarações geradas:</p>
+                    <p class="text-2xl font-bold" :class="getContador() >= 5 ? 'text-red-600' : 'text-blue-600'">
+                        <span x-text="getContador()"></span> / 5
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div x-show="previewGerado" 
+             x-transition
+             class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="bi bi-file-text mr-2 text-blue-600"></i>
+                    Pré-visualização do Documento
+                </h2>
+                <button @click="fecharPreview()" class="text-gray-500 hover:text-gray-700">
+                    <i class="bi bi-x-lg text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Preview Container -->
+            <div id="preview-container" class="border-2 border-gray-200 rounded-lg bg-white p-8 shadow-inner min-h-[400px]">
+                <!-- Conteúdo será injetado aqui pelo JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">&copy; 2025 Gerador de Declarações. Sistema offline profissional.</p>
+            <p class="text-sm text-gray-500 mt-2">
+                <i class="bi bi-shield-check"></i> Documentos gerados localmente no seu dispositivo
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data-handler.js"></script>
+    <script src="js/storage-handler.js"></script>
+    <script src="js/model-builder.js"></script>
+    <script src="js/pdf-generator.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('✅ Service Worker registrado'))
+                    .catch(err => console.log('❌ Erro no Service Worker:', err));
+            });
+        }
+    </script>
+
+</body>
+</html>

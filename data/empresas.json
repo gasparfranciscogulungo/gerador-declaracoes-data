@@ -1,0 +1,52 @@
+{
+  "empresas": [
+    {
+      "id": "empresa1",
+      "nome": "TechnoSoft Solutions, Lda",
+      "nif": "501234567",
+      "morada": "Avenida da Liberdade, 245 - 3º Andar",
+      "cidade": "1250-143 Lisboa",
+      "telefone": "+351 21 123 4567",
+      "email": "geral@technosoft.pt",
+      "logo": "assets/logos/empresa1.png",
+      "carimbo": "assets/carimbos/carimbo1.png",
+      "cor_primaria": "#1e40af",
+      "cor_secundaria": "#dbeafe",
+      "representante": "Dr. João Santos",
+      "cargo_representante": "Diretor de Recursos Humanos",
+      "type_models": ["type1", "type2"]
+    },
+    {
+      "id": "empresa2",
+      "nome": "Global Consulting Group, S.A.",
+      "nif": "502987654",
+      "morada": "Rua das Flores, 88 - Sala 201",
+      "cidade": "4000-230 Porto",
+      "telefone": "+351 22 987 6543",
+      "email": "info@globalconsulting.pt",
+      "logo": "assets/logos/empresa2.png",
+      "carimbo": "assets/carimbos/carimbo2.png",
+      "cor_primaria": "#059669",
+      "cor_secundaria": "#d1fae5",
+      "representante": "Dra. Maria Silva",
+      "cargo_representante": "Gestora de Recursos Humanos",
+      "type_models": ["type1", "type3"]
+    },
+    {
+      "id": "empresa3",
+      "nome": "Innovation Tech Ventures",
+      "nif": "503456789",
+      "morada": "Parque Tecnológico, Edifício 5",
+      "cidade": "3810-193 Aveiro",
+      "telefone": "+351 234 567 890",
+      "email": "contacto@innovationtech.pt",
+      "logo": "assets/logos/empresa3.png",
+      "carimbo": "assets/carimbos/carimbo3.png",
+      "cor_primaria": "#7c3aed",
+      "cor_secundaria": "#ede9fe",
+      "representante": "Eng. Pedro Costa",
+      "cargo_representante": "CEO",
+      "type_models": ["type2", "type3"]
+    }
+  ]
+}

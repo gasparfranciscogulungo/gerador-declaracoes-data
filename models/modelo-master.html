@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Estilos base do documento */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .documento-pdf {
+            width: 100%;
+            max-width: 210mm;
+            padding: 40px;
+            background: white;
+            color: #000;
+            font-size: 12pt;
+            line-height: 1.8;
+        }
+        
+        /* Cabeçalho da empresa */
+        .header-empresa {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid {EMPRESA_COR_PRIMARIA};
+        }
+        
+        .logo-container {
+            flex: 0 0 150px;
+        }
+        
+        .logo-empresa {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        .info-empresa {
+            flex: 1;
+            text-align: right;
+            padding-left: 20px;
+        }
+        
+        .info-empresa h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            color: {EMPRESA_COR_PRIMARIA};
+            margin: 0 0 10px 0;
+        }
+        
+        .info-empresa p {
+            margin: 3px 0;
+            font-size: 10pt;
+            color: #333;
+        }
+        
+        /* Conteúdo dinâmico (vem do type model) */
+        .conteudo-dinamico {
+            margin: 30px 0;
+        }
+        
+        .conteudo-dinamico h2 {
+            font-size: 18pt;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            color: {EMPRESA_COR_PRIMARIA};
+            margin: 30px 0 20px 0;
+            letter-spacing: 1px;
+        }
+        
+        .conteudo-dinamico p {
+            margin-bottom: 15px;
+            text-align: justify;
+            text-indent: 30px;
+        }
+        
+        .conteudo-dinamico p.no-indent {
+            text-indent: 0;
+        }
+        
+        /* Caixa de destaque */
+        .destaque {
+            background: {EMPRESA_COR_SECUNDARIA};
+            border-left: 5px solid {EMPRESA_COR_PRIMARIA};
+            padding: 20px;
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        
+        /* Box de informações do trabalhador */
+        .box-trabalhador {
+            background: #f9fafb;
+            border: 2px solid {EMPRESA_COR_PRIMARIA};
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        
+        .box-trabalhador h3 {
+            font-size: 14pt;
+            font-weight: bold;
+            color: {EMPRESA_COR_PRIMARIA};
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid {EMPRESA_COR_PRIMARIA};
+            padding-bottom: 8px;
+        }
+        
+        .box-trabalhador table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .box-trabalhador td {
+            padding: 8px 0;
+            font-size: 11pt;
+        }
+        
+        .box-trabalhador td:first-child {
+            font-weight: bold;
+            width: 40%;
+            color: #374151;
+        }
+        
+        /* Tabelas */
+        table.tabela-dados {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table.tabela-dados th,
+        table.tabela-dados td {
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            text-align: left;
+            font-size: 11pt;
+        }
+        
+        table.tabela-dados th {
+            background: {EMPRESA_COR_SECUNDARIA};
+            font-weight: bold;
+            color: {EMPRESA_COR_PRIMARIA};
+        }
+        
+        /* Rodapé do documento */
+        .footer-documento {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 2px solid {EMPRESA_COR_PRIMARIA};
+        }
+        
+        .assinatura-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+        
+        .assinatura-box {
+            text-align: center;
+            width: 45%;
+        }
+        
+        .assinatura-linha {
+            border-top: 2px solid #000;
+            margin-bottom: 8px;
+        }
+        
+        .assinatura-box p {
+            margin: 5px 0;
+            font-size: 10pt;
+        }
+        
+        .carimbo-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .carimbo {
+            max-width: 120px;
+            height: auto;
+            opacity: 0.9;
+        }
+        
+        /* Rodapé informativo */
+        .footer-info {
+            text-align: center;
+            font-size: 9pt;
+            color: #6b7280;
+            font-style: italic;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Metadados do documento */
+        .metadata {
+            font-size: 9pt;
+            color: #9ca3af;
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        /* Utilitários */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-bold { font-weight: bold; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        
+        /* Impressão */
+        @media print {
+            .documento-pdf {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="documento-pdf">
+        
+        <!-- ==================== CABEÇALHO DA EMPRESA ==================== -->
+        <div class="header-empresa">
+            <div class="logo-container">
+                <img src="{EMPRESA_LOGO}" alt="Logo da Empresa" class="logo-empresa">
+            </div>
+            <div class="info-empresa">
+                <h1>{EMPRESA_NOME}</h1>
+                <p><strong>NIF:</strong> {EMPRESA_NIF}</p>
+                <p>{EMPRESA_MORADA}</p>
+                <p>{EMPRESA_CIDADE}</p>
+                <p><strong>Tel:</strong> {EMPRESA_TELEFONE} | <strong>Email:</strong> {EMPRESA_EMAIL}</p>
+            </div>
+        </div>
+        
+        <!-- ==================== CONTEÚDO DINÂMICO (TYPE MODEL) ==================== -->
+        <div class="conteudo-dinamico">
+            {TYPE_CONTENT}
+        </div>
+        
+        <!-- ==================== SEÇÃO DO TRABALHADOR (TYPE MODEL) ==================== -->
+        <div class="secao-trabalhador">
+            {TRABALHADOR_SECTION}
+        </div>
+        
+        <!-- ==================== RODAPÉ DO DOCUMENTO ==================== -->
+        <div class="footer-documento">
+            
+            <!-- Texto do rodapé (vem do type model) -->
+            <div class="footer-text">
+                {TYPE_FOOTER}
+            </div>
+            
+            <!-- Data de emissão -->
+            <p class="text-center mt-20">
+                <strong>{EMPRESA_CIDADE}, {DATA_ATUAL}</strong>
+            </p>
+            
+            <!-- Assinaturas -->
+            <div class="assinatura-container">
+                <div class="assinatura-box">
+                    <div class="assinatura-linha"></div>
+                    <p class="text-bold">{EMPRESA_REPRESENTANTE}</p>
+                    <p>{CARGO_REPRESENTANTE}</p>
+                </div>
+                <div class="assinatura-box">
+                    <div class="assinatura-linha"></div>
+                    <p class="text-bold">{TRABALHADOR_NOME}</p>
+                    <p>O Trabalhador</p>
+                </div>
+            </div>
+            
+            <!-- Carimbo da empresa -->
+            <div class="carimbo-container">
+                <img src="{EMPRESA_CARIMBO}" alt="Carimbo" class="carimbo">
+            </div>
+            
+            <!-- Informações de rodapé -->
+            <div class="footer-info">
+                <p>Documento emitido eletronicamente por {EMPRESA_NOME}</p>
+                <p>Este documento é válido sem assinatura física, conforme legislação em vigor</p>
+            </div>
+            
+            <!-- Metadados -->
+            <div class="metadata">
+                <p>Ref: {DOCUMENTO_REF} | Emitido em: {DATA_HORA_EMISSAO}</p>
+            </div>
+            
+        </div>
+        
+    </div>
+</body>
+</html>

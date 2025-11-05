@@ -1,0 +1,25 @@
+{
+  "modelos": [
+    {
+      "id": "type1",
+      "nome": "Declaração de Vencimento",
+      "descricao": "Declaração oficial de vencimento mensal do trabalhador",
+      "categoria": "Declarações",
+      "icone": "bi-cash-coin"
+    },
+    {
+      "id": "type2",
+      "nome": "Declaração de Vínculo Laboral",
+      "descricao": "Declaração de existência de vínculo laboral ativo",
+      "categoria": "Declarações",
+      "icone": "bi-briefcase"
+    },
+    {
+      "id": "type3",
+      "nome": "Recibo de Vencimento",
+      "descricao": "Recibo mensal de pagamento de salário",
+      "categoria": "Recibos",
+      "icone": "bi-receipt"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "type2",
+  "nome": "Declaração de Vínculo Laboral",
+  "empresa_id": "all",
+  "descricao": "Declaração de existência de vínculo laboral ativo com a empresa",
+  
+  "type_content": {
+    "titulo": "<h2>DECLARAÇÃO DE VÍNCULO LABORAL</h2>",
+    "corpo": [
+      {
+        "tipo": "paragrafo",
+        "classe": "no-indent",
+        "texto": "Declaração,"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "<strong>{EMPRESA_NOME}</strong>, pessoa coletiva n.º <strong>{EMPRESA_NIF}</strong>, com sede social em {EMPRESA_MORADA}, {EMPRESA_CIDADE}, na qualidade de entidade empregadora, declara para os devidos e legais efeitos que:"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "<strong>{TRABALHADOR_NOME}</strong>, portador(a) do {TRABALHADOR_TIPO_DOC} n.º <strong>{TRABALHADOR_DOC}</strong> e contribuinte fiscal n.º <strong>{TRABALHADOR_NIF}</strong>, nascido(a) em <strong>{TRABALHADOR_DATA_NASCIMENTO}</strong>, de nacionalidade <strong>{TRABALHADOR_NACIONALIDADE}</strong>, residente em {TRABALHADOR_MORADA}, {TRABALHADOR_CIDADE},"
+      },
+      {
+        "tipo": "destaque",
+        "texto": "MANTÉM VÍNCULO LABORAL ATIVO COM ESTA EMPRESA"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "O(a) referido(a) trabalhador(a) foi admitido(a) em <strong>{DATA_ADMISSAO}</strong>, exercendo funções na qualidade de <strong>{TRABALHADOR_FUNCAO}</strong>, no âmbito de um <strong>{TIPO_CONTRATO}</strong>."
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "O contrato de trabalho encontra-se em pleno vigor, não existindo qualquer procedimento disciplinar em curso, nem qualquer situação de cessação contratual pendente."
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "A presente declaração é válida por um período de 30 (trinta) dias a contar da data de emissão, para apresentação a quem de direito."
+      },
+      {
+        "tipo": "paragrafo",
+        "classe": "no-indent mt-20",
+        "texto": "Mais se declara que a informação prestada é verdadeira,"
+      }
+    ]
+  },
+
+  "trabalhador_section": {
+    "template": "<div class='box-trabalhador'><h3>Identificação do Trabalhador</h3><table><tr><td>Nome Completo:</td><td><strong>{TRABALHADOR_NOME}</strong></td></tr><tr><td>Documento de Identificação:</td><td>{TRABALHADOR_TIPO_DOC} n.º {TRABALHADOR_DOC}</td></tr><tr><td>NIF:</td><td>{TRABALHADOR_NIF}</td></tr><tr><td>Data de Nascimento:</td><td>{TRABALHADOR_DATA_NASCIMENTO}</td></tr><tr><td>Nacionalidade:</td><td>{TRABALHADOR_NACIONALIDADE}</td></tr><tr><td>Morada:</td><td>{TRABALHADOR_MORADA}, {TRABALHADOR_CIDADE}</td></tr><tr><td>Contacto:</td><td>{TRABALHADOR_TELEFONE}</td></tr></table><h3 style='margin-top: 20px;'>Informação Contratual</h3><table><tr><td>Função/Cargo:</td><td><strong>{TRABALHADOR_FUNCAO}</strong></td></tr><tr><td>Departamento:</td><td>{TRABALHADOR_DEPARTAMENTO}</td></tr><tr><td>Data de Admissão:</td><td>{DATA_ADMISSAO}</td></tr><tr><td>Tipo de Contrato:</td><td>{TIPO_CONTRATO}</td></tr><tr><td>Situação Atual:</td><td><strong style='color: #059669;'>✓ ATIVO</strong></td></tr></table></div>"
+  },
+
+  "type_footer": {
+    "template": "<p class='text-center'><small>Declaração emitida nos termos do n.º 1 do artigo 128.º do Código do Trabalho.<br>Válida por 30 dias a contar da data de emissão.</small></p>"
+  }
+}

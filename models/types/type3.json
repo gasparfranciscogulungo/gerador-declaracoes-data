@@ -1,0 +1,41 @@
+{
+  "id": "type3",
+  "nome": "Recibo de Vencimento",
+  "empresa_id": "all",
+  "descricao": "Recibo mensal de pagamento de vencimento",
+  
+  "type_content": {
+    "titulo": "<h2>RECIBO DE VENCIMENTO</h2><p class='text-center' style='margin-top: -10px;'><strong>Mês de Referência:</strong> {MES_REFERENCIA}</p>",
+    "corpo": [
+      {
+        "tipo": "tabela",
+        "html": "<table class='tabela-dados'><thead><tr><th colspan='2' style='text-align: center; background: {EMPRESA_COR_PRIMARIA}; color: white;'>IDENTIFICAÇÃO</th></tr></thead><tbody><tr><td><strong>Empregador:</strong></td><td>{EMPRESA_NOME} - NIF: {EMPRESA_NIF}</td></tr><tr><td><strong>Trabalhador:</strong></td><td>{TRABALHADOR_NOME} - NIF: {TRABALHADOR_NIF}</td></tr><tr><td><strong>Função:</strong></td><td>{TRABALHADOR_FUNCAO}</td></tr><tr><td><strong>Departamento:</strong></td><td>{TRABALHADOR_DEPARTAMENTO}</td></tr></tbody></table>"
+      },
+      {
+        "tipo": "tabela",
+        "html": "<table class='tabela-dados' style='margin-top: 30px;'><thead><tr><th style='text-align: center; background: {EMPRESA_COR_PRIMARIA}; color: white;'>DESCRIÇÃO</th><th style='text-align: center; background: {EMPRESA_COR_PRIMARIA}; color: white; width: 150px;'>VALOR ({MOEDA})</th></tr></thead><tbody><tr><td><strong>Vencimento Base</strong></td><td style='text-align: right;'>{SALARIO_BRUTO}</td></tr><tr><td>Subsídio de Alimentação (22 dias × 6.00)</td><td style='text-align: right;'>132.00</td></tr><tr><td>Prémio de Desempenho</td><td style='text-align: right;'>0.00</td></tr><tr style='background: #f3f4f6;'><td><strong>Total de Vencimentos</strong></td><td style='text-align: right;'><strong>{TOTAL_VENCIMENTOS}</strong></td></tr></tbody></table>"
+      },
+      {
+        "tipo": "tabela",
+        "html": "<table class='tabela-dados' style='margin-top: 20px;'><thead><tr><th style='text-align: center; background: #dc2626; color: white;'>DESCONTOS</th><th style='text-align: center; background: #dc2626; color: white; width: 150px;'>VALOR ({MOEDA})</th></tr></thead><tbody><tr><td>Segurança Social (11%)</td><td style='text-align: right;'>{DESCONTO_SS}</td></tr><tr><td>IRS</td><td style='text-align: right;'>{DESCONTO_IRS}</td></tr><tr style='background: #fee2e2;'><td><strong>Total de Descontos</strong></td><td style='text-align: right;'><strong>{TOTAL_DESCONTOS}</strong></td></tr></tbody></table>"
+      },
+      {
+        "tipo": "destaque",
+        "texto": "VALOR LÍQUIDO A RECEBER: {SALARIO_LIQUIDO} {MOEDA}"
+      },
+      {
+        "tipo": "paragrafo",
+        "classe": "no-indent",
+        "texto": "<strong>Forma de Pagamento:</strong> Transferência Bancária<br><strong>IBAN:</strong> {TRABALHADOR_IBAN}<br><strong>Data de Pagamento:</strong> {DATA_PAGAMENTO}"
+      }
+    ]
+  },
+
+  "trabalhador_section": {
+    "template": "<div style='margin-top: 30px; padding: 15px; background: #fef3c7; border-left: 5px solid #f59e0b; border-radius: 5px;'><p style='margin: 0; font-size: 10pt;'><strong>ℹ️ Nota Importante:</strong> Este recibo de vencimento comprova o pagamento efetuado no mês de referência. Para efeitos de IRS, consulte a declaração anual de rendimentos.</p></div>"
+  },
+
+  "type_footer": {
+    "template": "<p class='text-center'><small>Recibo emitido eletronicamente, válido sem assinatura nos termos da legislação aplicável.<br>Processado pelo Departamento de Recursos Humanos de {EMPRESA_NOME}</small></p>"
+  }
+}

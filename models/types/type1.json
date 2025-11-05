@@ -1,0 +1,54 @@
+{
+  "id": "type1",
+  "nome": "Declaração de Vencimento",
+  "empresa_id": "all",
+  "descricao": "Declaração oficial de vencimento mensal para uso bancário ou outros fins",
+  
+  "type_content": {
+    "titulo": "<h2>DECLARAÇÃO DE VENCIMENTO</h2>",
+    "corpo": [
+      {
+        "tipo": "paragrafo",
+        "classe": "no-indent",
+        "texto": "Para os devidos efeitos,"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "A empresa <strong>{EMPRESA_NOME}</strong>, com o número de identificação fiscal (NIF) <strong>{EMPRESA_NIF}</strong>, com sede em {EMPRESA_MORADA}, {EMPRESA_CIDADE}, declara, para os devidos efeitos legais, que:"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "O(a) trabalhador(a) <strong>{TRABALHADOR_NOME}</strong>, portador(a) do {TRABALHADOR_TIPO_DOC} n.º <strong>{TRABALHADOR_DOC}</strong>, titular do NIF <strong>{TRABALHADOR_NIF}</strong>, exerce funções nesta empresa na qualidade de <strong>{TRABALHADOR_FUNCAO}</strong>, no departamento de <strong>{TRABALHADOR_DEPARTAMENTO}</strong>."
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "O(a) referido(a) trabalhador(a) aufere um <strong>vencimento mensal bruto</strong> no valor de:"
+      },
+      {
+        "tipo": "destaque",
+        "texto": "{SALARIO_BRUTO} {MOEDA}<br><small>({SALARIO_BRUTO_EXTENSO})</small>"
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "O vencimento líquido mensal, após descontos legais obrigatórios (Segurança Social e IRS), corresponde a <strong>{SALARIO_LIQUIDO} {MOEDA}</strong>."
+      },
+      {
+        "tipo": "paragrafo",
+        "texto": "Esta declaração é emitida a pedido do(a) interessado(a), para os fins que entender convenientes, nomeadamente para apresentação a entidades bancárias, serviços públicos ou outras instituições."
+      },
+      {
+        "tipo": "paragrafo",
+        "classe": "no-indent",
+        "texto": "Por ser verdade,"
+      }
+    ]
+  },
+
+  "trabalhador_section": {
+    "template": "<div class='box-trabalhador'><h3>Dados do Trabalhador</h3><table><tr><td>Nome Completo:</td><td>{TRABALHADOR_NOME}</td></tr><tr><td>Documento Identificação:</td><td>{TRABALHADOR_TIPO_DOC} n.º {TRABALHADOR_DOC}</td></tr><tr><td>NIF:</td><td>{TRABALHADOR_NIF}</td></tr><tr><td>Função:</td><td>{TRABALHADOR_FUNCAO}</td></tr><tr><td>Departamento:</td><td>{TRABALHADOR_DEPARTAMENTO}</td></tr><tr><td>Tipo de Contrato:</td><td>{TIPO_CONTRATO}</td></tr><tr><td>Data de Admissão:</td><td>{DATA_ADMISSAO}</td></tr><tr><td>Vencimento Bruto Mensal:</td><td><strong>{SALARIO_BRUTO} {MOEDA}</strong></td></tr><tr><td>Vencimento Líquido Mensal:</td><td><strong>{SALARIO_LIQUIDO} {MOEDA}</strong></td></tr></table></div>"
+  },
+
+  "type_footer": {
+    "template": "<p class='text-center'>Declaração emitida ao abrigo do Código do Trabalho, Lei n.º 7/2009, de 12 de fevereiro, na sua redação atual.</p>"
+  }
+}
