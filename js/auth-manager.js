@@ -6,7 +6,7 @@
 class AuthManager {
     constructor() {
         this.CLIENT_ID = null;  // Será configurado
-        this.REDIRECT_URI = window.location.origin + '/callback.html';
+        this.REDIRECT_URI = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/callback.html');
         this.STORAGE_KEY = 'github_auth';
         this.isAuthenticated = false;
         this.currentUser = null;
