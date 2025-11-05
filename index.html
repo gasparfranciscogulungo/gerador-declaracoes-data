@@ -238,10 +238,10 @@
                 
                 mostrarSucesso(`Bem-vindo, ${user.login}! ${isAdmin ? '👑 Admin' : '👤 User'}`);
                 
-                // Redirecionar
+                // Redirecionar (mais rápido: 600ms)
                 setTimeout(() => {
                     window.location.href = isAdmin ? 'admin.html' : 'user.html';
-                }, 1200);
+                }, 600);
                 
             } catch (error) {
                 console.error('Erro:', error);
@@ -256,19 +256,25 @@
         // Carregar token salvo e fazer login automático
         window.addEventListener('DOMContentLoaded', async () => {
             const savedToken = authManager.carregarToken();
+            const savedUsername = localStorage.getItem('username');
+            
             if (savedToken) {
                 document.getElementById('token').value = savedToken;
                 
                 // Mostrar botão de usar outro token
                 document.getElementById('btnUsarOutroToken').classList.remove('hidden');
                 
-                // Mostrar mensagem de login automático
-                mostrarSucesso('Token salvo encontrado! Entrando automaticamente...');
+                // Mostrar mensagem com username se disponível
+                const mensagem = savedUsername 
+                    ? `Bem-vindo de volta, ${savedUsername}! Entrando...`
+                    : 'Token salvo encontrado! Entrando automaticamente...';
                 
-                // Login automático após 800ms
+                mostrarSucesso(mensagem);
+                
+                // Login automático IMEDIATO (300ms apenas para UX)
                 setTimeout(() => {
                     document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-                }, 800);
+                }, 300);
             }
         });
     </script>
