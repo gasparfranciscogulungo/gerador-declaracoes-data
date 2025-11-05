@@ -485,6 +485,11 @@ async function processarCallback() {
     const statusMsg = document.getElementById('status-message');
     
     try {
+        // ✅ Verificar se CONFIG está carregado
+        if (!CONFIG || !CONFIG.github) {
+            throw new Error('Configuração do sistema não carregada. Recarregue a página.');
+        }
+        
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const error = urlParams.get('error');
@@ -522,11 +527,17 @@ async function processarCallback() {
         
         // ✅ CONFIGURAR GitHub API com o repositório
         console.log('⚙️ Configurando GitHub API...');
+        console.log('   Owner:', CONFIG.github.owner);
+        console.log('   Repo:', CONFIG.github.repo);
+        console.log('   Branch:', CONFIG.github.branch);
+        
         githubAPI.configurar({
             owner: CONFIG.github.owner,
             repo: CONFIG.github.repo,
             branch: CONFIG.github.branch
         });
+        
+        console.log('✅ GitHub API configurado com sucesso');
         
         currentToken = token;
         currentProfile = profile;
