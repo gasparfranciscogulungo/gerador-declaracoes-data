@@ -520,6 +520,14 @@ async function processarCallback() {
         
         if (!profile || !profile.login) throw new Error('Token inválido');
         
+        // ✅ CONFIGURAR GitHub API com o repositório
+        console.log('⚙️ Configurando GitHub API...');
+        githubAPI.configurar({
+            owner: CONFIG.owner,
+            repo: CONFIG.repo,
+            branch: CONFIG.branch
+        });
+        
         currentToken = token;
         currentProfile = profile;
         
