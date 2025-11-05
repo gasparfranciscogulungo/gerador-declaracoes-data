@@ -1,29 +1,29 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762371998228",
-      "nome": "gaskasdjlçdaçdçj",
-      "nif": "jaçlhçshdçadh",
+      "id": "empresa_1762373126992",
+      "nome": "Gasoaçosdhalçds ad hi",
+      "nif": "090809808080",
       "endereco": {
-        "rua": "çhçldçahsdçh",
-        "edificio": "çhlçhç",
-        "andar": "çhlççç",
-        "sala": "hçhçlhç",
-        "bairro": "jºjaºfjaçsfºaj",
-        "municipio": "jçjsdkçfjsakçfja",
-        "provincia": "jçfaºjfça",
-        "pais": "Angola"
+        "rua": "hjlakjdhkjalskjda da k",
+        "edificio": " hlhjklhlkjhdjh alkjd h",
+        "andar": "hjlk hjlk hlj hjl hjl",
+        "sala": "hlkjhlkjhlkjhjh",
+        "bairro": "hklhlkj hjl h",
+        "municipio": "h lhlkj ",
+        "provincia": "hjlhlhjlkhljhj",
+        "pais": "ljkjklhdkjlklhjdsklhlkd"
       },
-      "telefone": "8904289038408203",
-      "email": "hsdhfahhfha@gmail.com",
+      "telefone": "",
+      "email": "",
       "website": "",
       "logo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
       "carimbo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T19:46:38.228Z",
-      "updatedAt": "2025-11-05T19:46:38.228Z",
+      "createdAt": "2025-11-05T20:05:26.992Z",
+      "updatedAt": "2025-11-05T20:05:26.992Z",
       "contador": 0
     }
   ]
