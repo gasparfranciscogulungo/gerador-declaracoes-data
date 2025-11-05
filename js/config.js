@@ -8,14 +8,14 @@ const CONFIG = {
     github: {
         // IMPORTANTE: Você precisa criar um OAuth App no GitHub
         // https://github.com/settings/developers
-        clientId: 'SEU_CLIENT_ID_AQUI',  // ← CONFIGURAR
-        owner: 'gaspargulungo',           // ← Seu username do GitHub
-        repo: 'gerador-declaracoes-data'  // ← Nome do repositório de dados
+        clientId: 'Ov23liYkxPW1TQtLXdhL',  // ← Client ID do OAuth App
+        owner: 'gasparfranciscogulungo',    // ← Seu username do GitHub
+        repo: 'gerador-declaracoes-data'    // ← Nome do repositório de dados
     },
 
     // ========== ADMINISTRADORES ==========
     admins: [
-        'gaspargulungo',  // ← Seu username
+        'gasparfranciscogulungo',  // ← Seu username
         // Adicione outros admins aqui
     ],
 
