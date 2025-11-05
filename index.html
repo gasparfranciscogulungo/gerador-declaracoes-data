@@ -72,6 +72,15 @@
             </button>
         </form>
 
+        <!-- Botão Usar Outro Token (aparece quando já tem token salvo) -->
+        <button 
+            id="btnUsarOutroToken"
+            onclick="usarOutroToken()"
+            class="hidden w-full mt-3 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition text-sm"
+        >
+            <i class="bi bi-arrow-repeat mr-2"></i>Usar outro token
+        </button>
+
         <!-- Como obter token -->
         <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p class="text-sm font-semibold text-blue-800 mb-2">
@@ -116,6 +125,27 @@
             document.getElementById('erro').classList.add('hidden');
             document.getElementById('sucesso-msg').textContent = msg;
             document.getElementById('sucesso').classList.remove('hidden');
+        }
+
+        function usarOutroToken() {
+            // Limpar token salvo
+            authManager.logout();
+            localStorage.removeItem('username');
+            
+            // Limpar campo e focar
+            document.getElementById('token').value = '';
+            document.getElementById('token').type = 'password';
+            document.getElementById('token').focus();
+            
+            // Esconder botão
+            document.getElementById('btnUsarOutroToken').classList.add('hidden');
+            
+            mostrarSucesso('Token removido. Cole um novo token.');
+            
+            // Limpar mensagem após 3s
+            setTimeout(() => {
+                document.getElementById('sucesso').classList.add('hidden');
+            }, 3000);
         }
 
         async function fazerLogin(e) {
@@ -178,11 +208,22 @@
 
         document.getElementById('loginForm').addEventListener('submit', fazerLogin);
         
-        // Carregar token salvo
-        window.addEventListener('DOMContentLoaded', () => {
+        // Carregar token salvo e fazer login automático
+        window.addEventListener('DOMContentLoaded', async () => {
             const savedToken = authManager.carregarToken();
             if (savedToken) {
                 document.getElementById('token').value = savedToken;
+                
+                // Mostrar botão de usar outro token
+                document.getElementById('btnUsarOutroToken').classList.remove('hidden');
+                
+                // Mostrar mensagem de login automático
+                mostrarSucesso('Token salvo encontrado! Entrando automaticamente...');
+                
+                // Login automático após 800ms
+                setTimeout(() => {
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                }, 800);
             }
         });
     </script>
