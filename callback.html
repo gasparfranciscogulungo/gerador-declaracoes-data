@@ -470,11 +470,24 @@ async function processarCallback() {
             finalizarComSucesso(profile.login, result.isAdmin);
             
         } else {
+            // Verificar se conta já existe
             statusMsg.innerHTML = '<i class="bi bi-search mr-2"></i>Verificando...';
             const existe = await passwordManager.usuarioExiste(profile.login);
             
             if (existe) {
-                throw new Error(`Conta já existe!\n\nUse o login com senha.\nEsqueceu? Clique em "Esqueci minha senha".`);
+                // Conta existe - perguntar se quer recriar ou usar login
+                const recriar = confirm(
+                    `⚠️ Já existe uma conta para ${profile.login}\n\n` +
+                    `Clique em:\n` +
+                    `• OK para RECRIAR a conta (apaga a senha antiga)\n` +
+                    `• CANCELAR para usar o login com senha`
+                );
+                
+                if (!recriar) {
+                    throw new Error(`Conta já existe. Use o login com senha na página inicial.`);
+                }
+                
+                console.log('🔄 Usuário optou por recriar a conta');
             }
             
             statusMsg.innerHTML = '<i class="bi bi-key mr-2"></i>Crie sua senha...';

@@ -246,9 +246,14 @@ class PasswordManager {
     
     async usuarioExiste(username) {
         try {
-            const result = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
-            return !!(result && result.data);
+            console.log(`🔍 Verificando se usuário existe: ${username}`);
+            const authPath = `${this.AUTH_DIR}/${username}.json`;
+            const result = await githubAPI.lerJSON(authPath);
+            const existe = !!(result && result.data);
+            console.log(`${existe ? '✅' : '❌'} Usuário ${username} ${existe ? 'EXISTE' : 'NÃO EXISTE'}`);
+            return existe;
         } catch (error) {
+            console.log(`❌ Erro ao verificar usuário ${username}, assumindo que não existe:`, error.message);
             return false;
         }
     }
