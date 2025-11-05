@@ -33,8 +33,11 @@ class AuthManager {
         // Salvar state para validação depois
         sessionStorage.setItem('oauth_state', state);
 
+        console.log('🔐 Redirect URI:', this.REDIRECT_URI);
+
         const authURL = `https://github.com/login/oauth/authorize?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
 
+        console.log('🔗 Auth URL completa:', authURL);
         console.log('🔐 Redirecionando para GitHub OAuth...');
         window.location.href = authURL;
     }
