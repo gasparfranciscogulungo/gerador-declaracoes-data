@@ -74,11 +74,13 @@ class PasswordManager {
     async loginComSenha(username, password) {
         try {
             // 1. Buscar arquivo de autenticação do GitHub
-            const authData = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
+            const result = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
             
-            if (!authData) {
+            if (!result || !result.data) {
                 throw new Error('Usuário não encontrado. Use "Primeiro acesso" para criar conta.');
             }
+            
+            const authData = result.data;
             
             // 2. Verificar senha
             const passwordHash = await CryptoUtils.sha256(password);
@@ -103,7 +105,8 @@ class PasswordManager {
             await githubAPI.salvarJSON(
                 `${this.AUTH_DIR}/${username}.json`,
                 authData,
-                `🔓 Login de ${username}`
+                `🔓 Login de ${username}`,
+                result.sha
             );
             
             // 6. Salvar último username
@@ -157,7 +160,8 @@ class PasswordManager {
             const passwordHash = await CryptoUtils.sha256(senhaNova);
             
             // 4. Buscar dados atuais
-            const authData = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
+            const result = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
+            const authData = result.data;
             
             // 5. Atualizar apenas senha e token
             authData.tokenEncrypted = tokenEncrypted;
@@ -168,7 +172,8 @@ class PasswordManager {
             await githubAPI.salvarJSON(
                 `${this.AUTH_DIR}/${username}.json`,
                 authData,
-                `🔑 Troca de senha para ${username}`
+                `🔑 Troca de senha para ${username}`,
+                result.sha
             );
             
             console.log(`✅ Senha alterada para ${username}`);
@@ -185,8 +190,8 @@ class PasswordManager {
     
     async usuarioExiste(username) {
         try {
-            const authData = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
-            return !!authData;
+            const result = await githubAPI.lerJSON(`${this.AUTH_DIR}/${username}.json`);
+            return !!(result && result.data);
         } catch (error) {
             return false;
         }

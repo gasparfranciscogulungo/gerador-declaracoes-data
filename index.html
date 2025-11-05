@@ -73,6 +73,18 @@
                 </div>
             </div>
 
+            <!-- Área de Erro -->
+            <div id="loginError" style="display:none;" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-exclamation-triangle-fill text-red-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-800 font-medium" id="loginErrorText"></p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Botão Entrar -->
             <button 
                 type="submit"
@@ -171,14 +183,31 @@
 
         // ========== LOGIN COM SENHA ==========
         
+        function mostrarErroLogin(mensagem) {
+            const errorDiv = document.getElementById('loginError');
+            const errorText = document.getElementById('loginErrorText');
+            errorText.textContent = mensagem;
+            errorDiv.style.display = 'block';
+            
+            // Scroll suave até o erro
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function ocultarErroLogin() {
+            document.getElementById('loginError').style.display = 'none';
+        }
+        
         async function fazerLogin(event) {
             event.preventDefault();
+            
+            // Ocultar erro anterior
+            ocultarErroLogin();
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
             if (!username || !password) {
-                alert('⚠️ Preencha todos os campos!');
+                mostrarErroLogin('⚠️ Preencha todos os campos!');
                 return;
             }
             
@@ -202,7 +231,7 @@
                 
             } catch (error) {
                 console.error('❌ Erro no login:', error);
-                alert(`❌ ${error.message}`);
+                mostrarErroLogin(error.message);
                 
                 // Reabilitar botão
                 submitBtn.disabled = false;
