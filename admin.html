@@ -72,8 +72,8 @@
     <main class="container mx-auto px-4 py-8">
         
         <!-- Dashboard Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-sm">Empresas</p>
@@ -83,7 +83,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-sm">Modelos</p>
@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-sm">Users Ativos</p>
@@ -103,13 +103,33 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-sm">Declarações Hoje</p>
+                        <p class="text-gray-500 text-sm">PDFs Hoje</p>
                         <p class="text-3xl font-bold text-orange-600" x-text="stats.declaracoesHoje"></p>
                     </div>
-                    <i class="bi bi-graph-up text-4xl text-orange-200"></i>
+                    <i class="bi bi-file-earmark-pdf text-4xl text-orange-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Clientes</p>
+                        <p class="text-3xl font-bold text-cyan-600" x-text="stats.totalClientes || 0"></p>
+                    </div>
+                    <i class="bi bi-briefcase text-4xl text-cyan-200"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total PDFs</p>
+                        <p class="text-3xl font-bold text-pink-600" x-text="stats.totalDeclaracoes || 0"></p>
+                    </div>
+                    <i class="bi bi-graph-up-arrow text-4xl text-pink-200"></i>
                 </div>
             </div>
         </div>
@@ -290,7 +310,7 @@
             </div>
         </div>
 
-    </main>
+    </main>d
 
     <!-- Modal: Nova Empresa -->
     <div x-show="modalNovaEmpresa" 
