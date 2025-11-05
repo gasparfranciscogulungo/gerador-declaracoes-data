@@ -500,8 +500,22 @@ function finalizarComSucesso(username, isAdmin) {
     document.getElementById('user-name').textContent = username;
     
     setTimeout(() => {
-        window.location.href = isAdmin ? 'admin.html' : 'user.html';
-    }, 2000);
+        // Determinar página de destino
+        const targetPage = isAdmin ? 'admin.html' : 'user.html';
+        
+        // Construir URL completa
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+        const targetUrl = window.location.origin + basePath + targetPage;
+        
+        console.log('🔄 Redirecionando...');
+        console.log('   Usuário:', username);
+        console.log('   Admin:', isAdmin);
+        console.log('   Destino:', targetUrl);
+        
+        // Redirecionar
+        window.location.replace(targetUrl);
+    }, 2500);
 }
 
 window.addEventListener('load', processarCallback);

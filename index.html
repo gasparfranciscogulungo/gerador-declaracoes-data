@@ -195,12 +195,10 @@
                 // Sucesso!
                 console.log('✅ Login bem-sucedido:', result);
                 
-                // Redirecionar
-                if (result.isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'user.html';
-                }
+                // Redirecionar com caminho correto
+                const targetPage = result.isAdmin ? 'admin.html' : 'user.html';
+                console.log('🔄 Redirecionando para:', targetPage);
+                window.location.href = targetPage;
                 
             } catch (error) {
                 console.error('❌ Erro no login:', error);
