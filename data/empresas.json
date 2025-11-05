@@ -1,42 +1,30 @@
 {
   "empresas": [
     {
-      "id": "empresa2",
-      "nome": "Global Consulting Group, S.A.",
-      "nif": "502987654",
-      "morada": "Rua das Flores, 88 - Sala 201",
-      "cidade": "4000-230 Porto",
-      "telefone": "+351 22 987 6543",
-      "email": "info@globalconsulting.pt",
-      "logo": "assets/logos/empresa2.png",
-      "carimbo": "assets/carimbos/carimbo2.png",
-      "cor_primaria": "#059669",
-      "cor_secundaria": "#d1fae5",
-      "representante": "Dra. Maria Silva",
-      "cargo_representante": "Gestora de Recursos Humanos",
-      "type_models": [
-        "type1",
-        "type3"
-      ]
-    },
-    {
-      "id": "empresa3",
-      "nome": "Innovation Tech Ventures",
-      "nif": "503456789",
-      "morada": "Parque TecnolÃ³gico, EdifÃ­cio 5",
-      "cidade": "3810-193 Aveiro",
-      "telefone": "+351 234 567 890",
-      "email": "contacto@innovationtech.pt",
-      "logo": "assets/logos/empresa3.png",
-      "carimbo": "assets/carimbos/carimbo3.png",
-      "cor_primaria": "#7c3aed",
-      "cor_secundaria": "#ede9fe",
-      "representante": "Eng. Pedro Costa",
-      "cargo_representante": "CEO",
-      "type_models": [
-        "type2",
-        "type3"
-      ]
+      "id": "empresa_1762371998228",
+      "nome": "gaskasdjlçdaçdçj",
+      "nif": "jaçlhçshdçadh",
+      "endereco": {
+        "rua": "çhçldçahsdçh",
+        "edificio": "çhlçhç",
+        "andar": "çhlççç",
+        "sala": "hçhçlhç",
+        "bairro": "jºjaºfjaçsfºaj",
+        "municipio": "jçjsdkçfjsakçfja",
+        "provincia": "jçfaºjfça",
+        "pais": "Angola"
+      },
+      "telefone": "8904289038408203",
+      "email": "hsdhfahhfha@gmail.com",
+      "website": "",
+      "logo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+      "carimbo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-05T19:46:38.228Z",
+      "updatedAt": "2025-11-05T19:46:38.228Z",
+      "contador": 0
     }
   ]
 }
