@@ -9,6 +9,7 @@ class GitHubAPI {
         this.token = null;
         this.owner = null;  // Será configurado depois do login
         this.repo = null;   // Será configurado depois do login
+        this.branch = 'master';  // Branch padrão
         this.user = null;
     }
 
@@ -17,7 +18,8 @@ class GitHubAPI {
     configurar(config) {
         this.owner = config.owner;
         this.repo = config.repo;
-        console.log(`✅ GitHub API configurado: ${this.owner}/${this.repo}`);
+        this.branch = config.branch || 'master';
+        console.log(`✅ GitHub API configurado: ${this.owner}/${this.repo} (${this.branch})`);
     }
 
     setToken(token) {
@@ -137,7 +139,7 @@ class GitHubAPI {
             const body = {
                 message: message,
                 content: contentBase64,
-                branch: 'main'
+                branch: this.branch
             };
 
             // Se está atualizando, precisa do SHA
@@ -191,7 +193,7 @@ class GitHubAPI {
             const body = {
                 message: message,
                 content: base64Clean,
-                branch: 'main'
+                branch: this.branch
             };
 
             const response = await fetch(url, {
@@ -241,7 +243,7 @@ class GitHubAPI {
                 body: JSON.stringify({
                     message: message,
                     sha: arquivo.sha,
-                    branch: 'main'
+                    branch: this.branch
                 })
             });
 
@@ -294,7 +296,7 @@ class GitHubAPI {
 
     async getUltimoCommit() {
         try {
-            const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/commits/main`;
+            const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/commits/${this.branch}`;
 
             const response = await fetch(url, {
                 headers: this.getHeaders()

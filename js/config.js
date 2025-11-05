@@ -10,7 +10,8 @@ const CONFIG = {
         // https://github.com/settings/developers
         clientId: 'Ov23liYkxPW1TQtLXdhL',  // ← Client ID do OAuth App
         owner: 'gasparfranciscogulungo',    // ← Seu username do GitHub
-        repo: 'gerador-declaracoes-data'    // ← Nome do repositório de dados
+        repo: 'gerador-declaracoes-data',   // ← Nome do repositório de dados
+        branch: 'master'                    // ← Branch principal (master ou main)
     },
 
     // ========== ADMINISTRADORES ==========
@@ -69,7 +70,8 @@ async function inicializarSistema() {
     // Configurar GitHub API
     githubAPI.configurar({
         owner: CONFIG.github.owner,
-        repo: CONFIG.github.repo
+        repo: CONFIG.github.repo,
+        branch: CONFIG.github.branch
     });
 
     console.log('✅ Sistema inicializado');
