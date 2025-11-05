@@ -136,7 +136,10 @@ function usersApp() {
             this.loadingMessage = 'Aprovando usuário...';
             
             try {
-                const adminUsername = authManager.getUsername();
+                // Obter username do admin do GitHub API
+                const adminUser = await githubAPI.getUser();
+                const adminUsername = adminUser.login;
+                
                 await this.userManager.aprovarUser(userId, adminUsername);
                 
                 await this.carregarUsuarios();
