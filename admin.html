@@ -133,8 +133,12 @@
                     <i class="bi bi-people mr-2"></i>Clientes (Todos)
                 </button>
                 <a href="users.html"
-                        class="px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-blue-600 hover:border-blue-300 font-medium transition-colors">
+                        class="px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-blue-600 hover:border-blue-300 font-medium transition-colors relative">
                     <i class="bi bi-person-gear mr-2"></i>Usuários
+                    <!-- Badge de notificação -->
+                    <span id="users-badge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">0</span>
+                    <!-- Ícone de notificação pulsante -->
+                    <i id="users-notification-icon" class="hidden bi bi-bell-fill text-orange-500 absolute -top-2 -right-2 animate-pulse"></i>
                 </a>
                 <button @click="activeTab = 'config'" 
                         :class="activeTab === 'config' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600'"
@@ -303,8 +307,20 @@
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
     <script src="js/auth-manager.js"></script>
+    <script src="js/user-manager.js"></script>
+    <script src="js/notification-system.js"></script>
     <script src="js/admin-controller.js"></script>
     <script src="js/dark-mode.js"></script>
+
+    <!-- Inicialização do Sistema de Notificações -->
+    <script>
+        // Inicializa notificações quando a página carregar
+        document.addEventListener('DOMContentLoaded', async () => {
+            await notificationSystem.init();
+            // Exibe notificações em camadas (timing diferente)
+            await notificationSystem.notifyWithLayers();
+        });
+    </script>
 
 </body>
 </html>
