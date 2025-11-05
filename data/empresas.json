@@ -1,29 +1,29 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762373590940",
-      "nome": "Gaspar ",
-      "nif": "kçjkçjºkjº",
+      "id": "empresa_1762374803293",
+      "nome": " js jfd sjdf sjkfdldjfçks",
+      "nif": "jkçjkçskjçfdjkç sjdf ",
       "endereco": {
-        "rua": "nlçhdçahlçdhaç",
-        "edificio": "çlkhlkçhkhlçkhç",
-        "andar": "adad",
-        "sala": "çlhkhkhç",
-        "bairro": "adadsad",
-        "municipio": "dada",
-        "provincia": "dadada",
-        "pais": "Angoladad"
+        "rua": "ç jçlkd jfkçsjdflç jdsç",
+        "edificio": " jlkç jkl",
+        "andar": "jç jlk",
+        "sala": " jlk ",
+        "bairro": "jlkç jkl jçlk",
+        "municipio": "jkl jk",
+        "provincia": "ç jkç jkç jlç j",
+        "pais": "jlk jlç jç çjç j"
       },
       "telefone": "",
       "email": "",
       "website": "",
       "logo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
       "carimbo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
+      "corPrimaria": "#1f3ea3",
+      "corSecundaria": "#93a5be",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T20:13:10.940Z",
-      "updatedAt": "2025-11-05T20:13:10.940Z",
+      "createdAt": "2025-11-05T20:33:23.293Z",
+      "updatedAt": "2025-11-05T20:33:23.293Z",
       "contador": 0
     }
   ]
