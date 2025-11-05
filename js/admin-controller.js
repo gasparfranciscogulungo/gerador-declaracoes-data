@@ -47,27 +47,36 @@ function adminApp() {
 
         // ========== INICIALIZAÇÃO ==========
         async init() {
-            console.log('🚀 Iniciando painel admin COMPLETO...');
+            console.log('🚀 Iniciando painel admin...');
             
             // Verificar autenticação
             this.loading = true;
             this.loadingMessage = 'Verificando autenticação...';
             
-            if (!authManager.isAuthenticated()) {
-                console.log('❌ Não autenticado, redirecionando...');
+            // Verificar se tem token
+            const token = localStorage.getItem('github_token');
+            if (!token) {
+                console.log('❌ Token não encontrado, redirecionando...');
                 window.location.href = 'index.html';
                 return;
             }
             
+            // Configurar GitHub API
+            githubAPI.setToken(token);
+            githubAPI.configurar(CONFIG.github);
+            
             // Obter usuário do GitHub
             this.loadingMessage = 'Carregando perfil...';
             try {
-                this.usuario = await githubAPI.getUser();
+                this.usuario = await githubAPI.getAuthenticatedUser();
                 console.log('✅ Usuário:', this.usuario.login);
             } catch (error) {
                 console.error('❌ Erro ao obter usuário:', error);
-                this.showAlert('error', 'Erro ao carregar perfil');
-                this.loading = false;
+                this.showAlert('error', 'Erro ao carregar perfil. Token inválido?');
+                localStorage.removeItem('github_token');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
                 return;
             }
             
