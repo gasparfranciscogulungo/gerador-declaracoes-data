@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="bi bi-people-fill text-4xl text-blue-600"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Gerenciar Usuários</h1>
+                        <p class="text-gray-600 text-sm">Sistema simplificado - apenas tokens</p>
+                    </div>
+                </div>
+                <a href="admin.html" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+                    <i class="bi bi-arrow-left mr-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+
+        <!-- Como Funciona -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-6">
+            <h2 class="font-bold text-blue-900 mb-3 flex items-center">
+                <i class="bi bi-info-circle-fill mr-2"></i>
+                Como funciona o sistema de usuários
+            </h2>
+            <div class="text-sm text-blue-800 space-y-2">
+                <p><strong>✅ Sistema simplificado:</strong> Usuários entram apenas com GitHub Personal Access Token</p>
+                <p><strong>🔐 Sem cadastro prévio:</strong> Qualquer pessoa com token GitHub válido pode entrar</p>
+                <p><strong>👤 Tipos de usuário:</strong></p>
+                <ul class="ml-6 list-disc space-y-1">
+                    <li><strong>Admin:</strong> Definido no arquivo <code class="bg-blue-100 px-2 py-1 rounded">js/config.js</code></li>
+                    <li><strong>User:</strong> Todos os outros usuários com token válido</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Adicionar Admin -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="bi bi-shield-plus text-purple-600 mr-2"></i>
+                Adicionar Administrador
+            </h2>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                <p class="text-sm text-yellow-800">
+                    <i class="bi bi-exclamation-triangle-fill mr-2"></i>
+                    Para adicionar um admin, edite o arquivo <strong>js/config.js</strong>
+                </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <p class="text-sm font-semibold text-gray-700 mb-2">📝 Passos:</p>
+                <ol class="text-sm text-gray-700 space-y-2 ml-4 list-decimal">
+                    <li>Abra o arquivo <code class="bg-gray-200 px-2 py-1 rounded">js/config.js</code></li>
+                    <li>Procure a seção <code class="bg-gray-200 px-2 py-1 rounded">admins: [...]</code></li>
+                    <li>Adicione o username do GitHub entre aspas</li>
+                    <li>Salve o arquivo e faça commit no GitHub</li>
+                </ol>
+            </div>
+
+            <div class="mt-4 bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                <pre>// js/config.js
+
+const CONFIG = {
+    // ...
+    admins: [
+        'gasparfranciscogulungo',  // ← Admin existente
+        'novo-admin-username',     // ← Adicione aqui
+        'outro-admin'              // ← Ou aqui
+    ],
+    // ...
+};</pre>
+            </div>
+        </div>
+
+        <!-- Lista de Admins Atuais -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="bi bi-shield-check text-green-600 mr-2"></i>
+                Administradores Atuais
+            </h2>
+            
+            <div id="adminsList" class="space-y-2">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Usuários Regulares -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="bi bi-people text-blue-600 mr-2"></i>
+                Usuários Regulares
+            </h2>
+            
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <p class="text-sm text-gray-700">
+                    <i class="bi bi-info-circle mr-2"></i>
+                    <strong>Qualquer pessoa com GitHub token válido pode entrar como usuário regular.</strong>
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                    Usuários regulares têm acesso limitado e não podem:
+                </p>
+                <ul class="text-sm text-gray-600 ml-6 mt-2 list-disc space-y-1">
+                    <li>Gerenciar empresas</li>
+                    <li>Criar modelos de declaração</li>
+                    <li>Acessar configurações do sistema</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Como Criar Token GitHub - GUIA COMPLETO -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-lg p-6 mt-6">
+            <h2 class="text-2xl font-bold text-green-900 mb-4 flex items-center">
+                <i class="bi bi-person-plus-fill mr-2"></i>
+                Guia Completo: Como Criar Token e Registrar Usuário
+            </h2>
+            
+            <!-- PASSO 1 -->
+            <div class="bg-white rounded-lg p-5 mb-4 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">1</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Acessar GitHub Token Settings</h3>
+                        <p class="text-gray-700 mb-3">Acesse a página de criação de tokens do GitHub:</p>
+                        <a href="https://github.com/settings/tokens/new" target="_blank" 
+                           class="inline-flex items-center bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg font-semibold transition">
+                            <i class="bi bi-github mr-2"></i>
+                            Abrir GitHub Token Settings
+                            <i class="bi bi-box-arrow-up-right ml-2"></i>
+                        </a>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="bi bi-info-circle mr-1"></i>
+                            Você precisa estar logado no GitHub
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 2 -->
+            <div class="bg-white rounded-lg p-5 mb-4 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">2</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Configurar o Token</h3>
+                        
+                        <!-- Note -->
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4">
+                            <p class="text-sm font-semibold text-blue-900 mb-1">📝 Note (Nome do Token)</p>
+                            <p class="text-sm text-blue-800">Digite um nome descritivo, exemplo:</p>
+                            <code class="bg-blue-100 px-2 py-1 rounded text-xs">Gerador de Declarações</code>
+                        </div>
+
+                        <!-- Expiration -->
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+                            <p class="text-sm font-semibold text-yellow-900 mb-1">⏰ Expiration (Validade)</p>
+                            <p class="text-sm text-yellow-800 mb-2">Escolha quanto tempo o token será válido:</p>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex items-center">
+                                    <i class="bi bi-check-circle-fill text-green-600 mr-2"></i>
+                                    <span><strong>90 days</strong> - Recomendado para uso regular</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="bi bi-check-circle-fill text-green-600 mr-2"></i>
+                                    <span><strong>No expiration</strong> - Nunca expira (mais conveniente)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scopes - IMPORTANTE -->
+                        <div class="bg-red-50 border-l-4 border-red-500 p-3">
+                            <p class="text-sm font-semibold text-red-900 mb-2">
+                                <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                                Select scopes (Permissões) - ATENÇÃO!
+                            </p>
+                            <p class="text-sm text-red-800 mb-3">
+                                <strong>Marque APENAS esta opção:</strong>
+                            </p>
+                            
+                            <div class="bg-white border-2 border-red-300 rounded-lg p-3">
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <div class="w-5 h-5 border-2 border-red-500 rounded flex items-center justify-center bg-red-500">
+                                            <i class="bi bi-check text-white font-bold"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">✅ repo</p>
+                                        <p class="text-xs text-gray-600">Full control of private repositories</p>
+                                        <p class="text-xs text-red-700 mt-1">
+                                            <i class="bi bi-arrow-right mr-1"></i>
+                                            Essa opção já inclui automaticamente: repo:status, repo_deployment, public_repo, repo:invite, security_events
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 bg-gray-100 p-2 rounded">
+                                <p class="text-xs text-gray-700">
+                                    <i class="bi bi-x-circle text-red-600 mr-1"></i>
+                                    <strong>NÃO marque:</strong> admin:org, workflow, write:packages, delete:packages, etc.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 3 -->
+            <div class="bg-white rounded-lg p-5 mb-4 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">3</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Gerar o Token</h3>
+                        <p class="text-gray-700 mb-3">Clique no botão verde no final da página:</p>
+                        <div class="bg-green-100 border border-green-300 rounded-lg p-3 inline-block">
+                            <span class="font-bold text-green-900">
+                                <i class="bi bi-key-fill mr-2"></i>
+                                Generate token
+                            </span>
+                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-3">
+                            <p class="text-sm text-yellow-900">
+                                <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                                <strong>IMPORTANTE:</strong> O token será mostrado apenas UMA VEZ! Copie agora!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 4 -->
+            <div class="bg-white rounded-lg p-5 mb-4 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">4</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Copiar o Token</h3>
+                        <p class="text-gray-700 mb-3">O token gerado parecerá com isso:</p>
+                        <div class="bg-gray-900 text-green-400 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+                            ghp_abcdefghijklmnopqrstuvwxyz1234567890
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="bi bi-info-circle mr-1"></i>
+                            Clique no ícone de copiar ao lado do token ou selecione e copie manualmente
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 5 -->
+            <div class="bg-white rounded-lg p-5 mb-4 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">5</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Entrar no Sistema</h3>
+                        <p class="text-gray-700 mb-3">Acesse o sistema:</p>
+                        <div class="bg-purple-100 border border-purple-300 rounded-lg p-3 mb-3">
+                            <a id="siteUrlLink" href="#" target="_blank" class="font-semibold text-purple-900 hover:underline">
+                                <i class="bi bi-link-45deg mr-1"></i>
+                                <span id="siteUrl"></span>
+                            </a>
+                        </div>
+                        <p class="text-gray-700 mb-2">Cole o token no campo de login e clique em "Entrar"</p>
+                        <div class="bg-gray-100 p-3 rounded-lg">
+                            <p class="text-sm text-gray-700">
+                                <i class="bi bi-info-circle-fill text-blue-500 mr-1"></i>
+                                O sistema detectará automaticamente seu username e avatar do GitHub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 6 -->
+            <div class="bg-white rounded-lg p-5 border-2 border-green-200">
+                <div class="flex items-start space-x-4">
+                    <span class="flex-shrink-0 w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg">✓</span>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-green-800 mb-2">
+                            <i class="bi bi-check-circle-fill mr-2"></i>
+                            Pronto! Você está dentro!
+                        </h3>
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <p>✅ <strong>Token salvo automaticamente</strong> no seu navegador</p>
+                            <p>✅ <strong>Próximas vezes:</strong> Login automático (nem precisa clicar)</p>
+                            <p>✅ <strong>Seguro:</strong> Token criptografado e armazenado localmente</p>
+                            <p>✅ <strong>Tipo de usuário:</strong> Admin ou User (detectado automaticamente)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Dicas de Segurança -->
+        <div class="bg-gray-800 text-white rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-3 flex items-center">
+                <i class="bi bi-shield-lock-fill text-yellow-400 mr-2"></i>
+                Dicas de Segurança
+            </h3>
+            <ul class="space-y-2 text-sm">
+                <li class="flex items-start">
+                    <i class="bi bi-check-circle-fill text-green-400 mr-2 mt-1"></i>
+                    <span><strong>Nunca compartilhe</strong> seu token com outras pessoas</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-check-circle-fill text-green-400 mr-2 mt-1"></i>
+                    <span><strong>Guarde em local seguro</strong> (gerenciador de senhas)</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-check-circle-fill text-green-400 mr-2 mt-1"></i>
+                    <span>Se perder o token, pode <strong>gerar um novo</strong> no GitHub</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-check-circle-fill text-green-400 mr-2 mt-1"></i>
+                    <span>Se suspeitar de comprometimento, <strong>revogue o token</strong> imediatamente em github.com/settings/tokens</span>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Mostrar admins atuais
+        const adminsList = document.getElementById('adminsList');
+        
+        if (CONFIG.admins && CONFIG.admins.length > 0) {
+            CONFIG.admins.forEach((admin, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">
+                            ${index + 1}
+                        </span>
+                        <div>
+                            <p class="font-semibold text-gray-800">${admin}</p>
+                            <p class="text-xs text-gray-600">
+                                <i class="bi bi-github mr-1"></i>github.com/${admin}
+                            </p>
+                        </div>
+                    </div>
+                    <i class="bi bi-shield-check text-2xl text-green-600"></i>
+                `;
+                adminsList.appendChild(div);
+            });
+        } else {
+            adminsList.innerHTML = '<p class="text-gray-500 text-sm">Nenhum administrador configurado.</p>';
+        }
+
+        // Mostrar URL do site
+        const siteOrigin = window.location.origin;
+        document.getElementById('siteUrl').textContent = siteOrigin;
+        document.getElementById('siteUrlLink').href = siteOrigin;
+    </script>
+
+</body>
+</html>
