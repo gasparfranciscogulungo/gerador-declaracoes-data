@@ -1,29 +1,29 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762374982006",
-      "nome": "jlçhçlçh",
-      "nif": "lçjçlkjlkçjçlk",
+      "id": "empresa_1762375181969",
+      "nome": "Gasjadajslkdjçdsaj",
+      "nif": "jlçjlçjlçjçlkj",
       "endereco": {
-        "rua": "jlçkjçljçj",
-        "edificio": "jlkçjklç",
-        "andar": "jlkç",
-        "sala": "jlkçjçlkj",
-        "bairro": "jnlçjlkjkl",
-        "municipio": "lkjlkjklç",
-        "provincia": "jlkjçljkljljlj",
-        "pais": "jkljçjçjjçjç"
+        "rua": "jlkjlçjlj",
+        "edificio": "jljçlkjçlj",
+        "andar": "jlkjlçjj",
+        "sala": "jlkjçjçj",
+        "bairro": "jlkçjlkçjljl",
+        "municipio": "jljçlkjlkjkçljkçjçj",
+        "provincia": "jlkçjlçjljljç",
+        "pais": "jlkçjlçjçljçljçljçjçlj"
       },
-      "telefone": "jlkjljlkjkljl",
-      "email": "gaspar@gmail.com",
-      "website": "https://www.gaspar.com",
+      "telefone": "",
+      "email": "",
+      "website": "",
       "logo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
       "carimbo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-05T20:36:22.006Z",
-      "updatedAt": "2025-11-05T20:36:22.006Z",
+      "createdAt": "2025-11-05T20:39:41.969Z",
+      "updatedAt": "2025-11-05T20:39:41.969Z",
       "contador": 0
     }
   ]
