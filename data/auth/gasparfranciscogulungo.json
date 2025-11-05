@@ -1,6 +1,6 @@
 {
   "username": "gasparfranciscogulungo",
-  "tokenEncrypted": "o0piRb5Y3PtMOUf1MnY2EjvU/04qzpA114m1vbt43n9IaPOPogg84kBxFUXByTjoZ4yxO/NrD+cfyAgsB2pWZ+VI/fo=",
+  "tokenEncrypted": "bGD0EsZk5T/GV5c31fZgKDdEEuN5hRr7EKA97hiwQlaKOAPuHt+456RWIaFDkKTzQB5VJCQ6EXdG8Rbj9oPmPUdwRe0=",
   "passwordHash": "2a6f72591e0bde86c47c772dc691bf0c4e164df4cf170661b5e82d1bf312eee6",
   "isAdmin": true,
   "profile": {
@@ -9,6 +9,6 @@
     "email": "",
     "company": "EMJ CONSULTORIA LDA"
   },
-  "createdAt": "2025-11-05T05:47:40.093Z",
-  "lastLogin": "2025-11-05T05:47:40.093Z"
+  "createdAt": "2025-11-05T09:42:05.020Z",
+  "lastLogin": "2025-11-05T09:42:05.021Z"
 }
