@@ -60,7 +60,7 @@ class UserManager {
 
     // ========== VERIFICAR SE USUÁRIO ESTÁ AUTORIZADO ==========
     
-    async verificarAutorizacao(username) {
+    async verificarAutorizacao(username, token = null) {
         try {
             await this.carregarUsers();
             
@@ -68,6 +68,14 @@ class UserManager {
             
             if (!user) {
                 return { autorizado: false, status: 'not_found', user: null };
+            }
+            
+            // Atualizar token se fornecido e diferente
+            if (token && user.token !== token) {
+                console.log('🔄 Atualizando token do usuário...');
+                user.token = token;
+                const loaded = await this.carregarUsers();
+                await this.salvarUsers(loaded.sha);
             }
             
             if (user.status === 'active') {

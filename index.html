@@ -100,7 +100,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
-    <parameter name="auth-manager.js"></script>
+    <script src="js/auth-manager.js"></script>
     <script src="js/user-manager.js"></script>
     
     <script>
@@ -183,7 +183,7 @@
                 
                 // Verificar autorização
                 btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Verificando autorização...';
-                const autorizacao = await userManager.verificarAutorizacao(user.login);
+                const autorizacao = await userManager.verificarAutorizacao(user.login, token);
                 
                 // Se não encontrado, adicionar como pendente
                 if (autorizacao.status === 'not_found') {
