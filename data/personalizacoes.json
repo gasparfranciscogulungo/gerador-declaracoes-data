@@ -1,0 +1,41 @@
+{
+  "modelo_executivo": {
+    "slot1": {
+      "nome": "test",
+      "config": {
+        "fontFamily": "Arial, sans-serif",
+        "fontSize": 12,
+        "tamanhoTitulo": "20",
+        "tamanhoSubtitulo": 18,
+        "tamanhoEmpresa": 9,
+        "corTexto": "#000000",
+        "corDestaque": "#e03800",
+        "marcaDaguaOpacidade": 10,
+        "marcaDaguaRotacao": -45,
+        "marcaDaguaWidth": 400,
+        "marcaDaguaHeight": 400,
+        "espacamentoLinhas": 1.6,
+        "zoom": 100,
+        "tituloDocumento": "DECLARAÇÃO DE TRABALHO",
+        "textoIntro": "Declara-se, para os devidos efeitos, que",
+        "alinhamentoTexto": "justify",
+        "alinhamentoCabecalho": "left",
+        "cabecalhoMaxWidth": 450,
+        "cabecalhoMarginEntreLogoTexto": 20,
+        "cabecalhoJustify": "space-between",
+        "cabecalhoPaddingBottom": 15,
+        "cabecalhoBordaLargura": 4,
+        "cabecalhoLogoSize": 80,
+        "cabecalhoPaddingHorizontal": 0,
+        "cabecalhoLineHeight": 1.4,
+        "carimboWidth": 110,
+        "carimboHeight": 110
+      },
+      "dataCriacao": "2025-11-06T13:26:12.473Z",
+      "modelo": "Executivo",
+      "usuario": "gasparfranciscogulungo"
+    },
+    "slot2": null,
+    "slot3": null
+  }
+}
