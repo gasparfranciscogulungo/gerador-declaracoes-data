@@ -238,9 +238,6 @@ function adminApp() {
             // Carregar TODOS os dados
             await this.carregarTodosDados();
             
-            // Carregar personalizações salvas
-            this.carregarPersonalizacoesSalvas();
-            
             // Configurar autosave (a cada 10 segundos)
             setInterval(() => {
                 if (this.autosaveEnabled && this.modalPreviewModelo) {
@@ -897,6 +894,12 @@ function adminApp() {
             // Abrir modal
             this.modalPreviewModelo = true;
             this.tipoPreview = 'declaracao';
+            
+            // Carregar personalizações deste modelo específico
+            this.carregarPersonalizacoesSalvas();
+            
+            // Tentar recuperar autosave
+            this.recuperarAutosave();
             
             console.log('📄 Visualizando modelo:', modelo.nome);
         },
