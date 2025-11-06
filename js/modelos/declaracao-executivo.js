@@ -89,39 +89,6 @@ const ModeloDeclaracaoExecutivo = {
             overflow: hidden;
         ">
             
-            <!-- MARCA D'ÁGUA DIAGONAL (SEM TRANSFORM PARA html2pdf) -->
-            <div style="
-                position: absolute;
-                top: 100px;
-                left: 50%;
-                margin-left: -200px;
-                opacity: ${cfg.marcaDaguaOpacidade / 100};
-                pointer-events: none;
-                z-index: 0;
-                text-align: center;
-                width: 400px;
-                height: 400px;
-            ">
-                ${empresa.logo ? `
-                    <img src="${empresa.logo}" 
-                         alt="Marca d'água" 
-                         style="width: 100%; height: 100%; object-fit: contain;">
-                ` : `
-                    <div style="
-                        width: 100%; 
-                        height: 100%; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center;
-                        font-size: 80px; 
-                        font-weight: bold; 
-                        color: #ccc;
-                    ">
-                        ${empresa.nome}
-                    </div>
-                `}
-            </div>
-
             <!-- CONTEÚDO -->
             <div style="position: relative; z-index: 1;">
                 
@@ -141,11 +108,11 @@ const ModeloDeclaracaoExecutivo = {
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
-                                 style="width: 65px; height: 65px; object-fit: contain;">
+                                 style="width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px; object-fit: contain;">
                         ` : `
                             <div style="
-                                width: 65px; 
-                                height: 65px; 
+                                width: ${cfg.cabecalhoLogoSize}px; 
+                                height: ${cfg.cabecalhoLogoSize}px; 
                                 background: #f3f4f6; 
                                 border-radius: 8px;
                                 display: flex;
@@ -248,22 +215,22 @@ const ModeloDeclaracaoExecutivo = {
                             <img src="${empresa.carimbo}" 
                                  alt="Carimbo e Assinatura" 
                                  style="
-                                    width: 90px; 
-                                    height: 90px; 
+                                    width: ${cfg.carimboWidth}px; 
+                                    height: ${cfg.carimboHeight}px; 
                                     object-fit: contain; 
                                     opacity: 0.9;
                                     display: block;
                                  ">
                         ` : `
                             <div style="
-                                width: 90px;
-                                height: 90px;
+                                width: ${cfg.carimboWidth}px;
+                                height: ${cfg.carimboHeight}px;
                                 border: 3px solid #999;
                                 border-radius: 50%;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                font-size: 36px;
+                                font-size: ${cfg.carimboWidth * 0.4}px;
                                 color: #999;
                             ">📌</div>
                         `}
