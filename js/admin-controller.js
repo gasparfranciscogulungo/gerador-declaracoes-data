@@ -17,6 +17,7 @@ function adminApp() {
         activeTab: 'empresas',
         loading: false,
         loadingMessage: 'Carregando...',
+        uploadProgress: null, // Progresso do upload (0-100)
         
         alert: {
             show: false,
@@ -51,36 +52,36 @@ function adminApp() {
         
         // Customização do Preview
         previewConfig: {
-            fontFamily: 'Times New Roman',
+            fontFamily: 'Arial',
             fontSize: 12,
-            tamanhoTitulo: 28,
-            tamanhoSubtitulo: 18,
+            tamanhoTitulo: 24,
+            tamanhoSubtitulo: 16,
             tamanhoEmpresa: 9,
             corTexto: '#000000',
-            corDestaque: '#1e40af',
-            marcaDaguaOpacidade: 10,
+            corDestaque: '#091f67',
+            marcaDaguaOpacidade: 8,
             marcaDaguaRotacao: -45,
-            marcaDaguaWidth: 400,
-            marcaDaguaHeight: 400,
-            espacamentoLinhas: 1.6,
-            zoom: 100,
+            marcaDaguaWidth: 350,
+            marcaDaguaHeight: 350,
+            espacamentoLinhas: 1.8,
+            zoom: 55,
             // Edição de Conteúdo
-            tituloDocumento: 'DECLARAÇÃO DE TRABALHO',
+            tituloDocumento: 'Declaração de Serviço',
             textoIntro: 'Declara-se, para os devidos efeitos, que',
             alinhamentoTexto: 'justify',
             alinhamentoCabecalho: 'left',
             // Controles Avançados do Cabeçalho
             cabecalhoMaxWidth: 450,           // Largura máxima do texto (px)
-            cabecalhoMarginEntreLogoTexto: 20, // Espaço entre logo e texto (px)
+            cabecalhoMarginEntreLogoTexto: 340, // Espaço entre logo e texto (px) - Era 20, agora 340
             cabecalhoJustify: 'space-between', // Distribuição: space-between, flex-start, flex-end, center
-            cabecalhoPaddingBottom: 15,        // Padding inferior (px)
-            cabecalhoBordaLargura: 4,          // Largura da borda inferior (px)
-            cabecalhoLogoSize: 80,             // Tamanho do logo (px)
-            cabecalhoPaddingHorizontal: 0,     // Padding lateral do container (px)
-            cabecalhoLineHeight: 1.4,          // Espaçamento entre linhas do texto (multiplicador)
+            cabecalhoPaddingBottom: 5,        // Padding inferior (px) - Era 15, agora 5
+            cabecalhoBordaLargura: 2,          // Largura da borda inferior (px) - Era 4, agora 2
+            cabecalhoLogoSize: 90,             // Tamanho do logo (px) - Era 80, agora 90
+            cabecalhoPaddingHorizontal: 5,     // Padding lateral do container (px) - Era 0, agora 5
+            cabecalhoLineHeight: 1.2,          // Espaçamento entre linhas do texto (multiplicador) - Era 1.4, agora 1.2
             // Controles do Carimbo
-            carimboWidth: 110,                 // Largura do carimbo (px)
-            carimboHeight: 110                 // Altura do carimbo (px)
+            carimboWidth: 200,                 // Largura do carimbo (px) - Era 110, agora 200
+            carimboHeight: 190                 // Altura do carimbo (px) - Era 110, agora 190
         },
         
         // Presets de Estilos Profissionais
@@ -90,17 +91,26 @@ function adminApp() {
                 icone: 'bi-mortarboard',
                 cor: 'blue',
                 config: {
-                    fontFamily: 'Times New Roman',
+                    fontFamily: 'Arial',
                     fontSize: 12,
                     tamanhoTitulo: 24,
                     tamanhoSubtitulo: 16,
                     tamanhoEmpresa: 9,
-                    corDestaque: '#1e40af',
+                    corDestaque: '#091f67',
                     marcaDaguaOpacidade: 8,
                     marcaDaguaRotacao: -45,
                     marcaDaguaWidth: 350,
                     marcaDaguaHeight: 350,
-                    espacamentoLinhas: 1.8
+                    espacamentoLinhas: 1.8,
+                    cabecalhoLogoSize: 90,
+                    cabecalhoMarginEntreLogoTexto: 340,
+                    cabecalhoPaddingBottom: 5,
+                    cabecalhoBordaLargura: 2,
+                    cabecalhoPaddingHorizontal: 5,
+                    cabecalhoLineHeight: 1.2,
+                    carimboWidth: 200,
+                    carimboHeight: 190,
+                    zoom: 55
                 }
             },
             moderno: {
@@ -672,6 +682,13 @@ function adminApp() {
             }, 5000);
         },
 
+        /**
+         * Helper: Sleep (delay)
+         */
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+
         // ========== EMPRESAS - CRUD ==========
         
         async salvarEmpresa() {
@@ -857,8 +874,11 @@ function adminApp() {
             const file = event.target.files[0];
             if (!file) return;
 
+            console.log('🔄 handleLogoUpload iniciado', { file: file.name, size: file.size });
+
             // Verificar se empresa tem NIF (necessário para organizar no GitHub)
             if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
+                console.warn('⚠️ NIF não preenchido');
                 this.showAlert('error', '❌ Preencha o NIF da empresa primeiro!');
                 event.target.value = '';
                 return;
@@ -866,65 +886,128 @@ function adminApp() {
 
             try {
                 this.loading = true;
-                this.loadingMessage = 'Fazendo upload do logo...';
+                this.uploadProgress = 0;
+                this.loadingMessage = 'Iniciando upload do logo...';
+                console.log('✅ Loading ativado');
+
+                // Simular progresso inicial
+                await this.sleep(300);
+                this.uploadProgress = 10;
+                console.log('📊 Progresso: 10%');
 
                 const uploader = this.initImageUploader();
+                console.log('✅ ImageUploader inicializado:', uploader);
 
                 // Validar
+                this.loadingMessage = 'Validando imagem...';
+                this.uploadProgress = 20;
+                console.log('📊 Progresso: 20% - Validando');
                 const validation = uploader.validateImage(file);
+                console.log('🔍 Validação:', validation);
                 if (!validation.valid) {
+                    console.error('❌ Validação falhou:', validation.error);
                     this.showAlert('error', `❌ ${validation.error}`);
                     return;
                 }
 
+                await this.sleep(300);
+                this.uploadProgress = 30;
+                console.log('📊 Progresso: 30%');
+
                 // Converter para Base64
                 this.loadingMessage = 'Preparando imagem...';
+                this.uploadProgress = 40;
+                console.log('📊 Progresso: 40% - Convertendo para Base64');
                 const base64Content = await uploader.fileToBase64(file);
+                console.log('✅ Base64 gerado, tamanho:', base64Content.length);
+
+                await this.sleep(300);
+                this.uploadProgress = 50;
+                console.log('📊 Progresso: 50%');
 
                 // Sanitizar NIF
                 const nifSanitizado = this.empresaForm.nif.replace(/[^a-zA-Z0-9]/g, '');
+                console.log('🔤 NIF sanitizado:', nifSanitizado);
 
                 // Extensão do arquivo
                 const extensao = file.name.split('.').pop().toLowerCase();
+                console.log('📄 Extensão:', extensao);
 
                 // Caminho no GitHub
                 const fileName = `logo.${extensao}`;
                 const filePath = `assets/empresas/${nifSanitizado}/${fileName}`;
+                console.log('📂 Caminho no GitHub:', filePath);
 
                 // Verificar se arquivo já existe
                 this.loadingMessage = 'Verificando GitHub...';
+                this.uploadProgress = 60;
+                console.log('📊 Progresso: 60% - Verificando arquivo existente');
                 let sha = null;
                 try {
                     const existingFile = await githubAPI.getFile(filePath);
                     sha = existingFile.sha;
+                    console.log('📄 Arquivo existe, SHA:', sha);
                 } catch (error) {
-                    // Arquivo não existe, ok
+                    console.log('📄 Arquivo não existe (ok)');
                 }
+
+                await this.sleep(300);
+                this.uploadProgress = 70;
+                console.log('📊 Progresso: 70%');
 
                 // Fazer upload com commit automático
                 this.loadingMessage = 'Enviando para GitHub...';
+                this.uploadProgress = 80;
+                console.log('📊 Progresso: 80% - Enviando para GitHub');
+                console.log('🚀 Chamando githubAPI.uploadFile...');
                 await githubAPI.uploadFile(
                     filePath,
                     base64Content,
                     `Upload logo da empresa ${this.empresaForm.nome || nifSanitizado}`,
                     sha
                 );
+                console.log('✅ Upload concluído!');
+
+                await this.sleep(300);
+                this.uploadProgress = 90;
+                console.log('📊 Progresso: 90%');
 
                 // Gerar URL do GitHub
                 const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+                console.log('🔗 URL gerada:', githubUrl);
 
                 // Atualizar formulário
                 this.empresaForm.logo = githubUrl;
+                console.log('✅ Formulário atualizado');
+
+                this.uploadProgress = 100;
+                this.loadingMessage = '✅ Logo enviado com sucesso!';
+                console.log('📊 Progresso: 100% - Concluído!');
+                await this.sleep(500);
 
                 this.showAlert('success', '✅ Logo enviado com sucesso!');
-                console.log(`✅ Logo URL: ${githubUrl}`);
+                console.log(`✅ Logo URL final: ${githubUrl}`);
 
             } catch (error) {
-                console.error('❌ Erro no upload do logo:', error);
-                this.showAlert('error', `❌ Erro: ${error.message}`);
+                console.error('❌ ERRO NO UPLOAD DO LOGO:', error);
+                console.error('📋 Stack trace:', error.stack);
+                console.error('📋 Mensagem:', error.message);
+                
+                let errorMessage = error.message;
+                if (error.message.includes('401')) {
+                    errorMessage = 'Token GitHub inválido ou expirado. Configure em Configurações.';
+                } else if (error.message.includes('404')) {
+                    errorMessage = 'Repositório GitHub não encontrado. Verifique as configurações.';
+                } else if (error.message.includes('network') || error.message.includes('fetch')) {
+                    errorMessage = 'Erro de conexão. Verifique sua internet.';
+                }
+                
+                this.showAlert('error', `❌ Erro: ${errorMessage}`);
             } finally {
                 this.loading = false;
+                this.uploadProgress = null;
                 event.target.value = '';
+                console.log('🏁 handleLogoUpload finalizado');
             }
         },
 
@@ -935,8 +1018,11 @@ function adminApp() {
             const file = event.target.files[0];
             if (!file) return;
 
+            console.log('🔄 handleCarimboUpload iniciado', { file: file.name, size: file.size });
+
             // Verificar se empresa tem NIF
             if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
+                console.warn('⚠️ NIF não preenchido');
                 this.showAlert('error', '❌ Preencha o NIF da empresa primeiro!');
                 event.target.value = '';
                 return;
@@ -944,65 +1030,127 @@ function adminApp() {
 
             try {
                 this.loading = true;
-                this.loadingMessage = 'Fazendo upload do carimbo...';
+                this.uploadProgress = 0;
+                this.loadingMessage = 'Iniciando upload do carimbo...';
+                console.log('✅ Loading ativado');
+
+                await this.sleep(300);
+                this.uploadProgress = 10;
+                console.log('📊 Progresso: 10%');
 
                 const uploader = this.initImageUploader();
+                console.log('✅ ImageUploader inicializado');
 
                 // Validar
+                this.loadingMessage = 'Validando imagem...';
+                this.uploadProgress = 20;
+                console.log('📊 Progresso: 20% - Validando');
                 const validation = uploader.validateImage(file);
+                console.log('🔍 Validação:', validation);
                 if (!validation.valid) {
+                    console.error('❌ Validação falhou:', validation.error);
                     this.showAlert('error', `❌ ${validation.error}`);
                     return;
                 }
 
+                await this.sleep(300);
+                this.uploadProgress = 30;
+                console.log('📊 Progresso: 30%');
+
                 // Converter para Base64
                 this.loadingMessage = 'Preparando imagem...';
+                this.uploadProgress = 40;
+                console.log('📊 Progresso: 40% - Convertendo para Base64');
                 const base64Content = await uploader.fileToBase64(file);
+                console.log('✅ Base64 gerado');
+
+                await this.sleep(300);
+                this.uploadProgress = 50;
+                console.log('📊 Progresso: 50%');
 
                 // Sanitizar NIF
                 const nifSanitizado = this.empresaForm.nif.replace(/[^a-zA-Z0-9]/g, '');
+                console.log('🔤 NIF sanitizado:', nifSanitizado);
 
                 // Extensão do arquivo
                 const extensao = file.name.split('.').pop().toLowerCase();
+                console.log('📄 Extensão:', extensao);
 
                 // Caminho no GitHub
                 const fileName = `carimbo.${extensao}`;
                 const filePath = `assets/empresas/${nifSanitizado}/${fileName}`;
+                console.log('📂 Caminho no GitHub:', filePath);
 
                 // Verificar se arquivo já existe
                 this.loadingMessage = 'Verificando GitHub...';
+                this.uploadProgress = 60;
+                console.log('📊 Progresso: 60% - Verificando arquivo existente');
                 let sha = null;
                 try {
                     const existingFile = await githubAPI.getFile(filePath);
                     sha = existingFile.sha;
+                    console.log('📄 Arquivo existe, SHA:', sha);
                 } catch (error) {
-                    // Arquivo não existe, ok
+                    console.log('📄 Arquivo não existe (ok)');
                 }
+
+                await this.sleep(300);
+                this.uploadProgress = 70;
+                console.log('📊 Progresso: 70%');
 
                 // Fazer upload com commit automático
                 this.loadingMessage = 'Enviando para GitHub...';
+                this.uploadProgress = 80;
+                console.log('📊 Progresso: 80% - Enviando para GitHub');
+                console.log('🚀 Chamando githubAPI.uploadFile...');
                 await githubAPI.uploadFile(
                     filePath,
                     base64Content,
                     `Upload carimbo da empresa ${this.empresaForm.nome || nifSanitizado}`,
                     sha
                 );
+                console.log('✅ Upload concluído!');
+
+                await this.sleep(300);
+                this.uploadProgress = 90;
+                console.log('📊 Progresso: 90%');
 
                 // Gerar URL do GitHub
                 const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+                console.log('🔗 URL gerada:', githubUrl);
 
                 // Atualizar formulário
                 this.empresaForm.carimbo = githubUrl;
+                console.log('✅ Formulário atualizado');
+
+                this.uploadProgress = 100;
+                this.loadingMessage = '✅ Carimbo enviado com sucesso!';
+                console.log('📊 Progresso: 100% - Concluído!');
+                await this.sleep(500);
 
                 this.showAlert('success', '✅ Carimbo enviado com sucesso!');
-                console.log(`✅ Carimbo URL: ${githubUrl}`);
+                console.log(`✅ Carimbo URL final: ${githubUrl}`);
 
             } catch (error) {
-                console.error('❌ Erro no upload do carimbo:', error);
-                this.showAlert('error', `❌ Erro: ${error.message}`);
+                console.error('❌ ERRO NO UPLOAD DO CARIMBO:', error);
+                console.error('📋 Stack trace:', error.stack);
+                console.error('📋 Mensagem:', error.message);
+                
+                let errorMessage = error.message;
+                if (error.message.includes('401')) {
+                    errorMessage = 'Token GitHub inválido ou expirado. Configure em Configurações.';
+                } else if (error.message.includes('404')) {
+                    errorMessage = 'Repositório GitHub não encontrado. Verifique as configurações.';
+                } else if (error.message.includes('network') || error.message.includes('fetch')) {
+                    errorMessage = 'Erro de conexão. Verifique sua internet.';
+                }
+                
+                this.showAlert('error', `❌ Erro: ${errorMessage}`);
             } finally {
                 this.loading = false;
+                this.uploadProgress = null;
                 event.target.value = '';
+                console.log('🏁 handleCarimboUpload finalizado');
             }
         },
 

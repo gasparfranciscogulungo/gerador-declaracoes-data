@@ -22,35 +22,35 @@ const ModeloDeclaracaoExecutivo = {
         
         // Configurações padrão
         const cfg = {
-            fontFamily: config.fontFamily || 'Times New Roman, serif',
-            fontSize: config.fontSize || 10,
-            tamanhoTitulo: config.tamanhoTitulo || 22,
-            tamanhoSubtitulo: config.tamanhoSubtitulo || 14,
-            tamanhoEmpresa: config.tamanhoEmpresa || 8,
+            fontFamily: config.fontFamily || 'Arial',
+            fontSize: config.fontSize || 12,
+            tamanhoTitulo: config.tamanhoTitulo || 24,
+            tamanhoSubtitulo: config.tamanhoSubtitulo || 16,
+            tamanhoEmpresa: config.tamanhoEmpresa || 9,
             corTexto: config.corTexto || '#000000',
-            corDestaque: config.corDestaque || empresa.corPrimaria || '#1e40af',
-            marcaDaguaOpacidade: config.marcaDaguaOpacidade || 10,
+            corDestaque: config.corDestaque || empresa.corPrimaria || '#091f67',
+            marcaDaguaOpacidade: config.marcaDaguaOpacidade || 8,
             marcaDaguaRotacao: config.marcaDaguaRotacao !== undefined ? config.marcaDaguaRotacao : -45,
-            marcaDaguaWidth: config.marcaDaguaWidth || 400,
-            marcaDaguaHeight: config.marcaDaguaHeight || 400,
-            espacamentoLinhas: config.espacamentoLinhas || 1.5,
+            marcaDaguaWidth: config.marcaDaguaWidth || 350,
+            marcaDaguaHeight: config.marcaDaguaHeight || 350,
+            espacamentoLinhas: config.espacamentoLinhas || 1.8,
             // Edição de Conteúdo
-            tituloDocumento: config.tituloDocumento || 'DECLARAÇÃO DE TRABALHO',
+            tituloDocumento: config.tituloDocumento || 'Declaração de Serviço',
             textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
             alinhamentoTexto: config.alinhamentoTexto || 'justify',
             alinhamentoCabecalho: config.alinhamentoCabecalho || 'left',
             // Controles Avançados do Cabeçalho
             cabecalhoMaxWidth: config.cabecalhoMaxWidth || 450,
-            cabecalhoMarginEntreLogoTexto: config.cabecalhoMarginEntreLogoTexto || 20,
+            cabecalhoMarginEntreLogoTexto: config.cabecalhoMarginEntreLogoTexto || 340,
             cabecalhoJustify: config.cabecalhoJustify || 'space-between',
-            cabecalhoPaddingBottom: config.cabecalhoPaddingBottom || 15,
-            cabecalhoBordaLargura: config.cabecalhoBordaLargura || 4,
-            cabecalhoLogoSize: config.cabecalhoLogoSize || 80,
-            cabecalhoPaddingHorizontal: config.cabecalhoPaddingHorizontal || 0,
-            cabecalhoLineHeight: config.cabecalhoLineHeight || 1.4,
+            cabecalhoPaddingBottom: config.cabecalhoPaddingBottom || 5,
+            cabecalhoBordaLargura: config.cabecalhoBordaLargura || 2,
+            cabecalhoLogoSize: config.cabecalhoLogoSize || 90,
+            cabecalhoPaddingHorizontal: config.cabecalhoPaddingHorizontal || 5,
+            cabecalhoLineHeight: config.cabecalhoLineHeight || 1.2,
             // Controles do Carimbo
-            carimboWidth: config.carimboWidth || 110,
-            carimboHeight: config.carimboHeight || 110
+            carimboWidth: config.carimboWidth || 200,
+            carimboHeight: config.carimboHeight || 190
         };
 
         // Data atual formatada

@@ -192,7 +192,7 @@ class GitHubAPI {
 
     // ========== UPLOAD DE IMAGEM (BASE64) ==========
 
-    async uploadImagem(path, base64Data, message) {
+    async uploadImagem(path, base64Data, message, sha = null) {
         try {
             const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/contents/${path}`;
 
@@ -204,6 +204,11 @@ class GitHubAPI {
                 content: base64Clean,
                 branch: this.branch
             };
+
+            // Se está atualizando arquivo existente, precisa do SHA
+            if (sha) {
+                body.sha = sha;
+            }
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -223,11 +228,59 @@ class GitHubAPI {
             return {
                 success: true,
                 url: result.content.download_url,
-                sha: result.content.sha
+                sha: result.content.sha,
+                path: result.content.path
             };
 
         } catch (error) {
             console.error(`❌ Erro ao fazer upload de imagem ${path}:`, error);
+            throw error;
+        }
+    }
+
+    // ========== UPLOAD DE ARQUIVO GENÉRICO (Alias para uploadImagem) ==========
+    
+    async uploadFile(path, base64Content, message, sha = null) {
+        console.log(`📤 Uploading file: ${path}${sha ? ' (updating)' : ' (new)'}`);
+        return await this.uploadImagem(path, base64Content, message, sha);
+    }
+
+    // ========== OBTER INFORMAÇÕES DE ARQUIVO (para verificar se existe) ==========
+
+    async getFile(path) {
+        try {
+            const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/contents/${path}`;
+            
+            console.log(`🔍 Verificando arquivo: ${path}`);
+            
+            const response = await fetch(url, {
+                headers: this.getHeaders()
+            });
+
+            if (response.status === 404) {
+                console.log(`📝 Arquivo não existe: ${path}`);
+                return null;
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`GitHub API Error: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            console.log(`✅ Arquivo encontrado: ${path}`);
+
+            return {
+                sha: data.sha,
+                path: data.path,
+                size: data.size,
+                url: data.download_url,
+                content: data.content // Base64
+            };
+
+        } catch (error) {
+            console.error(`❌ Erro ao obter arquivo ${path}:`, error);
             throw error;
         }
     }

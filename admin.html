@@ -22,11 +22,79 @@
 </head>
 <body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
     
-    <!-- Loading Overlay -->
-    <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 flex flex-col items-center">
-            <div class="spinner mb-4"></div>
-            <p class="text-gray-700 font-medium" x-text="loadingMessage"></p>
+    <!-- Loading Overlay Profissional -->
+    <div x-show="loading" 
+         x-transition.opacity
+         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
+            <!-- Animação de Upload -->
+            <div class="flex flex-col items-center">
+                <!-- Ícone Animado -->
+                <div class="relative mb-6">
+                    <!-- Círculo Externo Girando -->
+                    <div class="w-24 h-24 border-4 border-blue-200 rounded-full animate-spin border-t-blue-600"></div>
+                    
+                    <!-- Ícone Central -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <template x-if="loadingMessage.includes('upload') || loadingMessage.includes('Upload') || loadingMessage.includes('Enviando')">
+                            <i class="bi bi-cloud-upload text-4xl text-blue-600 animate-pulse"></i>
+                        </template>
+                        <template x-if="loadingMessage.includes('Verificando') || loadingMessage.includes('verificando')">
+                            <i class="bi bi-search text-4xl text-blue-600 animate-pulse"></i>
+                        </template>
+                        <template x-if="loadingMessage.includes('Preparando') || loadingMessage.includes('preparando')">
+                            <i class="bi bi-gear text-4xl text-blue-600 animate-spin"></i>
+                        </template>
+                        <template x-if="!loadingMessage.includes('upload') && !loadingMessage.includes('Upload') && !loadingMessage.includes('Enviando') && !loadingMessage.includes('Verificando') && !loadingMessage.includes('verificando') && !loadingMessage.includes('Preparando') && !loadingMessage.includes('preparando')">
+                            <i class="bi bi-hourglass-split text-4xl text-blue-600 animate-pulse"></i>
+                        </template>
+                    </div>
+                </div>
+                
+                <!-- Mensagem -->
+                <p class="text-gray-800 font-semibold text-lg text-center mb-2" x-text="loadingMessage"></p>
+                
+                <!-- Barra de Progresso (se houver uploadProgress) -->
+                <template x-if="uploadProgress !== null && uploadProgress >= 0">
+                    <div class="w-full mt-4">
+                        <!-- Texto de Progresso -->
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span>Progresso</span>
+                            <span x-text="`${uploadProgress}%`"></span>
+                        </div>
+                        
+                        <!-- Barra -->
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-300 ease-out"
+                                 :style="`width: ${uploadProgress}%`">
+                            </div>
+                        </div>
+                        
+                        <!-- Status -->
+                        <div class="flex items-center justify-center mt-3 text-sm text-gray-500">
+                            <template x-if="uploadProgress < 30">
+                                <span>🔄 Validando arquivo...</span>
+                            </template>
+                            <template x-if="uploadProgress >= 30 && uploadProgress < 70">
+                                <span>📤 Enviando para GitHub...</span>
+                            </template>
+                            <template x-if="uploadProgress >= 70 && uploadProgress < 100">
+                                <span>✍️ Commitando alterações...</span>
+                            </template>
+                            <template x-if="uploadProgress === 100">
+                                <span>✅ Concluído!</span>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Animação de Pontos -->
+                <div class="mt-4 flex space-x-2">
+                    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -59,18 +127,18 @@
         </div>
     </header>
 
-    <!-- Alert System -->
+    <!-- Alert System - Fixed Position Above Everything -->
     <div x-show="alert.show" 
          x-transition
-         class="container mx-auto px-4 mt-4">
+         class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-2xl px-4">
         <div :class="alert.type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700'"
-             class="border-l-4 p-4 rounded shadow-md" role="alert">
+             class="border-l-4 p-4 rounded-lg shadow-2xl" role="alert">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <i :class="alert.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'" class="text-xl mr-3"></i>
-                    <p x-text="alert.message"></p>
+                    <p x-text="alert.message" class="font-medium"></p>
                 </div>
-                <button @click="alert.show = false" class="text-lg">&times;</button>
+                <button @click="alert.show = false" class="text-2xl font-bold hover:opacity-70 transition-opacity ml-4">&times;</button>
             </div>
         </div>
     </div>
@@ -646,7 +714,7 @@
                 <span :class="darkMode ? 'bg-gray-600 text-gray-300' : 'bg-white text-gray-500'" 
                       class="text-xs px-3 py-1 rounded-full">
                     <i class="bi bi-info-circle mr-1"></i>
-                    Dados de exemplo
+                    Dados de exemplowww
                 </span>
             </div>
 
@@ -940,7 +1008,7 @@
 
                     <!-- SEÇÃO: ZOOM -->
                     <div class="mb-6 pb-6 border-b border-gray-300">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium mb-2">
                             <i class="bi bi-zoom-in mr-1"></i>Zoom: 
                             <span class="font-bold" x-text="previewConfig.zoom + '%'"></span>
                         </label>
@@ -1217,139 +1285,185 @@
     <!-- Modal: Nova Empresa -->
     <div x-show="modalNovaEmpresa" 
          x-transition
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex">
+         @click.self="fecharModalEmpresa()"
+         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-40 p-0">
+        <div @click.stop 
+             :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'"
+             class="rounded-none lg:rounded-2xl max-w-full lg:max-w-7xl w-full h-screen lg:h-[98vh] overflow-hidden shadow-2xl flex flex-col">
             
-            <!-- FORMULÁRIO (Lado Esquerdo) -->
-            <div class="w-full lg:w-3/5 overflow-y-auto p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-3xl font-bold text-gray-800">
-                        <i class="bi bi-building-add mr-3 text-blue-600"></i>
-                        <span x-text="empresaForm.id ? 'Editar Empresa' : 'Nova Empresa'"></span>
-                    </h3>
-                    <button @click="fecharModalEmpresa()" class="text-gray-400 hover:text-gray-600 text-3xl">
-                        &times;
-                    </button>
-                </div>
+            <!-- Header Fixo -->
+            <div class="flex items-center justify-between px-6 lg:px-8 py-4 lg:py-6 border-b-2"
+                 :class="darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'">
+                <h3 class="text-2xl lg:text-3xl font-bold"
+                    :class="darkMode ? 'text-white' : 'text-gray-800'">
+                    <i class="bi bi-building-add mr-2 lg:mr-3 text-blue-600"></i>
+                    <span x-text="empresaForm.id ? 'Editar Empresa' : 'Nova Empresa'"></span>
+                </h3>
+                <button @click="fecharModalEmpresa()" 
+                        :class="darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'"
+                        class="text-3xl lg:text-4xl transition-all duration-300 hover:rotate-90 transform">
+                    &times;
+                </button>
+            </div>
 
-                <form @submit.prevent="salvarEmpresa()">
+            <!-- Container Principal com Flex -->
+            <div class="flex flex-1 overflow-hidden">
+                
+                <!-- FORMULÁRIO (Lado Esquerdo) -->
+                <div class="w-full lg:w-3/5 overflow-y-auto p-6 lg:p-8"
+                     :class="darkMode ? 'bg-gray-800' : 'bg-white'">
+                    <form @submit.prevent="salvarEmpresa()" class="space-y-6 lg:space-y-8" 
+                          x-bind:class="darkMode ? 'dark-form' : 'light-form'">
+                    
+                    <style>
+                        /* Dark mode form styles */
+                        .dark-form label { color: #d1d5db !important; }
+                        .dark-form h4 { color: #e5e7eb !important; }
+                        .dark-form input:not([type="color"]):not([type="file"]),
+                        .dark-form textarea,
+                        .dark-form select {
+                            background-color: #374151 !important;
+                            border-color: #4b5563 !important;
+                            color: #ffffff !important;
+                        }
+                        .dark-form input::placeholder,
+                        .dark-form textarea::placeholder {
+                            color: #9ca3af !important;
+                        }
+                        .dark-form p { color: #d1d5db !important; }
+                        
+                        /* Light mode form styles */
+                        .light-form label { color: #374151 !important; }
+                        .light-form h4 { color: #374151 !important; }
+                        .light-form input:not([type="color"]):not([type="file"]),
+                        .light-form textarea,
+                        .light-form select {
+                            background-color: #ffffff !important;
+                            border-color: #d1d5db !important;
+                            color: #111827 !important;
+                        }
+                        .light-form input::placeholder,
+                        .light-form textarea::placeholder {
+                            color: #9ca3af !important;
+                        }
+                    </style>
                     
                     <!-- SEÇÃO 1: Identificação -->
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-blue-600">
+                    <div class="mb-6 lg:mb-8">
+                        <h4 class="text-lg font-bold mb-4 pb-2 border-b-2 border-blue-600">
                             <i class="bi bi-info-circle mr-2"></i>Identificação
                         </h4>
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <label class="block text-sm font-medium mb-2">
                                     Nome da Empresa <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" 
                                        x-model="empresaForm.nome"
                                        required
                                        placeholder="Ex: EMFC Consulting, S.A."
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <label class="block text-sm font-medium mb-2">
                                     NIF/CC <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" 
                                        x-model="empresaForm.nif"
                                        required
                                        placeholder="Ex: 5480023446"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
                             </div>
                         </div>
                     </div>
 
                     <!-- SEÇÃO 2: Endereço Completo -->
                     <div class="mb-8">
-                        <h4 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b-2 border-green-600">
+                        <h4 class="text-lg font-bold mb-4 pb-2 border-b-2 border-green-600">
                             <i class="bi bi-geo-alt mr-2"></i>Endereço da Sede
                         </h4>
                         
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block text-sm font-medium mb-2">
                                         Rua/Avenida <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.rua"
                                            required
                                            placeholder="Ex: Avenida 4 de Fevereiro"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Edifício</label>
+                                    <label class="block text-sm font-medium mb-2">Edifício</label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.edificio"
                                            placeholder="Ex: Edifício Summit Tower"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Andar</label>
+                                    <label class="block text-sm font-medium mb-2">Andar</label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.andar"
                                            placeholder="Ex: 5.º andar"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sala</label>
+                                    <label class="block text-sm font-medium mb-2">Sala</label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.sala"
                                            placeholder="Ex: Sala 502"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block text-sm font-medium mb-2">
                                         Bairro <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.bairro"
                                            required
                                            placeholder="Ex: Kinaxixe"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block text-sm font-medium mb-2">
                                         Município <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.municipio"
                                            required
                                            placeholder="Ex: Luanda"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block text-sm font-medium mb-2">
                                         Província <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.provincia"
                                            required
                                            placeholder="Ex: Luanda"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label class="block text-sm font-medium mb-2">
                                         País <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.pais"
                                            required
                                            placeholder="Ex: Angola"
-                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
                             </div>
                         </div>
@@ -1363,27 +1477,27 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                                <label class="block text-sm font-medium mb-2">Telefone</label>
                                 <input type="tel" 
                                        x-model="empresaForm.telefone"
                                        placeholder="Ex: +244 XXX XXX XXX"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <label class="block text-sm font-medium mb-2">Email</label>
                                 <input type="email" 
                                        x-model="empresaForm.email"
                                        placeholder="Ex: contato@empresa.ao"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                                <label class="block text-sm font-medium mb-2">Website</label>
                                 <input type="url" 
                                        x-model="empresaForm.website"
                                        placeholder="Ex: www.empresa.ao"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                         </div>
                     </div>
@@ -1519,7 +1633,7 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cor Primária</label>
+                                    <label class="block text-sm font-medium mb-2">Cor Primária</label>
                                     <div class="flex items-center space-x-3">
                                         <input type="color" 
                                                x-model="empresaForm.corPrimaria"
@@ -1532,7 +1646,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cor Secundária</label>
+                                    <label class="block text-sm font-medium mb-2">Cor Secundária</label>
                                     <div class="flex items-center space-x-3">
                                         <input type="color" 
                                                x-model="empresaForm.corSecundaria"
@@ -1546,26 +1660,29 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Marca d'água <span class="text-sm text-gray-500">(Opcional)</span></label>
+                                <label class="block text-sm font-medium mb-2">Marca d'água <span class="text-sm text-gray-500">(Opcional)</span></label>
                                 <input type="text" 
                                        x-model="empresaForm.marcaDagua"
                                        placeholder="Ex: CONSULTING, S.A."
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <p class="text-xs text-gray-500 mt-1">Texto que aparecerá em diagonal no fundo do documento</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- BOTÕES -->
-                    <div class="flex items-center justify-between pt-6 border-t">
+                    <div class="flex items-center justify-between pt-6 border-t-2 sticky bottom-0 pb-4"
+                         :class="darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'">
                         <button type="button" 
                                 @click="fecharModalEmpresa()"
-                                class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                            <i class="bi bi-x-circle mr-2"></i>Cancelar
+                                :class="darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+                                class="px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                            <i class="bi bi-x-circle"></i>
+                            <span>Cancelar</span>
                         </button>
                         <button type="submit"
-                                class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg">
-                            <i class="bi bi-check-circle mr-2"></i>
+                                class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 font-medium shadow-lg hover:shadow-xl flex items-center space-x-2">
+                            <i class="bi bi-check-circle"></i>
                             <span x-text="empresaForm.id ? 'Salvar Alterações' : 'Cadastrar Empresa'"></span>
                         </button>
                     </div>
@@ -1574,22 +1691,26 @@
             </div>
 
             <!-- PREVIEW (Lado Direito) -->
-            <div class="hidden lg:block lg:w-2/5 bg-gradient-to-br from-gray-50 to-gray-100 p-8 overflow-y-auto border-l">
-                <h4 class="text-xl font-bold text-gray-800 mb-6">
-                    <i class="bi bi-eye mr-2 text-purple-600"></i>Preview
-                </h4>
+            <div class="hidden lg:block lg:w-2/5 overflow-y-auto border-l-2"
+                 :class="darkMode ? 'bg-gradient-to-br from-gray-700 to-gray-800 border-gray-700' : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200'">
+                <div class="p-8">
+                    <h4 class="text-xl font-bold mb-6 flex items-center"
+                        :class="darkMode ? 'text-white' : 'text-gray-800'">
+                        <i class="bi bi-eye mr-2 text-purple-600"></i>Preview em Tempo Real
+                    </h4>
 
                 <!-- Preview Card -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <div class="rounded-xl shadow-lg p-6 mb-6 border-2"
+                     :class="darkMode ? 'bg-gray-900 border-gray-600' : 'bg-white border-gray-200'">
                     <div class="flex items-start justify-between mb-4">
                         <!-- Logo Preview -->
-                        <div class="w-24 h-24 border-2 border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
+                        <div class="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                             <img x-show="empresaForm.logo" 
                                  :src="empresaForm.logo" 
                                  alt="Logo"
                                  class="max-w-full max-h-full object-contain"
                                  @error="$el.style.display='none'">
-                            <i x-show="!empresaForm.logo" class="bi bi-image text-4xl text-gray-300"></i>
+                            <i x-show="!empresaForm.logo" class="bi bi-image text-4xl text-gray-300 dark:text-gray-600"></i>
                         </div>
                     </div>
 
@@ -1631,51 +1752,52 @@
                     </div>
 
                     <!-- Carimbo Preview -->
-                    <div class="pt-4 border-t">
-                        <p class="text-xs text-gray-500 mb-2 font-medium">Carimbo:</p>
-                        <div class="w-24 h-24 border-2 border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Carimbo:</p>
+                        <div class="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                             <img x-show="empresaForm.carimbo" 
                                  :src="empresaForm.carimbo" 
                                  alt="Carimbo"
                                  class="max-w-full max-h-full object-contain"
                                  @error="$el.style.display='none'">
-                            <i x-show="!empresaForm.carimbo" class="bi bi-stamp text-4xl text-gray-300"></i>
+                            <i x-show="!empresaForm.carimbo" class="bi bi-stamp text-4xl text-gray-300 dark:text-gray-600"></i>
                         </div>
                     </div>
 
                     <!-- Cores -->
-                    <div x-show="empresaForm.corPrimaria || empresaForm.corSecundaria" class="pt-4 border-t mt-4">
-                        <p class="text-xs text-gray-500 mb-2 font-medium">Cores:</p>
+                    <div x-show="empresaForm.corPrimaria || empresaForm.corSecundaria" class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Cores:</p>
                         <div class="flex space-x-3">
                             <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded border border-gray-300" 
+                                <div class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 shadow-sm" 
                                      :style="'background-color: ' + (empresaForm.corPrimaria || '#1e40af')"></div>
-                                <span class="text-xs text-gray-600">Primária</span>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Primária</span>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded border border-gray-300" 
+                                <div class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 shadow-sm" 
                                      :style="'background-color: ' + (empresaForm.corSecundaria || '#64748b')"></div>
-                                <span class="text-xs text-gray-600">Secundária</span>
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Secundária</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Marca d'água -->
-                    <div x-show="empresaForm.marcaDagua" class="pt-4 border-t mt-4">
-                        <p class="text-xs text-gray-500 mb-2 font-medium">Marca d'água:</p>
-                        <p class="text-2xl font-bold text-gray-200 transform -rotate-45 text-center" 
+                    <div x-show="empresaForm.marcaDagua" class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Marca d'água:</p>
+                        <p class="text-2xl font-bold text-gray-200 dark:text-gray-700 transform -rotate-45 text-center" 
                            x-text="empresaForm.marcaDagua"></p>
                     </div>
                 </div>
 
                 <!-- Dica -->
-                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
-                    <p class="text-sm text-blue-800">
-                        <i class="bi bi-lightbulb mr-2"></i>
+                <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-600 p-4 rounded-lg">
+                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                        <i class="bi bi-lightbulb-fill mr-2"></i>
                         <strong>Dica:</strong> Este preview mostra como sua empresa aparecerá nos documentos PDF gerados.
                     </p>
                 </div>
             </div>
+        </div>
 
         </div>
     </div>
@@ -1715,7 +1837,7 @@
 
             <!-- Nome da Personalização -->
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium mb-2">
                     Nome da Personalização
                 </label>
                 <input type="text" 
