@@ -87,7 +87,7 @@ const ModeloDeclaracaoExecutivo = {
             box-sizing: border-box;
             margin: 0 auto;
             overflow: hidden;
-        ">`;
+        ">
             
             <!-- MARCA D'ÁGUA DIAGONAL -->
             <div style="
