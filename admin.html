@@ -1520,15 +1520,14 @@
                                     <!-- Preview -->
                                     <div class="flex-shrink-0">
                                         <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
-                                            <template x-if="empresaForm.logo && empresaForm.logo.trim() !== ''">
-                                                <img :src="empresaForm.logo" 
-                                                     :key="empresaForm.logo"
+                                            <template x-if="empresaForm.logoPreview || empresaForm.logo">
+                                                <img :src="empresaForm.logoPreview || empresaForm.logo" 
+                                                     :key="empresaForm.logoPreview || empresaForm.logo"
                                                      alt="Logo Preview" 
                                                      class="w-full h-full object-contain"
-                                                     crossorigin="anonymous"
-                                                     @error="console.error('Erro ao carregar logo:', empresaForm.logo); empresaForm.logo = ''">
+                                                     crossorigin="anonymous">
                                             </template>
-                                            <template x-if="!empresaForm.logo || empresaForm.logo.trim() === ''">
+                                            <template x-if="!empresaForm.logoPreview && !empresaForm.logo">
                                                 <div class="text-center text-gray-400">
                                                     <i class="bi bi-image text-4xl"></i>
                                                     <p class="text-xs mt-1">Sem logo</p>
@@ -1539,12 +1538,13 @@
                                     
                                     <!-- Botões de Ação -->
                                     <div class="flex-1 space-y-2">
-                                        <!-- Botão Upload -->
+                                        <!-- Botão Upload/Alterar -->
                                         <button type="button"
                                                 @click="$refs.logoInput.click()"
-                                                class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2">
-                                            <i class="bi bi-cloud-upload"></i>
-                                            <span x-text="empresaForm.logo ? 'Alterar Logo' : 'Upload Logo'"></span>
+                                                class="w-full px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 shadow-sm"
+                                                :class="empresaForm.logo || empresaForm.logoPreview ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'">
+                                            <i :class="empresaForm.logo || empresaForm.logoPreview ? 'bi bi-arrow-repeat' : 'bi bi-cloud-upload-fill'"></i>
+                                            <span x-text="(empresaForm.logo || empresaForm.logoPreview) ? 'Alterar Logo' : 'Upload Logo'"></span>
                                         </button>
                                         
                                         <!-- Input File Oculto -->
@@ -1555,14 +1555,30 @@
                                                class="hidden">
                                         
                                         <!-- Botão Remover (se tiver logo) -->
-                                        <template x-if="empresaForm.logo && empresaForm.logo.trim() !== ''">
+                                        <template x-if="empresaForm.logo || empresaForm.logoPreview">
                                             <button type="button"
                                                     @click="removerLogoEmpresa()"
-                                                    class="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                                                <i class="bi bi-trash"></i>
+                                                    class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border-2 border-red-200 hover:border-red-300 rounded-lg transition-all flex items-center justify-center space-x-2">
+                                                <i class="bi bi-trash3"></i>
                                                 <span>Remover Logo</span>
                                             </button>
                                         </template>
+                                        
+                                        <!-- Status -->
+                                        <div class="flex items-center space-x-2 text-xs mt-2">
+                                            <template x-if="empresaForm.logoPreview || empresaForm.logo">
+                                                <div class="flex items-center text-green-600">
+                                                    <i class="bi bi-check-circle-fill mr-1"></i>
+                                                    <span>Logo carregado</span>
+                                                </div>
+                                            </template>
+                                            <template x-if="!empresaForm.logoPreview && !empresaForm.logo">
+                                                <div class="flex items-center text-gray-400">
+                                                    <i class="bi bi-exclamation-circle mr-1"></i>
+                                                    <span>Obrigatório</span>
+                                                </div>
+                                            </template>
+                                        </div>
                                         
                                         <p class="text-xs text-gray-500 mt-2">
                                             <i class="bi bi-info-circle mr-1"></i>
@@ -1583,15 +1599,14 @@
                                     <!-- Preview -->
                                     <div class="flex-shrink-0">
                                         <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
-                                            <template x-if="empresaForm.carimbo && empresaForm.carimbo.trim() !== ''">
-                                                <img :src="empresaForm.carimbo" 
-                                                     :key="empresaForm.carimbo"
+                                            <template x-if="empresaForm.carimboPreview || empresaForm.carimbo">
+                                                <img :src="empresaForm.carimboPreview || empresaForm.carimbo" 
+                                                     :key="empresaForm.carimboPreview || empresaForm.carimbo"
                                                      alt="Carimbo Preview" 
                                                      class="w-full h-full object-contain"
-                                                     crossorigin="anonymous"
-                                                     @error="console.error('Erro ao carregar carimbo:', empresaForm.carimbo); empresaForm.carimbo = ''">
+                                                     crossorigin="anonymous">
                                             </template>
-                                            <template x-if="!empresaForm.carimbo || empresaForm.carimbo.trim() === ''">
+                                            <template x-if="!empresaForm.carimboPreview && !empresaForm.carimbo">
                                                 <div class="text-center text-gray-400">
                                                     <i class="bi bi-stamp text-4xl"></i>
                                                     <p class="text-xs mt-1">Sem carimbo</p>
@@ -1602,12 +1617,13 @@
                                     
                                     <!-- Botões de Ação -->
                                     <div class="flex-1 space-y-2">
-                                        <!-- Botão Upload -->
+                                        <!-- Botão Upload/Alterar -->
                                         <button type="button"
                                                 @click="$refs.carimboInput.click()"
-                                                class="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2">
-                                            <i class="bi bi-cloud-upload"></i>
-                                            <span x-text="empresaForm.carimbo ? 'Alterar Carimbo' : 'Upload Carimbo'"></span>
+                                                class="w-full px-4 py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center space-x-2 shadow-sm"
+                                                :class="empresaForm.carimbo || empresaForm.carimboPreview ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'">
+                                            <i :class="empresaForm.carimbo || empresaForm.carimboPreview ? 'bi bi-arrow-repeat' : 'bi bi-cloud-upload-fill'"></i>
+                                            <span x-text="(empresaForm.carimbo || empresaForm.carimboPreview) ? 'Alterar Carimbo' : 'Upload Carimbo'"></span>
                                         </button>
                                         
                                         <!-- Input File Oculto -->
@@ -1618,14 +1634,30 @@
                                                class="hidden">
                                         
                                         <!-- Botão Remover (se tiver carimbo) -->
-                                        <template x-if="empresaForm.carimbo && empresaForm.carimbo.trim() !== ''">
+                                        <template x-if="empresaForm.carimbo || empresaForm.carimboPreview">
                                             <button type="button"
                                                     @click="removerCarimboEmpresa()"
-                                                    class="w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                                                <i class="bi bi-trash"></i>
+                                                    class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border-2 border-red-200 hover:border-red-300 rounded-lg transition-all flex items-center justify-center space-x-2">
+                                                <i class="bi bi-trash3"></i>
                                                 <span>Remover Carimbo</span>
                                             </button>
                                         </template>
+                                        
+                                        <!-- Status -->
+                                        <div class="flex items-center space-x-2 text-xs mt-2">
+                                            <template x-if="empresaForm.carimboPreview || empresaForm.carimbo">
+                                                <div class="flex items-center text-green-600">
+                                                    <i class="bi bi-check-circle-fill mr-1"></i>
+                                                    <span>Carimbo carregado</span>
+                                                </div>
+                                            </template>
+                                            <template x-if="!empresaForm.carimboPreview && !empresaForm.carimbo">
+                                                <div class="flex items-center text-gray-400">
+                                                    <i class="bi bi-exclamation-circle mr-1"></i>
+                                                    <span>Obrigatório</span>
+                                                </div>
+                                            </template>
+                                        </div>
                                         
                                         <p class="text-xs text-gray-500 mt-2">
                                             <i class="bi bi-info-circle mr-1"></i>
@@ -1709,12 +1741,12 @@
                     <div class="flex items-start justify-between mb-4">
                         <!-- Logo Preview -->
                         <div class="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-800">
-                            <img x-show="empresaForm.logo" 
-                                 :src="empresaForm.logo" 
+                            <img x-show="empresaForm.logoPreview || empresaForm.logo" 
+                                 :src="empresaForm.logoPreview || empresaForm.logo" 
+                                 :key="empresaForm.logoPreview || empresaForm.logo"
                                  alt="Logo"
-                                 class="max-w-full max-h-full object-contain"
-                                 @error="$el.style.display='none'">
-                            <i x-show="!empresaForm.logo" class="bi bi-image text-4xl text-gray-300 dark:text-gray-600"></i>
+                                 class="max-w-full max-h-full object-contain">
+                            <i x-show="!empresaForm.logoPreview && !empresaForm.logo" class="bi bi-image text-4xl text-gray-300 dark:text-gray-600"></i>
                         </div>
                     </div>
 
@@ -1759,12 +1791,12 @@
                     <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Carimbo:</p>
                         <div class="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center bg-gray-50 dark:bg-gray-800">
-                            <img x-show="empresaForm.carimbo" 
-                                 :src="empresaForm.carimbo" 
+                            <img x-show="empresaForm.carimboPreview || empresaForm.carimbo" 
+                                 :src="empresaForm.carimboPreview || empresaForm.carimbo" 
+                                 :key="empresaForm.carimboPreview || empresaForm.carimbo"
                                  alt="Carimbo"
-                                 class="max-w-full max-h-full object-contain"
-                                 @error="$el.style.display='none'">
-                            <i x-show="!empresaForm.carimbo" class="bi bi-stamp text-4xl text-gray-300 dark:text-gray-600"></i>
+                                 class="max-w-full max-h-full object-contain">
+                            <i x-show="!empresaForm.carimboPreview && !empresaForm.carimbo" class="bi bi-stamp text-4xl text-gray-300 dark:text-gray-600"></i>
                         </div>
                     </div>
 

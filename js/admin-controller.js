@@ -806,32 +806,43 @@ function adminApp() {
                     return;
                 }
 
-                // Validar URLs de imagens
-                if (!this.empresaForm.logo || !this.empresaForm.carimbo) {
+                // Validar se tem logo e carimbo (preview OU url)
+                const temLogo = this.empresaForm.logoPreview || this.empresaForm.logo;
+                const temCarimbo = this.empresaForm.carimboPreview || this.empresaForm.carimbo;
+                
+                if (!temLogo || !temCarimbo) {
                     this.showAlert('error', 'Logo e carimbo são obrigatórios. Faça upload das imagens primeiro.');
                     this.loading = false;
                     return;
                 }
 
-                // Verificar se as imagens estão acessíveis no GitHub
-                this.loadingMessage = 'Verificando imagens no servidor...';
-                console.log('🔍 Verificando acessibilidade das imagens...');
-                
-                const logoAcessivel = await this.verificarImagemAcessivel(this.empresaForm.logo);
-                if (!logoAcessivel) {
-                    this.showAlert('error', '❌ Logo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
-                    this.loading = false;
-                    return;
+                // Se tem preview base64, significa que já foi carregado - não precisa verificar API
+                // Só verifica se for URL do CDN (sem preview)
+                if (!this.empresaForm.logoPreview && this.empresaForm.logo) {
+                    this.loadingMessage = 'Verificando logo no servidor...';
+                    console.log('🔍 Verificando acessibilidade do logo...');
+                    
+                    const logoAcessivel = await this.verificarImagemAcessivel(this.empresaForm.logo);
+                    if (!logoAcessivel) {
+                        this.showAlert('error', '❌ Logo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
+                        this.loading = false;
+                        return;
+                    }
                 }
                 
-                const carimboAcessivel = await this.verificarImagemAcessivel(this.empresaForm.carimbo);
-                if (!carimboAcessivel) {
-                    this.showAlert('error', '❌ Carimbo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
-                    this.loading = false;
-                    return;
+                if (!this.empresaForm.carimboPreview && this.empresaForm.carimbo) {
+                    this.loadingMessage = 'Verificando carimbo no servidor...';
+                    console.log('🔍 Verificando acessibilidade do carimbo...');
+                    
+                    const carimboAcessivel = await this.verificarImagemAcessivel(this.empresaForm.carimbo);
+                    if (!carimboAcessivel) {
+                        this.showAlert('error', '❌ Carimbo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
+                        this.loading = false;
+                        return;
+                    }
                 }
                 
-                console.log('✅ Ambas as imagens estão acessíveis!');
+                console.log('✅ Imagens validadas!');
                 this.loadingMessage = 'Salvando empresa...';
 
                 // Validar email se fornecido
@@ -920,7 +931,9 @@ function adminApp() {
                 email: empresa.email || '',
                 website: empresa.website || '',
                 logo: empresa.logo ? `${this.limparUrlCache(empresa.logo)}?v=${timestamp}` : '',
+                logoPreview: '', // Preview base64 (carregado depois)
                 carimbo: empresa.carimbo ? `${this.limparUrlCache(empresa.carimbo)}?v=${timestamp}` : '',
+                carimboPreview: '', // Preview base64 (carregado depois)
                 corPrimaria: empresa.corPrimaria || '#1e40af',
                 corSecundaria: empresa.corSecundaria || '#64748b',
                 marcaDagua: empresa.marcaDagua || ''
@@ -1091,16 +1104,33 @@ function adminApp() {
                         
                         if (conteudoExistente === novoConteudo) {
                             console.log('✅ Imagem idêntica já existe no servidor!');
-                            this.uploadProgress = 100;
-                            this.loadingMessage = '✅ Logo já existe (sem alterações)';
                             
-                            // Usar URL existente
+                            // USAR DOIS CAMPOS: URL + PREVIEW
+                            this.loadingMessage = 'Carregando preview...';
+                            this.uploadProgress = 90;
+                            
+                            // Gerar URL do CDN para salvar no JSON
                             const timestamp = new Date().getTime();
-                            const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
-                            this.empresaForm.logo = githubUrl;
+                            const cdnUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
+                            
+                            // Gerar base64 para preview (data URI)
+                            const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
+                            const base64Preview = `data:${mimeType};base64,${arquivoExistente.content}`;
+                            
+                            // Atualizar ambos os campos
+                            this.empresaForm.logo = cdnUrl; // Para salvar no JSON
+                            this.empresaForm.logoPreview = base64Preview; // Para preview no HTML
+                            
+                            this.uploadProgress = 100;
+                            this.loadingMessage = '✅ Logo já existe (reusando)';
+                            
+                            console.log('✅ Logo reutilizado:', {
+                                urlCDN: cdnUrl,
+                                previewBase64: base64Preview.substring(0, 50) + '...'
+                            });
                             
                             await this.sleep(500);
-                            this.showAlert('success', '✅ Logo já existe no servidor (mesma imagem)');
+                            this.showAlert('success', '✅ Logo já existe - preview carregado!');
                             this.loading = false;
                             this.uploadProgress = null;
                             event.target.value = '';
@@ -1156,9 +1186,14 @@ function adminApp() {
                 this.uploadProgress = 95;
                 console.log('📊 Progresso: 95%');
 
-                // Atualizar formulário
-                this.empresaForm.logo = githubUrl;
-                console.log('✅ Formulário atualizado');
+                // Gerar base64 preview (data URI)
+                const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
+                const base64Preview = `data:${mimeType};base64,${base64Content}`;
+
+                // Atualizar ambos os campos
+                this.empresaForm.logo = githubUrl; // URL CDN (para salvar)
+                this.empresaForm.logoPreview = base64Preview; // Base64 (para preview)
+                console.log('✅ Formulário atualizado (URL + Preview)');
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Logo enviado e verificado!';
@@ -1279,16 +1314,33 @@ function adminApp() {
                         
                         if (conteudoExistente === novoConteudo) {
                             console.log('✅ Imagem idêntica já existe no servidor!');
-                            this.uploadProgress = 100;
-                            this.loadingMessage = '✅ Carimbo já existe (sem alterações)';
                             
-                            // Usar URL existente
+                            // USAR DOIS CAMPOS: URL + PREVIEW
+                            this.loadingMessage = 'Carregando preview...';
+                            this.uploadProgress = 90;
+                            
+                            // Gerar URL do CDN para salvar no JSON
                             const timestamp = new Date().getTime();
-                            const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
-                            this.empresaForm.carimbo = githubUrl;
+                            const cdnUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
+                            
+                            // Gerar base64 para preview (data URI)
+                            const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
+                            const base64Preview = `data:${mimeType};base64,${arquivoExistente.content}`;
+                            
+                            // Atualizar ambos os campos
+                            this.empresaForm.carimbo = cdnUrl; // Para salvar no JSON
+                            this.empresaForm.carimboPreview = base64Preview; // Para preview no HTML
+                            
+                            this.uploadProgress = 100;
+                            this.loadingMessage = '✅ Carimbo já existe (reusando)';
+                            
+                            console.log('✅ Carimbo reutilizado:', {
+                                urlCDN: cdnUrl,
+                                previewBase64: base64Preview.substring(0, 50) + '...'
+                            });
                             
                             await this.sleep(500);
-                            this.showAlert('success', '✅ Carimbo já existe no servidor (mesma imagem)');
+                            this.showAlert('success', '✅ Carimbo já existe - preview carregado!');
                             this.loading = false;
                             this.uploadProgress = null;
                             event.target.value = '';
@@ -1344,9 +1396,14 @@ function adminApp() {
                 this.uploadProgress = 95;
                 console.log('📊 Progresso: 95%');
 
-                // Atualizar formulário
-                this.empresaForm.carimbo = githubUrl;
-                console.log('✅ Formulário atualizado');
+                // Gerar base64 preview (data URI)
+                const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
+                const base64Preview = `data:${mimeType};base64,${base64Content}`;
+
+                // Atualizar ambos os campos
+                this.empresaForm.carimbo = githubUrl; // URL CDN (para salvar)
+                this.empresaForm.carimboPreview = base64Preview; // Base64 (para preview)
+                console.log('✅ Formulário atualizado (URL + Preview)');
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Carimbo enviado e verificado!';
@@ -1385,6 +1442,7 @@ function adminApp() {
         removerLogoEmpresa() {
             if (confirm('Deseja remover o logo? (O arquivo permanecerá no GitHub)')) {
                 this.empresaForm.logo = '';
+                this.empresaForm.logoPreview = '';
                 this.showAlert('success', '✅ Logo removido do formulário');
             }
         },
@@ -1395,6 +1453,7 @@ function adminApp() {
         removerCarimboEmpresa() {
             if (confirm('Deseja remover o carimbo? (O arquivo permanecerá no GitHub)')) {
                 this.empresaForm.carimbo = '';
+                this.empresaForm.carimboPreview = '';
                 this.showAlert('success', '✅ Carimbo removido do formulário');
             }
         },
