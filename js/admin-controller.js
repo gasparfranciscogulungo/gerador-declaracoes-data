@@ -1341,15 +1341,23 @@ function adminApp() {
                 // Pegar o conteúdo interno (o modelo renderizado) ao invés do wrapper
                 const modeloHtml = previewElement.innerHTML;
                 
-                // Criar um container temporário limpo
+                // Criar um container temporário limpo e centralizado
                 const tempContainer = document.createElement('div');
                 tempContainer.innerHTML = modeloHtml;
-                tempContainer.style.width = '210mm';
-                tempContainer.style.height = '297mm';
-                tempContainer.style.margin = '0';
-                tempContainer.style.padding = '0';
-                tempContainer.style.transform = 'none';
-                tempContainer.style.position = 'relative';
+                tempContainer.style.cssText = `
+                    width: 210mm;
+                    min-height: 297mm;
+                    max-height: 297mm;
+                    margin: 0 auto;
+                    padding: 0;
+                    box-sizing: border-box;
+                    position: relative;
+                    overflow: hidden;
+                    background: white;
+                `;
+                
+                // Adicionar temporariamente ao DOM para renderização
+                document.body.appendChild(tempContainer);
 
                 // Obter dados para nome do arquivo
                 const empresa = this.getEmpresaExemplo();
@@ -1366,32 +1374,29 @@ function adminApp() {
 
                 // Configurações otimizadas para PDF profissional - UMA ÚNICA PÁGINA
                 const opcoesPDF = {
-                    margin: 0, // Sem margens - o conteúdo já tem padding interno
+                    margin: [0, 0, 0, 0], // [top, left, bottom, right] em mm
                     filename: nomeArquivo,
                     image: { 
                         type: 'jpeg', 
-                        quality: 0.98 // Máxima qualidade
+                        quality: 0.95
                     },
                     html2canvas: { 
-                        scale: 2, // Resolução otimizada (2x é suficiente e mais rápido)
-                        useCORS: true, // Permitir imagens externas
-                        letterRendering: true, // Melhorar renderização de texto
-                        logging: false, // Desativar logs
-                        scrollY: 0, // Fixar posição Y
-                        scrollX: 0, // Fixar posição X
-                        windowWidth: 794, // Largura A4 em pixels (210mm * 3.78)
-                        windowHeight: 1123, // Altura A4 em pixels (297mm * 3.78)
-                        width: 794,
-                        height: 1123
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        scrollY: -window.scrollY,
+                        scrollX: 0,
+                        windowWidth: 794, // 210mm * 3.78
+                        windowHeight: 1123 // 297mm * 3.78
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
-                        orientation: 'portrait',
-                        compress: true // Comprimir PDF
+                        orientation: 'portrait'
                     },
                     pagebreak: { 
-                        mode: 'avoid-all' // Forçar tudo em uma página
+                        mode: ['avoid-all', 'css', 'legacy']
                     }
                 };
 
@@ -1403,6 +1408,9 @@ function adminApp() {
                     .set(opcoesPDF)
                     .from(tempContainer)
                     .save();
+
+                // Remover container temporário
+                document.body.removeChild(tempContainer);
 
                 // Sucesso
                 this.showAlert('success', `✅ PDF gerado com sucesso!\n📄 ${nomeArquivo}`);
@@ -1447,42 +1455,48 @@ function adminApp() {
                 const modeloHtml = previewElement.innerHTML;
                 const tempContainer = document.createElement('div');
                 tempContainer.innerHTML = modeloHtml;
-                tempContainer.style.width = '210mm';
-                tempContainer.style.height = '297mm';
-                tempContainer.style.margin = '0';
-                tempContainer.style.padding = '0';
-                tempContainer.style.transform = 'none';
+                tempContainer.style.cssText = `
+                    width: 210mm;
+                    min-height: 297mm;
+                    max-height: 297mm;
+                    margin: 0 auto;
+                    padding: 0;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    background: white;
+                `;
+                
+                document.body.appendChild(tempContainer);
 
                 const opcoesPDF = {
-                    margin: 0,
-                    image: { type: 'jpeg', quality: 0.98 },
+                    margin: [0, 0, 0, 0],
+                    image: { type: 'jpeg', quality: 0.95 },
                     html2canvas: { 
                         scale: 2, 
                         useCORS: true, 
                         letterRendering: true,
                         logging: false,
-                        scrollY: 0,
+                        scrollY: -window.scrollY,
                         scrollX: 0,
                         windowWidth: 794,
-                        windowHeight: 1123,
-                        width: 794,
-                        height: 1123
+                        windowHeight: 1123
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
                         orientation: 'portrait'
                     },
-                    pagebreak: {
-                        mode: 'avoid-all'
+                    pagebreak: { 
+                        mode: ['avoid-all', 'css', 'legacy']
                     }
                 };
 
-                // Gerar blob
                 const pdfBlob = await html2pdf()
                     .set(opcoesPDF)
                     .from(tempContainer)
                     .output('blob');
+
+                document.body.removeChild(tempContainer);
 
                 // Abrir em nova aba
                 const url = URL.createObjectURL(pdfBlob);

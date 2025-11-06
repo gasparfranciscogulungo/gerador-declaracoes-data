@@ -23,17 +23,17 @@ const ModeloDeclaracaoExecutivo = {
         // Configurações padrão
         const cfg = {
             fontFamily: config.fontFamily || 'Times New Roman, serif',
-            fontSize: config.fontSize || 11,
-            tamanhoTitulo: config.tamanhoTitulo || 26,
-            tamanhoSubtitulo: config.tamanhoSubtitulo || 16,
-            tamanhoEmpresa: config.tamanhoEmpresa || 8.5,
+            fontSize: config.fontSize || 10,
+            tamanhoTitulo: config.tamanhoTitulo || 22,
+            tamanhoSubtitulo: config.tamanhoSubtitulo || 14,
+            tamanhoEmpresa: config.tamanhoEmpresa || 8,
             corTexto: config.corTexto || '#000000',
             corDestaque: config.corDestaque || empresa.corPrimaria || '#1e40af',
             marcaDaguaOpacidade: config.marcaDaguaOpacidade || 10,
             marcaDaguaRotacao: config.marcaDaguaRotacao !== undefined ? config.marcaDaguaRotacao : -45,
             marcaDaguaWidth: config.marcaDaguaWidth || 400,
             marcaDaguaHeight: config.marcaDaguaHeight || 400,
-            espacamentoLinhas: config.espacamentoLinhas || 1.8,
+            espacamentoLinhas: config.espacamentoLinhas || 1.5,
             // Edição de Conteúdo
             tituloDocumento: config.tituloDocumento || 'DECLARAÇÃO DE TRABALHO',
             textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
@@ -80,14 +80,15 @@ const ModeloDeclaracaoExecutivo = {
             color: ${cfg.corTexto};
             line-height: ${cfg.espacamentoLinhas};
             width: 210mm;
-            height: 297mm;
-            padding: 18mm 22mm;
+            min-height: 297mm;
+            max-height: 297mm;
+            padding: 15mm 20mm;
             background: white;
             position: relative;
             box-sizing: border-box;
-            margin: 0 auto;
+            margin: 0;
             overflow: hidden;
-        ">
+        ")
             
             <!-- MARCA D'ÁGUA DIAGONAL -->
             <div style="
@@ -133,7 +134,7 @@ const ModeloDeclaracaoExecutivo = {
                     padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
-                    margin-bottom: 18px;
+                    margin-bottom: 12px;
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
@@ -141,11 +142,11 @@ const ModeloDeclaracaoExecutivo = {
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
-                                 style="width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px; object-fit: contain;">
+                                 style="width: 65px; height: 65px; object-fit: contain;">
                         ` : `
                             <div style="
-                                width: ${cfg.cabecalhoLogoSize}px; 
-                                height: ${cfg.cabecalhoLogoSize}px; 
+                                width: 65px; 
+                                height: 65px; 
                                 background: #f3f4f6; 
                                 border-radius: 8px;
                                 display: flex;
@@ -183,17 +184,17 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- TÍTULO -->
-                <div style="text-align: center; margin: 20px 0 18px 0;">
+                <div style="text-align: center; margin: 12px 0 10px 0;">
                     <h2 style="
                         font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
                         color: ${cfg.corDestaque};
-                        letter-spacing: 2px;
-                        margin: 0 0 8px 0;
+                        letter-spacing: 1.5px;
+                        margin: 0 0 6px 0;
                     ">${cfg.tituloDocumento}</h2>
                     <div style="
-                        width: 100px;
-                        height: 3px;
+                        width: 80px;
+                        height: 2.5px;
                         background: ${cfg.corDestaque};
                         margin: 0 auto;
                         border-radius: 2px;
@@ -201,39 +202,35 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- CORPO DO TEXTO -->
-                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 18px;">
-                    <p style="margin-bottom: 12px;">
+                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 12px;">
+                    <p style="margin-bottom: 8px;">
                         ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
-                        exerce actualmente as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
-                        na <strong>${empresa.nome}</strong>, pessoa colectiva com o Número de Identificação Fiscal 
-                        <strong>${empresa.nif}</strong>, com sede em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
+                        exerce as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
+                        na <strong>${empresa.nome}</strong>, NIF <strong>${empresa.nif}</strong>, 
+                        sediada em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
                     </p>
                     
-                    <p style="margin-bottom: 12px;">
-                        O(A) referido(a) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
-                        desempenhando as suas funções com competência, profissionalismo e dedicação, 
-                        cumprindo integralmente com as responsabilidades inerentes ao seu cargo.
+                    <p style="margin-bottom: 8px;">
+                        O(A) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
+                        desempenhando as suas funções com competência e profissionalismo.
                     </p>
                     
-                    <p style="margin-bottom: 12px;">
-                        No exercício das suas funções, o(a) colaborador(a) aufere mensalmente o vencimento bruto de 
-                        <strong style="color: ${cfg.corDestaque}; font-size: 12pt;">${salarioFormatado} AKZ</strong>, 
-                        acrescido dos subsídios legalmente estabelecidos, demonstrando um desempenho exemplar 
-                        no cumprimento das suas obrigações contratuais.
+                    <p style="margin-bottom: 8px;">
+                        Aufere mensalmente o vencimento bruto de 
+                        <strong style="color: ${cfg.corDestaque};">${salarioFormatado} AKZ</strong>, 
+                        acrescido dos subsídios legalmente estabelecidos.
                     </p>
                     
-                    <p style="margin-bottom: 12px;">
+                    <p style="margin-bottom: 8px;">
                         A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
-                        nomeadamente para comprovação de vínculo laboral, auferimento de rendimentos e 
-                        quaisquer outras finalidades que entenda convenientes, podendo a mesma ser apresentada 
-                        perante as entidades competentes.
+                        nomeadamente comprovação de vínculo laboral e auferimento de rendimentos.
                     </p>
                 </div>
 
                 <!-- RODAPÉ -->
-                <div style="margin-top: 25px;">
-                    <p style="font-size: 10pt; margin-bottom: 30px;">
+                <div style="margin-top: 15px;">
+                    <p style="font-size: 9pt; margin-bottom: 20px;">
                         ${empresa.endereco.municipio}, aos ${dataAtual}.
                     </p>
                     
@@ -244,7 +241,7 @@ const ModeloDeclaracaoExecutivo = {
                         align-items: center;
                         justify-content: center;
                     ">
-                        <p style="font-size: 10pt; font-weight: 600; margin-bottom: 18px;">
+                        <p style="font-size: 9pt; font-weight: 600; margin-bottom: 12px;">
                             A Direcção da Empresa
                         </p>
                         
@@ -252,22 +249,22 @@ const ModeloDeclaracaoExecutivo = {
                             <img src="${empresa.carimbo}" 
                                  alt="Carimbo e Assinatura" 
                                  style="
-                                    width: ${cfg.carimboWidth}px; 
-                                    height: ${cfg.carimboHeight}px; 
+                                    width: 90px; 
+                                    height: 90px; 
                                     object-fit: contain; 
                                     opacity: 0.9;
                                     display: block;
                                  ">
                         ` : `
                             <div style="
-                                width: ${cfg.carimboWidth}px;
-                                height: ${cfg.carimboHeight}px;
-                                border: 4px solid #999;
+                                width: 90px;
+                                height: 90px;
+                                border: 3px solid #999;
                                 border-radius: 50%;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                font-size: ${cfg.carimboWidth * 0.4}px;
+                                font-size: 36px;
                                 color: #999;
                             ">📌</div>
                         `}
