@@ -81,13 +81,13 @@ const ModeloDeclaracaoExecutivo = {
             line-height: ${cfg.espacamentoLinhas};
             width: 210mm;
             height: 297mm;
-            padding: 15mm 20mm;
+            padding: 12mm 18mm;
             background: white;
             position: relative;
             box-sizing: border-box;
             margin: 0 auto;
             overflow: hidden;
-        ">
+        ">`;
             
             <!-- MARCA D'ÁGUA DIAGONAL -->
             <div style="
@@ -133,7 +133,7 @@ const ModeloDeclaracaoExecutivo = {
                     padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
-                    margin-bottom: 12px;
+                    margin-bottom: 10px;
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
@@ -167,33 +167,33 @@ const ModeloDeclaracaoExecutivo = {
                             font-size: ${cfg.tamanhoSubtitulo}pt;
                             font-weight: bold;
                             color: ${cfg.corDestaque};
-                            margin: 0 0 8px 0;
+                            margin: 0 0 6px 0;
                         ">${empresa.nome}</h1>
                         
                         <div style="
                             font-size: ${cfg.tamanhoEmpresa}pt; 
-                            line-height: ${cfg.cabecalhoLineHeight};
+                            line-height: 1.3;
                         ">
-                            <p style="margin: 3px 0;"><strong>NIF/CC:</strong> ${empresa.nif}</p>
-                            <p style="margin: 3px 0;"><strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}</p>
-                            <p style="margin: 3px 0;">Bairro ${empresa.endereco.bairro} — Município de ${empresa.endereco.municipio}</p>
-                            <p style="margin: 3px 0;">${empresa.endereco.provincia} — ${empresa.endereco.pais}</p>
+                            <p style="margin: 2px 0;"><strong>NIF/CC:</strong> ${empresa.nif}</p>
+                            <p style="margin: 2px 0;"><strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}</p>
+                            <p style="margin: 2px 0;">Bairro ${empresa.endereco.bairro} — Município de ${empresa.endereco.municipio}</p>
+                            <p style="margin: 2px 0;">${empresa.endereco.provincia} — ${empresa.endereco.pais}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- TÍTULO -->
-                <div style="text-align: center; margin: 20px 0 15px 0;">
+                <div style="text-align: center; margin: 15px 0 12px 0;">
                     <h2 style="
                         font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
                         color: ${cfg.corDestaque};
                         letter-spacing: 2px;
-                        margin: 0 0 8px 0;
+                        margin: 0 0 6px 0;
                     ">${cfg.tituloDocumento}</h2>
                     <div style="
-                        width: 120px;
-                        height: 4px;
+                        width: 100px;
+                        height: 3px;
                         background: ${cfg.corDestaque};
                         margin: 0 auto;
                         border-radius: 2px;
@@ -201,8 +201,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- CORPO DO TEXTO -->
-                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 20px;">
-                    <p style="margin-bottom: 10px;">
+                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 15px;">
+                    <p style="margin-bottom: 8px;">
                         ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce actualmente as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
@@ -210,20 +210,20 @@ const ModeloDeclaracaoExecutivo = {
                         <strong>${empresa.nif}</strong>, com sede em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
                     </p>
                     
-                    <p style="margin-bottom: 10px;">
+                    <p style="margin-bottom: 8px;">
                         O(A) referido(a) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
                         desempenhando as suas funções com competência, profissionalismo e dedicação, 
                         cumprindo integralmente com as responsabilidades inerentes ao seu cargo.
                     </p>
                     
-                    <p style="margin-bottom: 10px;">
+                    <p style="margin-bottom: 8px;">
                         No exercício das suas funções, o(a) colaborador(a) aufere mensalmente o vencimento bruto de 
-                        <strong style="color: ${cfg.corDestaque}; font-size: 13pt;">${salarioFormatado} AKZ</strong>, 
+                        <strong style="color: ${cfg.corDestaque}; font-size: 12pt;">${salarioFormatado} AKZ</strong>, 
                         acrescido dos subsídios legalmente estabelecidos, demonstrando um desempenho exemplar 
                         no cumprimento das suas obrigações contratuais.
                     </p>
                     
-                    <p style="margin-bottom: 10px;">
+                    <p style="margin-bottom: 8px;">
                         A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
                         nomeadamente para comprovação de vínculo laboral, auferimento de rendimentos e 
                         quaisquer outras finalidades que entenda convenientes, podendo a mesma ser apresentada 
@@ -232,8 +232,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- RODAPÉ -->
-                <div style="margin-top: 30px;">
-                    <p style="font-size: 10pt; margin-bottom: 30px;">
+                <div style="margin-top: 20px;">
+                    <p style="font-size: 10pt; margin-bottom: 25px;">
                         ${empresa.endereco.municipio}, aos ${dataAtual}.
                     </p>
                     
@@ -244,7 +244,7 @@ const ModeloDeclaracaoExecutivo = {
                         align-items: center;
                         justify-content: center;
                     ">
-                        <p style="font-size: 11pt; font-weight: 600; margin-bottom: 20px;">
+                        <p style="font-size: 10pt; font-weight: 600; margin-bottom: 15px;">
                             A Direcção da Empresa
                         </p>
                         
