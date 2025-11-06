@@ -5,7 +5,7 @@
       "nome": "EMFC Consulting, S.A",
       "nif": "5480023446",
       "endereco": {
-        "rua": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502",
+        "rua": "Avenida 4 de Fevereiro, EdifÃ­cio Summit Tower, 5.Âº andar, Sala 502",
         "edificio": "Edificio 42",
         "andar": "andar 3",
         "sala": "sala 4",
@@ -26,7 +26,7 @@
     },
     {
       "id": "empresa_1762398563451",
-      "nome": "Gaspar francjÃÂ§asjdÃÂ§",
+      "nome": "Angola Tech Prestacao de servico profissionals",
       "nif": "930209393",
       "endereco": {
         "rua": "avenida da maianga",
@@ -34,7 +34,7 @@
         "andar": "83",
         "sala": "saida 49",
         "bairro": "talatona",
-        "municipio": "LUanda",
+        "municipio": "Luanda",
         "provincia": "Luanda",
         "pais": "Angola"
       },
@@ -46,7 +46,7 @@
       "corPrimaria": "#06bc1b",
       "corSecundaria": "#5a7baa",
       "marcaDagua": "",
-      "updatedAt": "2025-11-06T03:38:07.292Z"
+      "updatedAt": "2025-11-06T13:47:56.954Z"
     }
   ]
 }
