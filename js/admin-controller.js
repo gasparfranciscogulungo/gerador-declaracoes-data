@@ -46,6 +46,17 @@ function adminApp() {
         // Preview de Modelo
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
+        mostrarPersonalizacao: false,
+        
+        // Customização do Preview
+        previewConfig: {
+            fontFamily: 'Times New Roman',
+            fontSize: 12,
+            corTexto: '#000000',
+            corDestaque: '#1e40af',
+            marcaDaguaOpacidade: 10,
+            espacamentoLinhas: 1.6
+        },
         
         // Forms
         empresaForm: {
@@ -815,6 +826,29 @@ function adminApp() {
                     { mes: 'Março/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 }
                 ]
             };
+        },
+
+        /**
+         * Renderiza modelo usando módulo externo
+         */
+        renderizarModelo() {
+            const modelo = this.modeloSelecionado;
+            const empresa = this.getEmpresaExemplo();
+            const cliente = this.getClienteExemplo();
+            
+            // Verificar qual modelo usar
+            if (modelo.id === 'modelo_executivo' && typeof ModeloDeclaracaoExecutivo !== 'undefined') {
+                return ModeloDeclaracaoExecutivo.renderizar(empresa, cliente, this.previewConfig);
+            }
+            
+            // Fallback: modelo não implementado ainda
+            return `
+                <div style="text-align: center; padding: 100px 20px; color: #666;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🚧</div>
+                    <h2 style="font-size: 24px; margin-bottom: 10px;">Modelo em Desenvolvimento</h2>
+                    <p style="font-size: 14px;">${modelo.nome} será implementado em breve</p>
+                </div>
+            `;
         }
     };
 }

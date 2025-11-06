@@ -1,0 +1,286 @@
+<!-- CONTEÚDO: Preview + Painel Lateral -->
+<div class="flex-1 overflow-hidden flex">
+    
+    <!-- PAINEL DE PERSONALIZAÇÃO (Lateral) -->
+    <div x-show="mostrarPersonalizacao" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         class="w-80 bg-white border-r border-gray-300 overflow-y-auto p-6">
+        
+        <h4 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="bi bi-sliders text-purple-600 mr-2"></i>
+            Personalização
+        </h4>
+
+        <!-- Fonte -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-fonts mr-1"></i>Fonte
+            </label>
+            <select x-model="previewConfig.fontFamily" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial">Arial</option>
+                <option value="Calibri">Calibri</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+        </div>
+
+        <!-- Tamanho da Fonte -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-type mr-1"></i>Tamanho da Fonte: 
+                <span class="font-bold" x-text="previewConfig.fontSize + 'pt'"></span>
+            </label>
+            <input type="range" x-model="previewConfig.fontSize" min="10" max="16" step="1"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>10pt</span>
+                <span>16pt</span>
+            </div>
+        </div>
+
+        <!-- Cor do Texto -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-palette mr-1"></i>Cor do Texto
+            </label>
+            <div class="flex items-center space-x-2">
+                <input type="color" x-model="previewConfig.corTexto"
+                       class="w-12 h-10 rounded border border-gray-300 cursor-pointer">
+                <input type="text" x-model="previewConfig.corTexto"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono">
+            </div>
+        </div>
+
+        <!-- Cor de Destaque -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-star mr-1"></i>Cor de Destaque
+            </label>
+            <div class="flex items-center space-x-2">
+                <input type="color" x-model="previewConfig.corDestaque"
+                       class="w-12 h-10 rounded border border-gray-300 cursor-pointer">
+                <input type="text" x-model="previewConfig.corDestaque"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono">
+            </div>
+        </div>
+
+        <!-- Opacidade da Marca d'água -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-droplet mr-1"></i>Opacidade da Marca d'água: 
+                <span class="font-bold" x-text="previewConfig.marcaDaguaOpacidade + '%'"></span>
+            </label>
+            <input type="range" x-model="previewConfig.marcaDaguaOpacidade" min="5" max="30" step="5"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>5%</span>
+                <span>30%</span>
+            </div>
+        </div>
+
+        <!-- Espaçamento de Linhas -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-text-indent-left mr-1"></i>Espaçamento de Linhas: 
+                <span class="font-bold" x-text="previewConfig.espacamentoLinhas.toFixed(1)"></span>
+            </label>
+            <input type="range" x-model.number="previewConfig.espacamentoLinhas" min="1.0" max="2.0" step="0.1"
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1.0</span>
+                <span>2.0</span>
+            </div>
+        </div>
+
+        <!-- Botão Resetar -->
+        <button @click="previewConfig = {fontFamily: 'Times New Roman', fontSize: 12, corTexto: '#000000', corDestaque: '#1e40af', marcaDaguaOpacidade: 10, espacamentoLinhas: 1.6}"
+                class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+            <i class="bi bi-arrow-counterclockwise mr-2"></i>Resetar Padrão
+        </button>
+
+    </div>
+
+    <!-- ÁREA DE PREVIEW (Scrollable) -->
+    <div class="flex-1 overflow-y-auto bg-gray-200 p-8">
+        
+        <!-- PREVIEW: DECLARAÇÃO (Modelo Executivo Profissional) -->
+        <template x-if="tipoPreview === 'declaracao'">
+            <div class="max-w-[210mm] mx-auto bg-white shadow-2xl p-16 relative"
+                 :style="'font-family: ' + previewConfig.fontFamily + '; font-size: ' + previewConfig.fontSize + 'pt; color: ' + previewConfig.corTexto + '; line-height: ' + previewConfig.espacamentoLinhas">
+                
+                <!-- Marca d'água Diagonal Profissional -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 transform rotate-[-45deg]"
+                     :style="'opacity: ' + (previewConfig.marcaDaguaOpacidade / 100)">
+                    <template x-if="getEmpresaExemplo().logo">
+                        <img :src="getEmpresaExemplo().logo" 
+                             alt="Marca d'água" 
+                             class="max-w-[60%] max-h-[60%] object-contain">
+                    </template>
+                    <template x-if="!getEmpresaExemplo().logo">
+                        <div class="text-center">
+                            <i class="bi bi-building text-[150px] text-gray-400"></i>
+                            <p class="text-4xl font-bold text-gray-400 mt-4" 
+                               x-text="getEmpresaExemplo().nome"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Conteúdo do Documento -->
+                <div class="relative z-10">
+                    
+                    <!-- Header Corporativo com Logo e Dados da Empresa -->
+                    <div class="flex items-start justify-between mb-6 pb-6 border-b-4"
+                         :style="'border-color: ' + previewConfig.corDestaque">
+                        
+                        <!-- Logo (Esquerda) -->
+                        <div class="flex items-center space-x-4">
+                            <div x-show="getEmpresaExemplo().logo" class="w-20 h-20 flex items-center justify-center">
+                                <img :src="getEmpresaExemplo().logo" 
+                                     alt="Logo"
+                                     class="max-w-full max-h-full object-contain">
+                            </div>
+                            <div x-show="!getEmpresaExemplo().logo" 
+                                 class="w-20 h-20 flex items-center justify-center bg-gray-100 rounded">
+                                <i class="bi bi-building text-3xl text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Dados da Empresa (Direita) -->
+                        <div class="text-right">
+                            <h1 class="text-2xl font-bold mb-1" 
+                                :style="'color: ' + previewConfig.corDestaque"
+                                x-text="getEmpresaExemplo().nome"></h1>
+                            <p class="text-xs mb-1">
+                                <strong>NIF/CC:</strong> <span x-text="getEmpresaExemplo().nif"></span>
+                            </p>
+                            <p class="text-xs leading-tight">
+                                <strong>Sede:</strong> 
+                                <span x-text="getEmpresaExemplo().endereco.rua"></span>
+                                <span x-show="getEmpresaExemplo().endereco.edificio" 
+                                      x-text="', ' + getEmpresaExemplo().endereco.edificio"></span>
+                                <span x-show="getEmpresaExemplo().endereco.andar" 
+                                      x-text="', ' + getEmpresaExemplo().endereco.andar"></span>
+                                <span x-show="getEmpresaExemplo().endereco.sala" 
+                                      x-text="', ' + getEmpresaExemplo().endereco.sala"></span>
+                                <br>
+                                <span x-text="'Bairro ' + getEmpresaExemplo().endereco.bairro + ' — Município de ' + getEmpresaExemplo().endereco.municipio"></span>
+                                <br>
+                                <span x-text="getEmpresaExemplo().endereco.municipio + ' — ' + getEmpresaExemplo().endereco.pais"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Título Centralizado -->
+                    <div class="text-center my-10">
+                        <h2 class="text-4xl font-bold tracking-wide mb-2"
+                            :style="'color: ' + previewConfig.corDestaque">
+                            DECLARAÇÃO DE TRABALHO
+                        </h2>
+                        <div class="h-1 w-32 mx-auto rounded"
+                             :style="'background-color: ' + previewConfig.corDestaque"></div>
+                    </div>
+
+                    <!-- Corpo da Declaração - TEXTO PROFISSIONAL -->
+                    <div class="text-justify space-y-4">
+                        <p>
+                            Declara-se, para os devidos efeitos, que 
+                            <strong :style="'color: ' + previewConfig.corDestaque" x-text="getClienteExemplo().nome"></strong>, 
+                            portador(a) do Bilhete de Identidade n.º 
+                            <strong x-text="getClienteExemplo().bi"></strong>, 
+                            exerce actualmente as funções de 
+                            <strong :style="'color: ' + previewConfig.corDestaque" x-text="getClienteExemplo().cargo"></strong> 
+                            na 
+                            <span class="font-semibold" x-text="getEmpresaExemplo().nome"></span>, 
+                            pessoa colectiva com o Número de Identificação Fiscal 
+                            <strong x-text="getEmpresaExemplo().nif"></strong>, 
+                            com sede em 
+                            <span x-text="getEmpresaExemplo().endereco.rua + ', ' + getEmpresaExemplo().endereco.municipio + ', ' + getEmpresaExemplo().endereco.pais"></span>.
+                        </p>
+                        
+                        <p>
+                            O(A) referido(a) colaborador(a) foi admitido(a) em 
+                            <strong x-text="new Date(getClienteExemplo().dataAdmissao).toLocaleDateString('pt-AO', {day: 'numeric', month: 'long', year: 'numeric'})"></strong>, 
+                            desempenhando as suas funções com competência, profissionalismo e dedicação, 
+                            cumprindo integralmente com as responsabilidades inerentes ao seu cargo.
+                        </p>
+                        
+                        <p>
+                            No exercício das suas funções, o(a) colaborador(a) aufere mensalmente o vencimento bruto de 
+                            <strong :style="'color: ' + previewConfig.corDestaque" 
+                                    x-text="getClienteExemplo().salario.toLocaleString('pt-AO', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' AKZ'"></strong>, 
+                            acrescido dos subsídios legalmente estabelecidos, demonstrando um desempenho exemplar 
+                            no cumprimento das suas obrigações contratuais.
+                        </p>
+                        
+                        <p>
+                            A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
+                            nomeadamente para comprovação de vínculo laboral, auferimento de rendimentos e 
+                            quaisquer outras finalidades que entenda convenientes, podendo a mesma ser apresentada 
+                            perante as entidades competentes.
+                        </p>
+                    </div>
+
+                    <!-- Rodapé com Data, Assinatura e Carimbo -->
+                    <div class="mt-16">
+                        <p class="text-sm mb-12">
+                            <span x-text="getEmpresaExemplo().endereco.municipio"></span>, aos 
+                            <span x-text="new Date().toLocaleDateString('pt-AO', {day: 'numeric', month: 'long', year: 'numeric'})"></span>.
+                        </p>
+                        
+                        <div class="flex items-end justify-between">
+                            <!-- Assinatura -->
+                            <div class="text-center">
+                                <div class="border-t-2 border-gray-800 pt-2 w-56">
+                                    <p class="text-sm font-semibold">O Director de Recursos Humanos</p>
+                                    <p class="text-xs text-gray-600 mt-1" x-text="getEmpresaExemplo().nome"></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Carimbo -->
+                            <div class="flex flex-col items-center">
+                                <div x-show="getEmpresaExemplo().carimbo" 
+                                     class="w-28 h-28 flex items-center justify-center opacity-80">
+                                    <img :src="getEmpresaExemplo().carimbo" 
+                                         alt="Carimbo"
+                                         class="max-w-full max-h-full object-contain">
+                                </div>
+                                <div x-show="!getEmpresaExemplo().carimbo"
+                                     class="w-28 h-28 flex items-center justify-center border-4 border-gray-400 rounded-full">
+                                    <i class="bi bi-stamp text-4xl text-gray-400"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Carimbo e Assinatura</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </template>
+
+        <!-- PREVIEW: RECIBO (Em desenvolvimento) -->
+        <template x-if="tipoPreview === 'recibo'">
+            <div class="max-w-[210mm] mx-auto bg-white shadow-2xl p-8">
+                <div class="text-center py-20">
+                    <i class="bi bi-receipt text-8xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 text-xl font-medium">Preview do Recibo</p>
+                    <p class="text-gray-500 text-sm mt-2">Em construção - Modelo profissional com todas as rubricas</p>
+                </div>
+            </div>
+        </template>
+
+        <!-- PREVIEW: COMBO -->
+        <template x-if="tipoPreview === 'combo'">
+            <div class="text-center py-20">
+                <i class="bi bi-journals text-8xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600 text-xl font-medium">Preview do Combo</p>
+                <p class="text-gray-500 text-sm mt-2">1 Declaração + 3 Recibos = 4 Páginas</p>
+            </div>
+        </template>
+
+    </div>
+
+</div>
