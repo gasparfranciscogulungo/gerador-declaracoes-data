@@ -1636,6 +1636,149 @@ function adminApp() {
             } finally {
                 this.loading = false;
             }
+        },
+
+        // ========== UPLOAD DE IMAGENS ==========
+        
+        /**
+         * Inicializar Image Uploader
+         */
+        initImageUploader() {
+            if (!this.imageUploader) {
+                this.imageUploader = new ImageUploader();
+            }
+            return this.imageUploader;
+        },
+
+        /**
+         * Handle de arquivo selecionado
+         * @param {Event} event - Evento do input file
+         * @param {Object} empresa - Objeto da empresa
+         * @param {string} tipo - 'logo' ou 'carimbo'
+         */
+        async handleImageUpload(event, empresa, tipo) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                this.loading = true;
+                this.loadingMessage = `Processando ${tipo}...`;
+
+                // Inicializar uploader
+                const uploader = this.initImageUploader();
+
+                // Validar
+                const validation = uploader.validateImage(file);
+                if (!validation.valid) {
+                    this.showAlert('error', `❌ ${validation.error}`);
+                    return;
+                }
+
+                // Upload completo
+                const result = await uploader.processImageUpload(
+                    file,
+                    empresa,
+                    tipo,
+                    githubAPI,
+                    (message, progress) => {
+                        this.loadingMessage = `${message} (${progress}%)`;
+                    }
+                );
+
+                // Atualizar empresa localmente
+                const empresaIndex = this.empresas.findIndex(e => e.id === empresa.id);
+                if (empresaIndex !== -1) {
+                    this.empresas[empresaIndex][tipo] = result.imageUrl;
+                }
+
+                this.showAlert('success', `✅ ${tipo.toUpperCase()} atualizado com sucesso!`);
+                console.log(`✅ URL da imagem: ${result.imageUrl}`);
+
+                // Recarregar preview se modelo estiver aberto
+                if (this.modeloSelecionado) {
+                    this.atualizarPreview();
+                }
+
+            } catch (error) {
+                console.error(`❌ Erro no upload de ${tipo}:`, error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+                // Limpar input para permitir re-upload do mesmo arquivo
+                event.target.value = '';
+            }
+        },
+
+        /**
+         * Abrir seletor de arquivo para logo
+         * @param {Object} empresa - Objeto da empresa
+         */
+        selecionarLogo(empresa) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png,image/jpeg,image/jpg,image/svg+xml';
+            input.onchange = (e) => this.handleImageUpload(e, empresa, 'logo');
+            input.click();
+        },
+
+        /**
+         * Abrir seletor de arquivo para carimbo
+         * @param {Object} empresa - Objeto da empresa
+         */
+        selecionarCarimbo(empresa) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png,image/jpeg,image/jpg,image/svg+xml';
+            input.onchange = (e) => this.handleImageUpload(e, empresa, 'carimbo');
+            input.click();
+        },
+
+        /**
+         * Remover imagem (logo ou carimbo)
+         * @param {Object} empresa - Objeto da empresa
+         * @param {string} tipo - 'logo' ou 'carimbo'
+         */
+        async removerImagem(empresa, tipo) {
+            if (!confirm(`Deseja realmente remover o ${tipo} da empresa ${empresa.nome}?`)) {
+                return;
+            }
+
+            try {
+                this.loading = true;
+                this.loadingMessage = `Removendo ${tipo}...`;
+
+                // Buscar empresas.json
+                const empresasData = await githubAPI.getFile('data/empresas.json');
+                const empresas = JSON.parse(atob(empresasData.content));
+
+                // Encontrar e atualizar empresa
+                const empresaIndex = empresas.findIndex(e => e.id === empresa.id);
+                if (empresaIndex === -1) {
+                    throw new Error('Empresa não encontrada');
+                }
+
+                empresas[empresaIndex][tipo] = '';
+
+                // Salvar
+                const novoConteudo = JSON.stringify(empresas, null, 2);
+                await githubAPI.uploadFile(
+                    'data/empresas.json',
+                    btoa(unescape(encodeURIComponent(novoConteudo))),
+                    `Remover ${tipo} da empresa ${empresa.nome}`,
+                    empresasData.sha
+                );
+
+                // Atualizar localmente
+                this.empresas[this.empresas.findIndex(e => e.id === empresa.id)][tipo] = '';
+
+                this.showAlert('success', `✅ ${tipo.toUpperCase()} removido!`);
+
+            } catch (error) {
+                console.error(`❌ Erro ao remover ${tipo}:`, error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
         }
     };
 }
