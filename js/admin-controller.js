@@ -145,7 +145,8 @@ function adminApp() {
         // ========== CARREGAR USUÁRIOS ==========
         async carregarUsuarios() {
             try {
-                this.usersData = await githubAPI.lerJSON('data/users.json');
+                const response = await githubAPI.lerJSON('data/users.json');
+                this.usersData = response.data;
                 console.log(`✅ ${this.usersData.users.length} usuários carregados`);
             } catch (error) {
                 console.error('❌ Erro ao carregar users.json:', error);
@@ -156,9 +157,10 @@ function adminApp() {
         // ========== CARREGAR EMPRESAS ==========
         async carregarEmpresas() {
             try {
-                const empresasData = await githubAPI.lerJSON('data/empresas.json');
+                const response = await githubAPI.lerJSON('data/empresas.json');
+                const empresasData = response.data;
                 this.empresas = empresasData.empresas || [];
-                console.log(`✅ ${this.empresas.length} empresas carregadas`);
+                console.log(`✅ ${this.empresas.length} empresas carregadas`, this.empresas);
             } catch (error) {
                 console.error('❌ Erro ao carregar empresas:', error);
                 if (error.message.includes('404')) {
@@ -193,9 +195,10 @@ function adminApp() {
         // ========== CARREGAR MODELOS ==========
         async carregarModelos() {
             try {
-                const modelosData = await githubAPI.lerJSON('data/modelos.json');
+                const response = await githubAPI.lerJSON('data/modelos.json');
+                const modelosData = response.data;
                 this.modelos = modelosData.modelos || [];
-                console.log(`✅ ${this.modelos.length} modelos carregados`);
+                console.log(`✅ ${this.modelos.length} modelos carregados`, this.modelos);
             } catch (error) {
                 console.error('❌ Erro ao carregar modelos:', error);
                 if (error.message.includes('404')) {
@@ -229,7 +232,8 @@ function adminApp() {
         // ========== CARREGAR CONTADOR ==========
         async carregarContador() {
             try {
-                const contadorData = await githubAPI.lerJSON('data/contador.json');
+                const response = await githubAPI.lerJSON('data/contador.json');
+                const contadorData = response.data;
                 this.contador = contadorData.contadores || {};
                 console.log('✅ Contador carregado');
             } catch (error) {
@@ -318,7 +322,8 @@ function adminApp() {
                 this.contador[empresaId] = 0;
                 
                 // Carregar dados atuais
-                const contadorData = await githubAPI.lerJSON('data/contador.json');
+                const response = await githubAPI.lerJSON('data/contador.json');
+                const contadorData = response.data;
                 
                 // Atualizar
                 contadorData.contadores[empresaId] = 0;
@@ -370,7 +375,8 @@ function adminApp() {
                 this.empresas = this.empresas.filter(e => e.id !== empresaId);
                 
                 // Carregar dados atuais
-                const empresasData = await githubAPI.lerJSON('data/empresas.json');
+                const response = await githubAPI.lerJSON('data/empresas.json');
+                const empresasData = response.data;
                 empresasData.empresas = this.empresas;
                 empresasData.metadata.totalEmpresas = this.empresas.length;
                 empresasData.metadata.atualizadoEm = new Date().toISOString();
@@ -380,7 +386,7 @@ function adminApp() {
                     'data/empresas.json',
                     empresasData,
                     `🗑️ Admin deletou empresa: ${empresaRemovida?.nome || empresaId}`,
-                    empresasData.sha
+                    response.sha
                 );
                 
                 this.showAlert('success', '✅ Empresa deletada com sucesso!');
@@ -415,7 +421,8 @@ function adminApp() {
                 this.modelos = this.modelos.filter(m => m.id !== modeloId);
                 
                 // Carregar dados atuais
-                const modelosData = await githubAPI.lerJSON('data/modelos.json');
+                const response = await githubAPI.lerJSON('data/modelos.json');
+                const modelosData = response.data;
                 modelosData.modelos = this.modelos;
                 modelosData.metadata.totalModelos = this.modelos.length;
                 modelosData.metadata.atualizadoEm = new Date().toISOString();
@@ -425,7 +432,7 @@ function adminApp() {
                     'data/modelos.json',
                     modelosData,
                     `🗑️ Admin deletou modelo: ${modeloRemovido?.nome || modeloId}`,
-                    modelosData.sha
+                    response.sha
                 );
                 
                 this.showAlert('success', '✅ Modelo deletado com sucesso!');
@@ -557,13 +564,14 @@ function adminApp() {
                 }
 
                 // Carregar empresas existentes
-                const empresasData = await githubAPI.lerJSON('data/empresas.json').catch(() => ({
-                    empresas: [],
+                const response = await githubAPI.lerJSON('data/empresas.json').catch(() => ({
+                    data: { empresas: [] },
                     sha: null
                 }));
 
+                const empresasData = response.data || { empresas: [] };
                 let empresas = empresasData.empresas || [];
-                const sha = empresasData.sha;
+                const sha = response.sha;
 
                 // Novo ou edição?
                 if (this.empresaForm.id) {
@@ -642,7 +650,8 @@ function adminApp() {
                 this.loadingMessage = 'Excluindo empresa...';
 
                 // Carregar empresas
-                const empresasData = await githubAPI.lerJSON('data/empresas.json');
+                const response = await githubAPI.lerJSON('data/empresas.json');
+                const empresasData = response.data;
                 let empresas = empresasData.empresas || [];
                 
                 const empresaIndex = empresas.findIndex(e => e.id === empresaId);
@@ -656,7 +665,7 @@ function adminApp() {
                     'data/empresas.json',
                     { empresas },
                     `Excluir empresa: ${empresaNome}`,
-                    empresasData.sha
+                    response.sha
                 );
 
                 this.showAlert('success', '✅ Empresa excluída com sucesso!');
