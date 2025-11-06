@@ -41,6 +41,11 @@ function adminApp() {
         // Modals
         modalNovaEmpresa: false,
         modalNovoModelo: false,
+        modalPreviewModelo: false,
+        
+        // Preview de Modelo
+        modeloSelecionado: null,
+        tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
         
         // Forms
         empresaForm: {
@@ -744,9 +749,72 @@ function adminApp() {
 
         // ========== MODELOS ==========
         
+        modeloSelecionado: null,
+        modalPreviewModelo: false,
+        tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
+        
         visualizarModelo(modelo) {
-            this.showAlert('success', `🎨 Modelo "${modelo.nome}" selecionado!\n\nEm breve: Preview completo com dados de exemplo.`);
-            console.log('📄 Modelo selecionado:', modelo);
+            // Selecionar modelo
+            this.modeloSelecionado = modelo;
+            
+            // Se não tem empresa, mostrar alerta
+            if (this.empresas.length === 0) {
+                this.showAlert('warning', '⚠️ Cadastre uma empresa primeiro para ver o preview com dados reais!');
+                return;
+            }
+            
+            // Abrir modal
+            this.modalPreviewModelo = true;
+            this.tipoPreview = 'declaracao';
+            
+            console.log('📄 Visualizando modelo:', modelo.nome);
+        },
+        
+        fecharModalPreview() {
+            this.modalPreviewModelo = false;
+            this.modeloSelecionado = null;
+            this.tipoPreview = 'declaracao';
+        },
+        
+        getEmpresaExemplo() {
+            // Retorna primeira empresa cadastrada ou dados fake
+            return this.empresas[0] || {
+                nome: 'EMPRESA EXEMPLO LDA',
+                nif: '1234567890',
+                endereco: {
+                    rua: 'Avenida 4 de Fevereiro',
+                    edificio: 'Edifício Atlântico',
+                    andar: '5º',
+                    sala: 'Sala 502',
+                    bairro: 'Ingombota',
+                    municipio: 'Luanda',
+                    provincia: 'Luanda',
+                    pais: 'Angola'
+                },
+                telefone: '+244 923 456 789',
+                email: 'geral@exemplo.ao',
+                website: 'www.exemplo.ao',
+                logo: '',
+                carimbo: '',
+                corPrimaria: '#1e40af',
+                corSecundaria: '#64748b'
+            };
+        },
+        
+        getClienteExemplo() {
+            // Dados fake de cliente para demonstração
+            return {
+                nome: 'João Manuel da Silva Santos',
+                bi: '005678901LA042',
+                cargo: 'Gestor Comercial',
+                salario: 250000,
+                dataAdmissao: '2023-01-15',
+                mesesTrabalho: [
+                    { mes: 'Janeiro/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 },
+                    { mes: 'Fevereiro/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 },
+                    { mes: 'Março/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 }
+                ]
+            };
         }
-    }
+    };
 }
