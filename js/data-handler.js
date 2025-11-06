@@ -64,18 +64,48 @@ class DataHandler {
         return this.empresas;
     }
 
-    getEmpresaPorId(id) {
+    async getEmpresaPorId(id) {
         const empresa = this.empresas.find(e => e.id === id);
         
         if (!empresa) return null;
         
-        // Adicionar timestamp nas URLs de imagens para forçar reload e evitar cache
-        const timestamp = new Date().getTime();
+        // Obter imagens do cache (ou baixar se necessário)
+        let logoUrl = empresa.logo || '';
+        let carimboUrl = empresa.carimbo || '';
+        
+        // Carregar imagens via cache manager
+        if (logoUrl && typeof imageCacheManager !== 'undefined') {
+            try {
+                const cachedLogo = await imageCacheManager.getImage(logoUrl);
+                if (cachedLogo) {
+                    logoUrl = cachedLogo; // Usar data URL do cache
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao carregar logo do cache:', error);
+                // Fallback: adicionar timestamp
+                const timestamp = new Date().getTime();
+                logoUrl = `${logoUrl}?v=${timestamp}`;
+            }
+        }
+        
+        if (carimboUrl && typeof imageCacheManager !== 'undefined') {
+            try {
+                const cachedCarimbo = await imageCacheManager.getImage(carimboUrl);
+                if (cachedCarimbo) {
+                    carimboUrl = cachedCarimbo; // Usar data URL do cache
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao carregar carimbo do cache:', error);
+                // Fallback: adicionar timestamp
+                const timestamp = new Date().getTime();
+                carimboUrl = `${carimboUrl}?v=${timestamp}`;
+            }
+        }
         
         return {
             ...empresa,
-            logo: empresa.logo ? `${empresa.logo}?v=${timestamp}` : '',
-            carimbo: empresa.carimbo ? `${empresa.carimbo}?v=${timestamp}` : ''
+            logo: logoUrl,
+            carimbo: carimboUrl
         };
     }
 

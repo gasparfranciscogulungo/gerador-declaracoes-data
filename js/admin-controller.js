@@ -270,6 +270,12 @@ function adminApp() {
                 this.loadingMessage = 'Carregando empresas...';
                 await this.carregarEmpresas();
                 
+                // 2.5. Pré-carregar imagens das empresas no cache
+                if (typeof imageCacheManager !== 'undefined') {
+                    this.loadingMessage = 'Otimizando imagens...';
+                    await this.preloadEmpresasImages();
+                }
+                
                 // 3. Carregar modelos
                 this.loadingMessage = 'Carregando modelos...';
                 await this.carregarModelos();
@@ -626,6 +632,46 @@ function adminApp() {
                 this.showAlert('error', 'Erro ao sincronizar dados');
             } finally {
                 this.loading = false;
+            }
+        },
+
+        /**
+         * Pré-carregar imagens das empresas no cache
+         */
+        async preloadEmpresasImages() {
+            if (!this.empresas || this.empresas.length === 0) {
+                return;
+            }
+
+            try {
+                // Coletar todas as URLs de imagens
+                const imageUrls = [];
+                
+                this.empresas.forEach(empresa => {
+                    if (empresa.logo) {
+                        imageUrls.push(empresa.logo);
+                    }
+                    if (empresa.carimbo) {
+                        imageUrls.push(empresa.carimbo);
+                    }
+                });
+
+                if (imageUrls.length === 0) {
+                    console.log('📭 Nenhuma imagem para pré-carregar');
+                    return;
+                }
+
+                console.log(`🔄 Pré-carregando ${imageUrls.length} imagens...`);
+                
+                // Pré-carregar em segundo plano (não bloqueia UI)
+                imageCacheManager.preloadImages(imageUrls).then(count => {
+                    console.log(`✅ ${count} imagens cacheadas com sucesso!`);
+                }).catch(error => {
+                    console.warn('⚠️ Erro ao pré-carregar imagens:', error);
+                });
+                
+            } catch (error) {
+                console.warn('⚠️ Erro no pré-carregamento:', error);
             }
         },
 
