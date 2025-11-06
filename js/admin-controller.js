@@ -850,6 +850,182 @@ function adminApp() {
             }, 300);
         },
 
+        /**
+         * Handle upload de logo no formulário de empresa
+         */
+        async handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Verificar se empresa tem NIF (necessário para organizar no GitHub)
+            if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
+                this.showAlert('error', '❌ Preencha o NIF da empresa primeiro!');
+                event.target.value = '';
+                return;
+            }
+
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Fazendo upload do logo...';
+
+                const uploader = this.initImageUploader();
+
+                // Validar
+                const validation = uploader.validateImage(file);
+                if (!validation.valid) {
+                    this.showAlert('error', `❌ ${validation.error}`);
+                    return;
+                }
+
+                // Converter para Base64
+                this.loadingMessage = 'Preparando imagem...';
+                const base64Content = await uploader.fileToBase64(file);
+
+                // Sanitizar NIF
+                const nifSanitizado = this.empresaForm.nif.replace(/[^a-zA-Z0-9]/g, '');
+
+                // Extensão do arquivo
+                const extensao = file.name.split('.').pop().toLowerCase();
+
+                // Caminho no GitHub
+                const fileName = `logo.${extensao}`;
+                const filePath = `assets/empresas/${nifSanitizado}/${fileName}`;
+
+                // Verificar se arquivo já existe
+                this.loadingMessage = 'Verificando GitHub...';
+                let sha = null;
+                try {
+                    const existingFile = await githubAPI.getFile(filePath);
+                    sha = existingFile.sha;
+                } catch (error) {
+                    // Arquivo não existe, ok
+                }
+
+                // Fazer upload com commit automático
+                this.loadingMessage = 'Enviando para GitHub...';
+                await githubAPI.uploadFile(
+                    filePath,
+                    base64Content,
+                    `Upload logo da empresa ${this.empresaForm.nome || nifSanitizado}`,
+                    sha
+                );
+
+                // Gerar URL do GitHub
+                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+
+                // Atualizar formulário
+                this.empresaForm.logo = githubUrl;
+
+                this.showAlert('success', '✅ Logo enviado com sucesso!');
+                console.log(`✅ Logo URL: ${githubUrl}`);
+
+            } catch (error) {
+                console.error('❌ Erro no upload do logo:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+                event.target.value = '';
+            }
+        },
+
+        /**
+         * Handle upload de carimbo no formulário de empresa
+         */
+        async handleCarimboUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Verificar se empresa tem NIF
+            if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
+                this.showAlert('error', '❌ Preencha o NIF da empresa primeiro!');
+                event.target.value = '';
+                return;
+            }
+
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Fazendo upload do carimbo...';
+
+                const uploader = this.initImageUploader();
+
+                // Validar
+                const validation = uploader.validateImage(file);
+                if (!validation.valid) {
+                    this.showAlert('error', `❌ ${validation.error}`);
+                    return;
+                }
+
+                // Converter para Base64
+                this.loadingMessage = 'Preparando imagem...';
+                const base64Content = await uploader.fileToBase64(file);
+
+                // Sanitizar NIF
+                const nifSanitizado = this.empresaForm.nif.replace(/[^a-zA-Z0-9]/g, '');
+
+                // Extensão do arquivo
+                const extensao = file.name.split('.').pop().toLowerCase();
+
+                // Caminho no GitHub
+                const fileName = `carimbo.${extensao}`;
+                const filePath = `assets/empresas/${nifSanitizado}/${fileName}`;
+
+                // Verificar se arquivo já existe
+                this.loadingMessage = 'Verificando GitHub...';
+                let sha = null;
+                try {
+                    const existingFile = await githubAPI.getFile(filePath);
+                    sha = existingFile.sha;
+                } catch (error) {
+                    // Arquivo não existe, ok
+                }
+
+                // Fazer upload com commit automático
+                this.loadingMessage = 'Enviando para GitHub...';
+                await githubAPI.uploadFile(
+                    filePath,
+                    base64Content,
+                    `Upload carimbo da empresa ${this.empresaForm.nome || nifSanitizado}`,
+                    sha
+                );
+
+                // Gerar URL do GitHub
+                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+
+                // Atualizar formulário
+                this.empresaForm.carimbo = githubUrl;
+
+                this.showAlert('success', '✅ Carimbo enviado com sucesso!');
+                console.log(`✅ Carimbo URL: ${githubUrl}`);
+
+            } catch (error) {
+                console.error('❌ Erro no upload do carimbo:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+                event.target.value = '';
+            }
+        },
+
+        /**
+         * Remover logo da empresa (apenas do formulário)
+         */
+        removerLogoEmpresa() {
+            if (confirm('Deseja remover o logo? (O arquivo permanecerá no GitHub)')) {
+                this.empresaForm.logo = '';
+                this.showAlert('success', '✅ Logo removido do formulário');
+            }
+        },
+
+        /**
+         * Remover carimbo da empresa (apenas do formulário)
+         */
+        removerCarimboEmpresa() {
+            if (confirm('Deseja remover o carimbo? (O arquivo permanecerá no GitHub)')) {
+                this.empresaForm.carimbo = '';
+                this.showAlert('success', '✅ Carimbo removido do formulário');
+            }
+        },
+
         validarImagemURL(tipo, url) {
             if (!url) return false;
             
