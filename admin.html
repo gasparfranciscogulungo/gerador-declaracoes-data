@@ -1522,9 +1522,11 @@
                                         <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                                             <template x-if="empresaForm.logo && empresaForm.logo.trim() !== ''">
                                                 <img :src="empresaForm.logo" 
+                                                     :key="empresaForm.logo"
                                                      alt="Logo Preview" 
                                                      class="w-full h-full object-contain"
-                                                     @error="empresaForm.logo = ''">
+                                                     crossorigin="anonymous"
+                                                     @error="console.error('Erro ao carregar logo:', empresaForm.logo); empresaForm.logo = ''">
                                             </template>
                                             <template x-if="!empresaForm.logo || empresaForm.logo.trim() === ''">
                                                 <div class="text-center text-gray-400">
@@ -1583,9 +1585,11 @@
                                         <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                                             <template x-if="empresaForm.carimbo && empresaForm.carimbo.trim() !== ''">
                                                 <img :src="empresaForm.carimbo" 
+                                                     :key="empresaForm.carimbo"
                                                      alt="Carimbo Preview" 
                                                      class="w-full h-full object-contain"
-                                                     @error="empresaForm.carimbo = ''">
+                                                     crossorigin="anonymous"
+                                                     @error="console.error('Erro ao carregar carimbo:', empresaForm.carimbo); empresaForm.carimbo = ''">
                                             </template>
                                             <template x-if="!empresaForm.carimbo || empresaForm.carimbo.trim() === ''">
                                                 <div class="text-center text-gray-400">

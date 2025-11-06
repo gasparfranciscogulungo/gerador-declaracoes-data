@@ -689,6 +689,15 @@ function adminApp() {
             return new Promise(resolve => setTimeout(resolve, ms));
         },
 
+        /**
+         * Helper: Remove cache busting parameter from URL
+         */
+        limparUrlCache(url) {
+            if (!url) return url;
+            // Remove ?v=timestamp ou &v=timestamp
+            return url.replace(/[?&]v=\d+/, '');
+        },
+
         // ========== EMPRESAS - CRUD ==========
         
         async salvarEmpresa() {
@@ -717,6 +726,10 @@ function adminApp() {
                     return;
                 }
 
+                // Limpar URLs de cache antes de salvar
+                const logoLimpo = this.limparUrlCache(this.empresaForm.logo);
+                const carimboLimpo = this.limparUrlCache(this.empresaForm.carimbo);
+
                 // Carregar empresas existentes
                 const response = await githubAPI.lerJSON('data/empresas.json').catch(() => ({
                     data: { empresas: [] },
@@ -734,6 +747,8 @@ function adminApp() {
                     if (index !== -1) {
                         empresas[index] = {
                             ...this.empresaForm,
+                            logo: logoLimpo,
+                            carimbo: carimboLimpo,
                             updatedAt: new Date().toISOString()
                         };
                     }
@@ -741,6 +756,8 @@ function adminApp() {
                     // CRIAR NOVO
                     const novaEmpresa = {
                         ...this.empresaForm,
+                        logo: logoLimpo,
+                        carimbo: carimboLimpo,
                         id: `empresa_${Date.now()}`,
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
@@ -775,6 +792,9 @@ function adminApp() {
         },
 
         editarEmpresa(empresa) {
+            // Adicionar timestamp nas URLs para forçar reload das imagens
+            const timestamp = new Date().getTime();
+            
             // Preencher formulário com dados da empresa
             this.empresaForm = {
                 id: empresa.id,
@@ -784,8 +804,8 @@ function adminApp() {
                 telefone: empresa.telefone || '',
                 email: empresa.email || '',
                 website: empresa.website || '',
-                logo: empresa.logo,
-                carimbo: empresa.carimbo,
+                logo: empresa.logo ? `${this.limparUrlCache(empresa.logo)}?v=${timestamp}` : '',
+                carimbo: empresa.carimbo ? `${this.limparUrlCache(empresa.carimbo)}?v=${timestamp}` : '',
                 corPrimaria: empresa.corPrimaria || '#1e40af',
                 corSecundaria: empresa.corSecundaria || '#64748b',
                 marcaDagua: empresa.marcaDagua || ''
@@ -972,8 +992,9 @@ function adminApp() {
                 this.uploadProgress = 90;
                 console.log('📊 Progresso: 90%');
 
-                // Gerar URL do GitHub
-                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+                // Gerar URL do GitHub com cache busting (timestamp para forçar reload)
+                const timestamp = new Date().getTime();
+                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
                 console.log('🔗 URL gerada:', githubUrl);
 
                 // Atualizar formulário
@@ -1115,8 +1136,9 @@ function adminApp() {
                 this.uploadProgress = 90;
                 console.log('📊 Progresso: 90%');
 
-                // Gerar URL do GitHub
-                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}`;
+                // Gerar URL do GitHub com cache busting (timestamp para forçar reload)
+                const timestamp = new Date().getTime();
+                const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
                 console.log('🔗 URL gerada:', githubUrl);
 
                 // Atualizar formulário
