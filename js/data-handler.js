@@ -65,7 +65,18 @@ class DataHandler {
     }
 
     getEmpresaPorId(id) {
-        return this.empresas.find(e => e.id === id);
+        const empresa = this.empresas.find(e => e.id === id);
+        
+        if (!empresa) return null;
+        
+        // Adicionar timestamp nas URLs de imagens para forçar reload e evitar cache
+        const timestamp = new Date().getTime();
+        
+        return {
+            ...empresa,
+            logo: empresa.logo ? `${empresa.logo}?v=${timestamp}` : '',
+            carimbo: empresa.carimbo ? `${empresa.carimbo}?v=${timestamp}` : ''
+        };
     }
 
     getTrabalhadores() {

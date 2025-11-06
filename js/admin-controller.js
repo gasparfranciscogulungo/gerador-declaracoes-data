@@ -871,8 +871,11 @@ function adminApp() {
                     // EDITAR
                     const index = empresas.findIndex(e => e.id === this.empresaForm.id);
                     if (index !== -1) {
+                        // Preparar dados sem os previews base64
+                        const { logoPreview, carimboPreview, ...dadosLimpos } = this.empresaForm;
+                        
                         empresas[index] = {
-                            ...this.empresaForm,
+                            ...dadosLimpos,
                             logo: logoLimpo,
                             carimbo: carimboLimpo,
                             updatedAt: new Date().toISOString()
@@ -880,8 +883,11 @@ function adminApp() {
                     }
                 } else {
                     // CRIAR NOVO
+                    // Preparar dados sem os previews base64
+                    const { logoPreview, carimboPreview, ...dadosLimpos } = this.empresaForm;
+                    
                     const novaEmpresa = {
-                        ...this.empresaForm,
+                        ...dadosLimpos,
                         logo: logoLimpo,
                         carimbo: carimboLimpo,
                         id: `empresa_${Date.now()}`,

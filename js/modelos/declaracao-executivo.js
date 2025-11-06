@@ -108,6 +108,7 @@ const ModeloDeclaracaoExecutivo = {
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
+                                 crossorigin="anonymous"
                                  style="width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px; object-fit: contain;">
                         ` : `
                             <div style="
@@ -214,6 +215,7 @@ const ModeloDeclaracaoExecutivo = {
                         ${empresa.carimbo ? `
                             <img src="${empresa.carimbo}" 
                                  alt="Carimbo e Assinatura" 
+                                 crossorigin="anonymous"
                                  style="
                                     width: ${cfg.carimboWidth}px; 
                                     height: ${cfg.carimboHeight}px; 
