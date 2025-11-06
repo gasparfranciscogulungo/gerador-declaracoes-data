@@ -698,6 +698,41 @@ function adminApp() {
             return url.replace(/[?&]v=\d+/, '');
         },
 
+        /**
+         * Helper: Verificar se imagem está acessível (com retry)
+         */
+        async verificarImagemAcessivel(url, maxRetries = 5, delay = 1000) {
+            const urlLimpa = this.limparUrlCache(url);
+            
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    console.log(`🔍 Tentativa ${i + 1}/${maxRetries} - Verificando: ${urlLimpa}`);
+                    
+                    const response = await fetch(urlLimpa, { 
+                        method: 'HEAD',
+                        cache: 'no-cache'
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ Imagem acessível: ${urlLimpa}`);
+                        return true;
+                    }
+                    
+                    console.log(`⚠️ Resposta ${response.status}, tentando novamente...`);
+                } catch (error) {
+                    console.log(`⚠️ Erro na tentativa ${i + 1}: ${error.message}`);
+                }
+                
+                // Aguardar antes de tentar novamente
+                if (i < maxRetries - 1) {
+                    await this.sleep(delay);
+                }
+            }
+            
+            console.error(`❌ Imagem não acessível após ${maxRetries} tentativas`);
+            return false;
+        },
+
         // ========== EMPRESAS - CRUD ==========
         
         async salvarEmpresa() {
@@ -714,10 +749,31 @@ function adminApp() {
 
                 // Validar URLs de imagens
                 if (!this.empresaForm.logo || !this.empresaForm.carimbo) {
-                    this.showAlert('error', 'Logo e carimbo são obrigatórios');
+                    this.showAlert('error', 'Logo e carimbo são obrigatórios. Faça upload das imagens primeiro.');
                     this.loading = false;
                     return;
                 }
+
+                // Verificar se as imagens estão acessíveis no GitHub
+                this.loadingMessage = 'Verificando imagens no servidor...';
+                console.log('🔍 Verificando acessibilidade das imagens...');
+                
+                const logoAcessivel = await this.verificarImagemAcessivel(this.empresaForm.logo);
+                if (!logoAcessivel) {
+                    this.showAlert('error', '❌ Logo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
+                    this.loading = false;
+                    return;
+                }
+                
+                const carimboAcessivel = await this.verificarImagemAcessivel(this.empresaForm.carimbo);
+                if (!carimboAcessivel) {
+                    this.showAlert('error', '❌ Carimbo ainda não está disponível no servidor. Aguarde alguns segundos e tente novamente.');
+                    this.loading = false;
+                    return;
+                }
+                
+                console.log('✅ Ambas as imagens estão acessíveis!');
+                this.loadingMessage = 'Salvando empresa...';
 
                 // Validar email se fornecido
                 if (this.empresaForm.email && !this.validarEmail(this.empresaForm.email)) {
@@ -963,12 +1019,39 @@ function adminApp() {
                 this.uploadProgress = 60;
                 console.log('📊 Progresso: 60% - Verificando arquivo existente');
                 let sha = null;
+                let arquivoExistente = null;
                 try {
-                    const existingFile = await githubAPI.getFile(filePath);
-                    sha = existingFile.sha;
+                    arquivoExistente = await githubAPI.getFile(filePath);
+                    sha = arquivoExistente.sha;
                     console.log('📄 Arquivo existe, SHA:', sha);
+                    
+                    // Verificar se é a mesma imagem (comparando conteúdo Base64)
+                    if (arquivoExistente.content) {
+                        const conteudoExistente = arquivoExistente.content.replace(/\s/g, '');
+                        const novoConteudo = base64Content.replace(/\s/g, '');
+                        
+                        if (conteudoExistente === novoConteudo) {
+                            console.log('✅ Imagem idêntica já existe no servidor!');
+                            this.uploadProgress = 100;
+                            this.loadingMessage = '✅ Logo já existe (sem alterações)';
+                            
+                            // Usar URL existente
+                            const timestamp = new Date().getTime();
+                            const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
+                            this.empresaForm.logo = githubUrl;
+                            
+                            await this.sleep(500);
+                            this.showAlert('success', '✅ Logo já existe no servidor (mesma imagem)');
+                            this.loading = false;
+                            this.uploadProgress = null;
+                            event.target.value = '';
+                            return;
+                        } else {
+                            console.log('🔄 Imagem diferente detectada, será atualizada');
+                        }
+                    }
                 } catch (error) {
-                    console.log('📄 Arquivo não existe (ok)');
+                    console.log('📄 Arquivo não existe (ok, será criado)');
                 }
 
                 await this.sleep(300);
@@ -1107,12 +1190,39 @@ function adminApp() {
                 this.uploadProgress = 60;
                 console.log('📊 Progresso: 60% - Verificando arquivo existente');
                 let sha = null;
+                let arquivoExistente = null;
                 try {
-                    const existingFile = await githubAPI.getFile(filePath);
-                    sha = existingFile.sha;
+                    arquivoExistente = await githubAPI.getFile(filePath);
+                    sha = arquivoExistente.sha;
                     console.log('📄 Arquivo existe, SHA:', sha);
+                    
+                    // Verificar se é a mesma imagem (comparando conteúdo Base64)
+                    if (arquivoExistente.content) {
+                        const conteudoExistente = arquivoExistente.content.replace(/\s/g, '');
+                        const novoConteudo = base64Content.replace(/\s/g, '');
+                        
+                        if (conteudoExistente === novoConteudo) {
+                            console.log('✅ Imagem idêntica já existe no servidor!');
+                            this.uploadProgress = 100;
+                            this.loadingMessage = '✅ Carimbo já existe (sem alterações)';
+                            
+                            // Usar URL existente
+                            const timestamp = new Date().getTime();
+                            const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
+                            this.empresaForm.carimbo = githubUrl;
+                            
+                            await this.sleep(500);
+                            this.showAlert('success', '✅ Carimbo já existe no servidor (mesma imagem)');
+                            this.loading = false;
+                            this.uploadProgress = null;
+                            event.target.value = '';
+                            return;
+                        } else {
+                            console.log('🔄 Imagem diferente detectada, será atualizada');
+                        }
+                    }
                 } catch (error) {
-                    console.log('📄 Arquivo não existe (ok)');
+                    console.log('📄 Arquivo não existe (ok, será criado)');
                 }
 
                 await this.sleep(300);
