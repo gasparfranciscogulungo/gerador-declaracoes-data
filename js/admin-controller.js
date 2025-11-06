@@ -699,38 +699,62 @@ function adminApp() {
         },
 
         /**
-         * Helper: Verificar se imagem está acessível (com retry)
+         * Helper: Verificar se imagem está acessível usando GitHub API (mais rápido que CDN)
          */
-        async verificarImagemAcessivel(url, maxRetries = 5, delay = 1000) {
+        async verificarImagemAcessivel(url, maxRetries = 3, delay = 1000) {
+            if (!url) {
+                console.warn('⚠️ URL vazia');
+                return false;
+            }
+
+            // Extrair path do GitHub da URL
+            // URL: https://raw.githubusercontent.com/owner/repo/branch/assets/empresas/123/logo.png?v=123
+            // Path: assets/empresas/123/logo.png
             const urlLimpa = this.limparUrlCache(url);
             
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    console.log(`🔍 Tentativa ${i + 1}/${maxRetries} - Verificando: ${urlLimpa}`);
-                    
-                    const response = await fetch(urlLimpa, { 
-                        method: 'HEAD',
-                        cache: 'no-cache'
-                    });
-                    
-                    if (response.ok) {
-                        console.log(`✅ Imagem acessível: ${urlLimpa}`);
-                        return true;
-                    }
-                    
-                    console.log(`⚠️ Resposta ${response.status}, tentando novamente...`);
-                } catch (error) {
-                    console.log(`⚠️ Erro na tentativa ${i + 1}: ${error.message}`);
+            try {
+                // Extrair path da URL do GitHub
+                const githubPattern = /github(?:usercontent)?\.com\/[^\/]+\/[^\/]+\/[^\/]+\/(.+)/;
+                const match = urlLimpa.match(githubPattern);
+                
+                if (!match) {
+                    console.error('❌ URL não é do GitHub:', urlLimpa);
+                    return false;
                 }
                 
-                // Aguardar antes de tentar novamente
-                if (i < maxRetries - 1) {
-                    await this.sleep(delay);
+                const filePath = match[1];
+                console.log(`🔍 Verificando via API: ${filePath}`);
+                
+                // Tentar via GitHub API (muito mais rápido que CDN)
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        console.log(`📡 Tentativa ${i + 1}/${maxRetries} - Consultando GitHub API...`);
+                        
+                        const fileInfo = await githubAPI.getFile(filePath);
+                        
+                        if (fileInfo && fileInfo.sha) {
+                            console.log(`✅ Imagem confirmada na API: ${filePath} (SHA: ${fileInfo.sha.substring(0, 7)})`);
+                            return true;
+                        }
+                        
+                        console.log(`⚠️ Arquivo não encontrado, tentando novamente...`);
+                    } catch (error) {
+                        console.log(`⚠️ Erro na tentativa ${i + 1}: ${error.message}`);
+                    }
+                    
+                    // Aguardar antes de tentar novamente
+                    if (i < maxRetries - 1) {
+                        await this.sleep(delay);
+                    }
                 }
+                
+                console.error(`❌ Imagem não acessível após ${maxRetries} tentativas`);
+                return false;
+                
+            } catch (error) {
+                console.error('❌ Erro ao verificar imagem:', error);
+                return false;
             }
-            
-            console.error(`❌ Imagem não acessível após ${maxRetries} tentativas`);
-            return false;
         },
 
         // ========== EMPRESAS - CRUD ==========
