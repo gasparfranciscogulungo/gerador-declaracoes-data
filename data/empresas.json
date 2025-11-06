@@ -5,7 +5,7 @@
       "nome": "EMFC Consulting, S.A",
       "nif": "5480023446",
       "endereco": {
-        "rua": "Avenida 4 de Fevereiro, EdifÃ­cio Summit Tower, 5.Âº andar, Sala 502",
+        "rua": "Avenida 4 de Fevereiro, EdifÃÂ­cio Summit Tower, 5.ÃÂº andar, Sala 502",
         "edificio": "Edificio 42",
         "andar": "andar 3",
         "sala": "sala 4",
@@ -18,11 +18,11 @@
       "email": "",
       "website": "",
       "logo": "https://www.vendus.co.ao/foto/tipos-empresas-850_bg.jpg",
-      "carimbo": "https://images.unsplash.com/photo-1497316730643-415fac54a2af?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=464",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/carimbo.png",
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "updatedAt": "2025-11-06T09:57:09.517Z"
+      "updatedAt": "2025-11-06T20:33:31.878Z"
     },
     {
       "id": "empresa_1762398563451",
