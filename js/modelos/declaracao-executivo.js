@@ -80,12 +80,13 @@ const ModeloDeclaracaoExecutivo = {
             color: ${cfg.corTexto};
             line-height: ${cfg.espacamentoLinhas};
             width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
+            height: 297mm;
+            padding: 15mm 20mm;
             background: white;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-sizing: border-box;
             margin: 0 auto;
+            overflow: hidden;
         ">
             
             <!-- MARCA D'ÁGUA DIAGONAL -->
@@ -132,7 +133,7 @@ const ModeloDeclaracaoExecutivo = {
                     padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
-                    margin-bottom: 20px;
+                    margin-bottom: 12px;
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
@@ -182,13 +183,13 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- TÍTULO -->
-                <div style="text-align: center; margin: 40px 0 30px 0;">
+                <div style="text-align: center; margin: 20px 0 15px 0;">
                     <h2 style="
                         font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
                         color: ${cfg.corDestaque};
                         letter-spacing: 2px;
-                        margin: 0 0 10px 0;
+                        margin: 0 0 8px 0;
                     ">${cfg.tituloDocumento}</h2>
                     <div style="
                         width: 120px;
@@ -200,8 +201,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- CORPO DO TEXTO -->
-                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 30px;">
-                    <p style="margin-bottom: 15px;">
+                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 20px;">
+                    <p style="margin-bottom: 10px;">
                         ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce actualmente as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
@@ -209,20 +210,20 @@ const ModeloDeclaracaoExecutivo = {
                         <strong>${empresa.nif}</strong>, com sede em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
                     </p>
                     
-                    <p style="margin-bottom: 15px;">
+                    <p style="margin-bottom: 10px;">
                         O(A) referido(a) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
                         desempenhando as suas funções com competência, profissionalismo e dedicação, 
                         cumprindo integralmente com as responsabilidades inerentes ao seu cargo.
                     </p>
                     
-                    <p style="margin-bottom: 15px;">
+                    <p style="margin-bottom: 10px;">
                         No exercício das suas funções, o(a) colaborador(a) aufere mensalmente o vencimento bruto de 
                         <strong style="color: ${cfg.corDestaque}; font-size: 13pt;">${salarioFormatado} AKZ</strong>, 
                         acrescido dos subsídios legalmente estabelecidos, demonstrando um desempenho exemplar 
                         no cumprimento das suas obrigações contratuais.
                     </p>
                     
-                    <p style="margin-bottom: 15px;">
+                    <p style="margin-bottom: 10px;">
                         A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
                         nomeadamente para comprovação de vínculo laboral, auferimento de rendimentos e 
                         quaisquer outras finalidades que entenda convenientes, podendo a mesma ser apresentada 
@@ -231,8 +232,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- RODAPÉ -->
-                <div style="margin-top: 60px;">
-                    <p style="font-size: 10pt; margin-bottom: 50px;">
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 10pt; margin-bottom: 30px;">
                         ${empresa.endereco.municipio}, aos ${dataAtual}.
                     </p>
                     

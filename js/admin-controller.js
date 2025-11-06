@@ -1307,6 +1307,299 @@ function adminApp() {
             this.slotSelecionado = slot;
             this.nomePersonalizacaoTemp = '';
             this.modalSalvarPersonalizacao = true;
+        },
+
+        // ========== GERAÇÃO DE PDF ==========
+
+        /**
+         * Gera e faz download do PDF da declaração
+         */
+        async gerarPDF() {
+            try {
+                // Validações
+                if (!this.modeloSelecionado) {
+                    this.showAlert('error', '❌ Nenhum modelo selecionado');
+                    return;
+                }
+
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada. Recarregue a página.');
+                    console.error('html2pdf não está definido!');
+                    return;
+                }
+
+                // Mostrar loading
+                this.loading = true;
+                this.loadingMessage = 'Gerando PDF profissional...';
+
+                // Obter o HTML renderizado do preview
+                const previewElement = document.getElementById('preview-render');
+                if (!previewElement) {
+                    throw new Error('Elemento de preview não encontrado');
+                }
+
+                // Clonar o elemento para não afetar a visualização
+                const cloneElement = previewElement.cloneNode(true);
+                
+                // Ajustar zoom para 100% no clone (para PDF em tamanho real)
+                cloneElement.style.transform = 'scale(1)';
+                cloneElement.style.transformOrigin = 'top left';
+
+                // Obter dados para nome do arquivo
+                const empresa = this.getEmpresaExemplo();
+                const cliente = this.getClienteExemplo();
+                const dataAtual = new Date().toISOString().split('T')[0];
+                
+                // Nome do arquivo sanitizado
+                const nomeArquivo = this.gerarNomeArquivo({
+                    modeloNome: this.modeloSelecionado.nome,
+                    empresaNome: empresa.nome,
+                    clienteNome: cliente.nome,
+                    data: dataAtual
+                });
+
+                // Configurações otimizadas para PDF profissional - UMA ÚNICA PÁGINA
+                const opcoesPDF = {
+                    margin: 0, // Sem margens - o conteúdo já tem padding interno
+                    filename: nomeArquivo,
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.98 // Máxima qualidade
+                    },
+                    html2canvas: { 
+                        scale: 2, // Resolução otimizada (2x é suficiente e mais rápido)
+                        useCORS: true, // Permitir imagens externas
+                        letterRendering: true, // Melhorar renderização de texto
+                        logging: false, // Desativar logs
+                        scrollY: 0, // Fixar posição Y
+                        scrollX: 0, // Fixar posição X
+                        windowWidth: 794, // Largura A4 em pixels (210mm * 3.78)
+                        windowHeight: 1123, // Altura A4 em pixels (297mm * 3.78)
+                        width: 794,
+                        height: 1123
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true // Comprimir PDF
+                    },
+                    pagebreak: { 
+                        mode: 'avoid-all' // Forçar tudo em uma página
+                    }
+                };
+
+                console.log('📄 Gerando PDF com configurações:', opcoesPDF);
+                console.log('📝 Nome do arquivo:', nomeArquivo);
+
+                // Gerar e baixar PDF
+                await html2pdf()
+                    .set(opcoesPDF)
+                    .from(cloneElement)
+                    .save();
+
+                // Sucesso
+                this.showAlert('success', `✅ PDF gerado com sucesso!\n📄 ${nomeArquivo}`);
+                
+                console.log('✅ PDF gerado e baixado com sucesso!');
+
+                // Opcional: Registrar no histórico (pode implementar depois)
+                this.registrarDownloadPDF(nomeArquivo);
+
+            } catch (error) {
+                console.error('❌ Erro ao gerar PDF:', error);
+                this.showAlert('error', `❌ Erro ao gerar PDF: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Abre PDF em nova aba (sem baixar)
+         */
+        async visualizarPDFNovaAba() {
+            try {
+                if (!this.modeloSelecionado) {
+                    this.showAlert('error', '❌ Nenhum modelo selecionado');
+                    return;
+                }
+
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada');
+                    return;
+                }
+
+                this.loading = true;
+                this.loadingMessage = 'Preparando visualização...';
+
+                const previewElement = document.getElementById('preview-render');
+                if (!previewElement) {
+                    throw new Error('Elemento de preview não encontrado');
+                }
+
+                const cloneElement = previewElement.cloneNode(true);
+                cloneElement.style.transform = 'scale(1)';
+
+                const opcoesPDF = {
+                    margin: 0,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        logging: false,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait'
+                    },
+                    pagebreak: {
+                        mode: 'avoid-all'
+                    }
+                };
+
+                // Gerar blob
+                const pdfBlob = await html2pdf()
+                    .set(opcoesPDF)
+                    .from(cloneElement)
+                    .output('blob');
+
+                // Abrir em nova aba
+                const url = URL.createObjectURL(pdfBlob);
+                window.open(url, '_blank');
+
+                // Limpar URL após 1 minuto
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+                this.showAlert('success', '✅ PDF aberto em nova aba!');
+
+            } catch (error) {
+                console.error('❌ Erro ao visualizar PDF:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Gera nome de arquivo sanitizado e profissional
+         */
+        gerarNomeArquivo(dados) {
+            const { modeloNome, empresaNome, clienteNome, data } = dados;
+            
+            // Função para sanitizar strings
+            const sanitizar = (str) => {
+                if (!str) return 'documento';
+                return str
+                    .normalize('NFD') // Normalizar caracteres
+                    .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+                    .replace(/[^a-zA-Z0-9\s]/g, '') // Remover caracteres especiais
+                    .replace(/\s+/g, '_') // Espaços para underscore
+                    .toLowerCase()
+                    .substring(0, 30); // Limitar tamanho
+            };
+
+            const modeloSanitizado = sanitizar(modeloNome);
+            const empresaSanitizada = sanitizar(empresaNome);
+            const clienteSanitizado = sanitizar(clienteNome);
+            
+            // Formato: modelo_cliente_empresa_data_timestamp.pdf
+            return `${modeloSanitizado}_${clienteSanitizado}_${empresaSanitizada}_${data}_${Date.now()}.pdf`;
+        },
+
+        /**
+         * Registra download no histórico (opcional - para implementar)
+         */
+        registrarDownloadPDF(nomeArquivo) {
+            try {
+                // Salvar em localStorage
+                const historico = JSON.parse(localStorage.getItem('historico_pdfs') || '[]');
+                
+                historico.unshift({
+                    arquivo: nomeArquivo,
+                    modelo: this.modeloSelecionado?.nome,
+                    empresa: this.getEmpresaExemplo().nome,
+                    cliente: this.getClienteExemplo().nome,
+                    usuario: this.usuario?.login,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Manter apenas últimos 50
+                if (historico.length > 50) {
+                    historico.splice(50);
+                }
+
+                localStorage.setItem('historico_pdfs', JSON.stringify(historico));
+                console.log('📊 Download registrado no histórico');
+
+            } catch (error) {
+                console.error('⚠️ Erro ao registrar histórico:', error);
+            }
+        },
+
+        /**
+         * Imprime diretamente (abre diálogo de impressão)
+         */
+        async imprimirPDF() {
+            try {
+                if (!this.modeloSelecionado) {
+                    this.showAlert('error', '❌ Nenhum modelo selecionado');
+                    return;
+                }
+
+                this.loading = true;
+                this.loadingMessage = 'Preparando impressão...';
+
+                const previewElement = document.getElementById('preview-render');
+                if (!previewElement) {
+                    throw new Error('Elemento de preview não encontrado');
+                }
+
+                // Criar janela de impressão
+                const printWindow = window.open('', '', 'width=800,height=600');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Impressão - ${this.modeloSelecionado.nome}</title>
+                        <style>
+                            body { margin: 0; padding: 0; }
+                            @media print {
+                                body { margin: 0; }
+                                @page { margin: 0; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${previewElement.innerHTML}
+                    </body>
+                    </html>
+                `);
+                
+                printWindow.document.close();
+                
+                // Aguardar carregar e imprimir
+                printWindow.onload = function() {
+                    printWindow.focus();
+                    printWindow.print();
+                    setTimeout(() => printWindow.close(), 100);
+                };
+
+                this.showAlert('success', '🖨️ Diálogo de impressão aberto!');
+
+            } catch (error) {
+                console.error('❌ Erro ao imprimir:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
         }
     };
 }

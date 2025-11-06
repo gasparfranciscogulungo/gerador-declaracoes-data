@@ -14,6 +14,9 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
+    <!-- html2pdf.js - Geração de PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -1140,7 +1143,8 @@
                     
                     <!-- PREVIEW: DECLARAÇÃO (Modular) -->
                     <template x-if="tipoPreview === 'declaracao'">
-                        <div x-html="renderizarModelo()" 
+                        <div id="preview-render"
+                             x-html="renderizarModelo()" 
                              class="w-full max-w-[210mm] transition-transform duration-300"
                              :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'"></div>
                     </template>
@@ -1169,7 +1173,7 @@
             
             </div>
 
-            <!-- FOOTER: Ações -->
+            <!-- FOOTER: Ações de PDF -->
             <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
                  class="px-6 py-4 flex items-center justify-between border-t">
                 <div :class="darkMode ? 'text-gray-300' : 'text-gray-600'" 
@@ -1186,9 +1190,23 @@
                             class="px-4 py-2 rounded-lg transition-colors">
                         <i class="bi bi-x-circle mr-2"></i>Fechar
                     </button>
-                    <button @click="showAlert('info', '🚧 Em breve: Seleção de cliente e geração de PDF!')" 
-                            class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-                        <i class="bi bi-check-circle mr-2"></i>Usar Este Modelo
+                    
+                    <!-- Botão: Visualizar em Nova Aba -->
+                    <button @click="visualizarPDFNovaAba()" 
+                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                        <i class="bi bi-window mr-2"></i>Nova Aba
+                    </button>
+                    
+                    <!-- Botão: Imprimir -->
+                    <button @click="imprimirPDF()" 
+                            class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                        <i class="bi bi-printer mr-2"></i>Imprimir
+                    </button>
+                    
+                    <!-- Botão Principal: Baixar PDF -->
+                    <button @click="gerarPDF()" 
+                            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-medium shadow-lg hover:shadow-xl">
+                        <i class="bi bi-download mr-2"></i>Baixar PDF
                     </button>
                 </div>
             </div>
