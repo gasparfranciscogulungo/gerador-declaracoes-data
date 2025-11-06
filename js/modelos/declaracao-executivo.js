@@ -80,28 +80,27 @@ const ModeloDeclaracaoExecutivo = {
             color: ${cfg.corTexto};
             line-height: ${cfg.espacamentoLinhas};
             width: 210mm;
-            min-height: 297mm;
-            max-height: 297mm;
-            padding: 15mm 20mm;
+            height: 297mm;
+            padding: 12mm 15mm;
             background: white;
             position: relative;
             box-sizing: border-box;
-            margin: 0;
+            margin: 0 auto;
             overflow: hidden;
-        ")
+        ">
             
-            <!-- MARCA D'ÁGUA DIAGONAL -->
+            <!-- MARCA D'ÁGUA DIAGONAL (SEM TRANSFORM PARA html2pdf) -->
             <div style="
                 position: absolute;
-                top: 50%;
+                top: 100px;
                 left: 50%;
-                transform: translate(-50%, -50%) rotate(${cfg.marcaDaguaRotacao}deg);
+                margin-left: -200px;
                 opacity: ${cfg.marcaDaguaOpacidade / 100};
                 pointer-events: none;
                 z-index: 0;
                 text-align: center;
-                width: ${cfg.marcaDaguaWidth}px;
-                height: ${cfg.marcaDaguaHeight}px;
+                width: 400px;
+                height: 400px;
             ">
                 ${empresa.logo ? `
                     <img src="${empresa.logo}" 
@@ -134,7 +133,7 @@ const ModeloDeclaracaoExecutivo = {
                     padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
-                    margin-bottom: 12px;
+                    margin-bottom: 10px;
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->

@@ -1374,29 +1374,34 @@ function adminApp() {
 
                 // Configurações otimizadas para PDF profissional - UMA ÚNICA PÁGINA
                 const opcoesPDF = {
-                    margin: [0, 0, 0, 0], // [top, left, bottom, right] em mm
+                    margin: 0,
                     filename: nomeArquivo,
                     image: { 
                         type: 'jpeg', 
-                        quality: 0.95
+                        quality: 0.98
                     },
                     html2canvas: { 
-                        scale: 2,
+                        scale: 1.5,
                         useCORS: true,
                         letterRendering: true,
-                        logging: false,
-                        scrollY: -window.scrollY,
+                        logging: true,
+                        scrollY: 0,
                         scrollX: 0,
-                        windowWidth: 794, // 210mm * 3.78
-                        windowHeight: 1123 // 297mm * 3.78
+                        windowWidth: 794,
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123,
+                        x: 0,
+                        y: 0
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
-                        orientation: 'portrait'
+                        orientation: 'portrait',
+                        compress: true
                     },
                     pagebreak: { 
-                        mode: ['avoid-all', 'css', 'legacy']
+                        mode: 'avoid-all'
                     }
                 };
 
@@ -1457,8 +1462,7 @@ function adminApp() {
                 tempContainer.innerHTML = modeloHtml;
                 tempContainer.style.cssText = `
                     width: 210mm;
-                    min-height: 297mm;
-                    max-height: 297mm;
+                    height: 297mm;
                     margin: 0 auto;
                     padding: 0;
                     box-sizing: border-box;
@@ -1469,25 +1473,30 @@ function adminApp() {
                 document.body.appendChild(tempContainer);
 
                 const opcoesPDF = {
-                    margin: [0, 0, 0, 0],
-                    image: { type: 'jpeg', quality: 0.95 },
+                    margin: 0,
+                    image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
-                        scale: 2, 
+                        scale: 1.5, 
                         useCORS: true, 
                         letterRendering: true,
-                        logging: false,
-                        scrollY: -window.scrollY,
+                        logging: true,
+                        scrollY: 0,
                         scrollX: 0,
                         windowWidth: 794,
-                        windowHeight: 1123
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123,
+                        x: 0,
+                        y: 0
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
-                        orientation: 'portrait'
+                        orientation: 'portrait',
+                        compress: true
                     },
                     pagebreak: { 
-                        mode: ['avoid-all', 'css', 'legacy']
+                        mode: 'avoid-all'
                     }
                 };
 
