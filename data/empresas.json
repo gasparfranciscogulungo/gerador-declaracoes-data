@@ -5,7 +5,7 @@
       "nome": "EMFC Consulting, S.A",
       "nif": "5480023446",
       "endereco": {
-        "rua": "Avenida 4 de Fevereiro, EdifÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ­cio Summit Tower, 5.ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂº andar, Sala 502",
+        "rua": "Avenida 4 de Fevereiro, ",
         "edificio": "Edificio 42",
         "andar": "andar 3",
         "sala": "sala 4",
@@ -22,7 +22,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "updatedAt": "2025-11-06T22:59:04.101Z"
+      "updatedAt": "2025-11-06T23:00:13.304Z"
     },
     {
       "id": "empresa_1762398563451",
