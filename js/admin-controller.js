@@ -1338,12 +1338,18 @@ function adminApp() {
                     throw new Error('Elemento de preview não encontrado');
                 }
 
-                // Clonar o elemento para não afetar a visualização
-                const cloneElement = previewElement.cloneNode(true);
+                // Pegar o conteúdo interno (o modelo renderizado) ao invés do wrapper
+                const modeloHtml = previewElement.innerHTML;
                 
-                // Ajustar zoom para 100% no clone (para PDF em tamanho real)
-                cloneElement.style.transform = 'scale(1)';
-                cloneElement.style.transformOrigin = 'top left';
+                // Criar um container temporário limpo
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = modeloHtml;
+                tempContainer.style.width = '210mm';
+                tempContainer.style.height = '297mm';
+                tempContainer.style.margin = '0';
+                tempContainer.style.padding = '0';
+                tempContainer.style.transform = 'none';
+                tempContainer.style.position = 'relative';
 
                 // Obter dados para nome do arquivo
                 const empresa = this.getEmpresaExemplo();
@@ -1395,7 +1401,7 @@ function adminApp() {
                 // Gerar e baixar PDF
                 await html2pdf()
                     .set(opcoesPDF)
-                    .from(cloneElement)
+                    .from(tempContainer)
                     .save();
 
                 // Sucesso
@@ -1437,8 +1443,15 @@ function adminApp() {
                     throw new Error('Elemento de preview não encontrado');
                 }
 
-                const cloneElement = previewElement.cloneNode(true);
-                cloneElement.style.transform = 'scale(1)';
+                // Pegar o conteúdo interno limpo
+                const modeloHtml = previewElement.innerHTML;
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = modeloHtml;
+                tempContainer.style.width = '210mm';
+                tempContainer.style.height = '297mm';
+                tempContainer.style.margin = '0';
+                tempContainer.style.padding = '0';
+                tempContainer.style.transform = 'none';
 
                 const opcoesPDF = {
                     margin: 0,
@@ -1468,7 +1481,7 @@ function adminApp() {
                 // Gerar blob
                 const pdfBlob = await html2pdf()
                     .set(opcoesPDF)
-                    .from(cloneElement)
+                    .from(tempContainer)
                     .output('blob');
 
                 // Abrir em nova aba
