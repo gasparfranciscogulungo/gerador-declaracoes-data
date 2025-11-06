@@ -699,6 +699,41 @@ function adminApp() {
         },
 
         /**
+         * Helper: Aguardar CDN disponibilizar imagem (após upload)
+         * Retorna true quando imagem estiver acessível no CDN
+         */
+        async aguardarCDNDisponivel(url, maxRetries = 10, delay = 1000) {
+            console.log(`⏳ Aguardando CDN disponibilizar: ${url}`);
+            
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    // Tentar carregar a imagem
+                    const response = await fetch(url, { 
+                        method: 'HEAD',
+                        cache: 'no-cache'
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ CDN disponível após ${i + 1} tentativa(s) (${(i + 1) * delay / 1000}s)`);
+                        return true;
+                    }
+                    
+                    console.log(`⏳ Tentativa ${i + 1}/${maxRetries} - CDN retornou ${response.status}`);
+                } catch (error) {
+                    console.log(`⏳ Tentativa ${i + 1}/${maxRetries} - Erro: ${error.message}`);
+                }
+                
+                // Aguardar antes da próxima tentativa
+                if (i < maxRetries - 1) {
+                    await this.sleep(delay);
+                }
+            }
+            
+            console.warn(`⚠️ CDN não disponibilizou imagem após ${maxRetries * delay / 1000}s`);
+            return false;
+        },
+
+        /**
          * Helper: Verificar se imagem está acessível usando GitHub API (mais rápido que CDN)
          */
         async verificarImagemAcessivel(url, maxRetries = 3, delay = 1000) {
@@ -1096,24 +1131,41 @@ function adminApp() {
                 console.log('✅ Upload concluído!');
 
                 await this.sleep(300);
-                this.uploadProgress = 90;
-                console.log('📊 Progresso: 90%');
+                this.uploadProgress = 85;
+                console.log('📊 Progresso: 85%');
 
                 // Gerar URL do GitHub com cache busting (timestamp para forçar reload)
                 const timestamp = new Date().getTime();
                 const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
                 console.log('🔗 URL gerada:', githubUrl);
 
+                // AGUARDAR CDN disponibilizar a imagem
+                this.loadingMessage = 'Aguardando imagem ficar disponível...';
+                this.uploadProgress = 90;
+                console.log('📊 Progresso: 90% - Aguardando CDN...');
+                
+                const cdnDisponivel = await this.aguardarCDNDisponivel(githubUrl, 10, 1000);
+                
+                if (!cdnDisponivel) {
+                    console.warn('⚠️ CDN demorou muito, mas imagem foi enviada. Preview pode demorar a aparecer.');
+                    this.showAlert('warning', '⚠️ Logo enviado, mas preview pode demorar alguns segundos.');
+                } else {
+                    console.log('✅ Preview disponível!');
+                }
+
+                this.uploadProgress = 95;
+                console.log('📊 Progresso: 95%');
+
                 // Atualizar formulário
                 this.empresaForm.logo = githubUrl;
                 console.log('✅ Formulário atualizado');
 
                 this.uploadProgress = 100;
-                this.loadingMessage = '✅ Logo enviado com sucesso!';
+                this.loadingMessage = '✅ Logo enviado e verificado!';
                 console.log('📊 Progresso: 100% - Concluído!');
                 await this.sleep(500);
 
-                this.showAlert('success', '✅ Logo enviado com sucesso!');
+                this.showAlert('success', '✅ Logo enviado e pronto para uso!');
                 console.log(`✅ Logo URL final: ${githubUrl}`);
 
             } catch (error) {
@@ -1267,24 +1319,41 @@ function adminApp() {
                 console.log('✅ Upload concluído!');
 
                 await this.sleep(300);
-                this.uploadProgress = 90;
-                console.log('📊 Progresso: 90%');
+                this.uploadProgress = 85;
+                console.log('📊 Progresso: 85%');
 
                 // Gerar URL do GitHub com cache busting (timestamp para forçar reload)
                 const timestamp = new Date().getTime();
                 const githubUrl = `https://raw.githubusercontent.com/${githubAPI.owner}/${githubAPI.repo}/${githubAPI.branch}/${filePath}?v=${timestamp}`;
                 console.log('🔗 URL gerada:', githubUrl);
 
+                // AGUARDAR CDN disponibilizar a imagem
+                this.loadingMessage = 'Aguardando imagem ficar disponível...';
+                this.uploadProgress = 90;
+                console.log('📊 Progresso: 90% - Aguardando CDN...');
+                
+                const cdnDisponivel = await this.aguardarCDNDisponivel(githubUrl, 10, 1000);
+                
+                if (!cdnDisponivel) {
+                    console.warn('⚠️ CDN demorou muito, mas imagem foi enviada. Preview pode demorar a aparecer.');
+                    this.showAlert('warning', '⚠️ Carimbo enviado, mas preview pode demorar alguns segundos.');
+                } else {
+                    console.log('✅ Preview disponível!');
+                }
+
+                this.uploadProgress = 95;
+                console.log('📊 Progresso: 95%');
+
                 // Atualizar formulário
                 this.empresaForm.carimbo = githubUrl;
                 console.log('✅ Formulário atualizado');
 
                 this.uploadProgress = 100;
-                this.loadingMessage = '✅ Carimbo enviado com sucesso!';
+                this.loadingMessage = '✅ Carimbo enviado e verificado!';
                 console.log('📊 Progresso: 100% - Concluído!');
                 await this.sleep(500);
 
-                this.showAlert('success', '✅ Carimbo enviado com sucesso!');
+                this.showAlert('success', '✅ Carimbo enviado e pronto para uso!');
                 console.log(`✅ Carimbo URL final: ${githubUrl}`);
 
             } catch (error) {
