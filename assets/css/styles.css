@@ -1,18 +1,9 @@
-/* ================================
-   GERADOR DE DECLARAÇÕES - CSS CUSTOMIZADO
-   ================================ */
+/* GERADOR DE DECLARAÇÕES - CSS LIMPO */
 
 :root {
     --primary-color: #1e40af;
-    --secondary-color: #3b82f6;
-    --success-color: #10b981;
-    --danger-color: #ef4444;
-    --dark-bg: #1f2937;
 }
 
-/* ================================
-   RESET E GLOBAL
-   ================================ */
 * {
     margin: 0;
     padding: 0;
@@ -20,185 +11,10 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     line-height: 1.6;
 }
 
-/* ================================
-   BOTÕES CUSTOMIZADOS
-   ================================ */
-.btn-icon {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-icon:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-/* ================================
-   FORMULÁRIOS
-   ================================ */
-.form-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-}
-
-select:focus, input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* ================================
-   PREVIEW DO DOCUMENTO
-   ================================ */
-#preview-container {
-    max-width: 210mm; /* A4 width */
-    margin: 0 auto;
-    background: white;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para impressão do documento */
-.documento-pdf {
-    width: 100%;
-    padding: 40px;
-    font-family: 'Times New Roman', serif;
-    font-size: 12pt;
-    line-height: 1.8;
-    color: #000;
-}
-
-.documento-pdf h1 {
-    font-size: 18pt;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-}
-
-.documento-pdf h2 {
-    font-size: 16pt;
-    font-weight: bold;
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-
-.documento-pdf p {
-    margin-bottom: 12px;
-    text-align: justify;
-}
-
-.documento-pdf .destaque {
-    background: #fef3c7;
-    padding: 20px;
-    text-align: center;
-    font-size: 16pt;
-    font-weight: bold;
-    margin: 20px 0;
-    border-left: 4px solid #f59e0b;
-}
-
-.documento-pdf .header-empresa {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 3px solid #000;
-    padding-bottom: 20px;
-    margin-bottom: 30px;
-}
-
-.documento-pdf .logo-empresa {
-    max-width: 150px;
-    height: auto;
-}
-
-.documento-pdf .info-empresa {
-    text-align: right;
-}
-
-.documento-pdf .box-trabalhador {
-    background: #f3f4f6;
-    border: 2px solid #d1d5db;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 8px;
-}
-
-.documento-pdf .footer-empresa {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 2px solid #000;
-    text-align: center;
-}
-
-.documento-pdf .carimbo {
-    max-width: 120px;
-    margin-top: 20px;
-}
-
-.documento-pdf table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-.documento-pdf table th,
-.documento-pdf table td {
-    border: 1px solid #000;
-    padding: 10px;
-    text-align: left;
-}
-
-.documento-pdf table th {
-    background: #e5e7eb;
-    font-weight: bold;
-}
-
-/* ================================
-   ANIMAÇÕES
-   ================================ */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.fade-in {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
-.loading {
-    animation: pulse 1.5s infinite;
-}
-
-/* ================================
-   LOADING SPINNER
-   ================================ */
 .spinner {
     border: 3px solid #f3f3f3;
     border-top: 3px solid var(--primary-color);
@@ -206,7 +22,6 @@ select:focus, input:focus {
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-    margin: 20px auto;
 }
 
 @keyframes spin {
@@ -214,181 +29,24 @@ select:focus, input:focus {
     100% { transform: rotate(360deg); }
 }
 
-/* ================================
-   RESPONSIVIDADE
-   ================================ */
-@media (max-width: 768px) {
-    .documento-pdf {
-        padding: 20px;
-        font-size: 11pt;
-    }
-    
-    .documento-pdf .header-empresa {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .documento-pdf .info-empresa {
-        text-align: center;
-        margin-top: 15px;
-    }
+.modelo-declaracao-executivo {
+    background: white !important;
+    color: #000 !important;
 }
 
-/* ================================
-   DARK MODE
-   ================================ */
-body.dark-mode {
-    background: #0f172a;
-    color: #e2e8f0;
+::-webkit-scrollbar {
+    width: 10px;
 }
 
-/* Backgrounds */
-.dark-mode .bg-white {
-    background: #1e293b !important;
-    color: #e2e8f0 !important;
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
 }
 
-.dark-mode .bg-gray-50 {
-    background: #0f172a !important;
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 5px;
 }
 
-.dark-mode .bg-gray-100 {
-    background: #1e293b !important;
-}
-
-.dark-mode .bg-gray-200 {
-    background: #334155 !important;
-}
-
-.dark-mode .bg-blue-50 {
-    background: #1e3a5f !important;
-}
-
-/* Textos */
-.dark-mode .text-gray-800 {
-    color: #e2e8f0 !important;
-}
-
-.dark-mode .text-gray-700 {
-    color: #cbd5e1 !important;
-}
-
-.dark-mode .text-gray-600 {
-    color: #94a3b8 !important;
-}
-
-.dark-mode .text-gray-500 {
-    color: #64748b !important;
-}
-
-/* Borders */
-.dark-mode .border-gray-200 {
-    border-color: #334155 !important;
-}
-
-.dark-mode .border-gray-300 {
-    border-color: #475569 !important;
-}
-
-/* Inputs e Selects */
-.dark-mode input,
-.dark-mode select,
-.dark-mode textarea {
-    background: #334155 !important;
-    color: #e2e8f0 !important;
-    border-color: #475569 !important;
-}
-
-.dark-mode input:focus,
-.dark-mode select:focus,
-.dark-mode textarea:focus {
-    background: #475569 !important;
-    border-color: #60a5fa !important;
-}
-
-/* Cards e Shadows */
-.dark-mode .shadow-md,
-.dark-mode .shadow-lg {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Hover states */
-.dark-mode .hover\:bg-gray-100:hover {
-    background: #334155 !important;
-}
-
-.dark-mode .hover\:shadow-md:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Botão de toggle dark mode */
-.dark-mode-toggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    z-index: 1000;
-}
-
-.dark-mode-toggle:hover {
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-.dark-mode .dark-mode-toggle {
-    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-}
-
-/* Transições suaves */
-body,
-.bg-white,
-input,
-select,
-textarea {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* ================================
-   PRINT STYLES
-   ================================ */
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    
-    #preview-container,
-    #preview-container * {
-        visibility: visible;
-    }
-    
-    #preview-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-}
-
-/* ================================
-   UTILIDADES
-   ================================ */
-.text-justify {
-    text-align: justify;
-}
-
-.shadow-custom {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.transition-all {
+body, input, select, textarea {
     transition: all 0.3s ease;
 }

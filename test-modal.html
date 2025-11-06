@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Modal</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <style>
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; padding: 40px; border-radius: 10px; max-width: 600px; }
+        button { padding: 10px 20px; background: blue; color: white; border: none; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body x-data="{ open: false }">
+    
+    <h1>Teste Alpine.js Modal</h1>
+    <button @click="open = true">Abrir Modal</button>
+    
+    <div x-show="open" x-transition class="modal" @click.self="open = false">
+        <div class="modal-content">
+            <h2>Modal Funcionando!</h2>
+            <p>Se você vê isso, o Alpine.js está OK ✅</p>
+            <button @click="open = false">Fechar</button>
+        </div>
+    </div>
+    
+</body>
+</html>

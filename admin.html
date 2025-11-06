@@ -590,10 +590,10 @@
     <!-- ===================================================================== -->
     <div x-show="modalPreviewModelo" 
          x-transition
-         @click.self="fecharModalPreview()"
-         class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+         class="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
         
-        <div class="bg-white rounded-xl max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
+        <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" 
+             class="w-full h-full overflow-hidden shadow-2xl flex flex-col">
             
             <!-- HEADER -->
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-center justify-between">
@@ -610,21 +610,22 @@
             </div>
 
             <!-- TABS: Tipo de Documento + Personalização -->
-            <div class="bg-gray-100 px-6 py-3 flex items-center space-x-2 border-b">
+            <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
+                 class="px-6 py-3 flex items-center space-x-2 border-b">
                 <!-- Tabs de Tipo -->
                 <button @click="tipoPreview = 'declaracao'"
-                        :class="tipoPreview === 'declaracao' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                        :class="tipoPreview === 'declaracao' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
                         class="px-4 py-2 rounded-lg font-medium transition-colors">
                     <i class="bi bi-file-earmark-text mr-2"></i>Declaração
                 </button>
                 <button @click="tipoPreview = 'recibo'"
-                        :class="tipoPreview === 'recibo' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                        :class="tipoPreview === 'recibo' ? 'bg-green-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
                         class="px-4 py-2 rounded-lg font-medium transition-colors"
                         x-show="modeloSelecionado?.tiposSuportados.includes('recibo')">
                     <i class="bi bi-receipt mr-2"></i>Recibo
                 </button>
                 <button @click="tipoPreview = 'combo'"
-                        :class="tipoPreview === 'combo' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                        :class="tipoPreview === 'combo' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
                         class="px-4 py-2 rounded-lg font-medium transition-colors"
                         x-show="modeloSelecionado?.tiposSuportados.includes('combo')">
                     <i class="bi bi-journals mr-2"></i>Combo
@@ -634,12 +635,13 @@
                 
                 <!-- Botão de Personalização -->
                 <button @click="mostrarPersonalizacao = !mostrarPersonalizacao"
-                        :class="mostrarPersonalizacao ? 'bg-purple-600 text-white' : 'bg-white text-gray-700'"
+                        :class="mostrarPersonalizacao ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700')"
                         class="px-4 py-2 rounded-lg font-medium transition-colors hover:shadow-lg">
                     <i class="bi bi-palette mr-2"></i>Personalizar
                 </button>
                 
-                <span class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full">
+                <span :class="darkMode ? 'bg-gray-600 text-gray-300' : 'bg-white text-gray-500'" 
+                      class="text-xs px-3 py-1 rounded-full">
                     <i class="bi bi-info-circle mr-1"></i>
                     Dados de exemplo
                 </span>
@@ -651,102 +653,501 @@
                 <!-- PAINEL DE PERSONALIZAÇÃO (Lateral Direita) -->
                 <div x-show="mostrarPersonalizacao" 
                      x-transition
-                     class="w-80 bg-white border-l border-gray-300 overflow-y-auto p-6">
+                     :class="darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'"
+                     class="w-80 border-l overflow-y-auto p-6">
                     
-                    <h4 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" 
+                        class="text-lg font-bold mb-4 flex items-center">
                         <i class="bi bi-sliders text-purple-600 mr-2"></i>
                         Personalização
                     </h4>
 
-                    <!-- Fonte -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-fonts mr-1"></i>Fonte
+                    <!-- SEÇÃO: PRESETS DE ESTILOS -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i class="bi bi-palette mr-1"></i>Estilos Rápidos
                         </label>
-                        <select x-model="previewConfig.fontFamily" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <option value="Times New Roman, serif">Times New Roman</option>
-                            <option value="Arial, sans-serif">Arial</option>
-                            <option value="Calibri, sans-serif">Calibri</option>
-                            <option value="Georgia, serif">Georgia</option>
-                            <option value="Verdana, sans-serif">Verdana</option>
-                        </select>
-                    </div>
-
-                    <!-- Tamanho da Fonte -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-type mr-1"></i>Tamanho: 
-                            <span class="font-bold" x-text="previewConfig.fontSize + 'pt'"></span>
-                        </label>
-                        <input type="range" x-model="previewConfig.fontSize" min="10" max="16" step="1"
-                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>10pt</span>
-                            <span>16pt</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button @click="aplicarPreset('formal')"
+                                    class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-medium transition-colors flex flex-col items-center">
+                                <i class="bi bi-mortarboard text-lg mb-1"></i>
+                                <span>Formal</span>
+                            </button>
+                            <button @click="aplicarPreset('moderno')"
+                                    class="px-3 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-medium transition-colors flex flex-col items-center">
+                                <i class="bi bi-lightning text-lg mb-1"></i>
+                                <span>Moderno</span>
+                            </button>
+                            <button @click="aplicarPreset('minimalista')"
+                                    class="px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-xs font-medium transition-colors flex flex-col items-center">
+                                <i class="bi bi-dash-circle text-lg mb-1"></i>
+                                <span>Minimalista</span>
+                            </button>
+                            <button @click="aplicarPreset('executivo')"
+                                    class="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-xs font-medium transition-colors flex flex-col items-center">
+                                <i class="bi bi-briefcase text-lg mb-1"></i>
+                                <span>Executivo</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Cor de Destaque -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-star mr-1"></i>Cor de Destaque
+                    <!-- SEÇÃO: GERENCIAR PERSONALIZAÇÕES -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-save mr-1"></i>Gerenciar Personalizações
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs text-gray-600">
+                                    <input type="checkbox" x-model="autosaveEnabled" class="mr-1">
+                                    Autosave
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Slots de Personalização -->
+                        <div class="space-y-2 mb-3">
+                            <template x-for="i in [1, 2, 3]" :key="i">
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex-1 px-3 py-2 bg-gray-50 rounded border border-gray-200">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex-1">
+                                                <template x-if="personalizacoes['slot' + i]">
+                                                    <div>
+                                                        <p class="text-xs font-medium text-gray-700" x-text="personalizacoes['slot' + i].nome"></p>
+                                                        <p class="text-xs text-gray-400" x-text="'Slot ' + i"></p>
+                                                    </div>
+                                                </template>
+                                                <template x-if="!personalizacoes['slot' + i]">
+                                                    <p class="text-xs text-gray-400">Slot vazio</p>
+                                                </template>
+                                            </div>
+                                            <div class="flex space-x-1">
+                                                <button @click="abrirModalSalvar('slot' + i)"
+                                                        class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs"
+                                                        title="Salvar">
+                                                    <i class="bi bi-save"></i>
+                                                </button>
+                                                <button @click="carregarPersonalizacao('slot' + i)"
+                                                        class="px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs"
+                                                        title="Carregar"
+                                                        x-bind:disabled="!personalizacoes['slot' + i]">
+                                                    <i class="bi bi-upload"></i>
+                                                </button>
+                                                <button @click="deletarPersonalizacao('slot' + i)"
+                                                        class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs"
+                                                        title="Deletar"
+                                                        x-bind:disabled="!personalizacoes['slot' + i]">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Ações Adicionais -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button @click="exportarPersonalizacao()"
+                                    class="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded text-xs font-medium">
+                                <i class="bi bi-download mr-1"></i>Exportar JSON
+                            </button>
+                            <label class="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded text-xs font-medium text-center cursor-pointer">
+                                <i class="bi bi-upload mr-1"></i>Importar JSON
+                                <input type="file" accept=".json" @change="importarPersonalizacao($event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- Última Salvagem -->
+                        <template x-if="lastSaved">
+                            <p class="text-xs text-gray-400 mt-2 text-center">
+                                <i class="bi bi-clock mr-1"></i>
+                                Último save: <span x-text="new Date(lastSaved).toLocaleTimeString('pt-AO')"></span>
+                            </p>
+                        </template>
+                    </div>
+
+                    <!-- SEÇÃO: EDIÇÃO DE CONTEÚDO -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i class="bi bi-pencil mr-1"></i>Editar Conteúdo
                         </label>
-                        <div class="flex items-center space-x-2">
-                            <input type="color" x-model="previewConfig.corDestaque"
-                                   class="w-12 h-10 rounded border border-gray-300 cursor-pointer">
-                            <input type="text" x-model="previewConfig.corDestaque"
-                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono">
+                        
+                        <!-- Título do Documento -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">Título do Documento</label>
+                            <input type="text" 
+                                   x-model="previewConfig.tituloDocumento"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                                   placeholder="DECLARAÇÃO DE TRABALHO">
+                        </div>
+
+                        <!-- Texto Introdutório -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">Texto Introdutório</label>
+                            <textarea 
+                                x-model="previewConfig.textoIntro"
+                                rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                                placeholder="Declara-se, para os devidos efeitos..."></textarea>
+                        </div>
+
+                        <!-- Alinhamento do Texto -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">Alinhamento do Texto</label>
+                            <select x-model="previewConfig.alinhamentoTexto" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                                <option value="left">Esquerda</option>
+                                <option value="center">Centro</option>
+                                <option value="right">Direita</option>
+                                <option value="justify">Justificado</option>
+                            </select>
+                        </div>
+
+                        <!-- Alinhamento do Cabeçalho -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Alinhamento do Cabeçalho</label>
+                            <select x-model="previewConfig.alinhamentoCabecalho" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                                <option value="left">Esquerda</option>
+                                <option value="center">Centro</option>
+                                <option value="right">Direita</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Opacidade da Marca d'água -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-droplet mr-1"></i>Marca d'água: 
-                            <span class="font-bold" x-text="previewConfig.marcaDaguaOpacidade + '%'"></span>
-                        </label>
-                        <input type="range" x-model="previewConfig.marcaDaguaOpacidade" min="5" max="30" step="5"
-                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>5%</span>
-                            <span>30%</span>
+                    <!-- SEÇÃO: CONTROLES AVANÇADOS DO CABEÇALHO -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-layout-text-window mr-1"></i>Layout do Cabeçalho
+                            </label>
+                            <button @click="previewConfig.cabecalhoMaxWidth = 450; previewConfig.cabecalhoMarginEntreLogoTexto = 20; previewConfig.cabecalhoJustify = 'space-between'; previewConfig.cabecalhoPaddingBottom = 15; previewConfig.cabecalhoBordaLargura = 4; previewConfig.cabecalhoLogoSize = 80; previewConfig.cabecalhoPaddingHorizontal = 0; previewConfig.cabecalhoLineHeight = 1.4;" 
+                                    class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+
+                        <!-- Padding Horizontal do Container -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Espaço Lateral (Logo ↔ Bordas): <span class="font-bold" x-text="previewConfig.cabecalhoPaddingHorizontal + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoPaddingHorizontal" min="0" max="100" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>Sem espaço</span>
+                                <span>Muito espaço</span>
+                            </div>
+                        </div>
+
+                        <!-- Espaço entre Logo e Texto -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Espaço Logo ↔ Texto: <span class="font-bold" x-text="previewConfig.cabecalhoMarginEntreLogoTexto + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoMarginEntreLogoTexto" min="0" max="1000" step="10"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>0px</span>
+                                <span>1000px</span>
+                            </div>
+                        </div>
+
+                        <!-- Line Height do Texto do Cabeçalho -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Espaçamento Entre Linhas: <span class="font-bold" x-text="previewConfig.cabecalhoLineHeight"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoLineHeight" min="1.0" max="2.5" step="0.1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>Compacto</span>
+                                <span>Espaçado</span>
+                            </div>
+                        </div>
+
+                        <!-- Tamanho do Logo -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Tamanho do Logo: <span class="font-bold" x-text="previewConfig.cabecalhoLogoSize + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoLogoSize" min="50" max="150" step="10"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Padding Inferior -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Espaço Inferior: <span class="font-bold" x-text="previewConfig.cabecalhoPaddingBottom + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoPaddingBottom" min="0" max="40" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Largura da Borda -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Largura da Borda: <span class="font-bold" x-text="previewConfig.cabecalhoBordaLargura + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.cabecalhoBordaLargura" min="0" max="10" step="1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                         </div>
                     </div>
 
-                    <!-- Espaçamento -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-text-indent-left mr-1"></i>Espaçamento: 
-                            <span class="font-bold" x-text="previewConfig.espacamentoLinhas.toFixed(1)"></span>
-                        </label>
-                        <input type="range" x-model.number="previewConfig.espacamentoLinhas" min="1.0" max="2.0" step="0.1"
-                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                        <div class="flex justify-between text-xs text-gray-500 mt-1">
-                            <span>1.0</span>
-                            <span>2.0</span>
+                    <!-- SEÇÃO: CONTROLES DO CARIMBO -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-award mr-1"></i>Carimbo e Assinatura
+                            </label>
+                            <button @click="previewConfig.carimboWidth = 110; previewConfig.carimboHeight = 110;" 
+                                    class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+
+                        <!-- Largura do Carimbo -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Largura: <span class="font-bold" x-text="previewConfig.carimboWidth + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.carimboWidth" min="50" max="300" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>50px</span>
+                                <span>300px</span>
+                            </div>
+                        </div>
+
+                        <!-- Altura do Carimbo -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Altura: <span class="font-bold" x-text="previewConfig.carimboHeight + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.carimboHeight" min="50" max="300" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>50px</span>
+                                <span>300px</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Botão Resetar -->
-                    <button @click="previewConfig = {fontFamily: 'Times New Roman, serif', fontSize: 12, corTexto: '#000000', corDestaque: '#1e40af', marcaDaguaOpacidade: 10, espacamentoLinhas: 1.6}"
-                            class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm">
-                        <i class="bi bi-arrow-counterclockwise mr-2"></i>Resetar Padrão
+                    <!-- SEÇÃO: ZOOM -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="bi bi-zoom-in mr-1"></i>Zoom: 
+                            <span class="font-bold" x-text="previewConfig.zoom + '%'"></span>
+                        </label>
+                        <input type="range" x-model="previewConfig.zoom" min="50" max="150" step="5"
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex space-x-1">
+                                <button @click="previewConfig.zoom = 75" class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">75%</button>
+                                <button @click="previewConfig.zoom = 100" class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">100%</button>
+                                <button @click="previewConfig.zoom = 125" class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">125%</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: FONTES -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-fonts mr-1"></i>Tipografia
+                            </label>
+                            <button @click="resetFontes()" class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Fonte -->
+                        <div class="mb-4">
+                            <label class="block text-xs text-gray-600 mb-1">Família</label>
+                            <select x-model="previewConfig.fontFamily" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm">
+                                <option value="Times New Roman, serif">Times New Roman</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="Calibri, sans-serif">Calibri</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Tamanho Base -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Corpo do Texto: <span class="font-bold" x-text="previewConfig.fontSize + 'pt'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.fontSize" min="10" max="16" step="1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Título Principal -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Título Principal: <span class="font-bold" x-text="previewConfig.tamanhoTitulo + 'pt'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.tamanhoTitulo" min="20" max="36" step="2"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <!-- Subtítulos -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Subtítulos: <span class="font-bold" x-text="previewConfig.tamanhoSubtitulo + 'pt'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.tamanhoSubtitulo" min="14" max="24" step="1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <!-- Dados Empresa -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Dados Empresa: <span class="font-bold" x-text="previewConfig.tamanhoEmpresa + 'pt'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.tamanhoEmpresa" min="8" max="14" step="0.5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: CORES -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-palette mr-1"></i>Cores
+                            </label>
+                            <button @click="resetCores()" class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Cor de Destaque -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-2">Cor de Destaque</label>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" x-model="previewConfig.corDestaque"
+                                       class="w-12 h-10 rounded border border-gray-300 cursor-pointer">
+                                <input type="text" x-model="previewConfig.corDestaque"
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: MARCA D'ÁGUA -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="block text-sm font-medium text-gray-700">
+                                <i class="bi bi-droplet mr-1"></i>Marca d'água
+                            </label>
+                            <button @click="resetMarcaDagua()" class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Opacidade -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Opacidade: <span class="font-bold" x-text="previewConfig.marcaDaguaOpacidade + '%'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.marcaDaguaOpacidade" min="5" max="30" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Rotação -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Rotação: <span class="font-bold" x-text="previewConfig.marcaDaguaRotacao + '°'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.marcaDaguaRotacao" min="-45" max="45" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Width -->
+                        <div class="mb-3">
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Largura: <span class="font-bold" x-text="previewConfig.marcaDaguaWidth + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.marcaDaguaWidth" min="200" max="600" step="25"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Height -->
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Altura: <span class="font-bold" x-text="previewConfig.marcaDaguaHeight + 'px'"></span>
+                            </label>
+                            <input type="range" x-model="previewConfig.marcaDaguaHeight" min="200" max="600" step="25"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: ESPAÇAMENTO -->
+                    <div class="mb-6 pb-6 border-b border-gray-300">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i class="bi bi-text-indent-left mr-1"></i>Espaçamento
+                        </label>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">
+                                Entre linhas: <span class="font-bold" x-text="previewConfig.espacamentoLinhas.toFixed(1)"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.espacamentoLinhas" min="1.0" max="2.0" step="0.1"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+                    </div>
+
+                    <!-- Botão Resetar Tudo -->
+                    <button @click="previewConfig = {
+                                fontFamily: 'Times New Roman, serif', 
+                                fontSize: 12, 
+                                tamanhoTitulo: 28,
+                                tamanhoSubtitulo: 18,
+                                tamanhoEmpresa: 9,
+                                corTexto: '#000000', 
+                                corDestaque: '#1e40af', 
+                                marcaDaguaOpacidade: 10,
+                                marcaDaguaRotacao: -45,
+                                marcaDaguaWidth: 400,
+                                marcaDaguaHeight: 400,
+                                espacamentoLinhas: 1.6,
+                                zoom: 100,
+                                tituloDocumento: 'DECLARAÇÃO DE TRABALHO',
+                                textoIntro: 'Declara-se, para os devidos efeitos, que',
+                                alinhamentoTexto: 'justify',
+                                alinhamentoCabecalho: 'left',
+                                cabecalhoMaxWidth: 450,
+                                cabecalhoMarginEntreLogoTexto: 20,
+                                cabecalhoJustify: 'space-between',
+                                cabecalhoPaddingBottom: 15,
+                                cabecalhoBordaLargura: 4,
+                                cabecalhoLogoSize: 80,
+                                cabecalhoPaddingHorizontal: 0,
+                                cabecalhoLineHeight: 1.4,
+                                carimboWidth: 110,
+                                carimboHeight: 110
+                            }"
+                            class="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all text-sm font-medium shadow-lg">
+                        <i class="bi bi-arrow-counterclockwise mr-2"></i>Resetar Tudo
                     </button>
 
                 </div>
 
                 <!-- ÁREA DE PREVIEW (Scrollable) -->
-                <div class="flex-1 overflow-y-auto bg-gray-200 p-8">
+                <div :class="darkMode ? 'bg-gray-900' : 'bg-gray-200'" 
+                     class="flex-1 overflow-y-auto p-8 flex items-start justify-center">
                     
                     <!-- PREVIEW: DECLARAÇÃO (Modular) -->
                     <template x-if="tipoPreview === 'declaracao'">
-                        <div x-html="renderizarModelo()"></div>
+                        <div x-html="renderizarModelo()" 
+                             class="w-full max-w-[210mm] transition-transform duration-300"
+                             :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'"></div>
                     </template>
 
                     <!-- PREVIEW: RECIBO (3 MESES) -->
                     <template x-if="tipoPreview === 'recibo'">
-                        <div class="text-center py-12">
+                        <div class="text-center py-12 w-full max-w-[210mm]">
                             <i class="bi bi-receipt text-6xl text-gray-400 mb-4"></i>
                             <p class="text-gray-600 text-lg font-medium">Preview de Recibo</p>
                             <p class="text-gray-500 text-sm mt-2">Modelo de Recibo em desenvolvimento</p>
@@ -756,7 +1157,7 @@
 
                     <!-- PREVIEW: COMBO (Declaração + 3 Recibos = 4 páginas) -->
                     <template x-if="tipoPreview === 'combo'">
-                        <div class="text-center py-12">
+                        <div class="text-center py-12 w-full max-w-[210mm]">
                             <i class="bi bi-journals text-6xl text-gray-400 mb-4"></i>
                             <p class="text-gray-600 text-lg font-medium">Preview do Combo</p>
                             <p class="text-gray-500 text-sm mt-2">1 Declaração + 3 Recibos Mensais = 4 Páginas Totais</p>
@@ -765,10 +1166,14 @@
                     </template>
 
                 </div>
+            
+            </div>
 
             <!-- FOOTER: Ações -->
-            <div class="bg-gray-100 px-6 py-4 flex items-center justify-between border-t">
-                <div class="text-sm text-gray-600">
+            <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
+                 class="px-6 py-4 flex items-center justify-between border-t">
+                <div :class="darkMode ? 'text-gray-300' : 'text-gray-600'" 
+                     class="text-sm">
                     <i class="bi bi-lightbulb mr-2 text-yellow-500"></i>
                     <span>Dados de exemplo: 
                         <strong x-text="getEmpresaExemplo().nome"></strong> + 
@@ -777,7 +1182,8 @@
                 </div>
                 <div class="flex space-x-3">
                     <button @click="fecharModalPreview()" 
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                            :class="darkMode ? 'bg-gray-600 text-gray-200 hover:bg-gray-500' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'"
+                            class="px-4 py-2 rounded-lg transition-colors">
                         <i class="bi bi-x-circle mr-2"></i>Fechar
                     </button>
                     <button @click="showAlert('info', '🚧 Em breve: Seleção de cliente e geração de PDF!')" 
@@ -793,7 +1199,6 @@
     <!-- Modal: Nova Empresa -->
     <div x-show="modalNovaEmpresa" 
          x-transition
-         @click.self="modalNovaEmpresa = false"
          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex">
             
@@ -1172,6 +1577,62 @@
     
     <!-- Controllers -->
     <script src="js/admin-controller.js"></script>
+    <!-- MODAL: SALVAR PERSONALIZAÇÃO -->
+    <div x-show="modalSalvarPersonalizacao" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+             @click.stop>
+            
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-800">
+                    <i class="bi bi-save mr-2"></i>Salvar Personalização
+                </h3>
+                <button @click="modalSalvarPersonalizacao = false" 
+                        class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">
+                Salvando no <strong x-text="'Slot ' + slotSelecionado?.replace('slot', '')"></strong>
+            </p>
+
+            <!-- Nome da Personalização -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Nome da Personalização
+                </label>
+                <input type="text" 
+                       x-model="nomePersonalizacaoTemp"
+                       @keyup.enter="salvarPersonalizacao(slotSelecionado)"
+                       placeholder="Ex: Declaração Formal Azul"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                       autofocus>
+            </div>
+
+            <!-- Informações -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <p class="text-xs text-blue-700">
+                    <i class="bi bi-info-circle mr-1"></i>
+                    Esta personalização será salva localmente no seu navegador e ficará disponível para uso posterior.
+                </p>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex space-x-2">
+                <button @click="modalSalvarPersonalizacao = false"
+                        class="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                    Cancelar
+                </button>
+                <button @click="salvarPersonalizacao(slotSelecionado)"
+                        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                    <i class="bi bi-check-lg mr-1"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/dark-mode.js"></script>
 
     <!-- Inicialização do Sistema de Notificações -->

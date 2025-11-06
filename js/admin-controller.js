@@ -53,10 +53,110 @@ function adminApp() {
         previewConfig: {
             fontFamily: 'Times New Roman',
             fontSize: 12,
+            tamanhoTitulo: 28,
+            tamanhoSubtitulo: 18,
+            tamanhoEmpresa: 9,
             corTexto: '#000000',
             corDestaque: '#1e40af',
             marcaDaguaOpacidade: 10,
-            espacamentoLinhas: 1.6
+            marcaDaguaRotacao: -45,
+            marcaDaguaWidth: 400,
+            marcaDaguaHeight: 400,
+            espacamentoLinhas: 1.6,
+            zoom: 100,
+            // Edição de Conteúdo
+            tituloDocumento: 'DECLARAÇÃO DE TRABALHO',
+            textoIntro: 'Declara-se, para os devidos efeitos, que',
+            alinhamentoTexto: 'justify',
+            alinhamentoCabecalho: 'left',
+            // Controles Avançados do Cabeçalho
+            cabecalhoMaxWidth: 450,           // Largura máxima do texto (px)
+            cabecalhoMarginEntreLogoTexto: 20, // Espaço entre logo e texto (px)
+            cabecalhoJustify: 'space-between', // Distribuição: space-between, flex-start, flex-end, center
+            cabecalhoPaddingBottom: 15,        // Padding inferior (px)
+            cabecalhoBordaLargura: 4,          // Largura da borda inferior (px)
+            cabecalhoLogoSize: 80,             // Tamanho do logo (px)
+            cabecalhoPaddingHorizontal: 0,     // Padding lateral do container (px)
+            cabecalhoLineHeight: 1.4,          // Espaçamento entre linhas do texto (multiplicador)
+            // Controles do Carimbo
+            carimboWidth: 110,                 // Largura do carimbo (px)
+            carimboHeight: 110                 // Altura do carimbo (px)
+        },
+        
+        // Presets de Estilos Profissionais
+        presetsEstilo: {
+            formal: {
+                nome: 'Formal',
+                icone: 'bi-mortarboard',
+                cor: 'blue',
+                config: {
+                    fontFamily: 'Times New Roman',
+                    fontSize: 12,
+                    tamanhoTitulo: 24,
+                    tamanhoSubtitulo: 16,
+                    tamanhoEmpresa: 9,
+                    corDestaque: '#1e40af',
+                    marcaDaguaOpacidade: 8,
+                    marcaDaguaRotacao: -45,
+                    marcaDaguaWidth: 350,
+                    marcaDaguaHeight: 350,
+                    espacamentoLinhas: 1.8
+                }
+            },
+            moderno: {
+                nome: 'Moderno',
+                icone: 'bi-lightning',
+                cor: 'purple',
+                config: {
+                    fontFamily: 'Arial, sans-serif',
+                    fontSize: 11,
+                    tamanhoTitulo: 32,
+                    tamanhoSubtitulo: 20,
+                    tamanhoEmpresa: 9,
+                    corDestaque: '#7c3aed',
+                    marcaDaguaOpacidade: 15,
+                    marcaDaguaRotacao: -30,
+                    marcaDaguaWidth: 450,
+                    marcaDaguaHeight: 450,
+                    espacamentoLinhas: 1.5
+                }
+            },
+            minimalista: {
+                nome: 'Minimalista',
+                icone: 'bi-dash-circle',
+                cor: 'gray',
+                config: {
+                    fontFamily: 'Calibri, sans-serif',
+                    fontSize: 11,
+                    tamanhoTitulo: 26,
+                    tamanhoSubtitulo: 17,
+                    tamanhoEmpresa: 8.5,
+                    corDestaque: '#374151',
+                    marcaDaguaOpacidade: 5,
+                    marcaDaguaRotacao: 0,
+                    marcaDaguaWidth: 300,
+                    marcaDaguaHeight: 300,
+                    espacamentoLinhas: 1.6
+                }
+            },
+            executivo: {
+                nome: 'Executivo',
+                icone: 'bi-briefcase',
+                cor: 'green',
+                config: {
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 12,
+                    tamanhoTitulo: 30,
+                    tamanhoSubtitulo: 19,
+                    tamanhoEmpresa: 9.5,
+                    corDestaque: '#059669',
+                    marcaDaguaOpacidade: 12,
+                    marcaDaguaRotacao: -45,
+                    marcaDaguaWidth: 420,
+                    marcaDaguaHeight: 420,
+                    espacamentoLinhas: 1.7
+                }
+            }
         },
         
         // Forms
@@ -86,6 +186,19 @@ function adminApp() {
         
         // Managers
         userManager: null,
+
+        // ========== SISTEMA DE PERSONALIZAÇÕES ==========
+        personalizacoes: {
+            slot1: null,
+            slot2: null,
+            slot3: null
+        },
+        autosaveEnabled: true,
+        lastSaved: null,
+        modalSalvarPersonalizacao: false,
+        modalCarregarPersonalizacao: false,
+        nomePersonalizacaoTemp: '',
+        slotSelecionado: null,
 
         // ========== INICIALIZAÇÃO ==========
         async init() {
@@ -124,6 +237,16 @@ function adminApp() {
             
             // Carregar TODOS os dados
             await this.carregarTodosDados();
+            
+            // Carregar personalizações salvas
+            this.carregarPersonalizacoesSalvas();
+            
+            // Configurar autosave (a cada 10 segundos)
+            setInterval(() => {
+                if (this.autosaveEnabled && this.modalPreviewModelo) {
+                    this.autoSalvarPersonalizacao();
+                }
+            }, 10000);
             
             this.loading = false;
             console.log('✅ Painel admin iniciado com SUCESSO!');
@@ -784,6 +907,48 @@ function adminApp() {
             this.tipoPreview = 'declaracao';
         },
         
+        /**
+         * Aplicar preset de estilo
+         */
+        aplicarPreset(presetKey) {
+            const preset = this.presetsEstilo[presetKey];
+            if (preset) {
+                this.previewConfig = {
+                    ...this.previewConfig,
+                    ...preset.config,
+                    corTexto: '#000000', // Manter cor do texto preta
+                    zoom: this.previewConfig.zoom // Manter zoom atual
+                };
+                this.showAlert('success', `✨ Estilo "${preset.nome}" aplicado com sucesso!`);
+            }
+        },
+        
+        /**
+         * Reset por seção
+         */
+        resetFontes() {
+            this.previewConfig.fontFamily = 'Times New Roman';
+            this.previewConfig.fontSize = 12;
+            this.previewConfig.tamanhoTitulo = 28;
+            this.previewConfig.tamanhoSubtitulo = 18;
+            this.previewConfig.tamanhoEmpresa = 9;
+            this.showAlert('success', '🔤 Fontes resetadas!');
+        },
+        
+        resetCores() {
+            this.previewConfig.corDestaque = '#1e40af';
+            this.previewConfig.corTexto = '#000000';
+            this.showAlert('success', '🎨 Cores resetadas!');
+        },
+        
+        resetMarcaDagua() {
+            this.previewConfig.marcaDaguaOpacidade = 10;
+            this.previewConfig.marcaDaguaRotacao = -45;
+            this.previewConfig.marcaDaguaWidth = 400;
+            this.previewConfig.marcaDaguaHeight = 400;
+            this.showAlert('success', '💧 Marca d\'água resetada!');
+        },
+        
         getEmpresaExemplo() {
             // Retorna primeira empresa cadastrada ou dados fake
             return this.empresas[0] || {
@@ -866,6 +1031,279 @@ function adminApp() {
         toggleDarkMode() {
             this.darkMode = !this.darkMode;
             localStorage.setItem('darkMode', this.darkMode);
+        },
+
+        // ========== SISTEMA DE PERSONALIZAÇÕES ==========
+
+        /**
+         * Carrega personalizações salvas do localStorage E do servidor
+         */
+        async carregarPersonalizacoesSalvas() {
+            const modeloId = this.modeloSelecionado?.id || 'default';
+            
+            // 1. Tentar carregar do servidor (GitHub)
+            try {
+                const response = await githubAPI.lerJSON('data/personalizacoes.json');
+                const todasPersonalizacoes = response.data;
+                
+                // Carregar personalizações deste modelo específico
+                if (todasPersonalizacoes[modeloId]) {
+                    this.personalizacoes = todasPersonalizacoes[modeloId];
+                    console.log('✅ Personalizações carregadas do servidor:', this.personalizacoes);
+                }
+            } catch (error) {
+                console.log('ℹ️ Nenhuma personalização no servidor, usando localStorage');
+                
+                // 2. Fallback: carregar do localStorage
+                const chave = `personalizacoes_${modeloId}`;
+                try {
+                    const dados = localStorage.getItem(chave);
+                    if (dados) {
+                        this.personalizacoes = JSON.parse(dados);
+                        console.log('✅ Personalizações carregadas do localStorage');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao carregar do localStorage:', error);
+                }
+            }
+        },
+
+        /**
+         * Salva personalização em um slot (localStorage + servidor)
+         */
+        async salvarPersonalizacao(slot) {
+            if (!this.nomePersonalizacaoTemp.trim()) {
+                this.showAlert('error', 'Digite um nome para a personalização');
+                return;
+            }
+
+            const modeloId = this.modeloSelecionado?.id || 'default';
+
+            // Criar objeto de personalização
+            const personalizacao = {
+                nome: this.nomePersonalizacaoTemp.trim(),
+                config: { ...this.previewConfig },
+                dataCriacao: new Date().toISOString(),
+                modelo: this.modeloSelecionado?.nome || 'Modelo',
+                usuario: this.usuario?.login || 'admin'
+            };
+
+            // Salvar no slot
+            this.personalizacoes[slot] = personalizacao;
+
+            // 1. Salvar no localStorage (backup rápido)
+            const chaveLocal = `personalizacoes_${modeloId}`;
+            try {
+                localStorage.setItem(chaveLocal, JSON.stringify(this.personalizacoes));
+            } catch (error) {
+                console.error('⚠️ Erro ao salvar no localStorage:', error);
+            }
+
+            // 2. Salvar no servidor (GitHub)
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Salvando no servidor...';
+
+                // Carregar arquivo completo
+                let todasPersonalizacoes = {};
+                try {
+                    const response = await githubAPI.lerJSON('data/personalizacoes.json');
+                    todasPersonalizacoes = response.data;
+                } catch (error) {
+                    console.log('ℹ️ Criando arquivo de personalizações');
+                }
+
+                // Atualizar personalizações deste modelo
+                todasPersonalizacoes[modeloId] = this.personalizacoes;
+
+                // Salvar no GitHub
+                await githubAPI.salvarJSON(
+                    'data/personalizacoes.json',
+                    todasPersonalizacoes,
+                    `Salvar personalização "${personalizacao.nome}" - Slot ${slot.replace('slot', '')}`
+                );
+
+                this.lastSaved = new Date();
+                this.showAlert('success', `✅ Personalização "${personalizacao.nome}" salva no servidor!`);
+                this.modalSalvarPersonalizacao = false;
+                this.nomePersonalizacaoTemp = '';
+                
+            } catch (error) {
+                console.error('❌ Erro ao salvar no servidor:', error);
+                this.showAlert('warning', '⚠️ Salvo localmente, mas falhou no servidor: ' + error.message);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Carrega personalização de um slot
+         */
+        carregarPersonalizacao(slot) {
+            const personalizacao = this.personalizacoes[slot];
+            
+            if (!personalizacao) {
+                this.showAlert('error', 'Slot vazio');
+                return;
+            }
+
+            // Aplicar configuração
+            this.previewConfig = { ...personalizacao.config };
+            this.showAlert('success', `✅ Personalização "${personalizacao.nome}" carregada`);
+            this.modalCarregarPersonalizacao = false;
+        },
+
+        /**
+         * Deleta personalização de um slot (localStorage + servidor)
+         */
+        async deletarPersonalizacao(slot) {
+            const personalizacao = this.personalizacoes[slot];
+            if (!personalizacao) {
+                this.showAlert('error', 'Slot vazio');
+                return;
+            }
+
+            if (!confirm(`Tem certeza que deseja deletar "${personalizacao.nome}"?`)) {
+                return;
+            }
+
+            const modeloId = this.modeloSelecionado?.id || 'default';
+
+            // Remover do slot
+            this.personalizacoes[slot] = null;
+
+            // 1. Atualizar localStorage
+            const chaveLocal = `personalizacoes_${modeloId}`;
+            try {
+                localStorage.setItem(chaveLocal, JSON.stringify(this.personalizacoes));
+            } catch (error) {
+                console.error('⚠️ Erro ao atualizar localStorage:', error);
+            }
+
+            // 2. Atualizar servidor
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Deletando do servidor...';
+
+                // Carregar arquivo completo
+                const response = await githubAPI.lerJSON('data/personalizacoes.json');
+                const todasPersonalizacoes = response.data;
+
+                // Atualizar personalizações deste modelo
+                todasPersonalizacoes[modeloId] = this.personalizacoes;
+
+                // Salvar no GitHub
+                await githubAPI.salvarJSON(
+                    'data/personalizacoes.json',
+                    todasPersonalizacoes,
+                    `Deletar personalização - Slot ${slot.replace('slot', '')}`
+                );
+
+                this.showAlert('success', 'Personalização deletada do servidor');
+                
+            } catch (error) {
+                console.error('❌ Erro ao deletar do servidor:', error);
+                this.showAlert('warning', '⚠️ Deletado localmente, mas falhou no servidor');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Autosave - Salva automaticamente a cada mudança
+         */
+        autoSalvarPersonalizacao() {
+            if (!this.autosaveEnabled) return;
+
+            const modeloId = this.modeloSelecionado?.id || 'default';
+            const chave = `autosave_${modeloId}`;
+
+            try {
+                const autosave = {
+                    config: { ...this.previewConfig },
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem(chave, JSON.stringify(autosave));
+                this.lastSaved = new Date();
+            } catch (error) {
+                console.error('❌ Erro no autosave:', error);
+            }
+        },
+
+        /**
+         * Recupera autosave
+         */
+        recuperarAutosave() {
+            const modeloId = this.modeloSelecionado?.id || 'default';
+            const chave = `autosave_${modeloId}`;
+
+            try {
+                const dados = localStorage.getItem(chave);
+                if (dados) {
+                    const autosave = JSON.parse(dados);
+                    this.previewConfig = { ...autosave.config };
+                    this.showAlert('success', '✅ Autosave recuperado');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao recuperar autosave:', error);
+            }
+        },
+
+        /**
+         * Exporta personalização para JSON
+         */
+        exportarPersonalizacao() {
+            const modeloId = this.modeloSelecionado?.id || 'default';
+            const exportData = {
+                modelo: this.modeloSelecionado?.nome || 'Modelo',
+                modeloId: modeloId,
+                config: this.previewConfig,
+                dataExportacao: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `personalizacao_${modeloId}_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            this.showAlert('success', '✅ Personalização exportada');
+        },
+
+        /**
+         * Importa personalização de JSON
+         */
+        importarPersonalizacao(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.config) {
+                        this.previewConfig = { ...data.config };
+                        this.showAlert('success', `✅ Personalização "${data.modelo}" importada`);
+                    } else {
+                        this.showAlert('error', 'Arquivo inválido');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao importar:', error);
+                    this.showAlert('error', 'Erro ao importar arquivo');
+                }
+            };
+            reader.readAsText(file);
+        },
+
+        /**
+         * Abre modal de salvar
+         */
+        abrirModalSalvar(slot) {
+            this.slotSelecionado = slot;
+            this.nomePersonalizacaoTemp = '';
+            this.modalSalvarPersonalizacao = true;
         }
     };
 }

@@ -24,10 +24,33 @@ const ModeloDeclaracaoExecutivo = {
         const cfg = {
             fontFamily: config.fontFamily || 'Times New Roman, serif',
             fontSize: config.fontSize || 12,
+            tamanhoTitulo: config.tamanhoTitulo || 28,
+            tamanhoSubtitulo: config.tamanhoSubtitulo || 18,
+            tamanhoEmpresa: config.tamanhoEmpresa || 9,
             corTexto: config.corTexto || '#000000',
             corDestaque: config.corDestaque || empresa.corPrimaria || '#1e40af',
             marcaDaguaOpacidade: config.marcaDaguaOpacidade || 10,
-            espacamentoLinhas: config.espacamentoLinhas || 1.6
+            marcaDaguaRotacao: config.marcaDaguaRotacao !== undefined ? config.marcaDaguaRotacao : -45,
+            marcaDaguaWidth: config.marcaDaguaWidth || 400,
+            marcaDaguaHeight: config.marcaDaguaHeight || 400,
+            espacamentoLinhas: config.espacamentoLinhas || 1.6,
+            // Edição de Conteúdo
+            tituloDocumento: config.tituloDocumento || 'DECLARAÇÃO DE TRABALHO',
+            textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
+            alinhamentoTexto: config.alinhamentoTexto || 'justify',
+            alinhamentoCabecalho: config.alinhamentoCabecalho || 'left',
+            // Controles Avançados do Cabeçalho
+            cabecalhoMaxWidth: config.cabecalhoMaxWidth || 450,
+            cabecalhoMarginEntreLogoTexto: config.cabecalhoMarginEntreLogoTexto || 20,
+            cabecalhoJustify: config.cabecalhoJustify || 'space-between',
+            cabecalhoPaddingBottom: config.cabecalhoPaddingBottom || 15,
+            cabecalhoBordaLargura: config.cabecalhoBordaLargura || 4,
+            cabecalhoLogoSize: config.cabecalhoLogoSize || 80,
+            cabecalhoPaddingHorizontal: config.cabecalhoPaddingHorizontal || 0,
+            cabecalhoLineHeight: config.cabecalhoLineHeight || 1.4,
+            // Controles do Carimbo
+            carimboWidth: config.carimboWidth || 110,
+            carimboHeight: config.carimboHeight || 110
         };
 
         // Data atual formatada
@@ -70,18 +93,29 @@ const ModeloDeclaracaoExecutivo = {
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                transform: translate(-50%, -50%) rotate(-45deg);
+                transform: translate(-50%, -50%) rotate(${cfg.marcaDaguaRotacao}deg);
                 opacity: ${cfg.marcaDaguaOpacidade / 100};
                 pointer-events: none;
                 z-index: 0;
                 text-align: center;
+                width: ${cfg.marcaDaguaWidth}px;
+                height: ${cfg.marcaDaguaHeight}px;
             ">
                 ${empresa.logo ? `
                     <img src="${empresa.logo}" 
                          alt="Marca d'água" 
-                         style="max-width: 400px; max-height: 400px; object-fit: contain;">
+                         style="width: 100%; height: 100%; object-fit: contain;">
                 ` : `
-                    <div style="font-size: 80px; font-weight: bold; color: #ccc;">
+                    <div style="
+                        width: 100%; 
+                        height: 100%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center;
+                        font-size: 80px; 
+                        font-weight: bold; 
+                        color: #ccc;
+                    ">
                         ${empresa.nome}
                     </div>
                 `}
@@ -93,61 +127,69 @@ const ModeloDeclaracaoExecutivo = {
                 <!-- HEADER CORPORATIVO -->
                 <div style="
                     display: flex;
-                    justify-content: space-between;
+                    justify-content: ${cfg.cabecalhoJustify};
                     align-items: flex-start;
-                    padding-bottom: 15px;
+                    padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
+                    padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
+                    padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
                     margin-bottom: 20px;
-                    border-bottom: 4px solid ${cfg.corDestaque};
+                    border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
-                    <div style="flex-shrink: 0; margin-right: 20px;">
+                    <div style="flex-shrink: 0; margin-right: ${cfg.cabecalhoMarginEntreLogoTexto}px;">
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
-                                 style="width: 80px; height: 80px; object-fit: contain;">
+                                 style="width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px; object-fit: contain;">
                         ` : `
                             <div style="
-                                width: 80px; 
-                                height: 80px; 
+                                width: ${cfg.cabecalhoLogoSize}px; 
+                                height: ${cfg.cabecalhoLogoSize}px; 
                                 background: #f3f4f6; 
                                 border-radius: 8px;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                font-size: 40px;
+                                font-size: ${cfg.cabecalhoLogoSize * 0.5}px;
                                 color: #9ca3af;
                             ">🏢</div>
                         `}
                     </div>
 
                     <!-- Dados da Empresa -->
-                    <div style="text-align: right; flex: 1;">
+                    <div style="
+                        text-align: ${cfg.alinhamentoCabecalho}; 
+                        flex: 1;
+                        line-height: ${cfg.cabecalhoLineHeight};
+                    ">
                         <h1 style="
-                            font-size: 22pt;
+                            font-size: ${cfg.tamanhoSubtitulo}pt;
                             font-weight: bold;
                             color: ${cfg.corDestaque};
                             margin: 0 0 8px 0;
                         ">${empresa.nome}</h1>
-                        <p style="font-size: 9pt; margin: 2px 0;">
-                            <strong>NIF/CC:</strong> ${empresa.nif}
-                        </p>
-                        <p style="font-size: 8.5pt; margin: 2px 0; line-height: 1.3;">
-                            <strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}<br>
-                            Bairro ${empresa.endereco.bairro} — Município de ${empresa.endereco.municipio}<br>
-                            ${empresa.endereco.municipio} — ${empresa.endereco.pais}
-                        </p>
+                        
+                        <div style="
+                            font-size: ${cfg.tamanhoEmpresa}pt; 
+                            line-height: ${cfg.cabecalhoLineHeight};
+                        ">
+                            <p style="margin: 3px 0;"><strong>NIF/CC:</strong> ${empresa.nif}</p>
+                            <p style="margin: 3px 0;"><strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}</p>
+                            <p style="margin: 3px 0;">Bairro ${empresa.endereco.bairro} — Município de ${empresa.endereco.municipio}</p>
+                            <p style="margin: 3px 0;">${empresa.endereco.provincia} — ${empresa.endereco.pais}</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- TÍTULO -->
                 <div style="text-align: center; margin: 40px 0 30px 0;">
                     <h2 style="
-                        font-size: 28pt;
+                        font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
                         color: ${cfg.corDestaque};
                         letter-spacing: 2px;
                         margin: 0 0 10px 0;
-                    ">DECLARAÇÃO DE TRABALHO</h2>
+                    ">${cfg.tituloDocumento}</h2>
                     <div style="
                         width: 120px;
                         height: 4px;
@@ -158,9 +200,9 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- CORPO DO TEXTO -->
-                <div style="text-align: justify; margin-bottom: 30px;">
+                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 30px;">
                     <p style="margin-bottom: 15px;">
-                        Declara-se, para os devidos efeitos, que <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
+                        ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce actualmente as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
                         na <strong>${empresa.nome}</strong>, pessoa colectiva com o Número de Identificação Fiscal 
@@ -194,50 +236,40 @@ const ModeloDeclaracaoExecutivo = {
                         ${empresa.endereco.municipio}, aos ${dataAtual}.
                     </p>
                     
+                    <!-- Assinatura e Carimbo Centralizados -->
                     <div style="
                         display: flex;
-                        justify-content: space-between;
-                        align-items: flex-end;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
                     ">
-                        <!-- Assinatura -->
-                        <div style="text-align: center;">
-                            <div style="
-                                border-top: 2px solid #000;
-                                padding-top: 8px;
-                                width: 220px;
-                            ">
-                                <p style="font-size: 10pt; font-weight: 600; margin: 0;">
-                                    O Director de Recursos Humanos
-                                </p>
-                                <p style="font-size: 8pt; color: #666; margin: 4px 0 0 0;">
-                                    ${empresa.nome}
-                                </p>
-                            </div>
-                        </div>
+                        <p style="font-size: 11pt; font-weight: 600; margin-bottom: 20px;">
+                            A Direcção da Empresa
+                        </p>
                         
-                        <!-- Carimbo -->
-                        <div style="text-align: center;">
-                            ${empresa.carimbo ? `
-                                <img src="${empresa.carimbo}" 
-                                     alt="Carimbo" 
-                                     style="width: 110px; height: 110px; object-fit: contain; opacity: 0.8;">
-                            ` : `
-                                <div style="
-                                    width: 110px;
-                                    height: 110px;
-                                    border: 4px solid #999;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    font-size: 50px;
-                                    color: #999;
-                                ">📌</div>
-                            `}
-                            <p style="font-size: 7pt; color: #666; margin-top: 5px;">
-                                Carimbo e Assinatura
-                            </p>
-                        </div>
+                        ${empresa.carimbo ? `
+                            <img src="${empresa.carimbo}" 
+                                 alt="Carimbo e Assinatura" 
+                                 style="
+                                    width: ${cfg.carimboWidth}px; 
+                                    height: ${cfg.carimboHeight}px; 
+                                    object-fit: contain; 
+                                    opacity: 0.9;
+                                    display: block;
+                                 ">
+                        ` : `
+                            <div style="
+                                width: ${cfg.carimboWidth}px;
+                                height: ${cfg.carimboHeight}px;
+                                border: 4px solid #999;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: ${cfg.carimboWidth * 0.4}px;
+                                color: #999;
+                            ">📌</div>
+                        `}
                     </div>
                 </div>
 
