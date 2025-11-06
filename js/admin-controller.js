@@ -12,6 +12,7 @@ function adminApp() {
         modelos: [],
         contador: {},
         usersData: null,
+        darkMode: localStorage.getItem('darkMode') === 'true',
         
         activeTab: 'empresas',
         loading: false,
@@ -760,10 +761,6 @@ function adminApp() {
 
         // ========== MODELOS ==========
         
-        modeloSelecionado: null,
-        modalPreviewModelo: false,
-        tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
-        
         visualizarModelo(modelo) {
             // Selecionar modelo
             this.modeloSelecionado = modelo;
@@ -833,6 +830,18 @@ function adminApp() {
          */
         renderizarModelo() {
             const modelo = this.modeloSelecionado;
+            
+            // Verificar se há modelo selecionado
+            if (!modelo) {
+                return `
+                    <div style="text-align: center; padding: 100px 20px; color: #666;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">📄</div>
+                        <h2 style="font-size: 24px; margin-bottom: 10px;">Nenhum Modelo Selecionado</h2>
+                        <p style="font-size: 14px;">Selecione um modelo para visualizar</p>
+                    </div>
+                `;
+            }
+            
             const empresa = this.getEmpresaExemplo();
             const cliente = this.getClienteExemplo();
             
@@ -846,9 +855,17 @@ function adminApp() {
                 <div style="text-align: center; padding: 100px 20px; color: #666;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🚧</div>
                     <h2 style="font-size: 24px; margin-bottom: 10px;">Modelo em Desenvolvimento</h2>
-                    <p style="font-size: 14px;">${modelo.nome} será implementado em breve</p>
+                    <p style="font-size: 14px;">${modelo.nome || 'Este modelo'} será implementado em breve</p>
                 </div>
             `;
+        },
+
+        /**
+         * Toggle Dark Mode
+         */
+        toggleDarkMode() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('darkMode', this.darkMode);
         }
     };
 }
