@@ -23,17 +23,17 @@ const ModeloDeclaracaoExecutivo = {
         // Configurações padrão
         const cfg = {
             fontFamily: config.fontFamily || 'Times New Roman, serif',
-            fontSize: config.fontSize || 12,
-            tamanhoTitulo: config.tamanhoTitulo || 28,
-            tamanhoSubtitulo: config.tamanhoSubtitulo || 18,
-            tamanhoEmpresa: config.tamanhoEmpresa || 9,
+            fontSize: config.fontSize || 11,
+            tamanhoTitulo: config.tamanhoTitulo || 26,
+            tamanhoSubtitulo: config.tamanhoSubtitulo || 16,
+            tamanhoEmpresa: config.tamanhoEmpresa || 8.5,
             corTexto: config.corTexto || '#000000',
             corDestaque: config.corDestaque || empresa.corPrimaria || '#1e40af',
             marcaDaguaOpacidade: config.marcaDaguaOpacidade || 10,
             marcaDaguaRotacao: config.marcaDaguaRotacao !== undefined ? config.marcaDaguaRotacao : -45,
             marcaDaguaWidth: config.marcaDaguaWidth || 400,
             marcaDaguaHeight: config.marcaDaguaHeight || 400,
-            espacamentoLinhas: config.espacamentoLinhas || 1.6,
+            espacamentoLinhas: config.espacamentoLinhas || 1.8,
             // Edição de Conteúdo
             tituloDocumento: config.tituloDocumento || 'DECLARAÇÃO DE TRABALHO',
             textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
@@ -81,7 +81,7 @@ const ModeloDeclaracaoExecutivo = {
             line-height: ${cfg.espacamentoLinhas};
             width: 210mm;
             height: 297mm;
-            padding: 12mm 18mm;
+            padding: 18mm 22mm;
             background: white;
             position: relative;
             box-sizing: border-box;
@@ -133,7 +133,7 @@ const ModeloDeclaracaoExecutivo = {
                     padding-left: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-right: ${cfg.cabecalhoPaddingHorizontal}px;
                     padding-bottom: ${cfg.cabecalhoPaddingBottom}px;
-                    margin-bottom: 10px;
+                    margin-bottom: 18px;
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
@@ -183,13 +183,13 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- TÍTULO -->
-                <div style="text-align: center; margin: 15px 0 12px 0;">
+                <div style="text-align: center; margin: 20px 0 18px 0;">
                     <h2 style="
                         font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
                         color: ${cfg.corDestaque};
                         letter-spacing: 2px;
-                        margin: 0 0 6px 0;
+                        margin: 0 0 8px 0;
                     ">${cfg.tituloDocumento}</h2>
                     <div style="
                         width: 100px;
@@ -201,8 +201,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- CORPO DO TEXTO -->
-                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 15px;">
-                    <p style="margin-bottom: 8px;">
+                <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 18px;">
+                    <p style="margin-bottom: 12px;">
                         ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce actualmente as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
@@ -210,20 +210,20 @@ const ModeloDeclaracaoExecutivo = {
                         <strong>${empresa.nif}</strong>, com sede em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: 12px;">
                         O(A) referido(a) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
                         desempenhando as suas funções com competência, profissionalismo e dedicação, 
                         cumprindo integralmente com as responsabilidades inerentes ao seu cargo.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: 12px;">
                         No exercício das suas funções, o(a) colaborador(a) aufere mensalmente o vencimento bruto de 
                         <strong style="color: ${cfg.corDestaque}; font-size: 12pt;">${salarioFormatado} AKZ</strong>, 
                         acrescido dos subsídios legalmente estabelecidos, demonstrando um desempenho exemplar 
                         no cumprimento das suas obrigações contratuais.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: 12px;">
                         A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
                         nomeadamente para comprovação de vínculo laboral, auferimento de rendimentos e 
                         quaisquer outras finalidades que entenda convenientes, podendo a mesma ser apresentada 
@@ -232,8 +232,8 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- RODAPÉ -->
-                <div style="margin-top: 20px;">
-                    <p style="font-size: 10pt; margin-bottom: 25px;">
+                <div style="margin-top: 25px;">
+                    <p style="font-size: 10pt; margin-bottom: 30px;">
                         ${empresa.endereco.municipio}, aos ${dataAtual}.
                     </p>
                     
@@ -244,7 +244,7 @@ const ModeloDeclaracaoExecutivo = {
                         align-items: center;
                         justify-content: center;
                     ">
-                        <p style="font-size: 10pt; font-weight: 600; margin-bottom: 15px;">
+                        <p style="font-size: 10pt; font-weight: 600; margin-bottom: 18px;">
                             A Direcção da Empresa
                         </p>
                         
