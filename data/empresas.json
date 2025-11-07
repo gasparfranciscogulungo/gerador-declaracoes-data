@@ -77,14 +77,14 @@
       "nome": "test 3",
       "nif": "test 3",
       "endereco": {
-        "rua": "jjklÃÂ§",
+        "rua": "jjklÃÂÃÂ§",
         "edificio": "jkl",
-        "andar": "jlÃÂ§",
-        "sala": "jlkÃÂ§",
-        "bairro": "jklÃÂ§",
-        "municipio": "jkÃÂ§",
-        "provincia": "kÃÂ§",
-        "pais": "jkÃÂ§"
+        "andar": "jlÃÂÃÂ§",
+        "sala": "jlkÃÂÃÂ§",
+        "bairro": "jklÃÂÃÂ§",
+        "municipio": "jkÃÂÃÂ§",
+        "provincia": "kÃÂÃÂ§",
+        "pais": "jkÃÂÃÂ§"
       },
       "telefone": "",
       "email": "",
@@ -94,9 +94,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-07T10:41:21.953Z",
-      "updatedAt": "2025-11-07T10:41:21.953Z",
-      "contador": 0
+      "updatedAt": "2025-11-07T11:11:25.902Z"
     }
   ]
 }
