@@ -1,30 +1,6 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762376215587",
-      "nome": "EMFC Consulting, S.A",
-      "nif": "5480023446",
-      "endereco": {
-        "rua": "Avenida 4 de Fevereiro, ",
-        "edificio": "Edificio 42",
-        "andar": "andar 3",
-        "sala": "sala 4",
-        "bairro": "Talatona",
-        "municipio": "Talatona",
-        "provincia": "Luanda",
-        "pais": "Angola"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-07T10:39:52.938Z"
-    },
-    {
       "id": "empresa_1762398563451",
       "nome": "Angola Tech Prestacao de servico profissionals",
       "nif": "930209393",
@@ -101,14 +77,14 @@
       "nome": "test 3",
       "nif": "test 3",
       "endereco": {
-        "rua": "jjklç",
+        "rua": "jjklÃ§",
         "edificio": "jkl",
-        "andar": "jlç",
-        "sala": "jlkç",
-        "bairro": "jklç",
-        "municipio": "jkç",
-        "provincia": "kç",
-        "pais": "jkç"
+        "andar": "jlÃ§",
+        "sala": "jlkÃ§",
+        "bairro": "jklÃ§",
+        "municipio": "jkÃ§",
+        "provincia": "kÃ§",
+        "pais": "jkÃ§"
       },
       "telefone": "",
       "email": "",
