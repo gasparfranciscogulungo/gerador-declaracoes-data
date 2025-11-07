@@ -1130,6 +1130,15 @@ function adminApp() {
 
             console.log('🔄 handleLogoUpload iniciado', { file: file.name, size: file.size });
 
+            // VALIDAÇÃO DE TAMANHO: Máximo 100KB
+            const MAX_SIZE = 100 * 1024; // 100KB em bytes
+            if (file.size > MAX_SIZE) {
+                console.error('❌ Arquivo muito grande:', (file.size / 1024).toFixed(2), 'KB');
+                this.showAlert('error', `❌ Logo muito grande! Máximo: 100KB. Tamanho atual: ${(file.size / 1024).toFixed(2)}KB. Por favor, comprima a imagem antes de enviar.`);
+                event.target.value = '';
+                return;
+            }
+
             // Verificar se empresa tem NIF (necessário para organizar no GitHub)
             if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
                 console.warn('⚠️ NIF não preenchido');
@@ -1308,14 +1317,19 @@ function adminApp() {
                     console.log('📦 Imagem salva no cache IndexedDB');
                 }
 
-                // Atualizar ambos os campos
+                // LIMPAR preview antigo primeiro (força Alpine.js a detectar mudança)
+                this.empresaForm.logoPreview = '';
+                await this.$nextTick();
+                console.log('🔄 Preview antigo limpo');
+
+                // Atualizar com nova imagem
                 this.empresaForm.logo = githubUrl; // URL CDN (para salvar)
                 this.empresaForm.logoPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
 
                 // Forçar re-render do Alpine.js para atualizar preview visual
                 await this.$nextTick();
-                console.log('🔄 Preview visual atualizado');
+                console.log('🔄 Preview visual atualizado com nova imagem');
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Logo enviado e verificado!';
@@ -1356,6 +1370,15 @@ function adminApp() {
             if (!file) return;
 
             console.log('🔄 handleCarimboUpload iniciado', { file: file.name, size: file.size });
+
+            // VALIDAÇÃO DE TAMANHO: Máximo 100KB
+            const MAX_SIZE = 100 * 1024; // 100KB em bytes
+            if (file.size > MAX_SIZE) {
+                console.error('❌ Arquivo muito grande:', (file.size / 1024).toFixed(2), 'KB');
+                this.showAlert('error', `❌ Carimbo muito grande! Máximo: 100KB. Tamanho atual: ${(file.size / 1024).toFixed(2)}KB. Por favor, comprima a imagem antes de enviar.`);
+                event.target.value = '';
+                return;
+            }
 
             // Verificar se empresa tem NIF
             if (!this.empresaForm.nif || this.empresaForm.nif.trim() === '') {
@@ -1534,12 +1557,19 @@ function adminApp() {
                     console.log('📦 Imagem salva no cache IndexedDB');
                 }
 
-                // Atualizar ambos os campos
+                // LIMPAR preview antigo primeiro (força Alpine.js a detectar mudança)
+                this.empresaForm.carimboPreview = '';
+                await this.$nextTick();
+                console.log('🔄 Preview antigo limpo');
+
+                // Atualizar com nova imagem
                 this.empresaForm.carimbo = githubUrl; // URL CDN (para salvar)
                 this.empresaForm.carimboPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
 
                 // Forçar re-render do Alpine.js para atualizar preview visual
+                await this.$nextTick();
+                console.log('🔄 Preview visual atualizado com nova imagem');
                 await this.$nextTick();
                 console.log('🔄 Preview visual atualizado');
 
