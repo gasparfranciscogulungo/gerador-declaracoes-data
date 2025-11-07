@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>🔧 Fix Cache de Empresas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🔧 Corrigir Cache de Imagens</h1>
+        
+        <div class="bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl mb-4">📋 Status</h2>
+            <div id="status" class="font-mono text-sm"></div>
+        </div>
+
+        <div class="space-y-4">
+            <button onclick="baixarTodasImagens()" class="w-full bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-bold">
+                🔄 BAIXAR TODAS AS IMAGENS DO GITHUB API
+            </button>
+            <button onclick="verificarCache()" class="w-full bg-green-600 hover:bg-green-700 px-6 py-3 rounded font-bold">
+                📦 VERIFICAR CACHE
+            </button>
+            <button onclick="limparCache()" class="w-full bg-red-600 hover:bg-red-700 px-6 py-3 rounded font-bold">
+                🗑️ LIMPAR CACHE
+            </button>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg mt-6">
+            <h2 class="text-xl mb-4">🖼️ Preview</h2>
+            <div id="preview" class="grid grid-cols-2 gap-4"></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/image-cache-manager.js"></script>
+    <script>
+        const TOKEN = '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';
+        
+        function log(msg) {
+            const div = document.getElementById('status');
+            const time = new Date().toLocaleTimeString();
+            div.innerHTML += `<div>[${time}] ${msg}</div>`;
+            console.log(msg);
+        }
+
+        async function baixarTodasImagens() {
+            log('🚀 Iniciando download direto da API do GitHub...');
+            
+            try {
+                // Configurar GitHub API
+                githubAPI.setToken(TOKEN);
+                
+                // Carregar empresas
+                const response = await githubAPI.lerJSON('data/empresas.json');
+                const empresas = response.data.empresas;
+                log(`✅ ${empresas.length} empresas encontradas`);
+
+                for (const empresa of empresas) {
+                    log(`\n📊 Processando: ${empresa.nome}`);
+                    
+                    // Logo
+                    if (empresa.logo) {
+                        await baixarImagemDaAPI(empresa.logo, empresa.nome, 'logo');
+                    }
+                    
+                    // Carimbo
+                    if (empresa.carimbo) {
+                        await baixarImagemDaAPI(empresa.carimbo, empresa.nome, 'carimbo');
+                    }
+                }
+
+                log('\n✅ CONCLUÍDO! Todas as imagens baixadas e salvas no cache.');
+                await verificarCache();
+
+            } catch (error) {
+                log(`❌ ERRO: ${error.message}`);
+                console.error(error);
+            }
+        }
+
+        async function baixarImagemDaAPI(url, empresaNome, tipo) {
+            try {
+                // Extrair path do arquivo
+                const match = url.match(/master\/(.+?)(\?|$)/);
+                if (!match) {
+                    log(`⚠️ URL inválida: ${url}`);
+                    return;
+                }
+                
+                const filePath = match[1];
+                log(`  📥 Baixando ${tipo}: ${filePath}`);
+
+                // Buscar arquivo via API (não via CDN)
+                const apiUrl = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/${filePath}`;
+                
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const base64Content = data.content.replace(/\n/g, '');
+                
+                // Determinar MIME type
+                const ext = filePath.split('.').pop().toLowerCase();
+                const mimeType = ext === 'png' ? 'image/png' : 
+                                ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+                                ext === 'svg' ? 'image/svg+xml' : 'image/png';
+                
+                // Criar Data URL
+                const dataUrl = `data:${mimeType};base64,${base64Content}`;
+                
+                // Salvar no cache
+                await imageCacheManager.saveToCache(url, dataUrl);
+                
+                log(`  ✅ ${tipo} salvo no cache (${(base64Content.length / 1024).toFixed(2)} KB)`);
+
+                // Mostrar preview
+                mostrarPreview(empresaNome, tipo, dataUrl);
+
+            } catch (error) {
+                log(`  ❌ Erro ao baixar ${tipo}: ${error.message}`);
+            }
+        }
+
+        function mostrarPreview(empresa, tipo, dataUrl) {
+            const preview = document.getElementById('preview');
+            const div = document.createElement('div');
+            div.className = 'bg-gray-700 p-4 rounded';
+            div.innerHTML = `
+                <h3 class="text-sm font-bold mb-2">${empresa} - ${tipo}</h3>
+                <img src="${dataUrl}" class="max-w-full max-h-32 object-contain border-2 border-green-500 rounded">
+            `;
+            preview.appendChild(div);
+        }
+
+        async function verificarCache() {
+            log('\n📦 Verificando cache...');
+            const stats = await imageCacheManager.getCacheStats();
+            
+            log(`  Total de imagens: ${stats.count}`);
+            log(`  Tamanho total: ${stats.totalSizeMB} MB`);
+            
+            stats.items.forEach(item => {
+                const url = item.url.split('/').pop();
+                const size = (item.size / 1024).toFixed(2);
+                log(`  - ${url}: ${size} KB`);
+            });
+        }
+
+        async function limparCache() {
+            if (confirm('Deseja realmente limpar todo o cache?')) {
+                await imageCacheManager.clearAllCache();
+                log('🗑️ Cache limpo!');
+                document.getElementById('preview').innerHTML = '';
+            }
+        }
+
+        log('✅ Sistema carregado. Clique em "BAIXAR TODAS AS IMAGENS"');
+    </script>
+</body>
+</html>

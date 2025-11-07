@@ -173,33 +173,103 @@ class ImageCacheManager {
 
     /**
      * Baixar imagem do servidor e converter para Data URL
+     * COM FALLBACK PARA API DO GITHUB
      */
     async fetchImageAsDataURL(url) {
         try {
             console.log(`🌐 Baixando do servidor: ${url.substring(0, 50)}...`);
             
+            // Tentar CDN primeiro
             const response = await fetch(url, {
                 method: 'GET',
                 mode: 'cors',
                 cache: 'no-cache'
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            if (response.ok) {
+                const blob = await response.blob();
+                
+                // Converter blob para data URL
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
             }
 
-            const blob = await response.blob();
-            
-            // Converter blob para data URL
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
+            // Se CDN falhou (404), tentar API do GitHub
+            console.warn(`⚠️ CDN retornou ${response.status}, tentando API do GitHub...`);
+            return await this.fetchImageFromGitHubAPI(url);
             
         } catch (error) {
-            console.error('❌ Erro ao baixar imagem:', error);
+            console.warn('⚠️ Erro ao baixar do CDN:', error.message);
+            
+            // Fallback para API do GitHub
+            try {
+                return await this.fetchImageFromGitHubAPI(url);
+            } catch (apiError) {
+                console.error('❌ Erro também na API do GitHub:', apiError);
+                throw apiError;
+            }
+        }
+    }
+
+    /**
+     * Baixar imagem direto da API do GitHub (fallback quando CDN falha)
+     */
+    async fetchImageFromGitHubAPI(cdnUrl) {
+        try {
+            console.log('🔄 Tentando baixar via API do GitHub...');
+            
+            // Extrair path do arquivo da URL do CDN
+            const match = cdnUrl.match(/githubusercontent\.com\/[^\/]+\/[^\/]+\/[^\/]+\/(.+?)(\?|$)/);
+            if (!match) {
+                throw new Error('URL inválida - não é do GitHub');
+            }
+            
+            const filePath = match[1];
+            
+            // Verificar se CONFIG e githubAPI estão disponíveis
+            if (typeof CONFIG === 'undefined' || typeof githubAPI === 'undefined') {
+                throw new Error('CONFIG ou githubAPI não disponível');
+            }
+
+            // Construir URL da API
+            const apiUrl = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/${filePath}`;
+            
+            console.log(`📡 API URL: ${apiUrl}`);
+            
+            // Buscar arquivo via API
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${githubAPI.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API retornou ${response.status}`);
+            }
+
+            const data = await response.json();
+            const base64Content = data.content.replace(/\n/g, '');
+            
+            // Determinar MIME type
+            const ext = filePath.split('.').pop().toLowerCase();
+            const mimeType = ext === 'png' ? 'image/png' : 
+                            ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+                            ext === 'svg' ? 'image/svg+xml' : 'image/png';
+            
+            // Criar Data URL
+            const dataUrl = `data:${mimeType};base64,${base64Content}`;
+            
+            console.log(`✅ Imagem baixada via API (${(base64Content.length / 1024).toFixed(2)} KB)`);
+            
+            return dataUrl;
+            
+        } catch (error) {
+            console.error('❌ Erro ao baixar da API:', error);
             throw error;
         }
     }
