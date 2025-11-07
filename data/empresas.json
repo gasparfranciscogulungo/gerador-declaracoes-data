@@ -73,6 +73,32 @@
       "createdAt": "2025-11-07T09:09:52.249Z",
       "updatedAt": "2025-11-07T09:09:52.249Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1762511408657",
+      "nome": "test",
+      "nif": "6361279",
+      "endereco": {
+        "rua": "test",
+        "edificio": "test",
+        "andar": "test",
+        "sala": "test",
+        "bairro": "test",
+        "municipio": "test",
+        "provincia": "test",
+        "pais": "test"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/6361279/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/6361279/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-07T10:30:08.657Z",
+      "updatedAt": "2025-11-07T10:30:08.657Z",
+      "contador": 0
     }
   ]
 }
