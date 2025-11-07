@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Direto de Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px; }
+        button:hover { background: #0056b3; }
+        input[type="file"] { margin: 10px 0; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .loading { display: none; text-align: center; margin: 20px 0; }
+        .loading.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Teste Direto de Upload GitHub</h1>
+        
+        <div class="info result">
+            <strong>📝 Instruções:</strong><br>
+            1. Selecione uma imagem pequena (PNG, JPG)<br>
+            2. Clique em "Testar Upload"<br>
+            3. Aguarde o resultado
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*">
+        <br>
+        <button onclick="testDirectUpload()">📤 Testar Upload</button>
+        <button onclick="clearResults()">🗑️ Limpar</button>
+
+        <div class="loading" id="loading">
+            <p>⏳ Processando...</p>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const TOKEN = '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';
+        const OWNER = 'gasparfranciscogulungo';
+        const REPO = 'gerador-declaracoes-data';
+        const BRANCH = 'master';
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            loading.className = show ? 'loading active' : 'loading';
+        }
+
+        async function testDirectUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                log('❌ Por favor, selecione uma imagem primeiro!', 'error');
+                return;
+            }
+
+            clearResults();
+            showLoading(true);
+
+            try {
+                // 1. Converter para Base64
+                log('🔄 Convertendo imagem para Base64...', 'info');
+                const base64 = await fileToBase64(file);
+                const base64Clean = base64.split(',')[1]; // Remove data:image/...;base64,
+                
+                log(`✅ Base64 gerado: ${base64Clean.length} caracteres`, 'success');
+
+                // 2. Verificar permissões do token
+                log('🔐 Verificando permissões do token...', 'info');
+                const userResponse = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error(`Erro de autenticação: ${userResponse.status}`);
+                }
+
+                const userData = await userResponse.json();
+                const scopes = userResponse.headers.get('X-OAuth-Scopes');
+                
+                log(`✅ Usuário autenticado: ${userData.login}`, 'success');
+                log(`📋 Scopes do token: ${scopes || 'Nenhum'}`, scopes ? 'success' : 'error');
+
+                if (!scopes || (!scopes.includes('repo') && !scopes.includes('public_repo'))) {
+                    log('⚠️ AVISO: Token pode não ter permissões de escrita!', 'error');
+                    log('💡 Scope "repo" ou "public_repo" necessário', 'info');
+                }
+
+                // 3. Fazer upload
+                const timestamp = Date.now();
+                const filename = `test-${timestamp}.${file.name.split('.').pop()}`;
+                const path = `assets/test-uploads/${filename}`;
+
+                log(`📤 Fazendo upload: ${path}`, 'info');
+
+                const uploadResponse = await fetch(
+                    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Test upload: ${filename}`,
+                            content: base64Clean,
+                            branch: BRANCH
+                        })
+                    }
+                );
+
+                showLoading(false);
+
+                if (uploadResponse.ok) {
+                    const result = await uploadResponse.json();
+                    
+                    log('🎉 <strong>UPLOAD BEM-SUCEDIDO!</strong>', 'success');
+                    log(`📁 Arquivo: ${result.content.path}`, 'success');
+                    log(`🔗 URL: <a href="${result.content.download_url}" target="_blank">${result.content.download_url}</a>`, 'success');
+                    log(`📊 SHA: ${result.content.sha}`, 'info');
+                    
+                    log(`<img src="${result.content.download_url}" style="max-width: 400px; margin-top: 10px; border-radius: 5px;">`, 'success');
+
+                    // Perguntar se quer deletar
+                    log(`<button onclick="deleteTestFile('${path}', '${result.content.sha}')">🗑️ Deletar arquivo de teste</button>`, 'info');
+
+                } else {
+                    const error = await uploadResponse.json();
+                    
+                    log(`❌ <strong>ERRO ${uploadResponse.status}: ${uploadResponse.statusText}</strong>`, 'error');
+                    log(`<pre>${JSON.stringify(error, null, 2)}</pre>`, 'error');
+
+                    if (uploadResponse.status === 401) {
+                        log('🚨 <strong>Erro 401: Token inválido ou sem permissões</strong>', 'error');
+                        log('💡 Solução: Gere novo token com scope "repo" em: <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a>', 'info');
+                    } else if (uploadResponse.status === 403) {
+                        log('🚨 <strong>Erro 403: Acesso negado</strong>', 'error');
+                        log('💡 Token não pertence ao dono do repositório?', 'info');
+                    } else if (uploadResponse.status === 404) {
+                        log('🚨 <strong>Erro 404: Repositório não encontrado</strong>', 'error');
+                        log('💡 Verifique se owner/repo estão corretos', 'info');
+                    }
+                }
+
+            } catch (error) {
+                showLoading(false);
+                log(`❌ <strong>Erro:</strong> ${error.message}`, 'error');
+                console.error('Erro completo:', error);
+            }
+        }
+
+        async function deleteTestFile(path, sha) {
+            if (!confirm('Deletar arquivo de teste?')) return;
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `token ${TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Delete test file: ${path}`,
+                            sha: sha,
+                            branch: BRANCH
+                        })
+                    }
+                );
+
+                showLoading(false);
+
+                if (response.ok) {
+                    log('✅ Arquivo de teste deletado com sucesso!', 'success');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Erro ao deletar: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showLoading(false);
+                log(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Upload GitHub</title>
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+</head>
+<body>
+    <h1>Teste Upload GitHub</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="testUpload()">Enviar Teste</button>
+    <div id="result"></div>
+
+    <script>
+        // Configurar GitHubAPI
+        const token = localStorage.getItem('pdfsigner_github_token');
+        if (!token) {
+            document.getElementById('result').innerHTML = '<p style="color: red;">❌ Token não encontrado! Faça login primeiro.</p>';
+        } else {
+            githubAPI.setToken(token);
+            githubAPI.configurar(CONFIG.github);
+            document.getElementById('result').innerHTML = '<p style="color: green;">✅ Token encontrado e configurado</p>';
+        }
+
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Selecione uma imagem primeiro!');
+                return;
+            }
+
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>🔄 Processando...</p>';
+
+            try {
+                // Converter para base64
+                const base64 = await fileToBase64(file);
+                console.log('✅ Base64 gerado:', base64.substring(0, 100) + '...');
+
+                // Upload
+                result.innerHTML += '<p>📤 Enviando para GitHub...</p>';
+                const response = await githubAPI.uploadFile(
+                    `assets/test-upload/${Date.now()}.png`,
+                    base64,
+                    'Teste de upload'
+                );
+
+                console.log('✅ Upload response:', response);
+                result.innerHTML += `<p style="color: green;">✅ Upload bem-sucedido!</p>`;
+                result.innerHTML += `<p>URL: <a href="${response.url}" target="_blank">${response.url}</a></p>`;
+                result.innerHTML += `<img src="${response.url}" style="max-width: 300px">`;
+
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                result.innerHTML += `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+</body>
+</html>

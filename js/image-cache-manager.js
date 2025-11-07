@@ -64,6 +64,38 @@ class ImageCacheManager {
     }
 
     /**
+     * Verificar se URL está acessível (aguarda disponibilidade no CDN)
+     * Útil após upload - espera propagação do GitHub CDN
+     */
+    async waitForImageAvailability(url, maxRetries = 10, delayMs = 2000) {
+        console.log(`⏳ Aguardando disponibilidade: ${url.substring(0, 60)}...`);
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await fetch(url, { 
+                    method: 'HEAD',
+                    cache: 'no-cache' 
+                });
+                
+                if (response.ok) {
+                    console.log(`✅ Imagem disponível após ${attempt} tentativa(s)`);
+                    return true;
+                }
+            } catch (error) {
+                // Continua tentando
+            }
+            
+            if (attempt < maxRetries) {
+                console.log(`🔄 Tentativa ${attempt}/${maxRetries} - Aguardando ${delayMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        }
+        
+        console.warn(`⚠️ Imagem não disponível após ${maxRetries} tentativas`);
+        return false;
+    }
+
+    /**
      * Buscar imagem no cache
      */
     async getFromCache(url) {

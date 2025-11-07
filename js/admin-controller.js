@@ -1247,6 +1247,17 @@ function adminApp() {
                 this.empresaForm.logoPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
 
+                // Salvar no cache do ImageCacheManager para uso futuro
+                if (typeof imageCacheManager !== 'undefined') {
+                    await imageCacheManager.saveToCache(githubUrl, base64Content);
+                    console.log('📦 Imagem salva no cache IndexedDB');
+                }
+
+                // Forçar re-render do Alpine.js para atualizar preview visual
+                this.$nextTick(() => {
+                    console.log('🔄 Preview visual atualizado');
+                });
+
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Logo enviado e verificado!';
                 console.log('📊 Progresso: 100% - Concluído!');
@@ -1456,6 +1467,17 @@ function adminApp() {
                 this.empresaForm.carimbo = githubUrl; // URL CDN (para salvar)
                 this.empresaForm.carimboPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
+
+                // Salvar no cache do ImageCacheManager para uso futuro
+                if (typeof imageCacheManager !== 'undefined') {
+                    await imageCacheManager.saveToCache(githubUrl, base64Content);
+                    console.log('📦 Imagem salva no cache IndexedDB');
+                }
+
+                // Forçar re-render do Alpine.js para atualizar preview visual
+                this.$nextTick(() => {
+                    console.log('🔄 Preview visual atualizado');
+                });
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Carimbo enviado e verificado!';

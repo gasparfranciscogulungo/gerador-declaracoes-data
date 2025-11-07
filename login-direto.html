@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Rápido - Gerador de Declarações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/auth-manager.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+            🔐 Login Rápido (Desenvolvimento)
+        </h1>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    ⚠️
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>MODO DESENVOLVIMENTO</strong><br>
+                        Token temporário para testes. <br>
+                        <strong>Atualizar após validação!</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="loginForm">
+            <p class="text-gray-600 mb-4">
+                Login automático com token de desenvolvimento configurado.
+            </p>
+            
+            <button 
+                onclick="loginAutomatico()" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center space-x-2"
+            >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Entrar com GitHub (Dev)</span>
+            </button>
+
+            <div class="mt-4 text-center">
+                <a href="login.html" class="text-blue-600 hover:text-blue-800 text-sm">
+                    Ou fazer login manual →
+                </a>
+            </div>
+        </div>
+
+        <div id="loginStatus" class="hidden mt-6">
+            <div class="flex items-center justify-center space-x-2">
+                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-gray-700" id="statusMessage">Autenticando...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Token de desenvolvimento (TEMPORÁRIO - ATUALIZAR DEPOIS!)
+        const DEV_TOKEN = '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';
+
+        async function loginAutomatico() {
+            const loginForm = document.getElementById('loginForm');
+            const loginStatus = document.getElementById('loginStatus');
+            const statusMessage = document.getElementById('statusMessage');
+
+            try {
+                // Mostrar status
+                loginForm.classList.add('hidden');
+                loginStatus.classList.remove('hidden');
+
+                // Configurar GitHub API
+                githubAPI.setToken(DEV_TOKEN);
+                githubAPI.configurar(CONFIG.github);
+
+                statusMessage.textContent = 'Verificando permissões...';
+
+                // Verificar usuário
+                const user = await githubAPI.getAuthenticatedUser();
+                
+                console.log('✅ Usuário autenticado:', user.login);
+
+                // Salvar no localStorage (MESMO LOCAL QUE O SISTEMA USA)
+                localStorage.setItem('pdfsigner_github_token', DEV_TOKEN);
+                localStorage.setItem('github_user', JSON.stringify(user));
+                localStorage.setItem('username', user.login);
+
+                statusMessage.textContent = 'Login bem-sucedido! Redirecionando...';
+
+                // Aguardar 1 segundo para feedback visual
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Redirecionar para admin
+                window.location.href = 'admin.html';
+
+            } catch (error) {
+                console.error('❌ Erro no login:', error);
+                
+                loginForm.classList.remove('hidden');
+                loginStatus.classList.add('hidden');
+
+                alert('❌ Erro no login: ' + error.message + '\n\nO token pode estar inválido ou sem permissões.');
+            }
+        }
+
+        // Auto-verificar se já está logado
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('pdfsigner_github_token');
+            const user = localStorage.getItem('github_user');
+
+            if (token && user) {
+                console.log('✅ Usuário já logado');
+                
+                // Perguntar se quer continuar logado
+                if (confirm('Você já está logado. Ir para o painel admin?')) {
+                    window.location.href = 'admin.html';
+                } else {
+                    // Limpar e permitir novo login
+                    localStorage.clear();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

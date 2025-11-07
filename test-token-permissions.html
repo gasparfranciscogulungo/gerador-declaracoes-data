@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Token GitHub</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #fff; }
+        h1 { color: #4CAF50; }
+        .test { margin: 10px 0; padding: 10px; background: #2d2d2d; border-radius: 5px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        pre { background: #000; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #45a049; }
+    </style>
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+</head>
+<body>
+    <h1>🔍 Diagnóstico Completo do Token GitHub</h1>
+    <button onclick="runFullDiagnosis()">▶️ Executar Diagnóstico Completo</button>
+    <button onclick="clearResults()">🗑️ Limpar Resultados</button>
+    <div id="results"></div>
+
+    <script>
+        const results = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const colors = {
+                success: '#4CAF50',
+                error: '#f44336',
+                warning: '#ff9800',
+                info: '#2196F3'
+            };
+            results.innerHTML += `<div class="test" style="border-left: 4px solid ${colors[type]}">
+                <span class="${type}">${message}</span>
+            </div>`;
+        }
+
+        function logObject(title, obj) {
+            results.innerHTML += `<div class="test">
+                <strong class="info">${title}:</strong>
+                <pre>${JSON.stringify(obj, null, 2)}</pre>
+            </div>`;
+        }
+
+        function clearResults() {
+            results.innerHTML = '';
+        }
+
+        async function runFullDiagnosis() {
+            clearResults();
+            log('🚀 Iniciando diagnóstico completo...', 'info');
+            
+            // Teste 1: Verificar token no localStorage
+            log('<h2>📦 1. Verificação do Token Local</h2>', 'info');
+            const token = localStorage.getItem('pdfsigner_github_token');
+            
+            if (!token) {
+                log('❌ Token não encontrado no localStorage!', 'error');
+                log('💡 Solução: Faça login em login.html', 'warning');
+                return;
+            }
+            
+            log(`✅ Token encontrado: ${token.substring(0, 10)}...${token.substring(token.length - 4)}`, 'success');
+            log(`📏 Tamanho do token: ${token.length} caracteres`, 'info');
+            
+            // Teste 2: Configurar GitHub API
+            log('<h2>⚙️ 2. Configuração do GitHub API</h2>', 'info');
+            githubAPI.setToken(token);
+            githubAPI.configurar(CONFIG.github);
+            
+            logObject('Configuração', {
+                owner: githubAPI.owner,
+                repo: githubAPI.repo,
+                branch: githubAPI.branch,
+                baseURL: githubAPI.baseURL
+            });
+
+            // Teste 3: Verificar usuário autenticado
+            log('<h2>👤 3. Teste de Autenticação</h2>', 'info');
+            try {
+                const user = await githubAPI.getAuthenticatedUser();
+                log(`✅ Usuário autenticado: ${user.login}`, 'success');
+                logObject('Dados do usuário', {
+                    login: user.login,
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    type: user.type
+                });
+            } catch (error) {
+                log(`❌ Falha na autenticação: ${error.message}`, 'error');
+                log('💡 Token inválido ou expirado. Gere um novo token.', 'warning');
+                return;
+            }
+
+            // Teste 4: Verificar permissões do token
+            log('<h2>🔐 4. Análise de Permissões do Token</h2>', 'info');
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                const scopes = response.headers.get('X-OAuth-Scopes');
+                const scopesArray = scopes ? scopes.split(', ') : [];
+                
+                log(`📋 Scopes detectados: ${scopes || 'Nenhum'}`, scopes ? 'info' : 'warning');
+                
+                // Verificar scopes necessários
+                const requiredScopes = ['repo', 'workflow'];
+                const hasRepo = scopesArray.includes('repo') || scopesArray.includes('public_repo');
+                const hasWorkflow = scopesArray.includes('workflow');
+                
+                if (hasRepo) {
+                    log('✅ Scope "repo" ou "public_repo" presente', 'success');
+                } else {
+                    log('❌ PROBLEMA: Scope "repo" ausente!', 'error');
+                    log('💡 Este é o problema principal. Token precisa do scope "repo".', 'warning');
+                }
+                
+                if (hasWorkflow) {
+                    log('✅ Scope "workflow" presente', 'success');
+                } else {
+                    log('⚠️ Scope "workflow" ausente (opcional)', 'warning');
+                }
+                
+                logObject('Todos os scopes', scopesArray);
+                
+            } catch (error) {
+                log(`❌ Erro ao verificar scopes: ${error.message}`, 'error');
+            }
+
+            // Teste 5: Testar leitura do repositório
+            log('<h2>📖 5. Teste de Leitura do Repositório</h2>', 'info');
+            try {
+                const repoInfo = await fetch(`https://api.github.com/repos/${githubAPI.owner}/${githubAPI.repo}`, {
+                    headers: githubAPI.getHeaders()
+                });
+                
+                if (repoInfo.ok) {
+                    const repo = await repoInfo.json();
+                    log(`✅ Repositório acessível: ${repo.full_name}`, 'success');
+                    logObject('Info do repositório', {
+                        name: repo.name,
+                        private: repo.private,
+                        default_branch: repo.default_branch,
+                        permissions: repo.permissions
+                    });
+                } else {
+                    log(`❌ Erro ao acessar repositório: ${repoInfo.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erro: ${error.message}`, 'error');
+            }
+
+            // Teste 6: Testar escrita (criar arquivo de teste)
+            log('<h2>✍️ 6. Teste de Escrita (Upload)</h2>', 'info');
+            try {
+                const testPath = `assets/test-diagnostic/${Date.now()}.txt`;
+                const testContent = btoa('Test upload - ' + new Date().toISOString());
+                
+                log(`📤 Tentando criar arquivo: ${testPath}`, 'info');
+                
+                const uploadResponse = await fetch(`https://api.github.com/repos/${githubAPI.owner}/${githubAPI.repo}/contents/${testPath}`, {
+                    method: 'PUT',
+                    headers: githubAPI.getHeaders(),
+                    body: JSON.stringify({
+                        message: 'Test diagnostic upload',
+                        content: testContent,
+                        branch: githubAPI.branch
+                    })
+                });
+
+                if (uploadResponse.ok) {
+                    const result = await uploadResponse.json();
+                    log('✅ SUCESSO! Upload funcionou!', 'success');
+                    log(`🔗 Arquivo criado: ${result.content.path}`, 'success');
+                    log(`🌐 URL: ${result.content.download_url}`, 'info');
+                    
+                    // Tentar deletar o arquivo de teste
+                    try {
+                        await fetch(`https://api.github.com/repos/${githubAPI.owner}/${githubAPI.repo}/contents/${testPath}`, {
+                            method: 'DELETE',
+                            headers: githubAPI.getHeaders(),
+                            body: JSON.stringify({
+                                message: 'Delete test file',
+                                sha: result.content.sha,
+                                branch: githubAPI.branch
+                            })
+                        });
+                        log('🗑️ Arquivo de teste removido', 'info');
+                    } catch (e) {
+                        log('⚠️ Não foi possível remover arquivo de teste', 'warning');
+                    }
+                } else {
+                    const errorData = await uploadResponse.json();
+                    log(`❌ PROBLEMA ENCONTRADO: ${uploadResponse.status}`, 'error');
+                    logObject('Detalhes do erro', errorData);
+                    
+                    if (uploadResponse.status === 401) {
+                        log('🚨 Erro 401: Token sem permissões de escrita!', 'error');
+                        log('💡 Solução: Gere novo token com scope "repo"', 'warning');
+                    } else if (uploadResponse.status === 403) {
+                        log('🚨 Erro 403: Acesso negado!', 'error');
+                        log('💡 Verifique se o token pertence ao dono do repositório', 'warning');
+                    } else if (uploadResponse.status === 404) {
+                        log('🚨 Erro 404: Repositório não encontrado!', 'error');
+                        log('💡 Verifique owner/repo no config.js', 'warning');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Erro no teste de escrita: ${error.message}`, 'error');
+            }
+
+            // Teste 7: Resumo final
+            log('<h2>📊 7. Resumo e Recomendações</h2>', 'info');
+            log('Se todos os testes passaram: ✅ Sistema pronto para uso!', 'success');
+            log('Se teste 6 falhou com 401: 🔑 Gere novo token com scope "repo"', 'warning');
+            log('Se teste 6 falhou com 404: 📂 Verifique owner/repo no config.js', 'warning');
+            log('Se teste 6 falhou com 403: 👤 Token não pertence ao dono do repo', 'warning');
+        }
+    </script>
+</body>
+</html>
