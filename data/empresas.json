@@ -95,6 +95,32 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-11-07T10:38:02.612Z"
+    },
+    {
+      "id": "empresa_1762512081953",
+      "nome": "test 3",
+      "nif": "test 3",
+      "endereco": {
+        "rua": "jjklç",
+        "edificio": "jkl",
+        "andar": "jlç",
+        "sala": "jlkç",
+        "bairro": "jklç",
+        "municipio": "jkç",
+        "provincia": "kç",
+        "pais": "jkç"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/test3/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/test3/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-07T10:41:21.953Z",
+      "updatedAt": "2025-11-07T10:41:21.953Z",
+      "contador": 0
     }
   ]
 }
