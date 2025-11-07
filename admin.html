@@ -263,18 +263,30 @@
                         <div class="flex items-start justify-between">
                             <!-- Lado Esquerdo: Logo + Dados -->
                             <div class="flex items-start space-x-6 flex-1">
-                                <!-- Logo -->
-                                <div class="flex-shrink-0">
-                                    <template x-if="empresa.logoPreview || empresa.logo">
-                                        <img :src="empresa.logoPreview || empresa.logo" 
-                                             :alt="empresa.nome" 
-                                             class="w-24 h-24 object-contain rounded-lg border-2 border-gray-200 bg-white p-2">
-                                    </template>
-                                    <template x-if="!empresa.logoPreview && !empresa.logo">
-                                        <div class="w-24 h-24 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-gray-100">
-                                            <i class="bi bi-building text-4xl text-gray-400"></i>
-                                        </div>
-                                    </template>
+                                <!-- Logo e Carimbo -->
+                                <div class="flex-shrink-0 space-y-2">
+                                    <!-- Logo -->
+                                    <div>
+                                        <p class="text-xs text-gray-500 mb-1">Logo</p>
+                                        <template x-if="empresa.logoPreview || empresa.logo">
+                                            <img :src="empresa.logoPreview || empresa.logo" 
+                                                 :alt="empresa.nome" 
+                                                 class="w-24 h-24 object-contain rounded-lg border-2 border-gray-200 bg-white p-2">
+                                        </template>
+                                        <template x-if="!empresa.logoPreview && !empresa.logo">
+                                            <div class="w-24 h-24 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-gray-100">
+                                                <i class="bi bi-building text-4xl text-gray-400"></i>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    
+                                    <!-- Carimbo -->
+                                    <div x-show="empresa.carimboPreview || empresa.carimbo">
+                                        <p class="text-xs text-gray-500 mb-1">Carimbo</p>
+                                        <img :src="empresa.carimboPreview || empresa.carimbo" 
+                                             :alt="empresa.nome + ' - Carimbo'" 
+                                             class="w-24 h-24 object-contain rounded-lg border-2 border-green-200 bg-white p-2">
+                                    </div>
                                 </div>
 
                                 <!-- Dados Principais -->

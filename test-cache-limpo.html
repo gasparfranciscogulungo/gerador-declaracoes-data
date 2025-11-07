@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>🧪 Teste: Cache Limpo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🧪 Teste: Como Funciona com Cache Limpo</h1>
+        
+        <div class="bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl mb-4">📋 Cenário de Teste</h2>
+            <p class="mb-4">Este teste simula quando você:</p>
+            <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                <li>Limpa o cache do navegador (Ctrl+Shift+Del)</li>
+                <li>Ou limpa o IndexedDB manualmente</li>
+                <li>Abre a página pela primeira vez</li>
+                <li>CDN do GitHub ainda não propagou (404)</li>
+            </ol>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button onclick="limparCache()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded font-bold">
+                🗑️ 1. LIMPAR CACHE
+            </button>
+            <button onclick="carregarImagem()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-bold">
+                🔄 2. CARREGAR IMAGEM
+            </button>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg mb-6">
+            <h2 class="text-xl mb-4">📊 Log do Sistema</h2>
+            <div id="log" class="font-mono text-sm bg-black p-4 rounded max-h-96 overflow-y-auto"></div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg">
+            <h2 class="text-xl mb-4">🖼️ Resultado</h2>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/image-cache-manager.js"></script>
+    <script>
+        const TOKEN = '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';
+        const TEST_URL = 'https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/logo.png';
+
+        function log(msg, color = '#00ff00') {
+            const div = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            div.innerHTML += `<div style="color: ${color}">[${time}] ${msg}</div>`;
+            div.scrollTop = div.scrollHeight;
+            console.log(msg);
+        }
+
+        async function limparCache() {
+            log('🗑️ Limpando cache...', '#ff9800');
+            await imageCacheManager.clearAllCache();
+            log('✅ Cache limpo!', '#00ff00');
+            document.getElementById('result').innerHTML = '';
+        }
+
+        async function carregarImagem() {
+            log('\n🚀 Iniciando teste de carregamento...', '#00bfff');
+            log('📍 URL: ' + TEST_URL, '#888');
+            
+            // Configurar token
+            githubAPI.setToken(TOKEN);
+            
+            try {
+                log('\n1️⃣ Verificando cache...', '#00bfff');
+                const cached = await imageCacheManager.getFromCache(TEST_URL);
+                
+                if (cached) {
+                    log('📦 CACHE HIT - Imagem encontrada!', '#00ff00');
+                    mostrarImagem(cached);
+                    return;
+                }
+                
+                log('📭 CACHE MISS - Imagem não está no cache', '#ff9800');
+                
+                log('\n2️⃣ Tentando baixar do CDN...', '#00bfff');
+                let dataUrl;
+                try {
+                    dataUrl = await imageCacheManager.fetchImageAsDataURL(TEST_URL);
+                    log('✅ Imagem baixada com sucesso!', '#00ff00');
+                } catch (error) {
+                    log(`❌ Erro ao baixar: ${error.message}`, '#ff0000');
+                    return;
+                }
+                
+                log('\n3️⃣ Salvando no cache...', '#00bfff');
+                await imageCacheManager.saveToCache(TEST_URL, dataUrl);
+                log('💾 Imagem salva no cache IndexedDB', '#00ff00');
+                
+                log('\n4️⃣ Mostrando imagem...', '#00bfff');
+                mostrarImagem(dataUrl);
+                
+                log('\n✅ TESTE CONCLUÍDO!', '#00ff00');
+                log('📊 Próximas carregamentos usarão o cache', '#888');
+                
+            } catch (error) {
+                log(`\n❌ ERRO GERAL: ${error.message}`, '#ff0000');
+                console.error(error);
+            }
+        }
+
+        function mostrarImagem(dataUrl) {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div class="bg-gray-700 p-4 rounded">
+                    <p class="text-green-400 mb-4 font-bold">✅ Imagem Carregada com Sucesso!</p>
+                    <img src="${dataUrl}" class="max-w-full border-4 border-green-500 rounded">
+                    <p class="text-sm text-gray-400 mt-4">
+                        Tamanho: ${(dataUrl.length / 1024).toFixed(2)} KB
+                    </p>
+                </div>
+            `;
+        }
+
+        // Verificar cache ao carregar
+        (async () => {
+            log('✅ Sistema carregado', '#00ff00');
+            log('👉 Clique em "LIMPAR CACHE" e depois "CARREGAR IMAGEM"', '#888');
+            
+            const stats = await imageCacheManager.getCacheStats();
+            log(`\n📦 Cache atual: ${stats.count} imagens (${stats.totalSizeMB} MB)`, '#888');
+        })();
+    </script>
+</body>
+</html>

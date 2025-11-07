@@ -1666,8 +1666,19 @@ function adminApp() {
         },
         
         getEmpresaExemplo() {
-            // Retorna primeira empresa cadastrada ou dados fake
-            return this.empresas[0] || {
+            // Retorna primeira empresa cadastrada (com imagens do cache) ou dados fake
+            if (this.empresas.length > 0) {
+                const empresa = this.empresas[0];
+                // Usar preview do cache se disponível
+                return {
+                    ...empresa,
+                    logo: empresa.logoPreview || empresa.logo || '',
+                    carimbo: empresa.carimboPreview || empresa.carimbo || ''
+                };
+            }
+            
+            // Fallback para dados fake
+            return {
                 nome: 'EMPRESA EXEMPLO LDA',
                 nif: '1234567890',
                 endereco: {
