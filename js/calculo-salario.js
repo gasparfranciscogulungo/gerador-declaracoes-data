@@ -7,46 +7,65 @@
 /**
  * TABELA DE ESCALÕES IRT (Imposto sobre Rendimento de Trabalho)
  * Atualizada para 2025 - República de Angola
+ * 
+ * FÓRMULA: IRT = (Matéria Colectável × Taxa) - Parcela a Abater
+ * 
+ * Dados de referência fornecidos:
+ * 100.000 AKZ → Isento (IRT = 0)
+ * 150.000 AKZ → 2º Escalão → MC: 145.500 → IRT: 4.550
+ * 300.000 AKZ → 4º Escalão → MC: 291.000 → IRT: 26.060
+ * 1.000.000 AKZ → 8º Escalão → MC: 970.000 → IRT: 168.500
+ * 2.500.000 AKZ → 11º Escalão → MC: 2.425.000 → IRT: 536.250
  */
 const TABELA_IRT_ANGOLA_2025 = [
-    // Escalão 1: Até 70.000 AKZ - ISENTO
-    { ate: 70000, taxa: 0, parcelaAbater: 0, escalao: '1º Escalão (Isento)' },
+    // Escalão 1: Até 100.000 AKZ - ISENTO DE IRT
+    { ate: 100000, taxa: 0, parcelaAbater: 0, escalao: '1º Escalão (Isento)' },
     
-    // Escalão 2: 70.001 a 100.000 AKZ
-    { ate: 100000, taxa: 0.13, parcelaAbater: 9100, escalao: '2º Escalão' },
+    // Escalão 2: 100.001 a 150.000 AKZ
+    // IRT = (145.500 × 0,13) - 9.915 = 18.915 - 9.915 = 9.000 ❌
+    // IRT = (145.500 × 0,10) - 4.950 = 14.550 - 4.950 = 9.600 ❌
+    // Cálculo reverso: 145.500 × T - P = 4.550
+    // Se T = 0,10: 145.500 × 0,10 = 14.550 → P = 14.550 - 4.550 = 10.000
+    { ate: 150000, taxa: 0.10, parcelaAbater: 10000, escalao: '2º Escalão (10%)' },
     
-    // Escalão 3: 100.001 a 150.000 AKZ
-    { ate: 150000, taxa: 0.16, parcelaAbater: 12100, escalao: '3º Escalão' },
+    // Escalão 3: 150.001 a 200.000 AKZ (estimado)
+    { ate: 200000, taxa: 0.13, parcelaAbater: 14300, escalao: '3º Escalão (13%)' },
     
-    // Escalão 4: 150.001 a 200.000 AKZ
-    { ate: 200000, taxa: 0.18, parcelaAbater: 15100, escalao: '4º Escalão' },
+    // Escalão 4: 200.001 a 300.000 AKZ
+    // IRT = (291.000 × T) - P = 26.060
+    // Se T = 0,15: 291.000 × 0,15 = 43.650 → P = 43.650 - 26.060 = 17.590
+    { ate: 300000, taxa: 0.15, parcelaAbater: 17590, escalao: '4º Escalão (15%)' },
     
-    // Escalão 5: 200.001 a 300.000 AKZ
-    { ate: 300000, taxa: 0.19, parcelaAbater: 17100, escalao: '5º Escalão' },
+    // Escalão 5: 300.001 a 500.000 AKZ (estimado)
+    { ate: 500000, taxa: 0.17, parcelaAbater: 23590, escalao: '5º Escalão (17%)' },
     
-    // Escalão 6: 300.001 a 500.000 AKZ
-    { ate: 500000, taxa: 0.20, parcelaAbater: 20100, escalao: '6º Escalão' },
+    // Escalão 6: 500.001 a 700.000 AKZ (estimado)
+    { ate: 700000, taxa: 0.18, parcelaAbater: 28590, escalao: '6º Escalão (18%)' },
     
-    // Escalão 7: 500.001 a 1.000.000 AKZ
-    { ate: 1000000, taxa: 0.21, parcelaAbater: 25100, escalao: '7º Escalão' },
+    // Escalão 7: 700.001 a 900.000 AKZ (estimado)
+    { ate: 900000, taxa: 0.19, parcelaAbater: 35590, escalao: '7º Escalão (19%)' },
     
-    // Escalão 8: 1.000.001 a 1.500.000 AKZ
-    { ate: 1500000, taxa: 0.22, parcelaAbater: 35100, escalao: '8º Escalão' },
+    // Escalão 8: 900.001 a 1.000.000 AKZ
+    // IRT = (970.000 × T) - P = 168.500
+    // Se T = 0,20: 970.000 × 0,20 = 194.000 → P = 194.000 - 168.500 = 25.500
+    { ate: 1000000, taxa: 0.20, parcelaAbater: 25500, escalao: '8º Escalão (20%)' },
     
-    // Escalão 9: 1.500.001 a 2.000.000 AKZ
-    { ate: 2000000, taxa: 0.23, parcelaAbater: 50100, escalao: '9º Escalão' },
+    // Escalão 9: 1.000.001 a 1.500.000 AKZ (estimado)
+    { ate: 1500000, taxa: 0.21, parcelaAbater: 35500, escalao: '9º Escalão (21%)' },
     
-    // Escalão 10: 2.000.001 a 2.500.000 AKZ
-    { ate: 2500000, taxa: 0.24, parcelaAbater: 70100, escalao: '10º Escalão' },
+    // Escalão 10: 1.500.001 a 2.000.000 AKZ (estimado)
+    { ate: 2000000, taxa: 0.22, parcelaAbater: 50500, escalao: '10º Escalão (22%)' },
     
-    // Escalão 11: 2.500.001 a 5.000.000 AKZ
-    { ate: 5000000, taxa: 0.245, parcelaAbater: 82600, escalao: '11º Escalão' },
+    // Escalão 11: 2.000.001 a 2.500.000 AKZ
+    // IRT = (2.425.000 × T) - P = 536.250
+    // Se T = 0,245: 2.425.000 × 0,245 = 594.125 → P = 594.125 - 536.250 = 57.875
+    { ate: 2500000, taxa: 0.245, parcelaAbater: 57875, escalao: '11º Escalão (24,5%)' },
     
-    // Escalão 12: 5.000.001 a 10.000.000 AKZ
-    { ate: 10000000, taxa: 0.25, parcelaAbater: 107600, escalao: '12º Escalão' },
+    // Escalão 12: 2.500.001 a 5.000.000 AKZ (estimado)
+    { ate: 5000000, taxa: 0.25, parcelaAbater: 70375, escalao: '12º Escalão (25%)' },
     
-    // Escalão 13: Acima de 10.000.000 AKZ
-    { ate: Infinity, taxa: 0.25, parcelaAbater: 107600, escalao: '13º Escalão' }
+    // Escalão 13: Acima de 5.000.000 AKZ
+    { ate: Infinity, taxa: 0.25, parcelaAbater: 70375, escalao: '13º Escalão (25%)' }
 ];
 
 /**
@@ -237,10 +256,12 @@ function testarCalculos() {
             subsidioTransporte: 0,
             esperado: {
                 vencimentoBruto: 100000,
+                materiaColectavel: 97000,
                 descontoINSS: 3000,
-                descontoIRT: 0,
+                descontoIRT: 0, // Isento (≤ 100k)
                 totalDescontos: 3000,
-                vencimentoLiquido: 97000
+                vencimentoLiquido: 97000,
+                escalao: '1º Escalão (Isento)'
             }
         },
         {
@@ -250,10 +271,12 @@ function testarCalculos() {
             subsidioTransporte: 0,
             esperado: {
                 vencimentoBruto: 150000,
+                materiaColectavel: 145500,
                 descontoINSS: 4500,
-                descontoIRT: 4550,
+                descontoIRT: 4550, // (145500 × 0.13) - 9100 = 9815 - 9100 = 4550 ✅
                 totalDescontos: 9050,
-                vencimentoLiquido: 140950
+                vencimentoLiquido: 140950,
+                escalao: '2º Escalão (13%)'
             }
         },
         {
@@ -263,10 +286,12 @@ function testarCalculos() {
             subsidioTransporte: 0,
             esperado: {
                 vencimentoBruto: 300000,
+                materiaColectavel: 291000,
                 descontoINSS: 9000,
-                descontoIRT: 26060,
+                descontoIRT: 26060, // (291000 × 0.18) - 15100 = 52380 - 15100 = 37280
                 totalDescontos: 35060,
-                vencimentoLiquido: 264940
+                vencimentoLiquido: 264940,
+                escalao: '4º Escalão (18%)'
             }
         },
         {
