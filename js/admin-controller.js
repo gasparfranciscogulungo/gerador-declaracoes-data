@@ -1242,21 +1242,20 @@ function adminApp() {
                 const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
                 const base64Preview = `data:${mimeType};base64,${base64Content}`;
 
+                // Salvar no cache do ImageCacheManager PRIMEIRO (antes de atualizar UI)
+                if (typeof imageCacheManager !== 'undefined') {
+                    await imageCacheManager.saveToCache(githubUrl, base64Preview);
+                    console.log('📦 Imagem salva no cache IndexedDB');
+                }
+
                 // Atualizar ambos os campos
                 this.empresaForm.logo = githubUrl; // URL CDN (para salvar)
                 this.empresaForm.logoPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
 
-                // Salvar no cache do ImageCacheManager para uso futuro
-                if (typeof imageCacheManager !== 'undefined') {
-                    await imageCacheManager.saveToCache(githubUrl, base64Content);
-                    console.log('📦 Imagem salva no cache IndexedDB');
-                }
-
                 // Forçar re-render do Alpine.js para atualizar preview visual
-                this.$nextTick(() => {
-                    console.log('🔄 Preview visual atualizado');
-                });
+                await this.$nextTick();
+                console.log('🔄 Preview visual atualizado');
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Logo enviado e verificado!';
@@ -1463,21 +1462,20 @@ function adminApp() {
                 const mimeType = extensao === 'svg' ? 'image/svg+xml' : `image/${extensao}`;
                 const base64Preview = `data:${mimeType};base64,${base64Content}`;
 
+                // Salvar no cache do ImageCacheManager PRIMEIRO (antes de atualizar UI)
+                if (typeof imageCacheManager !== 'undefined') {
+                    await imageCacheManager.saveToCache(githubUrl, base64Preview);
+                    console.log('📦 Imagem salva no cache IndexedDB');
+                }
+
                 // Atualizar ambos os campos
                 this.empresaForm.carimbo = githubUrl; // URL CDN (para salvar)
                 this.empresaForm.carimboPreview = base64Preview; // Base64 (para preview)
                 console.log('✅ Formulário atualizado (URL + Preview)');
 
-                // Salvar no cache do ImageCacheManager para uso futuro
-                if (typeof imageCacheManager !== 'undefined') {
-                    await imageCacheManager.saveToCache(githubUrl, base64Content);
-                    console.log('📦 Imagem salva no cache IndexedDB');
-                }
-
                 // Forçar re-render do Alpine.js para atualizar preview visual
-                this.$nextTick(() => {
-                    console.log('🔄 Preview visual atualizado');
-                });
+                await this.$nextTick();
+                console.log('🔄 Preview visual atualizado');
 
                 this.uploadProgress = 100;
                 this.loadingMessage = '✅ Carimbo enviado e verificado!';
