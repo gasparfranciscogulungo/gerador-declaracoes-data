@@ -346,6 +346,9 @@ function adminApp() {
                         }
                     }
                     console.log('✅ Imagens carregadas do cache para todas as empresas');
+                    
+                    // Forçar re-render do Alpine.js
+                    await this.$nextTick();
                 }
             } catch (error) {
                 console.error('❌ Erro ao carregar empresas:', error);
@@ -1002,9 +1005,8 @@ function adminApp() {
             }
         },
 
-        editarEmpresa(empresa) {
-            // Adicionar timestamp nas URLs para forçar reload das imagens
-            const timestamp = new Date().getTime();
+        async editarEmpresa(empresa) {
+            console.log('📝 Editando empresa:', empresa.nome);
             
             // Preencher formulário com dados da empresa
             this.empresaForm = {
@@ -1015,14 +1017,33 @@ function adminApp() {
                 telefone: empresa.telefone || '',
                 email: empresa.email || '',
                 website: empresa.website || '',
-                logo: empresa.logo ? `${this.limparUrlCache(empresa.logo)}?v=${timestamp}` : '',
-                logoPreview: '', // Preview base64 (carregado depois)
-                carimbo: empresa.carimbo ? `${this.limparUrlCache(empresa.carimbo)}?v=${timestamp}` : '',
-                carimboPreview: '', // Preview base64 (carregado depois)
+                logo: empresa.logo || '',
+                logoPreview: empresa.logoPreview || '', // Usar preview do cache
+                carimbo: empresa.carimbo || '',
+                carimboPreview: empresa.carimboPreview || '', // Usar preview do cache
                 corPrimaria: empresa.corPrimaria || '#1e40af',
                 corSecundaria: empresa.corSecundaria || '#64748b',
                 marcaDagua: empresa.marcaDagua || ''
             };
+            
+            // Se não tiver preview, carregar do cache
+            if (empresa.logo && !this.empresaForm.logoPreview) {
+                console.log('📥 Carregando logo do cache para edição...');
+                const logoCache = await imageCacheManager.getImage(empresa.logo);
+                if (logoCache) {
+                    this.empresaForm.logoPreview = logoCache;
+                    console.log('✅ Logo carregado do cache');
+                }
+            }
+            
+            if (empresa.carimbo && !this.empresaForm.carimboPreview) {
+                console.log('📥 Carregando carimbo do cache para edição...');
+                const carimboCache = await imageCacheManager.getImage(empresa.carimbo);
+                if (carimboCache) {
+                    this.empresaForm.carimboPreview = carimboCache;
+                    console.log('✅ Carimbo carregado do cache');
+                }
+            }
             
             this.modalNovaEmpresa = true;
         },
@@ -1222,6 +1243,12 @@ function adminApp() {
                             return;
                         } else {
                             console.log('🔄 Imagem diferente detectada, será atualizada');
+                            
+                            // Limpar cache da imagem antiga
+                            if (typeof imageCacheManager !== 'undefined' && this.empresaForm.logo) {
+                                console.log('🗑️ Limpando cache do logo antigo...');
+                                await imageCacheManager.clearImage(this.empresaForm.logo);
+                            }
                         }
                     }
                 } catch (error) {
@@ -1442,6 +1469,12 @@ function adminApp() {
                             return;
                         } else {
                             console.log('🔄 Imagem diferente detectada, será atualizada');
+                            
+                            // Limpar cache do carimbo antigo
+                            if (typeof imageCacheManager !== 'undefined' && this.empresaForm.carimbo) {
+                                console.log('🗑️ Limpando cache do carimbo antigo...');
+                                await imageCacheManager.clearImage(this.empresaForm.carimbo);
+                            }
                         }
                     }
                 } catch (error) {
