@@ -314,6 +314,39 @@ function adminApp() {
                 const empresasData = response.data;
                 this.empresas = empresasData.empresas || [];
                 console.log(`✅ ${this.empresas.length} empresas carregadas`, this.empresas);
+                
+                // Carregar imagens do cache para cada empresa
+                if (typeof imageCacheManager !== 'undefined') {
+                    console.log('🖼️ Carregando imagens do cache para empresas...');
+                    for (const empresa of this.empresas) {
+                        // Carregar logo do cache
+                        if (empresa.logo && !empresa.logo.startsWith('data:')) {
+                            const logoCache = await imageCacheManager.getImage(empresa.logo);
+                            if (logoCache) {
+                                empresa.logoPreview = logoCache;
+                                console.log(`📦 Logo carregado do cache: ${empresa.nome}`);
+                            } else {
+                                empresa.logoPreview = empresa.logo; // Fallback para URL
+                            }
+                        } else {
+                            empresa.logoPreview = empresa.logo;
+                        }
+                        
+                        // Carregar carimbo do cache
+                        if (empresa.carimbo && !empresa.carimbo.startsWith('data:')) {
+                            const carimboCache = await imageCacheManager.getImage(empresa.carimbo);
+                            if (carimboCache) {
+                                empresa.carimboPreview = carimboCache;
+                                console.log(`📦 Carimbo carregado do cache: ${empresa.nome}`);
+                            } else {
+                                empresa.carimboPreview = empresa.carimbo; // Fallback para URL
+                            }
+                        } else {
+                            empresa.carimboPreview = empresa.carimbo;
+                        }
+                    }
+                    console.log('✅ Imagens carregadas do cache para todas as empresas');
+                }
             } catch (error) {
                 console.error('❌ Erro ao carregar empresas:', error);
                 if (error.message.includes('404')) {

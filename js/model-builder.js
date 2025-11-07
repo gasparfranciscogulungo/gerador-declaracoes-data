@@ -29,8 +29,8 @@ class ModelBuilder {
             if (!empresa) throw new Error('Empresa não encontrada');
             if (!trabalhador) throw new Error('Trabalhador não encontrado');
 
-            // 3. Construir placeholders
-            this.construirPlaceholders(empresa, trabalhador, typeModel);
+            // 3. Construir placeholders (ASYNC - aguarda cache de imagens)
+            await this.construirPlaceholders(empresa, trabalhador, typeModel);
 
             // 4. Montar conteúdo do type model
             const typeContent = this.montarTypeContent(typeModel.type_content);
@@ -57,7 +57,37 @@ class ModelBuilder {
 
     // ========== CONSTRUIR PLACEHOLDERS ==========
 
-    construirPlaceholders(empresa, trabalhador, typeModel) {
+    async construirPlaceholders(empresa, trabalhador, typeModel) {
+        // Carregar imagens do cache para uso no PDF
+        let logoParaPDF = empresa.logo;
+        let carimboParaPDF = empresa.carimbo;
+        
+        if (typeof imageCacheManager !== 'undefined') {
+            console.log('🖼️ Carregando imagens do cache para PDF...');
+            
+            // Logo
+            if (empresa.logo && !empresa.logo.startsWith('data:')) {
+                const logoCache = await imageCacheManager.getImage(empresa.logo);
+                if (logoCache) {
+                    logoParaPDF = logoCache;
+                    console.log('✅ Logo carregado do cache para PDF');
+                } else {
+                    console.warn('⚠️ Logo não encontrado no cache, usando URL');
+                }
+            }
+            
+            // Carimbo
+            if (empresa.carimbo && !empresa.carimbo.startsWith('data:')) {
+                const carimboCache = await imageCacheManager.getImage(empresa.carimbo);
+                if (carimboCache) {
+                    carimboParaPDF = carimboCache;
+                    console.log('✅ Carimbo carregado do cache para PDF');
+                } else {
+                    console.warn('⚠️ Carimbo não encontrado no cache, usando URL');
+                }
+            }
+        }
+        
         this.placeholders = {
             // Empresa
             'EMPRESA_NOME': empresa.nome,
@@ -66,8 +96,8 @@ class ModelBuilder {
             'EMPRESA_CIDADE': empresa.cidade,
             'EMPRESA_TELEFONE': empresa.telefone,
             'EMPRESA_EMAIL': empresa.email,
-            'EMPRESA_LOGO': empresa.logo,
-            'EMPRESA_CARIMBO': empresa.carimbo,
+            'EMPRESA_LOGO': logoParaPDF,
+            'EMPRESA_CARIMBO': carimboParaPDF,
             'EMPRESA_COR_PRIMARIA': empresa.cor_primaria,
             'EMPRESA_COR_SECUNDARIA': empresa.cor_secundaria,
             'EMPRESA_REPRESENTANTE': empresa.representante,
