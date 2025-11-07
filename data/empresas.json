@@ -70,21 +70,21 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "updatedAt": "2025-11-07T10:38:02.612Z"
+      "updatedAt": "2025-11-07T10:49:35.913Z"
     },
     {
       "id": "empresa_1762512081953",
       "nome": "test 3",
       "nif": "test 3",
       "endereco": {
-        "rua": "jjklÃ§",
+        "rua": "jjklÃÂ§",
         "edificio": "jkl",
-        "andar": "jlÃ§",
-        "sala": "jlkÃ§",
-        "bairro": "jklÃ§",
-        "municipio": "jkÃ§",
-        "provincia": "kÃ§",
-        "pais": "jkÃ§"
+        "andar": "jlÃÂ§",
+        "sala": "jlkÃÂ§",
+        "bairro": "jklÃÂ§",
+        "municipio": "jkÃÂ§",
+        "provincia": "kÃÂ§",
+        "pais": "jkÃÂ§"
       },
       "telefone": "",
       "email": "",
