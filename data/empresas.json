@@ -26,7 +26,7 @@
     },
     {
       "id": "empresa_1762506592249",
-      "nome": "test",
+      "nome": "ATENÇÂO EMPRESA IMPORTANT",
       "nif": "0821128",
       "endereco": {
         "rua": "test",
@@ -46,7 +46,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "updatedAt": "2025-11-07T10:37:21.338Z"
+      "updatedAt": "2025-11-08T14:05:57.490Z"
     },
     {
       "id": "empresa_1762511408657",
@@ -97,6 +97,30 @@
       "createdAt": "2025-11-08T12:38:14.507Z",
       "updatedAt": "2025-11-08T12:38:14.508Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1762610857091",
+      "nome": "Empresa Manuela João e filhos ",
+      "nif": "50009099",
+      "endereco": {
+        "rua": "TALATONA",
+        "edificio": "test",
+        "andar": "test",
+        "sala": "test",
+        "bairro": "test",
+        "municipio": "test",
+        "provincia": "test",
+        "pais": "Angola"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/1000/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/1000/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "updatedAt": "2025-11-08T14:13:56.096Z"
     }
   ]
 }
