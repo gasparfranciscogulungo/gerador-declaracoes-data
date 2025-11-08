@@ -156,19 +156,33 @@
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 addLog('Verificando autenticação...', 'info');
-                await authManager.verificarAutenticacao();
                 
-                if (authManager.usuarioAtual) {
-                    addLog(`✅ Autenticado como: ${authManager.usuarioAtual.username}`, 'success');
-                    setStatus('Pronto para corrigir dados');
-                } else {
+                // Verificar se tem token no localStorage
+                const token = localStorage.getItem('github_token');
+                const userData = localStorage.getItem('usuario_atual');
+                
+                if (!token || !userData) {
                     addLog('⚠️ Não autenticado. Redirecionando para login...', 'warning');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 2000);
+                    return;
                 }
+                
+                // Configurar API
+                const user = JSON.parse(userData);
+                githubAPI.setToken(token);
+                githubAPI.configurar(CONFIG);
+                authManager.usuarioAtual = user;
+                
+                addLog(`✅ Autenticado como: ${user.username}`, 'success');
+                setStatus('Pronto para corrigir dados');
+                
             } catch (error) {
                 addLog(`❌ Erro ao verificar autenticação: ${error.message}`, 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
             }
         });
     </script>
