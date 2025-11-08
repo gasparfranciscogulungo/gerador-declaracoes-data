@@ -73,20 +73,19 @@
 
         async function corrigirDados() {
             try {
-                addLog('Iniciando correção UTF-8...', 'info');
+                addLog('═══════════════════════════════════════', 'info');
+                addLog('🔧 INICIANDO CORREÇÃO UTF-8', 'info');
+                addLog('═══════════════════════════════════════', 'info');
                 setStatus('Processando...');
 
-                // Verificar autenticação
-                if (!authManager.usuarioAtual) {
-                    addLog('Fazendo login...', 'info');
-                    await authManager.verificarAutenticacao();
+                // Verificar configuração da API
+                if (!githubAPI.token || !githubAPI.owner || !githubAPI.repo) {
+                    throw new Error('API GitHub não está configurada corretamente');
                 }
 
-                if (!authManager.usuarioAtual) {
-                    throw new Error('Usuário não autenticado. Faça login primeiro.');
-                }
-
-                addLog(`Usuário: ${authManager.usuarioAtual.username}`, 'info');
+                addLog(`👤 Usuário: ${authManager.usuarioAtual.username}`, 'info');
+                addLog(`📦 Repo: ${githubAPI.owner}/${githubAPI.repo}`, 'info');
+                addLog('', 'info');
 
                 // Lista de arquivos para corrigir
                 const arquivos = [
@@ -103,19 +102,31 @@
 
                 for (const arquivo of arquivos) {
                     try {
-                        addLog(`Processando: ${arquivo}...`, 'info');
+                        addLog(`📂 Processando: ${arquivo}...`, 'info');
 
                         // Ler arquivo atual
+                        addLog(`  ⏳ Lendo do GitHub...`, 'info');
                         const result = await githubAPI.lerJSON(arquivo);
                         
                         if (!result || !result.data) {
-                            addLog(`  ⚠️ Arquivo não existe: ${arquivo}`, 'warning');
+                            addLog(`  ⚠️ Arquivo não existe ou está vazio`, 'warning');
                             continue;
                         }
 
-                        addLog(`  ✓ Lido com sucesso`, 'success');
+                        addLog(`  ✓ Lido com sucesso (SHA: ${result.sha.substring(0, 7)})`, 'success');
+                        
+                        // Verificar se tem caracteres problemáticos
+                        const jsonString = JSON.stringify(result.data);
+                        const temProblema = jsonString.includes('Ã§') || jsonString.includes('Ã£') || jsonString.includes('Ã');
+                        
+                        if (temProblema) {
+                            addLog(`  🔍 Detectados caracteres UTF-8 corrompidos`, 'warning');
+                        } else {
+                            addLog(`  ✓ Codificação parece OK`, 'info');
+                        }
 
                         // Salvar novamente (vai usar a codificação UTF-8 correta)
+                        addLog(`  💾 Salvando com UTF-8 correto...`, 'info');
                         await githubAPI.salvarJSON(
                             arquivo,
                             result.data,
@@ -124,10 +135,13 @@
                         );
 
                         addLog(`  ✅ Salvo com codificação UTF-8 correta`, 'success');
+                        addLog('', 'info');
                         processados++;
 
                     } catch (error) {
-                        addLog(`  ❌ Erro ao processar ${arquivo}: ${error.message}`, 'error');
+                        addLog(`  ❌ ERRO: ${error.message}`, 'error');
+                        console.error('Detalhes do erro:', error);
+                        addLog('', 'info');
                         erros++;
                     }
                 }
@@ -158,31 +172,56 @@
                 addLog('Verificando autenticação...', 'info');
                 
                 // Verificar se tem token no localStorage
-                const token = localStorage.getItem('github_token');
-                const userData = localStorage.getItem('usuario_atual');
+                let token = localStorage.getItem('github_token');
+                let userData = localStorage.getItem('usuario_atual');
                 
+                // Se não tiver no localStorage, usar token temporário
                 if (!token || !userData) {
-                    addLog('⚠️ Não autenticado. Redirecionando para login...', 'warning');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
-                    return;
+                    addLog('⚠️ Token não encontrado no localStorage', 'warning');
+                    addLog('🔑 Usando token de emergência...', 'info');
+                    
+                    // Token temporário fornecido pelo usuário
+                    token = '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';
+                    
+                    // Configurar API com token
+                    githubAPI.setToken(token);
+                    githubAPI.configurar(CONFIG);
+                    
+                    // Buscar dados do usuário do GitHub
+                    try {
+                        const githubUser = await githubAPI.getAuthenticatedUser();
+                        userData = {
+                            username: githubUser.login,
+                            email: githubUser.email || githubUser.login + '@github.com',
+                            role: 'admin'
+                        };
+                        
+                        // Salvar no localStorage para próxima vez
+                        localStorage.setItem('github_token', token);
+                        localStorage.setItem('usuario_atual', JSON.stringify(userData));
+                        
+                        addLog(`✅ Usuário GitHub: ${githubUser.login}`, 'success');
+                    } catch (error) {
+                        addLog(`❌ Erro ao buscar usuário: ${error.message}`, 'error');
+                        throw error;
+                    }
+                } else {
+                    // Tem no localStorage
+                    userData = JSON.parse(userData);
+                    githubAPI.setToken(token);
+                    githubAPI.configurar(CONFIG);
                 }
                 
-                // Configurar API
-                const user = JSON.parse(userData);
-                githubAPI.setToken(token);
-                githubAPI.configurar(CONFIG);
-                authManager.usuarioAtual = user;
+                authManager.usuarioAtual = userData;
                 
-                addLog(`✅ Autenticado como: ${user.username}`, 'success');
+                addLog(`✅ Autenticado como: ${userData.username}`, 'success');
+                addLog(`📦 Repositório: ${CONFIG.owner}/${CONFIG.repo}`, 'info');
                 setStatus('Pronto para corrigir dados');
                 
             } catch (error) {
                 addLog(`❌ Erro ao verificar autenticação: ${error.message}`, 'error');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+                addLog('💡 Verifique se o token está correto e tem permissões', 'warning');
+                setStatus('Erro de autenticação');
             }
         });
     </script>
