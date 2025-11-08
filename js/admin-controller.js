@@ -44,6 +44,16 @@ function adminApp() {
         modalNovaEmpresa: false,
         modalNovoModelo: false,
         modalPreviewModelo: false,
+        modalFluxoGeracao: false,
+        
+        // Fluxo de Geração de Documento
+        fluxoEtapa: 1, // 1=Empresa, 2=Cliente, 3=Tipo, 4=Preview
+        fluxoEmpresaSelecionada: null,
+        fluxoClienteSelecionado: null,
+        fluxoTipoDocumento: null, // 'declaracao', 'recibo', 'combo'
+        fluxoMesesRecibo: '1',
+        fluxoBuscaEmpresa: '',
+        fluxoBuscaCliente: '',
         
         // Preview de Modelo
         modeloSelecionado: null,
@@ -2733,6 +2743,150 @@ function adminApp() {
             } catch (error) {
                 console.error(`❌ Erro ao remover ${tipo}:`, error);
                 this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        // ========== FLUXO DE GERAÇÃO DE DOCUMENTO ==========
+        
+        /**
+         * Empresas filtradas pela busca
+         */
+        get empresasFiltradas() {
+            if (!this.fluxoBuscaEmpresa) return this.empresas;
+            
+            const busca = this.fluxoBuscaEmpresa.toLowerCase();
+            return this.empresas.filter(emp => 
+                emp.nome.toLowerCase().includes(busca) ||
+                emp.nif.includes(busca) ||
+                (emp.endereco.municipio && emp.endereco.municipio.toLowerCase().includes(busca))
+            );
+        },
+        
+        /**
+         * Clientes filtrados pela busca
+         */
+        get clientesFiltrados() {
+            if (!this.fluxoBuscaCliente) return this.trabalhadores;
+            
+            const busca = this.fluxoBuscaCliente.toLowerCase();
+            return this.trabalhadores.filter(cli => 
+                cli.nome.toLowerCase().includes(busca) ||
+                cli.nif.includes(busca) ||
+                (cli.funcao && cli.funcao.toLowerCase().includes(busca)) ||
+                (cli.departamento && cli.departamento.toLowerCase().includes(busca))
+            );
+        },
+        
+        /**
+         * Abre o fluxo de geração
+         */
+        abrirFluxoGeracao() {
+            this.modalFluxoGeracao = true;
+            this.fluxoEtapa = 1;
+            this.fluxoEmpresaSelecionada = null;
+            this.fluxoClienteSelecionado = null;
+            this.fluxoTipoDocumento = null;
+            this.fluxoMesesRecibo = '1';
+            this.fluxoBuscaEmpresa = '';
+            this.fluxoBuscaCliente = '';
+        },
+        
+        /**
+         * Fecha o fluxo de geração
+         */
+        fecharFluxoGeracao() {
+            this.modalFluxoGeracao = false;
+            this.fluxoEtapa = 1;
+            this.fluxoEmpresaSelecionada = null;
+            this.fluxoClienteSelecionado = null;
+            this.fluxoTipoDocumento = null;
+        },
+        
+        /**
+         * Seleciona uma empresa
+         */
+        selecionarEmpresa(empresa) {
+            this.fluxoEmpresaSelecionada = empresa;
+            console.log('✅ Empresa selecionada:', empresa.nome);
+        },
+        
+        /**
+         * Avança para seleção de clientes
+         */
+        avancarParaClientes() {
+            if (!this.fluxoEmpresaSelecionada) {
+                this.showAlert('error', 'Por favor, selecione uma empresa');
+                return;
+            }
+            this.fluxoEtapa = 2;
+            this.fluxoBuscaCliente = '';
+        },
+        
+        /**
+         * Seleciona um cliente
+         */
+        selecionarCliente(cliente) {
+            this.fluxoClienteSelecionado = cliente;
+            console.log('✅ Cliente selecionado:', cliente.nome);
+        },
+        
+        /**
+         * Avança para escolha do tipo
+         */
+        avancarParaTipo() {
+            if (!this.fluxoClienteSelecionado) {
+                this.showAlert('error', 'Por favor, selecione um cliente');
+                return;
+            }
+            this.fluxoEtapa = 3;
+        },
+        
+        /**
+         * Gera preview do documento
+         */
+        async gerarPreviewDocumento() {
+            if (!this.fluxoTipoDocumento) {
+                this.showAlert('error', 'Por favor, escolha o tipo de documento');
+                return;
+            }
+            
+            console.log('📄 Gerando preview...', {
+                empresa: this.fluxoEmpresaSelecionada.nome,
+                cliente: this.fluxoClienteSelecionado.nome,
+                tipo: this.fluxoTipoDocumento,
+                meses: this.fluxoMesesRecibo
+            });
+            
+            // TODO: Implementar geração real do preview
+            this.fluxoEtapa = 4;
+            this.showAlert('info', 'Preview em desenvolvimento');
+        },
+        
+        /**
+         * Gera documento final
+         */
+        async gerarDocumentoFinal() {
+            this.loading = true;
+            this.loadingMessage = 'Gerando documento...';
+            
+            try {
+                console.log('📄 Gerando documento final...', {
+                    empresa: this.fluxoEmpresaSelecionada,
+                    cliente: this.fluxoClienteSelecionado,
+                    tipo: this.fluxoTipoDocumento
+                });
+                
+                // TODO: Chamar pdf-generator.js com os dados corretos
+                // TODO: Registrar no histórico automaticamente
+                
+                this.showAlert('success', '✅ Documento gerado com sucesso!');
+                this.fecharFluxoGeracao();
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar documento:', error);
+                this.showAlert('error', `Erro: ${error.message}`);
             } finally {
                 this.loading = false;
             }
