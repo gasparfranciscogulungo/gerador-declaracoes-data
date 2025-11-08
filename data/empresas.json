@@ -71,30 +71,6 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-11-07T10:49:35.913Z"
-    },
-    {
-      "id": "empresa_1762512081953",
-      "nome": "test 3",
-      "nif": "test 3",
-      "endereco": {
-        "rua": "jjklÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "edificio": "jkl",
-        "andar": "jlÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "sala": "jlkÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "bairro": "jklÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "municipio": "jkÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "provincia": "kÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§",
-        "pais": "jkÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/test3/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/test3/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-07T11:12:08.849Z"
     }
   ]
 }
