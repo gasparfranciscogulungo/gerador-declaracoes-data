@@ -17,47 +17,38 @@
  */
 
 class ClienteManager {
-    constructor(githubAPI, authManager) {
-        this.githubAPI = githubAPI;
-        this.authManager = authManager;
-        this.clientes = [];
+    constructor() {
+        this.trabalhadores = [];
         this.cacheCarregado = false;
-        this.ARQUIVO_CLIENTES = 'data/trabalhadores.json';
+        this.ARQUIVO_TRABALHADORES = 'data/trabalhadores.json';
     }
     
     /**
-     * Modelo de dados de um trabalhador
+     * Modelo de dados de um trabalhador (compatível com estrutura existente)
      */
     static get MODELO_TRABALHADOR() {
         return {
             id: null,
             nome: '',
+            documento: '',              // BI/CC number
+            tipo_documento: 'BI',       // BI ou CC
             nif: '',
-            bi: '',
-            dataNascimento: '',
-            genero: '',
-            estadoCivil: '',
+            data_nascimento: '',        // DD/MM/YYYY
+            nacionalidade: 'Angolana',
             morada: '',
+            cidade: '',
             telefone: '',
             email: '',
-            cargo: '',
+            funcao: '',                 // Cargo/função
             departamento: '',
-            dataAdmissao: '',
-            tipoContrato: 'Efetivo',
-            vencimentoBase: 0,
-            subsidioAlimentacao: 0,
-            subsidioTransporte: 0,
-            outrosSubsidios: 0,
-            banco: '',
+            data_admissao: '',          // DD/MM/YYYY
+            tipo_contrato: 'Contrato sem termo',
+            salario_bruto: '0.00',
+            salario_liquido: '0.00',
+            moeda: 'AKZ',
             iban: '',
-            numeroConta: '',
-            numeroDependentes: 0,
             ativo: true,
-            observacoes: '',
-            criadoEm: null,
-            atualizadoEm: null,
-            criadoPor: '',
-            atualizadoPor: ''
+            observacoes: ''
         };
     }
 
@@ -153,10 +144,11 @@ class ClienteManager {
     // ===============================================
     
     isAdmin() {
-        if (!this.authManager || !this.authManager.usuarioAtual) {
-            return false;
+        // Verifica se usuário atual tem role 'admin'
+        if (typeof authManager !== 'undefined' && authManager.usuarioAtual) {
+            return authManager.usuarioAtual.role === 'admin';
         }
-        return this.authManager.usuarioAtual.role === 'admin';
+        return false;
     }
 
     // ===============================================
@@ -165,27 +157,22 @@ class ClienteManager {
 
     async carregar() {
         try {
-            const conteudo = await this.githubAPI.lerArquivo(this.ARQUIVO_CLIENTES);
+            const result = await githubAPI.lerJSON(this.ARQUIVO_TRABALHADORES);
             
-            if (conteudo) {
-                try {
-                    const dados = JSON.parse(conteudo);
-                    this.clientes = Array.isArray(dados) ? dados : (dados.trabalhadores || []);
-                } catch (e) {
-                    console.warn('❌ Erro ao parsear trabalhadores.json');
-                    this.clientes = [];
-                }
+            if (result && result.data && result.data.trabalhadores) {
+                this.trabalhadores = result.data.trabalhadores;
+                this.sha = result.sha;
             } else {
-                this.clientes = [];
+                this.trabalhadores = [];
             }
             
             this.cacheCarregado = true;
-            console.log(`✅ ${this.clientes.length} trabalhadores carregados`);
-            return this.clientes;
+            console.log(`✅ ${this.trabalhadores.length} trabalhadores carregados`);
+            return this.trabalhadores;
             
         } catch (erro) {
             console.error('❌ Erro ao carregar trabalhadores:', erro);
-            this.clientes = [];
+            this.trabalhadores = [];
             this.cacheCarregado = true;
             return [];
         }
@@ -193,22 +180,18 @@ class ClienteManager {
 
     async salvar() {
         try {
-            const estrutura = {
-                trabalhadores: this.clientes,
-                metadata: {
-                    total: this.clientes.length,
-                    ativos: this.clientes.filter(c => c.ativo).length,
-                    ultimaAtualizacao: new Date().toISOString()
-                }
+            const data = {
+                trabalhadores: this.trabalhadores
             };
             
-            const conteudo = JSON.stringify(estrutura, null, 2);
-            await this.githubAPI.salvarArquivo(
-                this.ARQUIVO_CLIENTES,
-                conteudo,
-                `Atualização de trabalhadores - ${new Date().toLocaleString('pt-AO')}`
+            const result = await githubAPI.salvarJSON(
+                this.ARQUIVO_TRABALHADORES,
+                data,
+                `📝 Atualização de trabalhadores - ${new Date().toLocaleString('pt-AO')}`,
+                this.sha
             );
             
+            this.sha = result.sha;
             console.log('✅ Trabalhadores salvos com sucesso');
             return true;
             
@@ -242,7 +225,7 @@ class ClienteManager {
             throw new Error('❌ Dados inválidos:\n- ' + validacao.erros.join('\n- '));
         }
 
-        const nifExistente = this.clientes.find(c => c.nif === dados.nif);
+        const nifExistente = this.trabalhadores.find(c => c.nif === dados.nif);
         if (nifExistente) {
             throw new Error('❌ Já existe um trabalhador com este NIF');
         }
@@ -250,21 +233,17 @@ class ClienteManager {
         const novoTrabalhador = {
             ...ClienteManager.MODELO_TRABALHADOR,
             ...dados,
-            id: this.gerarId(),
-            criadoEm: new Date().toISOString(),
-            atualizadoEm: new Date().toISOString(),
-            criadoPor: this.authManager?.usuarioAtual?.username || 'sistema',
-            atualizadoPor: this.authManager?.usuarioAtual?.username || 'sistema'
+            id: this.gerarId()
         };
 
         // Sanitizar
         novoTrabalhador.nome = this.sanitizar(novoTrabalhador.nome);
         novoTrabalhador.morada = this.sanitizar(novoTrabalhador.morada);
         novoTrabalhador.email = this.sanitizar(novoTrabalhador.email);
-        novoTrabalhador.cargo = this.sanitizar(novoTrabalhador.cargo);
+        novoTrabalhador.funcao = this.sanitizar(novoTrabalhador.funcao);
         novoTrabalhador.departamento = this.sanitizar(novoTrabalhador.departamento);
 
-        this.clientes.push(novoTrabalhador);
+        this.trabalhadores.push(novoTrabalhador);
         await this.salvar();
 
         console.log('✅ Trabalhador criado:', novoTrabalhador.nome);
@@ -280,21 +259,21 @@ class ClienteManager {
             await this.carregar();
         }
 
-        let resultado = [...this.clientes];
+        let resultado = [...this.trabalhadores];
 
         if (filtros.ativo !== undefined) {
-            resultado = resultado.filter(c => c.ativo === filtros.ativo);
+            resultado = resultado.filter(c => c.ativo !== false);
         }
 
         if (filtros.departamento) {
             resultado = resultado.filter(c => 
-                c.departamento.toLowerCase().includes(filtros.departamento.toLowerCase())
+                c.departamento && c.departamento.toLowerCase().includes(filtros.departamento.toLowerCase())
             );
         }
 
-        if (filtros.cargo) {
+        if (filtros.funcao) {
             resultado = resultado.filter(c => 
-                c.cargo.toLowerCase().includes(filtros.cargo.toLowerCase())
+                c.funcao && c.funcao.toLowerCase().includes(filtros.funcao.toLowerCase())
             );
         }
 
@@ -308,7 +287,7 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const trabalhador = this.clientes.find(c => c.id === id);
+        const trabalhador = this.trabalhadores.find(c => c.id === id);
         
         if (!trabalhador) {
             throw new Error('❌ Trabalhador não encontrado');
@@ -322,7 +301,7 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const trabalhador = this.clientes.find(c => c.nif === nif);
+        const trabalhador = this.trabalhadores.find(c => c.nif === nif);
         
         if (!trabalhador) {
             throw new Error('❌ Trabalhador com NIF ' + nif + ' não encontrado');
@@ -338,7 +317,7 @@ class ClienteManager {
 
         const nomeBusca = nome.toLowerCase();
         
-        return this.clientes.filter(c => 
+        return this.trabalhadores.filter(c => 
             c.nome.toLowerCase().includes(nomeBusca)
         );
     }
@@ -356,13 +335,13 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const indice = this.clientes.findIndex(c => c.id === id);
+        const indice = this.trabalhadores.findIndex(c => c.id === id);
         
         if (indice === -1) {
             throw new Error('❌ Trabalhador não encontrado');
         }
 
-        const trabalhadorAtual = this.clientes[indice];
+        const trabalhadorAtual = this.trabalhadores[indice];
         const dadosCompletos = { ...trabalhadorAtual, ...dados };
         const validacao = this.validarTrabalhador(dadosCompletos);
         
@@ -371,7 +350,7 @@ class ClienteManager {
         }
 
         if (dados.nif && dados.nif !== trabalhadorAtual.nif) {
-            const nifExistente = this.clientes.find(c => c.nif === dados.nif && c.id !== id);
+            const nifExistente = this.trabalhadores.find(c => c.nif === dados.nif && c.id !== id);
             if (nifExistente) {
                 throw new Error('❌ Já existe outro trabalhador com este NIF');
             }
@@ -380,19 +359,15 @@ class ClienteManager {
         const trabalhadorAtualizado = {
             ...trabalhadorAtual,
             ...dados,
-            id: trabalhadorAtual.id,
-            criadoEm: trabalhadorAtual.criadoEm,
-            criadoPor: trabalhadorAtual.criadoPor,
-            atualizadoEm: new Date().toISOString(),
-            atualizadoPor: this.authManager?.usuarioAtual?.username || 'sistema'
+            id: trabalhadorAtual.id
         };
 
         // Sanitizar
         if (dados.nome) trabalhadorAtualizado.nome = this.sanitizar(trabalhadorAtualizado.nome);
         if (dados.morada) trabalhadorAtualizado.morada = this.sanitizar(trabalhadorAtualizado.morada);
-        if (dados.cargo) trabalhadorAtualizado.cargo = this.sanitizar(trabalhadorAtualizado.cargo);
+        if (dados.funcao) trabalhadorAtualizado.funcao = this.sanitizar(trabalhadorAtualizado.funcao);
 
-        this.clientes[indice] = trabalhadorAtualizado;
+        this.trabalhadores[indice] = trabalhadorAtualizado;
         await this.salvar();
 
         console.log('✅ Trabalhador atualizado:', trabalhadorAtualizado.nome);
@@ -412,21 +387,19 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const indice = this.clientes.findIndex(c => c.id === id);
+        const indice = this.trabalhadores.findIndex(c => c.id === id);
         
         if (indice === -1) {
             throw new Error('❌ Trabalhador não encontrado');
         }
 
-        const trabalhador = this.clientes[indice];
+        const trabalhador = this.trabalhadores[indice];
 
         if (excluirDefinitivamente) {
-            this.clientes.splice(indice, 1);
+            this.trabalhadores.splice(indice, 1);
             console.log('✅ Trabalhador excluído permanentemente:', trabalhador.nome);
         } else {
-            this.clientes[indice].ativo = false;
-            this.clientes[indice].atualizadoEm = new Date().toISOString();
-            this.clientes[indice].atualizadoPor = this.authManager?.usuarioAtual?.username || 'sistema';
+            this.trabalhadores[indice].ativo = false;
             console.log('✅ Trabalhador marcado como inativo:', trabalhador.nome);
         }
 
@@ -443,20 +416,18 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const indice = this.clientes.findIndex(c => c.id === id);
+        const indice = this.trabalhadores.findIndex(c => c.id === id);
         
         if (indice === -1) {
             throw new Error('❌ Trabalhador não encontrado');
         }
 
-        this.clientes[indice].ativo = true;
-        this.clientes[indice].atualizadoEm = new Date().toISOString();
-        this.clientes[indice].atualizadoPor = this.authManager?.usuarioAtual?.username || 'sistema';
+        this.trabalhadores[indice].ativo = true;
 
         await this.salvar();
 
-        console.log('✅ Trabalhador reativado:', this.clientes[indice].nome);
-        return this.clientes[indice];
+        console.log('✅ Trabalhador reativado:', this.trabalhadores[indice].nome);
+        return this.trabalhadores[indice];
     }
 
     // ===============================================
@@ -480,8 +451,8 @@ class ClienteManager {
             await this.carregar();
         }
 
-        const ativos = this.clientes.filter(c => c.ativo);
-        const inativos = this.clientes.filter(c => !c.ativo);
+        const ativos = this.trabalhadores.filter(c => c.ativo !== false);
+        const inativos = this.trabalhadores.filter(c => c.ativo === false);
 
         const porDepartamento = {};
         ativos.forEach(c => {
@@ -490,29 +461,18 @@ class ClienteManager {
         });
 
         let massaSalarialTotal = 0;
-        let totalINSS = 0;
-        let totalIRT = 0;
 
         ativos.forEach(c => {
-            try {
-                const salario = this.calcularSalario(c);
-                massaSalarialTotal += salario.bruto;
-                totalINSS += salario.inss;
-                totalIRT += salario.irt;
-            } catch (e) {
-                // Ignora erros de cálculo individual
-            }
+            const salarioBruto = parseFloat(c.salario_bruto) || 0;
+            massaSalarialTotal += salarioBruto;
         });
 
         return {
-            total: this.clientes.length,
+            total: this.trabalhadores.length,
             ativos: ativos.length,
             inativos: inativos.length,
             porDepartamento,
-            massaSalarialTotal,
-            totalINSS,
-            totalIRT,
-            massaSalarialLiquida: massaSalarialTotal - totalINSS - totalIRT
+            massaSalarialTotal
         };
     }
 

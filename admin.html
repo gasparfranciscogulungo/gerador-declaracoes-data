@@ -20,7 +20,7 @@
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
+<body class="bg-gray-100 text-gray-900" x-data="adminApp()">
     
     <!-- Loading Overlay Profissional -->
     <div x-show="loading" 
@@ -115,10 +115,6 @@
                         <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
                     </div>
                     <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-white">
-                    <button @click="toggleDarkMode()" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
-                        <i :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'" class="mr-2"></i>
-                        <span x-text="darkMode ? 'Claro' : 'Escuro'"></span>
-                    </button>
                     <button @click="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
                         <i class="bi bi-box-arrow-right mr-2"></i>Sair
                     </button>
@@ -631,13 +627,116 @@
 
         <!-- TAB: Clientes (Todos) -->
         <div x-show="activeTab === 'clientes'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold mb-6" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
-                <i class="bi bi-people mr-2 text-purple-600"></i>Todos os Clientes
-            </h2>
-            <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="mb-4">Visualização de todos os clientes cadastrados pelos usuários.</p>
-            <div class="text-center py-12" :class="darkMode ? 'text-gray-500' : 'text-gray-500'">
-                <i class="bi bi-hourglass-split text-6xl mb-4"></i>
-                <p>Funcionalidade em desenvolvimento...</p>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                    <i class="bi bi-people mr-2 text-purple-600"></i>Trabalhadores
+                </h2>
+                <button @click="abrirModalNovoTrabalhador()" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="bi bi-person-plus mr-2"></i>Novo Trabalhador
+                </button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="mb-6 flex gap-4">
+                <input type="text" 
+                       x-model="filtroTrabalhador"
+                       @input="filtrarTrabalhadores()"
+                       placeholder="🔍 Buscar por nome, NIF, função..."
+                       :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+                       class="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                
+                <select x-model="filtroDepartamento" 
+                        @change="filtrarTrabalhadores()"
+                        :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+                        class="border rounded-lg px-4 py-2">
+                    <option value="">Todos os Departamentos</option>
+                    <template x-for="dept in departamentos" :key="dept">
+                        <option :value="dept" x-text="dept"></option>
+                    </template>
+                </select>
+
+                <select x-model="filtroStatus" 
+                        @change="filtrarTrabalhadores()"
+                        :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+                        class="border rounded-lg px-4 py-2">
+                    <option value="ativos">Apenas Ativos</option>
+                    <option value="todos">Todos</option>
+                    <option value="inativos">Apenas Inativos</option>
+                </select>
+            </div>
+
+            <!-- Tabela de Trabalhadores -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Nome</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">NIF</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Função</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Departamento</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Telefone</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody :class="darkMode ? 'divide-gray-700' : 'divide-gray-200'" class="divide-y">
+                        <template x-for="trabalhador in trabalhadoresFiltrados" :key="trabalhador.id">
+                            <tr :class="darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'" class="transition-colors">
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold mr-3">
+                                            <span x-text="trabalhador.nome.charAt(0)"></span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium" x-text="trabalhador.nome"></div>
+                                            <div class="text-xs opacity-60" x-text="trabalhador.email"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm" x-text="trabalhador.nif"></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm" x-text="trabalhador.funcao"></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm" x-text="trabalhador.departamento"></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm" x-text="trabalhador.telefone"></td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span x-show="trabalhador.ativo !== false" 
+                                          class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ativo
+                                    </span>
+                                    <span x-show="trabalhador.ativo === false" 
+                                          class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Inativo
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button @click="verDetalhesTrabalhador(trabalhador)" 
+                                            class="text-blue-600 hover:text-blue-900 mr-3"
+                                            title="Ver detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button @click="editarTrabalhador(trabalhador)" 
+                                            class="text-green-600 hover:text-green-900 mr-3"
+                                            title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button @click="excluirTrabalhador(trabalhador.id)" 
+                                            class="text-red-600 hover:text-red-900"
+                                            title="Excluir">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estado vazio -->
+            <div x-show="trabalhadoresFiltrados.length === 0" 
+                 class="text-center py-12"
+                 :class="darkMode ? 'text-gray-500' : 'text-gray-400'">
+                <i class="bi bi-inbox text-6xl mb-4"></i>
+                <p>Nenhum trabalhador encontrado</p>
             </div>
         </div>
 
@@ -1945,6 +2044,260 @@
             await notificationSystem.notifyWithLayers();
         });
     </script>
+
+    <!-- ===================================================================== -->
+    <!-- MODAIS DE TRABALHADORES -->
+    <!-- ===================================================================== -->
+
+    <!-- MODAL: NOVO TRABALHADOR -->
+    <div x-show="modalNovoTrabalhador" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-center justify-between sticky top-0">
+                <h3 class="text-2xl font-bold">
+                    <i class="bi bi-person-plus mr-2"></i>Novo Trabalhador
+                </h3>
+                <button @click="modalNovoTrabalhador = false" class="text-white hover:text-gray-200 text-3xl">
+                    &times;
+                </button>
+            </div>
+
+            <div class="p-6">
+                <form @submit.prevent="salvarNovoTrabalhador()">
+                    <!-- Dados Pessoais -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="bi bi-person mr-2 text-blue-600"></i>Dados Pessoais
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
+                                <input type="text" x-model="novoTrabalhador.nome" required 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="João Pedro Silva">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIF *</label>
+                                <input type="text" x-model="novoTrabalhador.nif" required 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="123456789" maxlength="9">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">BI/CC</label>
+                                <input type="text" x-model="novoTrabalhador.documento" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="BA001234567">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Data Nascimento</label>
+                                <input type="text" x-model="novoTrabalhador.data_nascimento" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="DD/MM/AAAA">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contato -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="bi bi-telephone mr-2 text-green-600"></i>Contato
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                                <input type="tel" x-model="novoTrabalhador.telefone" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="+244 923 456 789">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" x-model="novoTrabalhador.email" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="joao@email.com">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Morada</label>
+                                <input type="text" x-model="novoTrabalhador.morada" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Rua da Independência, Luanda">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados Profissionais -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="bi bi-briefcase mr-2 text-purple-600"></i>Dados Profissionais
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Função/Cargo</label>
+                                <input type="text" x-model="novoTrabalhador.funcao" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Desenvolvedor Full Stack">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                                <input type="text" x-model="novoTrabalhador.departamento" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Tecnologia da Informação">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Data Admissão</label>
+                                <input type="text" x-model="novoTrabalhador.data_admissao" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="DD/MM/AAAA">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Contrato</label>
+                                <select x-model="novoTrabalhador.tipo_contrato" 
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                    <option value="Contrato sem termo">Contrato sem termo</option>
+                                    <option value="Contrato a termo certo">Contrato a termo certo</option>
+                                    <option value="Contrato a termo incerto">Contrato a termo incerto</option>
+                                    <option value="Estágio">Estágio</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados Salariais -->
+                    <div class="mb-6">
+                        <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="bi bi-cash mr-2 text-green-600"></i>Dados Salariais
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Salário Bruto (AKZ)</label>
+                                <input type="number" x-model="novoTrabalhador.salario_bruto" step="0.01"
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="250000.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Salário Líquido (AKZ)</label>
+                                <input type="number" x-model="novoTrabalhador.salario_liquido" step="0.01"
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="200000.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                                <input type="text" x-model="novoTrabalhador.iban" 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                       placeholder="AO06...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" @click="modalNovoTrabalhador = false" 
+                                class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                            <i class="bi bi-check-lg mr-2"></i>Salvar Trabalhador
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VISUALIZAR TRABALHADOR -->
+    <div x-show="modalVisualizarTrabalhador" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 flex items-center justify-between sticky top-0">
+                <h3 class="text-2xl font-bold">
+                    <i class="bi bi-person-badge mr-2"></i>Detalhes do Trabalhador
+                </h3>
+                <button @click="modalVisualizarTrabalhador = false" class="text-white hover:text-gray-200 text-3xl">
+                    &times;
+                </button>
+            </div>
+
+            <div class="p-6" x-show="visualizarTrabalhador">
+                <div class="space-y-6">
+                    <!-- Cabeçalho com Avatar -->
+                    <div class="flex items-center gap-6 pb-6 border-b">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+                            <span x-text="visualizarTrabalhador?.nome?.charAt(0) || '?'"></span>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-bold text-gray-800" x-text="visualizarTrabalhador?.nome"></h4>
+                            <p class="text-gray-600" x-text="visualizarTrabalhador?.funcao"></p>
+                            <span x-show="visualizarTrabalhador?.ativo !== false" 
+                                  class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                Ativo
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Informações -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">NIF</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.nif || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">BI/CC</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.documento || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Data Nascimento</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.data_nascimento || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Telefone</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.telefone || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Email</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.email || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Departamento</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.departamento || '-'"></p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-sm font-medium text-gray-500">Morada</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.morada || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Data Admissão</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.data_admissao || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Tipo Contrato</label>
+                            <p class="text-gray-900 font-medium" x-text="visualizarTrabalhador?.tipo_contrato || '-'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Salário Bruto</label>
+                            <p class="text-gray-900 font-medium" x-text="(visualizarTrabalhador?.salario_bruto || '0') + ' AKZ'"></p>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Salário Líquido</label>
+                            <p class="text-gray-900 font-medium" x-text="(visualizarTrabalhador?.salario_liquido || '0') + ' AKZ'"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-6 border-t mt-6">
+                    <button @click="modalVisualizarTrabalhador = false" 
+                            class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Fechar
+                    </button>
+                    <button @click="modalVisualizarTrabalhador = false; editarTrabalhador(visualizarTrabalhador)" 
+                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                        <i class="bi bi-pencil mr-2"></i>Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

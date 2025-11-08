@@ -12,7 +12,6 @@ function adminApp() {
         modelos: [],
         contador: {},
         usersData: null,
-        darkMode: localStorage.getItem('darkMode') === 'true',
         
         activeTab: 'empresas',
         loading: false,
@@ -244,6 +243,7 @@ function adminApp() {
             
             // Inicializar managers
             this.userManager = new UserManager();
+            this.clienteManager = new ClienteManager();
             
             // Carregar TODOS os dados
             await this.carregarTodosDados();
@@ -284,7 +284,11 @@ function adminApp() {
                 this.loadingMessage = 'Carregando contadores...';
                 await this.carregarContador();
                 
-                // 5. Atualizar estatísticas REAIS
+                // 5. Carregar trabalhadores
+                this.loadingMessage = 'Carregando trabalhadores...';
+                await this.carregarTrabalhadores();
+                
+                // 6. Atualizar estatísticas REAIS
                 await this.atualizarStatsReais();
                 
                 console.log('✅ Todos os dados carregados!');
@@ -491,6 +495,150 @@ function adminApp() {
             } catch (error) {
                 console.error('❌ Erro ao atualizar stats:', error);
             }
+        },
+
+        // ===============================================
+        // TRABALHADORES / CLIENTES
+        // ===============================================
+
+        filtroTrabalhador: '',
+        filtroDepartamento: '',
+        filtroStatus: 'ativos',
+        departamentos: [],
+        trabalhadoresFiltrados: [],
+
+        async carregarTrabalhadores() {
+            try {
+                // Instanciar clienteManager se necessário
+                if (typeof ClienteManager !== 'undefined') {
+                    this.clienteManager = this.clienteManager || new ClienteManager();
+                }
+
+                const lista = await this.clienteManager.carregar();
+                this.trabalhadores = lista || [];
+
+                // Extrair departamentos únicos
+                const deps = new Set();
+                (this.trabalhadores || []).forEach(t => { if (t.departamento) deps.add(t.departamento); });
+                this.departamentos = Array.from(deps).sort();
+
+                // Inicializar filtrados
+                this.trabalhadoresFiltrados = this.trabalhadores.slice();
+                console.log('✅ Trabalhadores carregados no painel:', this.trabalhadores.length);
+                return this.trabalhadores;
+            } catch (e) {
+                console.error('❌ Erro ao carregar trabalhadores no painel:', e);
+                this.trabalhadores = [];
+                this.trabalhadoresFiltrados = [];
+                return [];
+            }
+        },
+
+        filtrarTrabalhadores() {
+            const q = (this.filtroTrabalhador || '').toLowerCase();
+            const dept = this.filtroDepartamento;
+            const status = this.filtroStatus;
+
+            let lista = (this.trabalhadores || []).slice();
+
+            if (status === 'ativos') {
+                lista = lista.filter(t => t.ativo !== false);
+            } else if (status === 'inativos') {
+                lista = lista.filter(t => t.ativo === false);
+            }
+
+            if (dept) {
+                lista = lista.filter(t => (t.departamento || '').toLowerCase().includes(dept.toLowerCase()));
+            }
+
+            if (q) {
+                lista = lista.filter(t => {
+                    return (t.nome || '').toLowerCase().includes(q)
+                        || (t.nif || '').toLowerCase().includes(q)
+                        || (t.funcao || '').toLowerCase().includes(q);
+                });
+            }
+
+            this.trabalhadoresFiltrados = lista;
+        },
+
+        modalNovoTrabalhador: false,
+        modalEditarTrabalhador: false,
+        modalVisualizarTrabalhador: false,
+        novoTrabalhador: {},
+        editarTrabalhadorObj: {},
+        visualizarTrabalhador: null,
+
+        abrirModalNovoTrabalhador() {
+            this.modalNovoTrabalhador = true;
+            this.novoTrabalhador = Object.assign({}, ClienteManager.MODELO_TRABALHADOR);
+        },
+
+        async salvarNovoTrabalhador() {
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Salvando trabalhador...';
+                
+                await this.clienteManager.criar(this.novoTrabalhador);
+                await this.carregarTrabalhadores();
+                this.filtrarTrabalhadores();
+                
+                this.modalNovoTrabalhador = false;
+                this.showAlert('success', 'Trabalhador criado com sucesso!');
+                
+            } catch (e) {
+                this.showAlert('error', e.message || 'Erro ao criar trabalhador');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async editarTrabalhador(trabalhador) {
+            this.modalEditarTrabalhador = true;
+            this.editarTrabalhadorObj = Object.assign({}, trabalhador);
+        },
+
+        async salvarEdicaoTrabalhador() {
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Atualizando trabalhador...';
+                
+                const id = this.editarTrabalhadorObj.id;
+                await this.clienteManager.atualizar(id, this.editarTrabalhadorObj);
+                await this.carregarTrabalhadores();
+                this.filtrarTrabalhadores();
+                
+                this.modalEditarTrabalhador = false;
+                this.showAlert('success', 'Trabalhador atualizado com sucesso!');
+                
+            } catch (e) {
+                this.showAlert('error', e.message || 'Erro ao atualizar trabalhador');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async excluirTrabalhador(id) {
+            if (!confirm('Tem certeza que deseja excluir este trabalhador?')) return;
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Excluindo trabalhador...';
+                
+                await this.clienteManager.excluir(id);
+                await this.carregarTrabalhadores();
+                this.filtrarTrabalhadores();
+                
+                this.showAlert('success', 'Trabalhador excluído com sucesso');
+            } catch (e) {
+                this.showAlert('error', e.message || 'Erro ao excluir');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async verDetalhesTrabalhador(trabalhador) {
+            this.modalVisualizarTrabalhador = true;
+            this.visualizarTrabalhador = trabalhador;
         },
 
         // ========== EMPRESAS ==========
@@ -1815,13 +1963,7 @@ function adminApp() {
             `;
         },
 
-        /**
-         * Toggle Dark Mode
-         */
-        toggleDarkMode() {
-            this.darkMode = !this.darkMode;
-            localStorage.setItem('darkMode', this.darkMode);
-        },
+
 
         // ========== SISTEMA DE PERSONALIZAÇÕES ==========
 
