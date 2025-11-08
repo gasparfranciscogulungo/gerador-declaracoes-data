@@ -6,11 +6,15 @@
  * ✅ CRUD completo (Create, Read, Update, Delete)
  * ✅ Validações robustas (NIF, email, telefone, datas)
  * ✅ Sanitização contra XSS
- * ✅ Sistema de permissões (admin vs usuário comum)
  * ✅ Busca e filtros avançados
  * ✅ Integração com CalculadoraSalario
  * ✅ Estatísticas e relatórios
  * ✅ Soft delete (marcar como inativo)
+ * 
+ * PERMISSÕES:
+ * - Todos os usuários (admin e comum) podem gerenciar seus próprios clientes
+ * - Admin tem painel adicional (users.html) para ver estatísticas de todos os usuários
+ * - Cada usuário tem seus próprios trabalhadores isolados
  * 
  * @author Gerador de PDF - Angola
  * @date 2025-11-08
@@ -212,10 +216,6 @@ class ClienteManager {
     // ===============================================
 
     async criar(dados) {
-        if (!this.isAdmin()) {
-            throw new Error('❌ Apenas administradores podem criar trabalhadores');
-        }
-
         if (!this.cacheCarregado) {
             await this.carregar();
         }
@@ -327,10 +327,6 @@ class ClienteManager {
     // ===============================================
 
     async atualizar(id, dados) {
-        if (!this.isAdmin()) {
-            throw new Error('❌ Apenas administradores podem atualizar trabalhadores');
-        }
-
         if (!this.cacheCarregado) {
             await this.carregar();
         }
@@ -379,10 +375,6 @@ class ClienteManager {
     // ===============================================
 
     async excluir(id, excluirDefinitivamente = false) {
-        if (!this.isAdmin()) {
-            throw new Error('❌ Apenas administradores podem excluir trabalhadores');
-        }
-
         if (!this.cacheCarregado) {
             await this.carregar();
         }
@@ -408,10 +400,6 @@ class ClienteManager {
     }
 
     async reativar(id) {
-        if (!this.isAdmin()) {
-            throw new Error('❌ Apenas administradores podem reativar trabalhadores');
-        }
-
         if (!this.cacheCarregado) {
             await this.carregar();
         }
