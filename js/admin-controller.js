@@ -12,6 +12,7 @@ function adminApp() {
         modelos: [],
         contador: {},
         usersData: null,
+        darkMode: localStorage.getItem('darkMode') === 'true',
         
         activeTab: 'empresas',
         loading: false,
@@ -1963,7 +1964,13 @@ function adminApp() {
             `;
         },
 
-
+        /**
+         * Toggle Dark Mode
+         */
+        toggleDarkMode() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('darkMode', this.darkMode);
+        },
 
         // ========== SISTEMA DE PERSONALIZAÇÕES ==========
 

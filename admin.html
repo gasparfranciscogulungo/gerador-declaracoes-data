@@ -20,7 +20,7 @@
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="bg-gray-100 text-gray-900" x-data="adminApp()">
+<body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
     
     <!-- Loading Overlay Profissional -->
     <div x-show="loading" 
@@ -115,6 +115,10 @@
                         <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
                     </div>
                     <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-white">
+                    <button @click="toggleDarkMode()" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
+                        <i :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'" class="mr-2"></i>
+                        <span x-text="darkMode ? 'Claro' : 'Escuro'"></span>
+                    </button>
                     <button @click="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
                         <i class="bi bi-box-arrow-right mr-2"></i>Sair
                     </button>
@@ -2033,7 +2037,6 @@
 
     <!-- Scripts -->
     <script src="js/image-cache-manager.js"></script>
-    <script src="js/dark-mode.js"></script>
 
     <!-- Inicialização do Sistema de Notificações -->
     <script>
