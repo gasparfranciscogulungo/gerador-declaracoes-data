@@ -100,10 +100,10 @@
     },
     {
       "id": "empresa_1762610857091",
-      "nome": "test",
+      "nome": "Empresa Manuela João e filhos ",
       "nif": "1000",
       "endereco": {
-        "rua": "test",
+        "rua": "TALANTONA",
         "edificio": "test",
         "andar": "test",
         "sala": "test",
@@ -120,9 +120,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-08T14:07:37.091Z",
-      "updatedAt": "2025-11-08T14:07:37.091Z",
-      "contador": 0
+      "updatedAt": "2025-11-08T14:13:09.157Z"
     }
   ]
 }
