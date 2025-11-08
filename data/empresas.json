@@ -71,6 +71,32 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-11-07T10:49:35.913Z"
+    },
+    {
+      "id": "empresa_1762605494507",
+      "nome": "Serviscos angola Gaspar Gulungo",
+      "nif": "3748978934",
+      "endereco": {
+        "rua": "Avenida de luanda",
+        "edificio": "edificio 23",
+        "andar": "2 andar",
+        "sala": "sala 2",
+        "bairro": "Talatona",
+        "municipio": "Talatona",
+        "provincia": "Luanda",
+        "pais": "Angola"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/3748978934/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/3748978934/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-08T12:38:14.507Z",
+      "updatedAt": "2025-11-08T12:38:14.508Z",
+      "contador": 0
     }
   ]
 }
