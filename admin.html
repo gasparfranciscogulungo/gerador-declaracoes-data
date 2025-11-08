@@ -2,6 +2,7 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Gerador de Declarações</title>
     
@@ -247,152 +248,171 @@
 
         <!-- TAB: Empresas -->
         <div x-show="activeTab === 'empresas'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
-                    <i class="bi bi-building mr-2 text-blue-600"></i>Gestão de Empresas
-                </h2>
-                <button @click="modalNovaEmpresa = true" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
-                    <i class="bi bi-plus-circle mr-2"></i>Adicionar Empresa
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                        <i class="bi bi-building mr-3 text-blue-600"></i>Gestão de Empresas
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <span x-text="empresas.length"></span> empresa<span x-show="empresas.length !== 1">s</span> cadastrada<span x-show="empresas.length !== 1">s</span>
+                    </p>
+                </div>
+                <button @click="modalNovaEmpresa = true" 
+                        class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="bi bi-plus-circle mr-2"></i>Nova Empresa
                 </button>
             </div>
 
-            <!-- Lista de Empresas -->
-            <div class="space-y-4">
+            <!-- Grid de Empresas -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <template x-for="empresa in empresas" :key="empresa.id">
-                    <div class="border-2 border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all hover:border-blue-300">
-                        <div class="flex items-start justify-between">
-                            <!-- Lado Esquerdo: Logo + Dados -->
-                            <div class="flex items-start space-x-6 flex-1">
-                                <!-- Logo e Carimbo -->
-                                <div class="flex-shrink-0 space-y-2">
-                                    <!-- Logo -->
-                                    <div>
-                                        <p class="text-xs text-gray-500 mb-1">Logo</p>
-                                        <template x-if="empresa.logoPreview || empresa.logo">
+                    <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-blue-400 group">
+                        
+                        <!-- Header do Card com Gradiente -->
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+                            
+                            <div class="relative flex items-start justify-between">
+                                <!-- Logo -->
+                                <div class="flex-shrink-0">
+                                    <template x-if="empresa.logoPreview || empresa.logo">
+                                        <div class="w-20 h-20 rounded-xl bg-white p-2 shadow-xl border-4 border-white/30">
                                             <img :src="empresa.logoPreview || empresa.logo" 
                                                  :alt="empresa.nome" 
-                                                 class="w-24 h-24 object-contain rounded-lg border-2 border-gray-200 bg-white p-2">
-                                        </template>
-                                        <template x-if="!empresa.logoPreview && !empresa.logo">
-                                            <div class="w-24 h-24 flex items-center justify-center rounded-lg border-2 border-gray-300 bg-gray-100">
-                                                <i class="bi bi-building text-4xl text-gray-400"></i>
-                                            </div>
-                                        </template>
+                                                 class="w-full h-full object-contain">
+                                        </div>
+                                    </template>
+                                    <template x-if="!empresa.logoPreview && !empresa.logo">
+                                        <div class="w-20 h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl border-2 border-white/30">
+                                            <i class="bi bi-building text-3xl text-white"></i>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Contador Badge -->
+                                <div class="bg-white/20 backdrop-blur-md rounded-xl px-4 py-2 border border-white/30 shadow-lg">
+                                    <p class="text-xs text-white/80 mb-1 font-medium">Documentos</p>
+                                    <p class="text-2xl font-bold text-white">
+                                        <span x-text="getContador(empresa.id)"></span>
+                                        <span class="text-sm text-white/70"> / 5</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Nome da Empresa -->
+                            <h3 class="text-white text-xl font-bold mt-4 mb-1" x-text="empresa.nome"></h3>
+                            <p class="text-blue-100 text-sm flex items-center">
+                                <i class="bi bi-credit-card mr-2"></i>
+                                NIF: <span x-text="empresa.nif" class="ml-1 font-medium"></span>
+                            </p>
+                        </div>
+
+                        <!-- Corpo do Card -->
+                        <div class="p-6">
+                            <!-- Informações Principais -->
+                            <div class="space-y-3 mb-4">
+                                <!-- Endereço -->
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3">
+                                        <i class="bi bi-geo-alt-fill text-green-600 text-lg"></i>
                                     </div>
-                                    
-                                    <!-- Carimbo -->
-                                    <div x-show="empresa.carimboPreview || empresa.carimbo">
-                                        <p class="text-xs text-gray-500 mb-1">Carimbo</p>
-                                        <img :src="empresa.carimboPreview || empresa.carimbo" 
-                                             :alt="empresa.nome + ' - Carimbo'" 
-                                             class="w-24 h-24 object-contain rounded-lg border-2 border-green-200 bg-white p-2">
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 mb-1">Endereço</p>
+                                        <p class="text-sm text-gray-800 font-medium" x-text="empresa.endereco.rua + ', ' + empresa.endereco.municipio"></p>
+                                        <p class="text-xs text-gray-600" x-show="empresa.endereco.bairro" x-text="empresa.endereco.bairro"></p>
                                     </div>
                                 </div>
 
-                                <!-- Dados Principais -->
-                                <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-800 mb-2" x-text="empresa.nome"></h3>
-                                    
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                        <div>
-                                            <p class="text-gray-600">
-                                                <i class="bi bi-credit-card text-blue-600 mr-2"></i>
-                                                <strong>NIF:</strong> <span x-text="empresa.nif"></span>
-                                            </p>
+                                <!-- Contatos -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div x-show="empresa.telefone" class="flex items-center">
+                                        <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center mr-2">
+                                            <i class="bi bi-telephone-fill text-orange-600"></i>
                                         </div>
-                                        
-                                        <div>
-                                            <p class="text-gray-600">
-                                                <i class="bi bi-geo-alt text-green-600 mr-2"></i>
-                                                <strong>Município:</strong> <span x-text="empresa.endereco.municipio"></span>
-                                            </p>
-                                        </div>
-
-                                        <div class="col-span-2">
-                                            <p class="text-gray-600">
-                                                <i class="bi bi-building text-purple-600 mr-2"></i>
-                                                <strong>Sede:</strong> 
-                                                <span x-text="empresa.endereco.rua"></span>
-                                                <span x-show="empresa.endereco.edificio" x-text="', ' + empresa.endereco.edificio"></span>
-                                                <span x-show="empresa.endereco.bairro" x-text="', ' + empresa.endereco.bairro"></span>
-                                            </p>
-                                        </div>
-
-                                        <div x-show="empresa.telefone">
-                                            <p class="text-gray-600">
-                                                <i class="bi bi-telephone text-orange-600 mr-2"></i>
-                                                <span x-text="empresa.telefone"></span>
-                                            </p>
-                                        </div>
-
-                                        <div x-show="empresa.email">
-                                            <p class="text-gray-600">
-                                                <i class="bi bi-envelope text-red-600 mr-2"></i>
-                                                <span x-text="empresa.email"></span>
-                                            </p>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs text-gray-500">Telefone</p>
+                                            <p class="text-sm text-gray-800 font-medium truncate" x-text="empresa.telefone"></p>
                                         </div>
                                     </div>
-
-                                    <!-- Tags de Cores -->
-                                    <div class="flex items-center space-x-2 mt-3">
-                                        <div class="w-6 h-6 rounded border-2 border-gray-300" 
-                                             :style="'background-color: ' + empresa.corPrimaria"
-                                             :title="'Cor Primária: ' + empresa.corPrimaria"></div>
-                                        <div class="w-6 h-6 rounded border-2 border-gray-300" 
-                                             :style="'background-color: ' + empresa.corSecundaria"
-                                             :title="'Cor Secundária: ' + empresa.corSecundaria"></div>
-                                        <span x-show="empresa.marcaDagua" class="text-xs text-gray-500 ml-2">
-                                            <i class="bi bi-water"></i> Marca d'água
-                                        </span>
+                                    <div x-show="empresa.email" class="flex items-center">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-2">
+                                            <i class="bi bi-envelope-fill text-purple-600"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs text-gray-500">Email</p>
+                                            <p class="text-sm text-gray-800 font-medium truncate" x-text="empresa.email"></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Lado Direito: Ações -->
-                            <div class="flex flex-col items-end space-y-3 ml-6">
-                                <!-- Contador de Declarações -->
-                                <div class="text-center bg-gray-50 rounded-lg p-3 min-w-[120px]">
-                                    <p class="text-xs text-gray-600 mb-1">Declarações</p>
-                                    <p class="text-3xl font-bold" :class="getContador(empresa.id) >= 5 ? 'text-red-600' : 'text-green-600'">
-                                        <span x-text="getContador(empresa.id)"></span><span class="text-lg text-gray-400"> / 5</span>
-                                    </p>
+                            <!-- Carimbo e Cores -->
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                                <!-- Carimbo -->
+                                <div x-show="empresa.carimboPreview || empresa.carimbo" class="flex items-center space-x-2">
+                                    <div class="w-12 h-12 rounded-lg border-2 border-gray-200 bg-white p-1 shadow-sm">
+                                        <img :src="empresa.carimboPreview || empresa.carimbo" 
+                                             :alt="empresa.nome + ' - Carimbo'" 
+                                             class="w-full h-full object-contain">
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Carimbo</p>
+                                        <p class="text-xs text-green-600 font-medium"><i class="bi bi-check-circle-fill mr-1"></i>Ativo</p>
+                                    </div>
                                 </div>
 
-                                <!-- Carimbo Thumbnail -->
-                                <div class="bg-gray-50 rounded-lg p-2 border border-gray-200">
-                                    <img :src="empresa.carimbo" 
-                                         alt="Carimbo" 
-                                         class="w-16 h-16 object-contain">
-                                </div>
-
-                                <!-- Botões de Ação -->
+                                <!-- Paleta de Cores -->
                                 <div class="flex items-center space-x-2">
-                                    <button @click="editarEmpresa(empresa)" 
-                                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"
-                                            title="Editar">
-                                        <i class="bi bi-pencil text-lg"></i>
-                                    </button>
-                                    <button @click="resetarContador(empresa.id)" 
-                                            class="bg-orange-100 text-orange-700 hover:bg-orange-200 p-2 rounded-lg transition-colors" 
-                                            title="Resetar contador">
-                                        <i class="bi bi-arrow-clockwise text-lg"></i>
-                                    </button>
-                                    <button @click="deletarEmpresa(empresa.id)" 
-                                            class="bg-red-100 text-red-700 hover:bg-red-200 p-2 rounded-lg transition-colors"
-                                            title="Excluir">
-                                        <i class="bi bi-trash text-lg"></i>
-                                    </button>
+                                    <div class="text-right mr-2">
+                                        <p class="text-xs text-gray-500">Cores</p>
+                                        <p class="text-xs text-gray-600 font-medium">Identidade</p>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-8 h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
+                                             :style="'background-color: ' + empresa.corPrimaria"
+                                             :title="'Cor Primária: ' + empresa.corPrimaria"></div>
+                                        <div class="w-8 h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
+                                             :style="'background-color: ' + empresa.corSecundaria"
+                                             :title="'Cor Secundária: ' + empresa.corSecundaria"></div>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+                                <button @click="editarEmpresa(empresa)" 
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center font-medium">
+                                    <i class="bi bi-pencil-square mr-2"></i>Editar
+                                </button>
+                                <button @click="resetarContador(empresa.id)" 
+                                        class="bg-orange-100 hover:bg-orange-200 text-orange-700 p-2 rounded-lg transition-colors"
+                                        title="Resetar contador">
+                                    <i class="bi bi-arrow-clockwise text-lg"></i>
+                                </button>
+                                <button @click="deletarEmpresa(empresa.id)" 
+                                        class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg transition-colors"
+                                        title="Excluir empresa">
+                                    <i class="bi bi-trash text-lg"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </template>
+            </div>
 
-                <div x-show="empresas.length === 0" class="text-center py-16 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                    <i class="bi bi-building text-7xl mb-4 text-gray-300"></i>
-                    <p class="text-lg font-medium mb-2">Nenhuma empresa cadastrada ainda</p>
-                    <p class="text-sm text-gray-400">Clique em "Adicionar Empresa" para começar a criar documentos profissionais</p>
+            <!-- Estado Vazio -->
+            <div x-show="empresas.length === 0" class="text-center py-20">
+                <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 mb-6">
+                    <i class="bi bi-building text-6xl text-blue-600"></i>
                 </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Nenhuma empresa cadastrada</h3>
+                <p class="text-gray-500 mb-6">Comece adicionando sua primeira empresa para gerar documentos profissionais</p>
+                <button @click="modalNovaEmpresa = true" 
+                        class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                    <i class="bi bi-plus-circle mr-2"></i>Adicionar Primeira Empresa
+                </button>
             </div>
         </div>
 

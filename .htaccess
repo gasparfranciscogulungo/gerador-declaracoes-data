@@ -1,0 +1,23 @@
+# Forçar UTF-8 para todos os arquivos
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .html .htm .css .js .json .xml .txt
+
+# Forçar Content-Type com UTF-8 para HTML
+<FilesMatch "\.(html|htm)$">
+    Header set Content-Type "text/html; charset=UTF-8"
+</FilesMatch>
+
+# Forçar UTF-8 para JSON
+<FilesMatch "\.json$">
+    Header set Content-Type "application/json; charset=UTF-8"
+</FilesMatch>
+
+# Forçar UTF-8 para JavaScript
+<FilesMatch "\.js$">
+    Header set Content-Type "application/javascript; charset=UTF-8"
+</FilesMatch>
+
+# Forçar UTF-8 para CSS
+<FilesMatch "\.css$">
+    Header set Content-Type "text/css; charset=UTF-8"
+</FilesMatch>

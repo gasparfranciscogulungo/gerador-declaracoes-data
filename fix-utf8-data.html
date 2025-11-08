@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrigir UTF-8 nos Dados - Gerador de Declarações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">
+                <i class="bi bi-tools mr-3 text-blue-600"></i>
+                Corrigir Codificação UTF-8 nos Dados
+            </h1>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
+                <p class="text-yellow-800">
+                    <i class="bi bi-exclamation-triangle mr-2"></i>
+                    Esta ferramenta vai reprocessar todos os dados JSON salvos no GitHub para corrigir problemas de codificação UTF-8.
+                </p>
+            </div>
+
+            <div class="space-y-4" id="app">
+                <!-- Status -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="font-bold text-lg mb-2">Status da Correção</h3>
+                    <div id="status" class="text-gray-600">Aguardando início...</div>
+                </div>
+
+                <!-- Logs -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="font-bold text-lg mb-2">Log de Operações</h3>
+                    <div id="logs" class="text-sm font-mono space-y-1 max-h-96 overflow-y-auto"></div>
+                </div>
+
+                <!-- Botão -->
+                <button onclick="corrigirDados()" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition-colors">
+                    <i class="bi bi-arrow-clockwise mr-2"></i>Iniciar Correção UTF-8
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/auth-manager.js"></script>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const colors = {
+                info: 'text-blue-600',
+                success: 'text-green-600',
+                error: 'text-red-600',
+                warning: 'text-orange-600'
+            };
+            
+            const time = new Date().toLocaleTimeString('pt-PT');
+            const logLine = document.createElement('div');
+            logLine.className = colors[type];
+            logLine.textContent = `[${time}] ${message}`;
+            logs.appendChild(logLine);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function setStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        async function corrigirDados() {
+            try {
+                addLog('Iniciando correção UTF-8...', 'info');
+                setStatus('Processando...');
+
+                // Verificar autenticação
+                if (!authManager.usuarioAtual) {
+                    addLog('Fazendo login...', 'info');
+                    await authManager.verificarAutenticacao();
+                }
+
+                if (!authManager.usuarioAtual) {
+                    throw new Error('Usuário não autenticado. Faça login primeiro.');
+                }
+
+                addLog(`Usuário: ${authManager.usuarioAtual.username}`, 'info');
+
+                // Lista de arquivos para corrigir
+                const arquivos = [
+                    'data/trabalhadores.json',
+                    'data/empresas.json',
+                    'data/users.json',
+                    'data/modelos.json',
+                    'data/contador.json',
+                    'data/personalizacoes.json'
+                ];
+
+                let processados = 0;
+                let erros = 0;
+
+                for (const arquivo of arquivos) {
+                    try {
+                        addLog(`Processando: ${arquivo}...`, 'info');
+
+                        // Ler arquivo atual
+                        const result = await githubAPI.lerJSON(arquivo);
+                        
+                        if (!result || !result.data) {
+                            addLog(`  ⚠️ Arquivo não existe: ${arquivo}`, 'warning');
+                            continue;
+                        }
+
+                        addLog(`  ✓ Lido com sucesso`, 'success');
+
+                        // Salvar novamente (vai usar a codificação UTF-8 correta)
+                        await githubAPI.salvarJSON(
+                            arquivo,
+                            result.data,
+                            `🔧 Corrigir codificação UTF-8: ${arquivo}`,
+                            result.sha
+                        );
+
+                        addLog(`  ✅ Salvo com codificação UTF-8 correta`, 'success');
+                        processados++;
+
+                    } catch (error) {
+                        addLog(`  ❌ Erro ao processar ${arquivo}: ${error.message}`, 'error');
+                        erros++;
+                    }
+                }
+
+                addLog('', 'info');
+                addLog('═══════════════════════════════════════', 'info');
+                addLog(`✅ Correção concluída!`, 'success');
+                addLog(`📊 Arquivos processados: ${processados}`, 'success');
+                if (erros > 0) {
+                    addLog(`⚠️ Erros encontrados: ${erros}`, 'warning');
+                }
+                addLog('═══════════════════════════════════════', 'info');
+                
+                setStatus(`Concluído! ${processados} arquivos corrigidos.`);
+
+                alert(`✅ Correção UTF-8 concluída!\n\n${processados} arquivos processados\n${erros} erros encontrados\n\nAtualize a página admin.html para ver os dados corrigidos.`);
+
+            } catch (error) {
+                addLog(`❌ ERRO FATAL: ${error.message}`, 'error');
+                setStatus('Erro ao processar');
+                alert(`❌ Erro: ${error.message}`);
+            }
+        }
+
+        // Auto-login ao carregar
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                addLog('Verificando autenticação...', 'info');
+                await authManager.verificarAutenticacao();
+                
+                if (authManager.usuarioAtual) {
+                    addLog(`✅ Autenticado como: ${authManager.usuarioAtual.username}`, 'success');
+                    setStatus('Pronto para corrigir dados');
+                } else {
+                    addLog('⚠️ Não autenticado. Redirecionando para login...', 'warning');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                addLog(`❌ Erro ao verificar autenticação: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

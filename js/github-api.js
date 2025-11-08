@@ -94,8 +94,18 @@ class GitHubAPI {
 
             const data = await response.json();
 
-            // Decodificar conteúdo Base64
-            const content = atob(data.content);
+            // Decodificar conteúdo Base64 com suporte UTF-8 correto
+            // Primeiro remove quebras de linha do base64
+            const base64Clean = data.content.replace(/\n/g, '');
+            // Decodifica base64 para string binária
+            const binaryString = atob(base64Clean);
+            // Converte string binária para array de bytes
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            // Decodifica UTF-8 corretamente
+            const content = new TextDecoder('utf-8').decode(bytes);
 
             console.log(`✅ Arquivo lido: ${path} (${data.size} bytes)`);
 
@@ -139,8 +149,16 @@ class GitHubAPI {
         try {
             const url = `${this.baseURL}/repos/${this.owner}/${this.repo}/contents/${path}`;
 
-            // Encodar conteúdo para Base64
-            const contentBase64 = btoa(unescape(encodeURIComponent(content)));
+            // Encodar conteúdo para Base64 com suporte UTF-8 correto
+            // Converte string para UTF-8 bytes
+            const utf8Bytes = new TextEncoder().encode(content);
+            // Converte bytes para string binária
+            let binaryString = '';
+            for (let i = 0; i < utf8Bytes.length; i++) {
+                binaryString += String.fromCharCode(utf8Bytes[i]);
+            }
+            // Encodifica para base64
+            const contentBase64 = btoa(binaryString);
 
             const body = {
                 message: message,
