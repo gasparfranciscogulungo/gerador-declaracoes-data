@@ -1,0 +1,31 @@
+{
+  "historico": [],
+  "_metadata": {
+    "versao": "1.0.0",
+    "criado_em": "2025-11-08T00:00:00Z",
+    "descricao": "Histórico de documentos gerados - apenas metadados, sem PDFs armazenados"
+  },
+  "_exemplo": {
+    "id": "unique-id-timestamp",
+    "tipo_documento": "declaracao|recibo|combo",
+    "empresa_id": "1000",
+    "trabalhador_id": "T001",
+    "dados_documento": {
+      "empresa_nome": "Nome da Empresa",
+      "empresa_nif": "1234567890",
+      "trabalhador_nome": "João Silva",
+      "trabalhador_nif": "987654321",
+      "trabalhador_funcao": "Técnico de TI",
+      "salario_bruto": "250000",
+      "salario_liquido": "220000",
+      "moeda": "AOA",
+      "meses_recibo": ["2025-01", "2025-02", "2025-03"]
+    },
+    "gerado_por": "username_github",
+    "gerado_em": "2025-11-08T14:30:00Z",
+    "contador": "001/2025",
+    "modelo_usado": "modelo_executivo",
+    "status": "ativo",
+    "notas": "Observações opcionais"
+  }
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste ClienteManager - ETAPA 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🧪 Teste ClienteManager - ETAPA 2</h1>
+        
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">📋 Instruções</h2>
+            <div class="space-y-2 text-sm">
+                <p>1. Abra o <strong>Console do Navegador</strong> (F12)</p>
+                <p>2. A instância <code class="bg-gray-700 px-2 py-1 rounded">clienteManager</code> está disponível globalmente</p>
+                <p>3. Execute os comandos abaixo para testar todas as funcionalidades:</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Teste 1: Criar -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-green-400">✅ 1. CRIAR Trabalhador</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Criar novo trabalhador
+await clienteManager.criar({
+    nome: 'João Manuel Silva',
+    nif: '123456789',
+    bi: 'BA001234567',
+    dataNascimento: '1985-03-15',
+    genero: 'M',
+    morada: 'Rua da Independência, Luanda',
+    telefone: '923456789',
+    email: 'joao.silva@email.com',
+    cargo: 'Analista de TI',
+    departamento: 'Tecnologia',
+    dataAdmissao: '2020-01-10',
+    vencimentoBase: 250000,
+    subsidioAlimentacao: 15000,
+    subsidioTransporte: 10000
+});</code></pre>
+            </div>
+
+            <!-- Teste 2: Listar -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-blue-400">📋 2. LISTAR Trabalhadores</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Listar todos
+await clienteManager.listar();
+
+// Listar apenas ativos
+await clienteManager.listar({ ativo: true });
+
+// Filtrar por departamento
+await clienteManager.listar({ 
+    departamento: 'Tecnologia' 
+});</code></pre>
+            </div>
+
+            <!-- Teste 3: Buscar -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-yellow-400">🔍 3. BUSCAR Trabalhador</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Buscar por NIF
+await clienteManager.buscarPorNIF('123456789');
+
+// Buscar por nome (parcial)
+await clienteManager.buscarPorNome('João');
+
+// Buscar por ID
+const lista = await clienteManager.listar();
+const id = lista[0].id;
+await clienteManager.buscarPorId(id);</code></pre>
+            </div>
+
+            <!-- Teste 4: Atualizar -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-purple-400">📝 4. ATUALIZAR Trabalhador</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Pegar ID do primeiro trabalhador
+const lista = await clienteManager.listar();
+const id = lista[0].id;
+
+// Atualizar salário
+await clienteManager.atualizar(id, {
+    vencimentoBase: 300000,
+    cargo: 'Analista Sênior de TI'
+});</code></pre>
+            </div>
+
+            <!-- Teste 5: Calcular Salário -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-cyan-400">💰 5. CALCULAR Salário</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Pegar trabalhador
+const lista = await clienteManager.listar();
+const trabalhador = lista[0];
+
+// Calcular salário
+const calculo = clienteManager
+    .calcularSalario(trabalhador);
+    
+console.log(calculo);</code></pre>
+            </div>
+
+            <!-- Teste 6: Estatísticas -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-pink-400">📊 6. ESTATÍSTICAS</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Obter estatísticas gerais
+const stats = await clienteManager
+    .obterEstatisticas();
+    
+console.log('Total:', stats.total);
+console.log('Ativos:', stats.ativos);
+console.log('Massa Salarial:', stats.massaSalarialTotal);
+console.log('Por Depto:', stats.porDepartamento);</code></pre>
+            </div>
+
+            <!-- Teste 7: Excluir (Soft Delete) -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-orange-400">🗑️ 7. EXCLUIR (Soft Delete)</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// Pegar ID
+const lista = await clienteManager.listar();
+const id = lista[0].id;
+
+// Marcar como inativo
+await clienteManager.excluir(id);
+
+// Verificar
+await clienteManager.listar({ ativo: false });
+
+// Reativar
+await clienteManager.reativar(id);</code></pre>
+            </div>
+
+            <!-- Teste 8: Validações -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-bold mb-3 text-red-400">⚠️ 8. TESTAR Validações</h3>
+                <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// NIF inválido (deve falhar)
+try {
+    await clienteManager.criar({
+        nome: 'Teste',
+        nif: '123' // NIF curto
+    });
+} catch(e) {
+    console.log('✅ Validação OK:', e.message);
+}
+
+// Email inválido (deve falhar)
+try {
+    await clienteManager.criar({
+        nome: 'Teste',
+        nif: '987654321',
+        email: 'email-invalido'
+    });
+} catch(e) {
+    console.log('✅ Validação OK:', e.message);
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-blue-900 border border-blue-500 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">🎯 Teste Completo (Executar tudo de uma vez)</h3>
+            <pre class="bg-gray-900 p-4 rounded text-xs overflow-x-auto"><code>// TESTE COMPLETO DA ETAPA 2
+(async () => {
+    console.log('🚀 Iniciando testes do ClienteManager...\n');
+    
+    try {
+        // 1. CRIAR
+        console.log('1️⃣ Criando trabalhador...');
+        const novo = await clienteManager.criar({
+            nome: 'Maria Santos Costa',
+            nif: '987654321',
+            bi: 'BA002345678',
+            dataNascimento: '1990-07-20',
+            genero: 'F',
+            morada: 'Av. 4 de Fevereiro, Luanda',
+            telefone: '934567890',
+            email: 'maria.costa@email.com',
+            cargo: 'Gerente de RH',
+            departamento: 'Recursos Humanos',
+            dataAdmissao: '2019-05-15',
+            vencimentoBase: 450000,
+            subsidioAlimentacao: 20000,
+            subsidioTransporte: 15000
+        });
+        console.log('✅ Criado:', novo.nome, '(ID:', novo.id, ')');
+        
+        // 2. LISTAR
+        console.log('\n2️⃣ Listando trabalhadores...');
+        const lista = await clienteManager.listar();
+        console.log('✅ Total:', lista.length, 'trabalhadores');
+        
+        // 3. BUSCAR
+        console.log('\n3️⃣ Buscando por NIF...');
+        const encontrado = await clienteManager.buscarPorNIF('987654321');
+        console.log('✅ Encontrado:', encontrado.nome);
+        
+        // 4. CALCULAR SALÁRIO
+        console.log('\n4️⃣ Calculando salário...');
+        const salario = clienteManager.calcularSalario(encontrado);
+        console.log('✅ Salário Bruto:', salario.brutoFormatado);
+        console.log('   INSS:', salario.inssFormatado);
+        console.log('   IRT:', salario.irtFormatado);
+        console.log('   Líquido:', salario.liquidoFormatado);
+        
+        // 5. ATUALIZAR
+        console.log('\n5️⃣ Atualizando trabalhador...');
+        const atualizado = await clienteManager.atualizar(encontrado.id, {
+            vencimentoBase: 500000
+        });
+        console.log('✅ Atualizado:', atualizado.nome, '- Novo salário:', atualizado.vencimentoBase);
+        
+        // 6. ESTATÍSTICAS
+        console.log('\n6️⃣ Gerando estatísticas...');
+        const stats = await clienteManager.obterEstatisticas();
+        console.log('✅ Total de trabalhadores:', stats.total);
+        console.log('   Ativos:', stats.ativos);
+        console.log('   Massa salarial total:', stats.massaSalarialTotal.toLocaleString('pt-AO'), 'AKZ');
+        console.log('   Departamentos:', Object.keys(stats.porDepartamento).length);
+        
+        // 7. SOFT DELETE
+        console.log('\n7️⃣ Testando exclusão (soft delete)...');
+        await clienteManager.excluir(encontrado.id);
+        console.log('✅ Trabalhador marcado como inativo');
+        
+        // 8. REATIVAR
+        console.log('\n8️⃣ Reativando trabalhador...');
+        await clienteManager.reativar(encontrado.id);
+        console.log('✅ Trabalhador reativado');
+        
+        console.log('\n🎉 TODOS OS TESTES PASSARAM! ETAPA 2 COMPLETA!');
+        
+    } catch (erro) {
+        console.error('❌ Erro nos testes:', erro);
+    }
+})();</code></pre>
+            <button 
+                onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)"
+                class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                📋 Copiar teste completo
+            </button>
+        </div>
+
+        <div class="mt-6 bg-green-900 border border-green-500 rounded-lg p-6">
+            <h3 class="text-lg font-bold mb-2">✅ ETAPA 2 - Funcionalidades Implementadas:</h3>
+            <ul class="space-y-1 text-sm">
+                <li>✅ CRUD completo (Create, Read, Update, Delete)</li>
+                <li>✅ Validações robustas (NIF 9 dígitos, email, telefone, datas)</li>
+                <li>✅ Sanitização contra XSS</li>
+                <li>✅ Sistema de permissões (admin vs usuário)</li>
+                <li>✅ Busca avançada (por nome, NIF, filtros)</li>
+                <li>✅ Integração com CalculadoraSalario</li>
+                <li>✅ Estatísticas e relatórios</li>
+                <li>✅ Soft delete (marcar como inativo)</li>
+                <li>✅ Integração com GitHub API</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/calculo-salario.js"></script>
+    <script src="js/cliente-manager.js"></script>
+
+    <script>
+        // Inicializar instância global para testes
+        console.log('🔧 Inicializando ClienteManager...');
+        
+        // Mock simples do authManager para testes
+        const mockAuthManager = {
+            usuarioAtual: {
+                username: 'admin',
+                role: 'admin'
+            }
+        };
+        
+        // Mock simples do githubAPI para testes
+        const mockGithubAPI = {
+            async lerArquivo(path) {
+                const saved = localStorage.getItem('trabalhadores_test');
+                return saved || null;
+            },
+            async salvarArquivo(path, conteudo, mensagem) {
+                localStorage.setItem('trabalhadores_test', conteudo);
+                console.log('💾 Salvo no localStorage (simulação)');
+                return true;
+            }
+        };
+        
+        // Criar instância global
+        window.clienteManager = new ClienteManager(mockGithubAPI, mockAuthManager);
+        
+        console.log('✅ ClienteManager pronto!');
+        console.log('💡 Use: clienteManager.criar(), .listar(), .buscarPorNIF(), etc.');
+        console.log('📝 Copie e execute os comandos dos cards acima no console');
+    </script>
+</body>
+</html>

@@ -91,7 +91,7 @@ class PDFGenerator {
             // Atualizar contador
             storageHandler.incrementarContador(empresaId);
 
-            // Adicionar ao histórico
+            // Adicionar ao histórico LOCAL (old system)
             storageHandler.adicionarHistorico({
                 empresaId: empresa.id,
                 empresaNome: empresa.nome,
@@ -101,6 +101,34 @@ class PDFGenerator {
                 modeloNome: modelo.nome,
                 referencia: referencia
             });
+
+            // 🆕 REGISTRAR NO HISTÓRICO MANAGER (GitHub)
+            try {
+                if (typeof historicoManager !== 'undefined' && historicoManager.initialized) {
+                    await historicoManager.registrarDocumento({
+                        tipo_documento: 'declaracao', // ou detectar automaticamente
+                        empresa_id: empresa.id,
+                        trabalhador_id: trabalhador.id,
+                        dados_documento: {
+                            empresa_nome: empresa.nome,
+                            empresa_nif: empresa.nif || '',
+                            trabalhador_nome: trabalhador.nome,
+                            trabalhador_nif: trabalhador.nif || '',
+                            trabalhador_funcao: trabalhador.funcao || '',
+                            salario_bruto: trabalhador.salario_bruto || '',
+                            salario_liquido: trabalhador.salario_liquido || '',
+                            moeda: trabalhador.moeda || 'AOA'
+                        },
+                        modelo_usado: modeloId,
+                        contador: referencia,
+                        notas: `Declaração gerada em ${new Date().toLocaleString('pt-PT')}`
+                    });
+                    console.log('📝 Documento registrado no histórico GitHub');
+                }
+            } catch (errorHistorico) {
+                console.warn('⚠️ Erro ao registrar no histórico GitHub:', errorHistorico);
+                // Não bloqueia a geração do PDF se falhar o registro
+            }
 
             console.log('✅ Declaração gerada e registrada:', referencia);
 

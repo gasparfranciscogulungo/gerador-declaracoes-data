@@ -246,6 +246,12 @@ function adminApp() {
             this.userManager = new UserManager();
             this.clienteManager = new ClienteManager();
             
+            // Inicializar HistoricoManager
+            if (typeof historicoManager !== 'undefined') {
+                await historicoManager.inicializar(githubAPI, authManager);
+                console.log('✅ HistoricoManager inicializado');
+            }
+            
             // Carregar TODOS os dados
             await this.carregarTodosDados();
             
@@ -481,16 +487,31 @@ function adminApp() {
                 this.stats.totalClientes = totalClientes;
                 this.stats.totalDeclaracoes = totalDeclaracoes;
                 
-                // PDFs HOJE: Para isso seria necessário ler arquivos, então deixamos 0 por padrão
-                // Será atualizado quando implementarmos histórico de declarações
-                this.stats.declaracoesHoje = 0;
+                // 🆕 PDFs HOJE e TOTAL: Buscar do HistoricoManager
+                if (typeof historicoManager !== 'undefined' && historicoManager.initialized) {
+                    try {
+                        const historicoStats = historicoManager.estatisticas();
+                        this.stats.totalDeclaracoes = historicoStats.total || totalDeclaracoes;
+                        this.stats.declaracoesHoje = historicoManager.estatisticasHoje();
+                        console.log('📊 Stats do histórico carregadas:', {
+                            totalDocs: historicoStats.total,
+                            hoje: this.stats.declaracoesHoje
+                        });
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao carregar stats do histórico:', error);
+                        this.stats.declaracoesHoje = 0;
+                    }
+                } else {
+                    this.stats.declaracoesHoje = 0;
+                }
                 
                 console.log('📊 Stats atualizadas:', {
                     empresas: this.stats.empresas,
                     modelos: this.stats.modelos,
                     usersAtivos: this.stats.users,
                     totalClientes: this.stats.totalClientes,
-                    totalDeclaracoes: this.stats.totalDeclaracoes
+                    totalDeclaracoes: this.stats.totalDeclaracoes,
+                    declaracoesHoje: this.stats.declaracoesHoje
                 });
                 
             } catch (error) {
