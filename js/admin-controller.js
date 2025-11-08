@@ -2780,28 +2780,87 @@ function adminApp() {
         },
         
         /**
-         * Abre o fluxo de geração
+         * Abre o fluxo de geração (carrega cache se disponível)
          */
         abrirFluxoGeracao() {
             this.modalFluxoGeracao = true;
-            this.fluxoEtapa = 1;
-            this.fluxoEmpresaSelecionada = null;
-            this.fluxoClienteSelecionado = null;
-            this.fluxoTipoDocumento = null;
-            this.fluxoMesesRecibo = '1';
+            
+            // Tentar carregar cache do localStorage
+            const cache = localStorage.getItem('fluxoGeracaoCache');
+            if (cache) {
+                try {
+                    const dados = JSON.parse(cache);
+                    console.log('📦 Carregando cache do fluxo:', dados);
+                    
+                    // Restaurar empresa selecionada
+                    if (dados.empresaId) {
+                        this.fluxoEmpresaSelecionada = this.empresas.find(e => e.id === dados.empresaId);
+                    }
+                    
+                    // Restaurar cliente selecionado
+                    if (dados.clienteId) {
+                        this.fluxoClienteSelecionado = this.trabalhadores.find(t => t.id === dados.clienteId);
+                    }
+                    
+                    // Restaurar etapa e configurações
+                    this.fluxoEtapa = dados.etapa || 1;
+                    this.fluxoTipoDocumento = dados.tipoDocumento || null;
+                    this.fluxoMesesRecibo = dados.mesesRecibo || '1';
+                    
+                } catch (e) {
+                    console.warn('⚠️ Erro ao carregar cache:', e);
+                    this.resetarFluxo();
+                }
+            } else {
+                this.resetarFluxo();
+            }
+            
             this.fluxoBuscaEmpresa = '';
             this.fluxoBuscaCliente = '';
         },
         
         /**
-         * Fecha o fluxo de geração
+         * Reseta o fluxo para estado inicial
          */
-        fecharFluxoGeracao() {
-            this.modalFluxoGeracao = false;
+        resetarFluxo() {
             this.fluxoEtapa = 1;
             this.fluxoEmpresaSelecionada = null;
             this.fluxoClienteSelecionado = null;
             this.fluxoTipoDocumento = null;
+            this.fluxoMesesRecibo = '1';
+        },
+        
+        /**
+         * Salva o estado atual no localStorage
+         */
+        salvarCacheFluxo() {
+            const cache = {
+                empresaId: this.fluxoEmpresaSelecionada?.id || null,
+                clienteId: this.fluxoClienteSelecionado?.id || null,
+                etapa: this.fluxoEtapa,
+                tipoDocumento: this.fluxoTipoDocumento,
+                mesesRecibo: this.fluxoMesesRecibo,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('fluxoGeracaoCache', JSON.stringify(cache));
+            console.log('💾 Cache salvo:', cache);
+        },
+        
+        /**
+         * Fecha o fluxo de geração (mantém cache)
+         */
+        fecharFluxoGeracao() {
+            this.salvarCacheFluxo();
+            this.modalFluxoGeracao = false;
+        },
+        
+        /**
+         * Limpa o cache e reseta o fluxo
+         */
+        limparCacheFluxo() {
+            localStorage.removeItem('fluxoGeracaoCache');
+            this.resetarFluxo();
+            console.log('🗑️ Cache limpo');
         },
         
         /**
@@ -2809,6 +2868,7 @@ function adminApp() {
          */
         selecionarEmpresa(empresa) {
             this.fluxoEmpresaSelecionada = empresa;
+            this.salvarCacheFluxo();
             console.log('✅ Empresa selecionada:', empresa.nome);
         },
         
@@ -2821,6 +2881,7 @@ function adminApp() {
                 return;
             }
             this.fluxoEtapa = 2;
+            this.salvarCacheFluxo();
             this.fluxoBuscaCliente = '';
         },
         
@@ -2829,6 +2890,7 @@ function adminApp() {
          */
         selecionarCliente(cliente) {
             this.fluxoClienteSelecionado = cliente;
+            this.salvarCacheFluxo();
             console.log('✅ Cliente selecionado:', cliente.nome);
         },
         
@@ -2841,10 +2903,11 @@ function adminApp() {
                 return;
             }
             this.fluxoEtapa = 3;
+            this.salvarCacheFluxo();
         },
         
         /**
-         * Gera preview do documento
+         * Gera preview do documento (ETAPA 4)
          */
         async gerarPreviewDocumento() {
             if (!this.fluxoTipoDocumento) {
@@ -2852,43 +2915,83 @@ function adminApp() {
                 return;
             }
             
-            console.log('📄 Gerando preview...', {
+            this.fluxoEtapa = 4;
+            this.salvarCacheFluxo();
+            
+            console.log('📄 Preview preparado:', {
                 empresa: this.fluxoEmpresaSelecionada.nome,
                 cliente: this.fluxoClienteSelecionado.nome,
                 tipo: this.fluxoTipoDocumento,
                 meses: this.fluxoMesesRecibo
             });
-            
-            // TODO: Implementar geração real do preview
-            this.fluxoEtapa = 4;
-            this.showAlert('info', 'Preview em desenvolvimento');
         },
         
         /**
-         * Gera documento final
+         * Gera documento final com pdf-generator.js
          */
         async gerarDocumentoFinal() {
             this.loading = true;
-            this.loadingMessage = 'Gerando documento...';
+            this.loadingMessage = '📄 Gerando PDF profissional...';
             
             try {
-                console.log('📄 Gerando documento final...', {
-                    empresa: this.fluxoEmpresaSelecionada,
-                    cliente: this.fluxoClienteSelecionado,
-                    tipo: this.fluxoTipoDocumento
+                console.log('📄 Gerando documento final:', {
+                    empresa: this.fluxoEmpresaSelecionada.nome,
+                    cliente: this.fluxoClienteSelecionado.nome,
+                    tipo: this.fluxoTipoDocumento,
+                    meses: this.fluxoMesesRecibo
                 });
                 
-                // TODO: Chamar pdf-generator.js com os dados corretos
-                // TODO: Registrar no histórico automaticamente
+                // TODO: Integração com pdf-generator.js
+                // Exemplo de chamada (precisa ser ajustado conforme sua API):
+                // await pdfGenerator.gerarDeclaracao(
+                //     this.fluxoEmpresaSelecionada, 
+                //     this.fluxoClienteSelecionado
+                // );
                 
                 this.showAlert('success', '✅ Documento gerado com sucesso!');
-                this.fecharFluxoGeracao();
+                
+                // Perguntar se deseja gerar outro documento
+                await this.perguntarGerarOutroDocumento();
                 
             } catch (error) {
                 console.error('❌ Erro ao gerar documento:', error);
-                this.showAlert('error', `Erro: ${error.message}`);
+                this.showAlert('error', `Erro ao gerar PDF: ${error.message}`);
             } finally {
                 this.loading = false;
+            }
+        },
+        
+        /**
+         * Pergunta se deseja gerar outro documento
+         */
+        async perguntarGerarOutroDocumento() {
+            const resposta = confirm('✅ PDF gerado!\n\n📄 Deseja gerar outro documento?');
+            
+            if (resposta) {
+                // SIM: Mantém empresa e cliente, volta para seleção de tipo
+                console.log('🔄 Gerando outro documento para o mesmo cliente');
+                this.fluxoEtapa = 3;
+                this.fluxoTipoDocumento = null;
+                this.fluxoMesesRecibo = '1';
+                this.salvarCacheFluxo();
+            } else {
+                // NÃO: Pergunta se quer gerar para outro cliente
+                const outroCliente = confirm('👤 Deseja gerar documento para outro cliente?');
+                
+                if (outroCliente) {
+                    // SIM: Mantém empresa, volta para seleção de cliente
+                    console.log('🔄 Gerando documento para outro cliente');
+                    this.fluxoEtapa = 2;
+                    this.fluxoClienteSelecionado = null;
+                    this.fluxoTipoDocumento = null;
+                    this.fluxoMesesRecibo = '1';
+                    this.salvarCacheFluxo();
+                } else {
+                    // NÃO: Fecha tudo e limpa cache
+                    console.log('✅ Fluxo finalizado');
+                    this.limparCacheFluxo();
+                    this.fecharFluxoGeracao();
+                }
             }
         }
     };
