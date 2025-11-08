@@ -121,6 +121,32 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-11-08T14:13:56.096Z"
+    },
+    {
+      "id": "empresa_1762641163240",
+      "nome": "Ricardo servico",
+      "nif": "5345345345353",
+      "endereco": {
+        "rua": "nm,n.,mn.",
+        "edificio": "hjçhçj",
+        "andar": " nm,.n",
+        "sala": "nm.nm.,",
+        "bairro": "nm,b",
+        "municipio": " .,bn.b.",
+        "provincia": "bnm,b,n",
+        "pais": "Angola"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5345345345353/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5345345345353/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-08T22:32:43.240Z",
+      "updatedAt": "2025-11-08T22:32:43.240Z",
+      "contador": 0
     }
   ]
 }
