@@ -3332,49 +3332,49 @@ function adminApp() {
                 }
                 
                 // ========== FOTO 1 (FRENTE) - Em cima ==========
-                yPos += 5;
-                pdf.setFontSize(12);
+                yPos += 3;
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('Fotografia Frontal', margin, yPos);
-                yPos += 5;
+                yPos += 4;
                 
-                // Calcular dimensões da foto 1 (mantendo proporção)
-                const foto1MaxWidth = pageWidth - (2 * margin);
-                const foto1MaxHeight = 100; // mm
-                
-                // Adicionar foto 1 centralizada
-                const foto1X = margin;
+                // Dimensões equilibradas para foto 1 (proporção confortável 3:2)
+                const foto1Width = 140; // mm - Largura moderada
+                const foto1Height = 90; // mm - Altura proporcional
+                const foto1X = (pageWidth - foto1Width) / 2; // Centralizar horizontalmente
                 const foto1Y = yPos;
-                pdf.addImage(this.biFoto1Editada, 'JPEG', foto1X, foto1Y, foto1MaxWidth, foto1MaxHeight, '', 'FAST');
+                
+                pdf.addImage(this.biFoto1Editada, 'JPEG', foto1X, foto1Y, foto1Width, foto1Height, '', 'FAST');
                 
                 // Borda ao redor da foto 1
                 pdf.setDrawColor(200, 200, 200);
                 pdf.setLineWidth(0.3);
-                pdf.rect(foto1X, foto1Y, foto1MaxWidth, foto1MaxHeight);
+                pdf.rect(foto1X, foto1Y, foto1Width, foto1Height);
                 
                 // ========== FOTO 2 (VERSO) - Em baixo ==========
-                yPos = foto1Y + foto1MaxHeight + 10;
+                yPos = foto1Y + foto1Height + 6;
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('Fotografia de Identificação', margin, yPos);
-                yPos += 5;
+                yPos += 4;
                 
-                // Calcular dimensões da foto 2 (mantendo proporção)
-                const foto2MaxWidth = pageWidth - (2 * margin);
-                const foto2MaxHeight = 100; // mm
-                
-                // Adicionar foto 2 centralizada
-                const foto2X = margin;
+                // Dimensões equilibradas para foto 2 (mesma proporção da foto 1)
+                const foto2Width = 140; // mm - Mesma largura
+                const foto2Height = 90; // mm - Mesma altura
+                const foto2X = (pageWidth - foto2Width) / 2; // Centralizar horizontalmente
                 const foto2Y = yPos;
-                pdf.addImage(this.biFoto2Editada, 'JPEG', foto2X, foto2Y, foto2MaxWidth, foto2MaxHeight, '', 'FAST');
+                
+                pdf.addImage(this.biFoto2Editada, 'JPEG', foto2X, foto2Y, foto2Width, foto2Height, '', 'FAST');
                 
                 // Borda ao redor da foto 2
-                pdf.rect(foto2X, foto2Y, foto2MaxWidth, foto2MaxHeight);
+                pdf.rect(foto2X, foto2Y, foto2Width, foto2Height);
                 
                 // ========== RODAPÉ ==========
+                const rodapeY = foto2Y + foto2Height + 6;
                 pdf.setFontSize(8);
                 pdf.setTextColor(100, 100, 100);
                 pdf.setFont('helvetica', 'italic');
-                pdf.text('Documento gerado automaticamente - Verificar autenticidade', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                pdf.text('Documento gerado automaticamente - Verificar autenticidade', pageWidth / 2, rodapeY, { align: 'center' });
                 
                 // ========== SALVAR PDF ==========
                 const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_BI.pdf`;
