@@ -60,8 +60,13 @@ function adminApp() {
         modelosSelecionadosIds: [], // Array de IDs dos modelos selecionados
         
         // Editor BI
-        cropperFoto1: null,
-        cropperFoto2: null,
+        modalCropperBI: false,
+        cropperInstance: null,
+        cropperFotoAtual: 1,
+        biFoto1Preview: null,
+        biFoto2Preview: null,
+        biFoto1Blob: null,
+        biFoto2Blob: null,
         
         // Preview de Modelo
         modeloSelecionado: null,
@@ -3024,18 +3029,236 @@ function adminApp() {
          * Abre editor de foto para documento BI
          */
         abrirEditorBI() {
-            console.log('📷 Abrindo editor de BI...');
+            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                this.showAlert('error', 'Selecione empresa e cliente primeiro');
+                return;
+            }
             
-            // Renderizar o editor BI no container
+            console.log('📷 Abrindo editor de BI para:', {
+                empresa: this.fluxoEmpresaSelecionada.nome,
+                cliente: this.fluxoClienteSelecionado.nome
+            });
+            
+            // Abrir o modal de preview com tipo 'bi'
+            this.tipoPreview = 'bi';
+            this.modalPreviewModelo = true;
+            
+            // Resetar fotos anteriores
+            this.biFoto1Preview = null;
+            this.biFoto2Preview = null;
+            this.biFoto1Blob = null;
+            this.biFoto2Blob = null;
+        },
+        
+        /**
+         * Carrega uma foto do BI (1 ou 2)
+         */
+        carregarFotoBI(numeroFoto, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validar tamanho (máx 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                this.showAlert('error', 'Foto muito grande! Máximo 5MB');
+                return;
+            }
+            
+            // Validar tipo
+            if (!file.type.startsWith('image/')) {
+                this.showAlert('error', 'Arquivo inválido! Use JPG ou PNG');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (numeroFoto === 1) {
+                    this.biFoto1Preview = e.target.result;
+                    this.biFoto1Blob = file;
+                } else {
+                    this.biFoto2Preview = e.target.result;
+                    this.biFoto2Blob = file;
+                }
+                console.log(`✅ Foto ${numeroFoto} carregada`);
+            };
+            reader.readAsDataURL(file);
+        },
+        
+        /**
+         * Remove uma foto do BI
+         */
+        removerFotoBI(numeroFoto) {
+            if (numeroFoto === 1) {
+                this.biFoto1Preview = null;
+                this.biFoto1Blob = null;
+            } else {
+                this.biFoto2Preview = null;
+                this.biFoto2Blob = null;
+            }
+            console.log(`🗑️ Foto ${numeroFoto} removida`);
+        },
+        
+        /**
+         * Abre o cropper para editar uma foto
+         */
+        abrirCropperBI(numeroFoto) {
+            const preview = numeroFoto === 1 ? this.biFoto1Preview : this.biFoto2Preview;
+            if (!preview) return;
+            
+            this.cropperFotoAtual = numeroFoto;
+            this.modalCropperBI = true;
+            
             this.$nextTick(() => {
-                this.renderizarEditorBI();
+                const image = document.getElementById('cropper-image');
+                if (image) {
+                    image.src = preview;
+                    
+                    // Destruir cropper anterior se existir
+                    if (this.cropperInstance) {
+                        this.cropperInstance.destroy();
+                    }
+                    
+                    // Inicializar Cropper.js com aspecto LIVRE (sem restrição)
+                    this.cropperInstance = new Cropper(image, {
+                        aspectRatio: NaN, // SEM manter proporção (crop livre)
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 0.8,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: true,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                        responsive: true,
+                        checkOrientation: true,
+                        background: true,
+                        modal: true,
+                    });
+                    
+                    console.log(`✂️ Cropper aberto para foto ${numeroFoto} (modo livre)`);
+                }
             });
         },
         
         /**
-         * Renderiza o editor BI completo
+         * Fecha o modal do cropper
          */
-        renderizarEditorBI() {
+        fecharCropperBI() {
+            if (this.cropperInstance) {
+                this.cropperInstance.destroy();
+                this.cropperInstance = null;
+            }
+            this.modalCropperBI = false;
+        },
+        
+        /**
+         * Rotaciona a imagem no cropper
+         */
+        rotacionarCropper(graus) {
+            if (this.cropperInstance) {
+                this.cropperInstance.rotate(graus);
+            }
+        },
+        
+        /**
+         * Reseta o cropper
+         */
+        resetarCropper() {
+            if (this.cropperInstance) {
+                this.cropperInstance.reset();
+            }
+        },
+        
+        /**
+         * Aplica o corte e atualiza o preview
+         */
+        aplicarCorte() {
+            if (!this.cropperInstance) return;
+            
+            this.cropperInstance.getCroppedCanvas().toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                
+                if (this.cropperFotoAtual === 1) {
+                    this.biFoto1Preview = url;
+                    this.biFoto1Blob = blob;
+                } else {
+                    this.biFoto2Preview = url;
+                    this.biFoto2Blob = blob;
+                }
+                
+                console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual}`);
+                this.fecharCropperBI();
+                this.showAlert('success', 'Corte aplicado com sucesso!');
+            });
+        },
+        
+        /**
+         * Gera o PDF do BI com as 2 fotos
+         */
+        async gerarBIPDF() {
+            if (!this.biFoto1Preview || !this.biFoto2Preview) {
+                this.showAlert('error', 'Adicione as 2 fotos antes de gerar o BI');
+                return;
+            }
+            
+            this.loading = true;
+            this.loadingMessage = 'Gerando BI em PDF...';
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                
+                // Título
+                pdf.setFontSize(24);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('BILHETE DE IDENTIDADE', pageWidth / 2, 20, { align: 'center' });
+                
+                // Dados
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(`Empresa: ${this.fluxoEmpresaSelecionada.nome}`, 20, 35);
+                pdf.text(`Nome: ${this.fluxoClienteSelecionado.nome}`, 20, 45);
+                pdf.text(`BI: ${this.fluxoClienteSelecionado.bi || 'N/A'}`, 20, 55);
+                
+                // Foto 1 (Superior) - Ocupa metade superior da página
+                const foto1Y = 70;
+                const foto1Height = (pageHeight - 80) / 2 - 10;
+                pdf.addImage(this.biFoto1Preview, 'JPEG', 20, foto1Y, pageWidth - 40, foto1Height);
+                
+                // Foto 2 (Inferior) - Ocupa metade inferior da página
+                const foto2Y = foto1Y + foto1Height + 10;
+                pdf.addImage(this.biFoto2Preview, 'JPEG', 20, foto2Y, pageWidth - 40, foto1Height);
+                
+                // Salvar PDF
+                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_BI.pdf`;
+                pdf.save(nomeArquivo);
+                
+                this.loading = false;
+                this.showAlert('success', `✅ BI gerado: ${nomeArquivo}`);
+                console.log('✅ BI PDF gerado com sucesso');
+                
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
+                
+            } catch (error) {
+                this.loading = false;
+                console.error('❌ Erro ao gerar BI:', error);
+                this.showAlert('error', 'Erro ao gerar BI em PDF');
+            }
+        },
+        
+        /**
+         * Renderiza o editor BI completo (REMOVIDO - Agora usa interface integrada no modal)
+         */
+        renderizarEditorBI_OLD() {
             const container = document.getElementById('editor-bi-container');
             if (!container) return;
             
