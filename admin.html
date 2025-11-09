@@ -1977,7 +1977,8 @@
                     
                     <!-- PREVIEW: BI (Editor de Fotos) -->
                     <template x-if="tipoPreview === 'bi'">
-                        <div class="w-full h-full p-8 overflow-y-auto">
+                        <div class="w-full h-full p-8 overflow-y-auto" 
+                             x-init="if (biFoto1Editada) { biFoto1Preview = biFoto1Editada; } if (biFoto2Editada) { biFoto2Preview = biFoto2Editada; }">
                             <div class="max-w-4xl mx-auto">
                                 <h3 class="text-2xl font-bold mb-6 text-center" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
                                     <i class="bi bi-person-badge text-pink-600 mr-2"></i>

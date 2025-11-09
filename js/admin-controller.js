@@ -2996,6 +2996,53 @@ function adminApp() {
         },
         
         /**
+         * Salva fotos do BI no localStorage (cache do navegador)
+         */
+        salvarCacheBI() {
+            try {
+                const cache = {
+                    foto1: this.biFoto1Editada,
+                    foto2: this.biFoto2Editada,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('editorBICache', JSON.stringify(cache));
+                console.log('💾 Cache BI salvo (tamanho:', JSON.stringify(cache).length, 'bytes)');
+            } catch (e) {
+                console.warn('⚠️ Erro ao salvar cache BI (imagens muito grandes?):', e);
+                // Se imagens forem muito grandes para localStorage, ignorar
+            }
+        },
+        
+        /**
+         * Carrega fotos do BI do localStorage
+         */
+        carregarCacheBI() {
+            try {
+                const cache = localStorage.getItem('editorBICache');
+                if (cache) {
+                    const dados = JSON.parse(cache);
+                    this.biFoto1Editada = dados.foto1 || null;
+                    this.biFoto2Editada = dados.foto2 || null;
+                    console.log('📦 Cache BI carregado:', dados.timestamp);
+                    return true;
+                }
+            } catch (e) {
+                console.warn('⚠️ Erro ao carregar cache BI:', e);
+            }
+            return false;
+        },
+        
+        /**
+         * Limpa cache do BI
+         */
+        limparCacheBI() {
+            localStorage.removeItem('editorBICache');
+            this.biFoto1Editada = null;
+            this.biFoto2Editada = null;
+            console.log('🗑️ Cache BI limpo');
+        },
+        
+        /**
          * Gera documento automaticamente (NIF ou Atestado) sem edição
          */
         async gerarDocumentoAutomatico(tipo) {
@@ -3039,15 +3086,15 @@ function adminApp() {
                 cliente: this.fluxoClienteSelecionado.nome
             });
             
+            // Tentar carregar cache de fotos anteriores
+            const cacheCarregado = this.carregarCacheBI();
+            if (cacheCarregado) {
+                console.log('✅ Fotos recuperadas do cache');
+            }
+            
             // Abrir o modal de preview com tipo 'bi'
             this.tipoPreview = 'bi';
             this.modalPreviewModelo = true;
-            
-            // Resetar fotos anteriores
-            this.biFoto1Preview = null;
-            this.biFoto2Preview = null;
-            this.biFoto1Blob = null;
-            this.biFoto2Blob = null;
         },
         
         /**
@@ -3177,28 +3224,37 @@ function adminApp() {
             if (!this.cropperInstance) return;
             
             this.cropperInstance.getCroppedCanvas().toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                
-                if (this.cropperFotoAtual === 1) {
-                    this.biFoto1Preview = url;
-                    this.biFoto1Blob = blob;
-                } else {
-                    this.biFoto2Preview = url;
-                    this.biFoto2Blob = blob;
-                }
-                
-                console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual}`);
-                this.fecharCropperBI();
-                this.showAlert('success', 'Corte aplicado com sucesso!');
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const dataUrl = reader.result;
+                    
+                    if (this.cropperFotoAtual === 1) {
+                        this.biFoto1Preview = dataUrl;
+                        this.biFoto1Editada = dataUrl;
+                        this.biFoto1Blob = blob;
+                    } else {
+                        this.biFoto2Preview = dataUrl;
+                        this.biFoto2Editada = dataUrl;
+                        this.biFoto2Blob = blob;
+                    }
+                    
+                    // Salvar no cache do navegador
+                    this.salvarCacheBI();
+                    
+                    console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual}`);
+                    this.fecharCropperBI();
+                    this.showAlert('success', 'Corte aplicado com sucesso!');
+                };
+                reader.readAsDataURL(blob);
             });
         },
         
         /**
-         * Gera o PDF do BI com as 2 fotos
+         * Gera o PDF do BI com as 2 fotos (PROFISSIONAL)
          */
         async gerarBIPDF() {
-            if (!this.biFoto1Preview || !this.biFoto2Preview) {
-                this.showAlert('error', 'Adicione as 2 fotos antes de gerar o BI');
+            if (!this.biFoto1Editada || !this.biFoto2Editada) {
+                this.showAlert('error', 'Adicione e edite as 2 fotos antes de gerar o BI');
                 return;
             }
             
@@ -3213,37 +3269,116 @@ function adminApp() {
                     format: 'a4'
                 });
                 
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
+                const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
+                const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
+                const margin = 15;
                 
-                // Título
-                pdf.setFontSize(24);
+                // ========== CABEÇALHO ==========
+                pdf.setFillColor(25, 32, 103); // Azul escuro profissional
+                pdf.rect(0, 0, pageWidth, 40, 'F');
+                
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(26);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('BILHETE DE IDENTIDADE', pageWidth / 2, 20, { align: 'center' });
+                pdf.text('BILHETE DE IDENTIDADE', pageWidth / 2, 18, { align: 'center' });
                 
-                // Dados
-                pdf.setFontSize(12);
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(`Empresa: ${this.fluxoEmpresaSelecionada.nome}`, 20, 35);
-                pdf.text(`Nome: ${this.fluxoClienteSelecionado.nome}`, 20, 45);
-                pdf.text(`BI: ${this.fluxoClienteSelecionado.bi || 'N/A'}`, 20, 55);
+                pdf.text(this.fluxoEmpresaSelecionada.nome, pageWidth / 2, 28, { align: 'center' });
+                pdf.text(new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 35, { align: 'center' });
                 
-                // Foto 1 (Superior) - Ocupa metade superior da página
-                const foto1Y = 70;
-                const foto1Height = (pageHeight - 80) / 2 - 10;
-                pdf.addImage(this.biFoto1Preview, 'JPEG', 20, foto1Y, pageWidth - 40, foto1Height);
+                // ========== DADOS DO TITULAR ==========
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Dados do Titular', margin, 55);
                 
-                // Foto 2 (Inferior) - Ocupa metade inferior da página
-                const foto2Y = foto1Y + foto1Height + 10;
-                pdf.addImage(this.biFoto2Preview, 'JPEG', 20, foto2Y, pageWidth - 40, foto1Height);
+                pdf.setDrawColor(25, 32, 103);
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, 57, pageWidth - margin, 57);
                 
-                // Salvar PDF
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'normal');
+                const cliente = this.fluxoClienteSelecionado;
+                let yPos = 67;
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Nome Completo:', margin, yPos);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(cliente.nome, margin + 45, yPos);
+                yPos += 7;
+                
+                if (cliente.bi) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Nº do BI:', margin, yPos);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(cliente.bi, margin + 45, yPos);
+                    yPos += 7;
+                }
+                
+                if (cliente.nif) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('NIF:', margin, yPos);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(cliente.nif, margin + 45, yPos);
+                    yPos += 7;
+                }
+                
+                // ========== FOTO 1 (FRENTE) - Em cima ==========
+                yPos += 5;
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Fotografia Frontal', margin, yPos);
+                yPos += 5;
+                
+                // Calcular dimensões da foto 1 (mantendo proporção)
+                const foto1MaxWidth = pageWidth - (2 * margin);
+                const foto1MaxHeight = 100; // mm
+                
+                // Adicionar foto 1 centralizada
+                const foto1X = margin;
+                const foto1Y = yPos;
+                pdf.addImage(this.biFoto1Editada, 'JPEG', foto1X, foto1Y, foto1MaxWidth, foto1MaxHeight, '', 'FAST');
+                
+                // Borda ao redor da foto 1
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.3);
+                pdf.rect(foto1X, foto1Y, foto1MaxWidth, foto1MaxHeight);
+                
+                // ========== FOTO 2 (VERSO) - Em baixo ==========
+                yPos = foto1Y + foto1MaxHeight + 10;
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Fotografia de Identificação', margin, yPos);
+                yPos += 5;
+                
+                // Calcular dimensões da foto 2 (mantendo proporção)
+                const foto2MaxWidth = pageWidth - (2 * margin);
+                const foto2MaxHeight = 100; // mm
+                
+                // Adicionar foto 2 centralizada
+                const foto2X = margin;
+                const foto2Y = yPos;
+                pdf.addImage(this.biFoto2Editada, 'JPEG', foto2X, foto2Y, foto2MaxWidth, foto2MaxHeight, '', 'FAST');
+                
+                // Borda ao redor da foto 2
+                pdf.rect(foto2X, foto2Y, foto2MaxWidth, foto2MaxHeight);
+                
+                // ========== RODAPÉ ==========
+                pdf.setFontSize(8);
+                pdf.setTextColor(100, 100, 100);
+                pdf.setFont('helvetica', 'italic');
+                pdf.text('Documento gerado automaticamente - Verificar autenticidade', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                
+                // ========== SALVAR PDF ==========
                 const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_BI.pdf`;
                 pdf.save(nomeArquivo);
                 
                 this.loading = false;
                 this.showAlert('success', `✅ BI gerado: ${nomeArquivo}`);
-                console.log('✅ BI PDF gerado com sucesso');
+                console.log('✅ BI PDF gerado com sucesso:', nomeArquivo);
+                
+                // Limpar cache após gerar com sucesso
+                this.limparCacheBI();
                 
                 // Perguntar se deseja gerar mais documentos
                 this.perguntarGerarOutroDocumento();
