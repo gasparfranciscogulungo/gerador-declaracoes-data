@@ -59,9 +59,13 @@ function adminApp() {
         // Sistema de Geração Múltipla
         modelosSelecionadosIds: [], // Array de IDs dos modelos selecionados
         
+        // Editor BI
+        cropperFoto1: null,
+        cropperFoto2: null,
+        
         // Preview de Modelo
         modeloSelecionado: null,
-        tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
+        tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo', 'bi'
         mostrarPersonalizacao: false,
         
         // Customização do Preview
@@ -3020,20 +3024,392 @@ function adminApp() {
          * Abre editor de foto para documento BI
          */
         abrirEditorBI() {
-            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
-                this.showAlert('error', 'Selecione empresa e cliente primeiro');
+            console.log('📷 Abrindo editor de BI...');
+            
+            // Renderizar o editor BI no container
+            this.$nextTick(() => {
+                this.renderizarEditorBI();
+            });
+        },
+        
+        /**
+         * Renderiza o editor BI completo
+         */
+        renderizarEditorBI() {
+            const container = document.getElementById('editor-bi-container');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
+                        <i class="bi bi-person-badge text-pink-600 mr-3 text-3xl"></i>
+                        Editor de BI - Documento de Identidade
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- FOTO 1 -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                    📷 Foto 1 (Frente / Principal)
+                                </label>
+                                <button onclick="document.getElementById('upload-foto1').click()" 
+                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="bi bi-upload mr-2"></i>Upload
+                                </button>
+                            </div>
+                            <input type="file" id="upload-foto1" accept="image/*" class="hidden">
+                            
+                            <div class="border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900">
+                                <div id="preview-foto1" class="w-full h-96 flex items-center justify-center text-gray-400">
+                                    <div class="text-center">
+                                        <i class="bi bi-image text-6xl mb-3"></i>
+                                        <p class="text-sm">Clique em "Upload" para adicionar foto</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controles Foto 1 -->
+                            <div id="controles-foto1" class="hidden space-y-3 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium">🔍 Zoom</span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="adminApp().cropperFoto1?.zoom(-0.1)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">−</button>
+                                        <button onclick="adminApp().cropperFoto1?.zoom(0.1)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium">🔄 Rotação</span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="adminApp().cropperFoto1?.rotate(-45)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">↶ 45°</button>
+                                        <button onclick="adminApp().cropperFoto1?.rotate(45)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">↷ 45°</button>
+                                    </div>
+                                </div>
+                                <button onclick="adminApp().resetarFoto1()" 
+                                        class="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium">
+                                    <i class="bi bi-trash mr-2"></i>Remover Foto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- FOTO 2 -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                    📷 Foto 2 (Verso / Secundária)
+                                </label>
+                                <button onclick="document.getElementById('upload-foto2').click()" 
+                                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="bi bi-upload mr-2"></i>Upload
+                                </button>
+                            </div>
+                            <input type="file" id="upload-foto2" accept="image/*" class="hidden">
+                            
+                            <div class="border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-900">
+                                <div id="preview-foto2" class="w-full h-96 flex items-center justify-center text-gray-400">
+                                    <div class="text-center">
+                                        <i class="bi bi-image text-6xl mb-3"></i>
+                                        <p class="text-sm">Clique em "Upload" para adicionar foto</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controles Foto 2 -->
+                            <div id="controles-foto2" class="hidden space-y-3 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium">🔍 Zoom</span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="adminApp().cropperFoto2?.zoom(-0.1)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">−</button>
+                                        <button onclick="adminApp().cropperFoto2?.zoom(0.1)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium">🔄 Rotação</span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="adminApp().cropperFoto2?.rotate(-45)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">↶ 45°</button>
+                                        <button onclick="adminApp().cropperFoto2?.rotate(45)" 
+                                                class="px-3 py-1 bg-white border rounded hover:bg-gray-50">↷ 45°</button>
+                                    </div>
+                                </div>
+                                <button onclick="adminApp().resetarFoto2()" 
+                                        class="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium">
+                                    <i class="bi bi-trash mr-2"></i>Remover Foto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão Gerar PDF BI -->
+                    <div class="mt-8 flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 p-6 rounded-xl">
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-bold mb-1">✅ Pronto para gerar PDF?</p>
+                            <p class="text-xs">Empresa: <strong>${this.fluxoEmpresaSelecionada?.nome || 'N/A'}</strong> • Cliente: <strong>${this.fluxoClienteSelecionado?.nome || 'N/A'}</strong></p>
+                        </div>
+                        <button onclick="adminApp().gerarPDFBI()" 
+                                class="px-8 py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                            <i class="bi bi-file-earmark-pdf-fill mr-2"></i>Gerar PDF BI
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Inicializar eventos de upload
+            this.inicializarUploadFotos();
+        },
+        
+        /**
+         * Inicializa os eventos de upload das fotos
+         */
+        inicializarUploadFotos() {
+            // Upload Foto 1
+            const input1 = document.getElementById('upload-foto1');
+            if (input1) {
+                input1.addEventListener('change', (e) => this.handleUploadFoto(e, 1));
+            }
+            
+            // Upload Foto 2
+            const input2 = document.getElementById('upload-foto2');
+            if (input2) {
+                input2.addEventListener('change', (e) => this.handleUploadFoto(e, 2));
+            }
+        },
+        
+        /**
+         * Processa upload de foto
+         */
+        handleUploadFoto(event, numeroFoto) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewId = `preview-foto${numeroFoto}`;
+                const controlesId = `controles-foto${numeroFoto}`;
+                const preview = document.getElementById(previewId);
+                const controles = document.getElementById(controlesId);
+                
+                if (preview) {
+                    // Criar imagem para o cropper
+                    preview.innerHTML = `<img id="image-foto${numeroFoto}" src="${e.target.result}" style="max-width: 100%; display: block;">`;
+                    
+                    // Mostrar controles
+                    if (controles) {
+                        controles.classList.remove('hidden');
+                    }
+                    
+                    // Inicializar Cropper.js
+                    this.$nextTick(() => {
+                        const image = document.getElementById(`image-foto${numeroFoto}`);
+                        if (image && typeof Cropper !== 'undefined') {
+                            if (numeroFoto === 1) {
+                                if (this.cropperFoto1) {
+                                    this.cropperFoto1.destroy();
+                                }
+                                this.cropperFoto1 = new Cropper(image, {
+                                    aspectRatio: 4 / 5, // Proporção de foto BI
+                                    viewMode: 1,
+                                    dragMode: 'move',
+                                    autoCropArea: 1,
+                                    restore: false,
+                                    guides: true,
+                                    center: true,
+                                    highlight: false,
+                                    cropBoxMovable: true,
+                                    cropBoxResizable: true,
+                                    toggleDragModeOnDblclick: false,
+                                });
+                            } else {
+                                if (this.cropperFoto2) {
+                                    this.cropperFoto2.destroy();
+                                }
+                                this.cropperFoto2 = new Cropper(image, {
+                                    aspectRatio: 4 / 5,
+                                    viewMode: 1,
+                                    dragMode: 'move',
+                                    autoCropArea: 1,
+                                    restore: false,
+                                    guides: true,
+                                    center: true,
+                                    highlight: false,
+                                    cropBoxMovable: true,
+                                    cropBoxResizable: true,
+                                    toggleDragModeOnDblclick: false,
+                                });
+                            }
+                            
+                            this.showAlert('success', `✅ Foto ${numeroFoto} carregada! Use os controles para ajustar.`);
+                        }
+                    });
+                }
+            };
+            reader.readAsDataURL(file);
+        },
+        
+        /**
+         * Reseta foto 1
+         */
+        resetarFoto1() {
+            if (this.cropperFoto1) {
+                this.cropperFoto1.destroy();
+                this.cropperFoto1 = null;
+            }
+            const preview = document.getElementById('preview-foto1');
+            const controles = document.getElementById('controles-foto1');
+            const input = document.getElementById('upload-foto1');
+            
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-image text-6xl mb-3"></i>
+                        <p class="text-sm">Clique em "Upload" para adicionar foto</p>
+                    </div>
+                `;
+            }
+            if (controles) controles.classList.add('hidden');
+            if (input) input.value = '';
+            
+            this.showAlert('info', 'Foto 1 removida');
+        },
+        
+        /**
+         * Reseta foto 2
+         */
+        resetarFoto2() {
+            if (this.cropperFoto2) {
+                this.cropperFoto2.destroy();
+                this.cropperFoto2 = null;
+            }
+            const preview = document.getElementById('preview-foto2');
+            const controles = document.getElementById('controles-foto2');
+            const input = document.getElementById('upload-foto2');
+            
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-image text-6xl mb-3"></i>
+                        <p class="text-sm">Clique em "Upload" para adicionar foto</p>
+                    </div>
+                `;
+            }
+            if (controles) controles.classList.add('hidden');
+            if (input) input.value = '';
+            
+            this.showAlert('info', 'Foto 2 removida');
+        },
+        
+        /**
+         * Gera PDF do BI com as fotos editadas
+         */
+        async gerarPDFBI() {
+            if (!this.cropperFoto1 && !this.cropperFoto2) {
+                this.showAlert('error', '❌ Adicione pelo menos uma foto para gerar o PDF');
                 return;
             }
             
-            console.log('📷 Abrindo editor de BI...');
-            this.showAlert('info', '🚧 Editor de BI em desenvolvimento');
+            try {
+                this.loading = true;
+                this.loadingMessage = 'Gerando PDF do BI...';
+                
+                // Obter as imagens editadas
+                const foto1 = this.cropperFoto1 ? this.cropperFoto1.getCroppedCanvas().toDataURL('image/jpeg', 0.9) : null;
+                const foto2 = this.cropperFoto2 ? this.cropperFoto2.getCroppedCanvas().toDataURL('image/jpeg', 0.9) : null;
+                
+                // Nome do arquivo
+                const nomeArquivo = `${this.fluxoEmpresaSelecionada?.nome || 'Empresa'}_${this.fluxoClienteSelecionado?.nome || 'Cliente'}_BI.pdf`;
+                
+                // Criar HTML do BI
+                const htmlBI = this.gerarHTMLBI(foto1, foto2);
+                
+                // Gerar PDF
+                const opt = {
+                    margin: 0,
+                    filename: nomeArquivo,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                await html2pdf().set(opt).from(htmlBI).save();
+                
+                this.loading = false;
+                this.showAlert('success', `✅ PDF do BI gerado: ${nomeArquivo}`);
+                console.log('✅ PDF BI gerado com sucesso');
+                
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
+                
+            } catch (error) {
+                this.loading = false;
+                console.error('❌ Erro ao gerar PDF BI:', error);
+                this.showAlert('error', 'Erro ao gerar PDF do BI');
+            }
+        },
+        
+        /**
+         * Gera HTML do documento BI
+         */
+        gerarHTMLBI(foto1, foto2) {
+            const empresa = this.fluxoEmpresaSelecionada || this.getEmpresaExemplo();
+            const cliente = this.fluxoClienteSelecionado || this.getClienteExemplo();
             
-            // TODO: Implementar editor de foto com:
-            // - Upload de imagem
-            // - Crop/resize com Cropper.js
-            // - Ajustes de brilho/contraste
-            // - Preview do BI com foto
-            // - Geração do PDF final
+            return `
+                <div style="width: 210mm; min-height: 297mm; padding: 20mm; background: white; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #1e40af; font-size: 28px; margin: 0;">DOCUMENTO DE IDENTIDADE</h1>
+                        <p style="color: #666; font-size: 14px; margin: 5px 0;">Bilhete de Identidade</p>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+                        ${foto1 ? `
+                        <div style="width: 45%; text-align: center;">
+                            <img src="${foto1}" style="width: 100%; max-width: 250px; border: 3px solid #1e40af; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">Foto Principal</p>
+                        </div>
+                        ` : ''}
+                        
+                        ${foto2 ? `
+                        <div style="width: 45%; text-align: center;">
+                            <img src="${foto2}" style="width: 100%; max-width: 250px; border: 3px solid #1e40af; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">Foto Secundária</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-left: 4px solid #1e40af; border-radius: 4px;">
+                        <h3 style="color: #1e40af; font-size: 18px; margin-bottom: 15px;">Dados Pessoais</h3>
+                        <table style="width: 100%; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-weight: bold;">Nome Completo:</td>
+                                <td style="padding: 8px 0;">${cliente.nome}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-weight: bold;">Número BI:</td>
+                                <td style="padding: 8px 0;">${cliente.bi || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-weight: bold;">Função:</td>
+                                <td style="padding: 8px 0;">${cliente.funcao || 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-weight: bold;">Empresa:</td>
+                                <td style="padding: 8px 0;">${empresa.nome}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 40px; text-align: center; color: #999; font-size: 11px;">
+                        <p>Documento gerado digitalmente em ${new Date().toLocaleDateString('pt-AO', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                        <p style="margin-top: 5px;">${empresa.nome}</p>
+                    </div>
+                </div>
+            `;
         },
         
         /**

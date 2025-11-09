@@ -18,6 +18,10 @@
     <!-- html2pdf.js - Geração de PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
+    <!-- Cropper.js - Editor de Imagens -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" integrity="sha512-hvNR0F/e2J7zPPfLC9auFe3/SE0yG4aJCOd/qxew74NN7eyiSKjr7xJJMu1Jy2wf7FXITpWS1E/RY8yzuXN7VA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" integrity="sha512-9KkIqdfN7ipEW6B6k+Aq20PV31bjODg4AA52W+tYtAE0jE0kMx49bjJ3FgvS56wzmyfMUHbQ4Km2b7l9+Y/+Eg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -1431,6 +1435,11 @@
                         x-show="modeloSelecionado?.tiposSuportados.includes('combo')">
                     <i class="bi bi-journals mr-2"></i>Combo
                 </button>
+                <button @click="tipoPreview = 'bi'; abrirEditorBI()"
+                        :class="tipoPreview === 'bi' ? 'bg-pink-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
+                        class="px-4 py-2 rounded-lg font-medium transition-colors">
+                    <i class="bi bi-person-badge mr-2"></i>BI
+                </button>
                 
                 <div class="flex-1"></div>
                 
@@ -1953,8 +1962,7 @@
                         <div class="text-center py-12 w-full max-w-[210mm]">
                             <i class="bi bi-receipt text-6xl text-gray-400 mb-4"></i>
                             <p class="text-gray-600 text-lg font-medium">Preview de Recibo</p>
-                            <p class="text-gray-500 text-sm mt-2">Modelo de Recibo em desenvolvimento</p>
-                            <p class="text-xs text-gray-400 mt-4">Em breve: Recibo com 1-3 meses de salário</p>
+                            <p class="text-gray-500 text-sm mt-2">Recibo com 1-3 meses de salário</p>
                         </div>
                     </template>
 
@@ -1964,7 +1972,15 @@
                             <i class="bi bi-journals text-6xl text-gray-400 mb-4"></i>
                             <p class="text-gray-600 text-lg font-medium">Preview do Combo</p>
                             <p class="text-gray-500 text-sm mt-2">1 Declaração + 3 Recibos Mensais = 4 Páginas Totais</p>
-                            <p class="text-xs text-gray-400 mt-4">Selecione as abas individualmente para visualizar</p>
+                        </div>
+                    </template>
+                    
+                    <!-- PREVIEW: BI (Editor de Fotos) -->
+                    <template x-if="tipoPreview === 'bi'">
+                        <div class="w-full h-full flex items-center justify-center p-6">
+                            <div class="w-full max-w-5xl" id="editor-bi-container">
+                                <!-- Editor BI será renderizado aqui -->
+                            </div>
                         </div>
                     </template>
 
