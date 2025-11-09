@@ -447,7 +447,17 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <template x-for="modelo in modelos" :key="modelo.id">
                     <div @click="visualizarModelo(modelo)" 
-                         class="border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-2xl transition-all cursor-pointer hover:border-blue-400 group">
+                         :class="modelosSelecionadosIds.includes(modelo.id) ? 'border-purple-600 ring-2 ring-purple-300' : 'border-gray-200'"
+                         class="border-2 rounded-xl overflow-hidden hover:shadow-2xl transition-all cursor-pointer hover:border-blue-400 group relative">
+                        
+                        <!-- Checkbox para seleção múltipla (canto superior direito) -->
+                        <div @click.stop="toggleModeloSelecionado(modelo)" 
+                             class="absolute top-3 right-3 z-20 bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-all">
+                            <input type="checkbox" 
+                                   :checked="modelosSelecionadosIds.includes(modelo.id)"
+                                   class="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                                   @click.stop>
+                        </div>
                         
                         <!-- Preview Visual do Modelo -->
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-8 h-72 flex items-center justify-center relative overflow-hidden">
@@ -656,6 +666,36 @@
                 <i class="bi bi-file-earmark-text text-7xl mb-4 text-gray-300"></i>
                 <p class="text-lg font-medium mb-2">Nenhum modelo disponível</p>
                 <p class="text-sm text-gray-400">Os modelos pré-definidos serão carregados automaticamente</p>
+            </div>
+            
+            <!-- Barra Flutuante: Ações de Geração Múltipla -->
+            <div x-show="modelosSelecionadosIds.length > 0"
+                 x-transition
+                 class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40">
+                <div :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300'"
+                     class="rounded-full shadow-2xl border-2 px-6 py-4 flex items-center space-x-4">
+                    
+                    <div :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="flex items-center space-x-2">
+                        <i class="bi bi-check-circle-fill text-purple-600 text-xl"></i>
+                        <span class="font-bold" x-text="modelosSelecionadosIds.length"></span>
+                        <span>modelo(s) selecionado(s)</span>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    
+                    <button @click="limparSelecaoModelos()"
+                            :class="darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'"
+                            class="transition-colors">
+                        <i class="bi bi-x-circle mr-1"></i>Limpar
+                    </button>
+                    
+                    <button @click="gerarMultiplosPDFs()"
+                            class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-2 rounded-full transition-all font-bold shadow-lg hover:shadow-xl flex items-center space-x-2">
+                        <i class="bi bi-file-earmark-pdf-fill text-xl"></i>
+                        <span>Gerar PDFs</span>
+                        <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs" x-text="modelosSelecionadosIds.length"></span>
+                    </button>
+                </div>
             </div>
         </div>
 

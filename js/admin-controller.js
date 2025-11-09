@@ -55,6 +55,9 @@ function adminApp() {
         fluxoBuscaEmpresa: '',
         fluxoBuscaCliente: '',
         
+        // Sistema de Geração Múltipla
+        modelosSelecionadosIds: [], // Array de IDs dos modelos selecionados
+        
         // Preview de Modelo
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
@@ -3111,6 +3114,100 @@ function adminApp() {
                     this.limparCacheFluxo();
                     this.fecharFluxoGeracao();
                 }
+            }
+        },
+        
+        // ========== SISTEMA DE GERAÇÃO MÚLTIPLA ==========
+        
+        /**
+         * Toggle seleção de modelo para geração múltipla
+         */
+        toggleModeloSelecionado(modelo) {
+            const index = this.modelosSelecionadosIds.indexOf(modelo.id);
+            
+            if (index > -1) {
+                // Remover da seleção
+                this.modelosSelecionadosIds.splice(index, 1);
+                console.log('❌ Modelo desmarcado:', modelo.nome);
+            } else {
+                // Adicionar à seleção
+                this.modelosSelecionadosIds.push(modelo.id);
+                console.log('✅ Modelo marcado:', modelo.nome);
+            }
+            
+            console.log('📋 Total selecionados:', this.modelosSelecionadosIds.length);
+        },
+        
+        /**
+         * Limpa seleção de modelos
+         */
+        limparSelecaoModelos() {
+            this.modelosSelecionadosIds = [];
+            console.log('🗑️ Seleção de modelos limpa');
+        },
+        
+        /**
+         * Gera múltiplos PDFs (um para cada modelo selecionado)
+         * TODO: Implementação completa - por enquanto apenas estrutura
+         */
+        async gerarMultiplosPDFs() {
+            if (this.modelosSelecionadosIds.length === 0) {
+                this.showAlert('warning', 'Nenhum modelo selecionado');
+                return;
+            }
+            
+            // Verificar se há empresa e cliente selecionados
+            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                const usar = confirm(
+                    '⚠️ Nenhuma empresa/cliente selecionado no fluxo.\n\n' +
+                    'Deseja usar dados de exemplo para preview?\n\n' +
+                    '💡 Dica: Use o TAB "Gerar PDF" para selecionar dados reais.'
+                );
+                
+                if (!usar) {
+                    return;
+                }
+            }
+            
+            this.loading = true;
+            this.loadingMessage = `📄 Gerando ${this.modelosSelecionadosIds.length} documento(s)...`;
+            
+            try {
+                const empresa = this.getEmpresaExemplo();
+                const cliente = this.getClienteExemplo();
+                const timestamp = new Date().toISOString().split('T')[0];
+                
+                console.log('🚀 Iniciando geração múltipla:', {
+                    modelos: this.modelosSelecionadosIds,
+                    empresa: empresa.nome,
+                    cliente: cliente.nome
+                });
+                
+                // TODO: Loop para gerar cada PDF
+                for (let i = 0; i < this.modelosSelecionadosIds.length; i++) {
+                    const modeloId = this.modelosSelecionadosIds[i];
+                    const modelo = this.modelos.find(m => m.id === modeloId);
+                    
+                    if (!modelo) continue;
+                    
+                    console.log(`📄 Gerando ${i + 1}/${this.modelosSelecionadosIds.length}: ${modelo.nome}`);
+                    
+                    // TODO: Chamar pdf-generator.js com dados corretos
+                    // const filename = `${empresa.nome.replace(/\s+/g, '_')}_${cliente.nome.replace(/\s+/g, '_')}_${timestamp}_${modeloId}.pdf`;
+                    // await pdfGenerator.gerar(empresa, cliente, modelo, filename);
+                    
+                    // Simulação de delay
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                this.showAlert('success', `✅ ${this.modelosSelecionadosIds.length} documento(s) gerado(s) com sucesso!`);
+                this.limparSelecaoModelos();
+                
+            } catch (error) {
+                console.error('❌ Erro na geração múltipla:', error);
+                this.showAlert('error', `Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
             }
         }
     };
