@@ -1296,21 +1296,172 @@
                     </div>
                 </div>
                 
-                <!-- ETAPA 4: Preview & Edição (TODO) -->
-                <div x-show="fluxoEtapa === 4" class="space-y-4">
-                    <div class="bg-gradient-to-r from-blue-50 via-green-50 to-purple-50 dark:from-blue-900/20 dark:via-green-900/20 dark:to-purple-900/20 border-l-4 border-indigo-600 p-4 rounded-r-lg mb-4">
-                        <p class="text-sm"><strong>Empresa:</strong> <span x-text="fluxoEmpresaSelecionada?.nome"></span></p>
-                        <p class="text-sm"><strong>Cliente:</strong> <span x-text="fluxoClienteSelecionado?.nome"></span></p>
-                        <p class="text-sm"><strong>Tipo:</strong> <span x-text="fluxoTipoDocumento"></span> 
-                            <span x-show="fluxoTipoDocumento === 'recibo'" x-text="'(' + fluxoMesesRecibo + ' mês' + (fluxoMesesRecibo > 1 ? 'es' : '') + ')'"></span>
-                        </p>
-                    </div>
+                <!-- ETAPA 4: Preview & Edição Completa -->
+                <div x-show="fluxoEtapa === 4" class="absolute inset-0 flex flex-col bg-white dark:bg-gray-800" style="margin: -1.5rem; width: calc(100% + 3rem); height: calc(100% + 6rem);">
                     
-                    <div class="text-center py-12">
-                        <i class="bi bi-file-earmark-code text-6xl text-gray-400 mb-4"></i>
-                        <p class="text-lg text-gray-500">🚧 Preview e edição em desenvolvimento</p>
-                        <p class="text-sm text-gray-400 mt-2">Em breve você poderá visualizar e personalizar o documento antes de gerar</p>
+                    <!-- HEADER DO PREVIEW -->
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="bi bi-file-earmark-richtext text-3xl"></i>
+                            <div>
+                                <h4 class="text-lg font-bold" x-text="fluxoModeloSelecionado?.nome || fluxoTipoDocumento.toUpperCase()"></h4>
+                                <p class="text-xs text-blue-100">
+                                    <span x-text="fluxoEmpresaSelecionada?.nome"></span> • 
+                                    <span x-text="fluxoClienteSelecionado?.nome"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-medium">
+                                <i class="bi bi-check-circle-fill mr-1"></i>Dados Reais
+                            </span>
+                            <button @click="mostrarPersonalizacao = !mostrarPersonalizacao"
+                                    :class="mostrarPersonalizacao ? 'bg-white text-purple-600' : 'bg-white/20 text-white'"
+                                    class="px-4 py-2 rounded-lg font-medium transition-colors hover:bg-white hover:text-purple-600">
+                                <i class="bi bi-palette mr-2"></i>Personalizar
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- CONTEÚDO: Preview + Painel Lateral -->
+                    <div class="flex-1 overflow-hidden flex">
+                        
+                        <!-- PAINEL DE PERSONALIZAÇÃO (Lateral Direita) -->
+                        <div x-show="mostrarPersonalizacao" 
+                             x-transition
+                             :class="darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'"
+                             class="w-80 border-l overflow-y-auto p-6">
+                            
+                            <h5 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" 
+                                class="text-md font-bold mb-4 flex items-center">
+                                <i class="bi bi-sliders text-purple-600 mr-2"></i>
+                                Personalização
+                            </h5>
+
+                            <!-- PRESETS DE ESTILOS -->
+                            <div class="mb-4 pb-4 border-b border-gray-300">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-palette mr-1"></i>Estilos Rápidos
+                                </label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button @click="aplicarPreset('formal')"
+                                            class="px-2 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-medium transition-colors">
+                                        <i class="bi bi-mortarboard text-sm"></i> Formal
+                                    </button>
+                                    <button @click="aplicarPreset('moderno')"
+                                            class="px-2 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-medium transition-colors">
+                                        <i class="bi bi-lightning text-sm"></i> Moderno
+                                    </button>
+                                    <button @click="aplicarPreset('minimalista')"
+                                            class="px-2 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-xs font-medium transition-colors">
+                                        <i class="bi bi-dash-circle text-sm"></i> Minimalista
+                                    </button>
+                                    <button @click="aplicarPreset('executivo')"
+                                            class="px-2 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-xs font-medium transition-colors">
+                                        <i class="bi bi-award text-sm"></i> Executivo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ZOOM -->
+                            <div class="mb-4 pb-4 border-b border-gray-300">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-zoom-in mr-1"></i>Zoom: <span x-text="previewConfig.zoom + '%'"></span>
+                                </label>
+                                <input type="range" x-model.number="previewConfig.zoom" min="50" max="150" step="5"
+                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            </div>
+
+                            <!-- FONTES -->
+                            <div class="mb-4 pb-4 border-b border-gray-300">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-fonts mr-1"></i>Família da Fonte
+                                </label>
+                                <select x-model="previewConfig.fontFamily" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    <option value="Times New Roman, serif">Times New Roman</option>
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="Georgia, serif">Georgia</option>
+                                    <option value="Courier New, monospace">Courier New</option>
+                                </select>
+                                
+                                <label class="block text-xs text-gray-600 mb-1 mt-3">
+                                    Tamanho Texto: <span x-text="previewConfig.fontSize"></span>pt
+                                </label>
+                                <input type="range" x-model.number="previewConfig.fontSize" min="10" max="16" step="1"
+                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            </div>
+
+                            <!-- CORES -->
+                            <div class="mb-4 pb-4 border-b border-gray-300">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-palette mr-1"></i>Cores
+                                </label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs">Texto</span>
+                                        <input type="color" x-model="previewConfig.corTexto" class="w-12 h-8 rounded cursor-pointer">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs">Destaque</span>
+                                        <input type="color" x-model="previewConfig.corDestaque" class="w-12 h-8 rounded cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MARCA D'ÁGUA -->
+                            <div class="mb-4 pb-4 border-b border-gray-300">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="bi bi-badge-tm mr-1"></i>Marca d'Água
+                                </label>
+                                <label class="block text-xs text-gray-600 mb-1">
+                                    Opacidade: <span x-text="previewConfig.marcaDaguaOpacidade + '%'"></span>
+                                </label>
+                                <input type="range" x-model.number="previewConfig.marcaDaguaOpacidade" min="0" max="30" step="1"
+                                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            </div>
+
+                            <!-- BOTÃO RESETAR -->
+                            <button @click="resetarPreviewConfig()"
+                                    class="w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all text-sm font-medium shadow-md">
+                                <i class="bi bi-arrow-counterclockwise mr-2"></i>Resetar Tudo
+                            </button>
+
+                        </div>
+
+                        <!-- ÁREA DE PREVIEW (Scrollable) -->
+                        <div :class="darkMode ? 'bg-gray-900' : 'bg-gray-200'" 
+                             class="flex-1 overflow-y-auto p-8 flex items-start justify-center">
+                            
+                            <!-- PREVIEW DO DOCUMENTO -->
+                            <div id="preview-render"
+                                 x-html="renderizarModelo()" 
+                                 class="w-full max-w-[210mm] transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'"></div>
+                        </div>
+                    
+                    </div>
+
+                    <!-- FOOTER: Ações -->
+                    <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
+                         class="px-6 py-3 flex items-center justify-between border-t">
+                        <button @click="fluxoEtapa = 3.5"
+                                :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
+                                class="px-4 py-2 rounded-lg transition-colors font-medium">
+                            <i class="bi bi-arrow-left mr-2"></i>Voltar
+                        </button>
+                        <div class="flex space-x-3">
+                            <button @click="visualizarPDFNovaAba()" 
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium shadow-md">
+                                <i class="bi bi-window mr-2"></i>Nova Aba
+                            </button>
+                            <button @click="gerarPDFFluxo()" 
+                                    class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-medium shadow-lg">
+                                <i class="bi bi-download mr-2"></i>Gerar PDF
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>

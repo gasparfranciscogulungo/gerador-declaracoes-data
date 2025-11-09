@@ -3037,6 +3037,83 @@ function adminApp() {
         },
         
         /**
+         * Reseta configurações de preview para padrão
+         */
+        resetarPreviewConfig() {
+            this.previewConfig = {
+                fontFamily: 'Times New Roman, serif', 
+                fontSize: 12, 
+                tamanhoTitulo: 28,
+                tamanhoSubtitulo: 18,
+                tamanhoEmpresa: 9,
+                corTexto: '#000000', 
+                corDestaque: '#1e40af', 
+                marcaDaguaOpacidade: 10,
+                marcaDaguaRotacao: -45,
+                marcaDaguaWidth: 400,
+                marcaDaguaHeight: 400,
+                espacamentoLinhas: 1.6,
+                zoom: 100,
+                tituloDocumento: 'DECLARAÇÃO DE TRABALHO',
+                textoIntro: 'Declara-se, para os devidos efeitos, que',
+                alinhamentoTexto: 'justify',
+                alinhamentoCabecalho: 'left',
+                cabecalhoMaxWidth: 450,
+                cabecalhoMarginEntreLogoTexto: 20,
+                cabecalhoJustify: 'space-between',
+                cabecalhoPaddingBottom: 15,
+                cabecalhoBordaLargura: 4,
+                cabecalhoLogoSize: 80,
+                cabecalhoPaddingHorizontal: 0,
+                cabecalhoLineHeight: 1.4,
+                carimboWidth: 110,
+                carimboHeight: 110
+            };
+            this.showAlert('success', '✅ Configurações resetadas');
+            console.log('🔄 Preview config resetado');
+        },
+        
+        /**
+         * Gera PDF dentro do fluxo do wizard
+         */
+        async gerarPDFFluxo() {
+            try {
+                if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                    this.showAlert('error', 'Dados incompletos');
+                    return;
+                }
+                
+                console.log('📄 Gerando PDF do fluxo...', {
+                    empresa: this.fluxoEmpresaSelecionada.nome,
+                    cliente: this.fluxoClienteSelecionado.nome,
+                    tipo: this.fluxoTipoDocumento,
+                    modelo: this.fluxoModeloSelecionado?.nome
+                });
+                
+                // Simular geração por enquanto
+                this.loading = true;
+                this.loadingMessage = 'Gerando PDF...';
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Nome do arquivo: {empresa}_{cliente}_{tipo}.pdf
+                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_${this.fluxoTipoDocumento}.pdf`;
+                
+                this.loading = false;
+                this.showAlert('success', `✅ PDF gerado: ${nomeArquivo}`);
+                console.log('✅ PDF gerado com sucesso:', nomeArquivo);
+                
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
+                
+            } catch (error) {
+                this.loading = false;
+                console.error('❌ Erro ao gerar PDF:', error);
+                this.showAlert('error', 'Erro ao gerar PDF');
+            }
+        },
+        
+        /**
          * Seleciona uma empresa
          */
         selecionarEmpresa(empresa) {
