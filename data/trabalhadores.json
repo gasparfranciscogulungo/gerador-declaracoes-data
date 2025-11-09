@@ -19,7 +19,8 @@
       "salario_bruto": "2500.00",
       "salario_liquido": "1850.00",
       "moeda": "EUR",
-      "iban": "PT50 0035 0000 0000 1234 5678 9"
+      "iban": "PT50 0035 0000 0000 1234 5678 9",
+      "ativo": false
     },
     {
       "id": "trab002",
