@@ -3258,6 +3258,13 @@ function adminApp() {
                 return;
             }
             
+            // Verificar se jsPDF está disponível
+            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+                this.showAlert('error', '❌ Biblioteca jsPDF não carregada. Recarregue a página.');
+                console.error('jsPDF não está definido!');
+                return;
+            }
+            
             this.loading = true;
             this.loadingMessage = 'Gerando BI em PDF...';
             
