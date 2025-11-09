@@ -1909,10 +1909,41 @@ function adminApp() {
         },
         
         getEmpresaExemplo() {
-            // Retorna primeira empresa cadastrada (com imagens do cache) ou dados fake
+            // 1. Tentar pegar empresa do fluxo de geração (dados reais)
+            if (this.fluxoEmpresaSelecionada) {
+                console.log('📦 Usando empresa do fluxo:', this.fluxoEmpresaSelecionada.nome);
+                return {
+                    ...this.fluxoEmpresaSelecionada,
+                    logo: this.fluxoEmpresaSelecionada.logoPreview || this.fluxoEmpresaSelecionada.logo || '',
+                    carimbo: this.fluxoEmpresaSelecionada.carimboPreview || this.fluxoEmpresaSelecionada.carimbo || ''
+                };
+            }
+            
+            // 2. Tentar carregar do cache localStorage
+            const cache = localStorage.getItem('fluxoGeracaoCache');
+            if (cache) {
+                try {
+                    const dados = JSON.parse(cache);
+                    if (dados.empresaId) {
+                        const empresa = this.empresas.find(e => e.id === dados.empresaId);
+                        if (empresa) {
+                            console.log('📦 Usando empresa do cache:', empresa.nome);
+                            return {
+                                ...empresa,
+                                logo: empresa.logoPreview || empresa.logo || '',
+                                carimbo: empresa.carimboPreview || empresa.carimbo || ''
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Erro ao carregar empresa do cache:', e);
+                }
+            }
+            
+            // 3. Usar primeira empresa cadastrada
             if (this.empresas.length > 0) {
                 const empresa = this.empresas[0];
-                // Usar preview do cache se disponível
+                console.log('📦 Usando primeira empresa cadastrada:', empresa.nome);
                 return {
                     ...empresa,
                     logo: empresa.logoPreview || empresa.logo || '',
@@ -1920,7 +1951,8 @@ function adminApp() {
                 };
             }
             
-            // Fallback para dados fake
+            // 4. Fallback para dados fake (apenas se não houver nenhuma empresa)
+            console.warn('⚠️ Nenhuma empresa encontrada - usando dados fake');
             return {
                 nome: 'EMPRESA EXEMPLO LDA',
                 nif: '1234567890',
@@ -1945,12 +1977,69 @@ function adminApp() {
         },
         
         getClienteExemplo() {
-            // Dados fake de cliente para demonstração
+            // 1. Tentar pegar cliente do fluxo de geração (dados reais)
+            if (this.fluxoClienteSelecionado) {
+                console.log('📦 Usando cliente do fluxo:', this.fluxoClienteSelecionado.nome);
+                return {
+                    nome: this.fluxoClienteSelecionado.nome,
+                    bi: this.fluxoClienteSelecionado.nif || this.fluxoClienteSelecionado.bi || '',
+                    cargo: this.fluxoClienteSelecionado.funcao || this.fluxoClienteSelecionado.cargo || '',
+                    salario: this.fluxoClienteSelecionado.salario_bruto || 0,
+                    dataAdmissao: this.fluxoClienteSelecionado.data_admissao || '',
+                    moeda: this.fluxoClienteSelecionado.moeda || 'Kz',
+                    // Gerar meses de trabalho baseado nos dados reais
+                    mesesTrabalho: this.gerarMesesTrabalho(this.fluxoClienteSelecionado)
+                };
+            }
+            
+            // 2. Tentar carregar do cache localStorage
+            const cache = localStorage.getItem('fluxoGeracaoCache');
+            if (cache) {
+                try {
+                    const dados = JSON.parse(cache);
+                    if (dados.clienteId) {
+                        const cliente = this.trabalhadores.find(t => t.id === dados.clienteId);
+                        if (cliente) {
+                            console.log('📦 Usando cliente do cache:', cliente.nome);
+                            return {
+                                nome: cliente.nome,
+                                bi: cliente.nif || cliente.bi || '',
+                                cargo: cliente.funcao || cliente.cargo || '',
+                                salario: cliente.salario_bruto || 0,
+                                dataAdmissao: cliente.data_admissao || '',
+                                moeda: cliente.moeda || 'Kz',
+                                mesesTrabalho: this.gerarMesesTrabalho(cliente)
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Erro ao carregar cliente do cache:', e);
+                }
+            }
+            
+            // 3. Usar primeiro trabalhador cadastrado
+            if (this.trabalhadores.length > 0) {
+                const cliente = this.trabalhadores[0];
+                console.log('📦 Usando primeiro trabalhador cadastrado:', cliente.nome);
+                return {
+                    nome: cliente.nome,
+                    bi: cliente.nif || cliente.bi || '',
+                    cargo: cliente.funcao || cliente.cargo || '',
+                    salario: cliente.salario_bruto || 0,
+                    dataAdmissao: cliente.data_admissao || '',
+                    moeda: cliente.moeda || 'Kz',
+                    mesesTrabalho: this.gerarMesesTrabalho(cliente)
+                };
+            }
+            
+            // 4. Fallback para dados fake
+            console.warn('⚠️ Nenhum cliente encontrado - usando dados fake');
             return {
                 nome: 'João Manuel da Silva Santos',
                 bi: '005678901LA042',
                 cargo: 'Gestor Comercial',
                 salario: 250000,
+                moeda: 'Kz',
                 dataAdmissao: '2023-01-15',
                 mesesTrabalho: [
                     { mes: 'Janeiro/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 },
@@ -1958,6 +2047,36 @@ function adminApp() {
                     { mes: 'Março/2025', salarioBruto: 250000, descontos: 12500, liquido: 237500 }
                 ]
             };
+        },
+        
+        /**
+         * Gera array de meses de trabalho baseado nos dados do trabalhador
+         */
+        gerarMesesTrabalho(trabalhador) {
+            const meses = [];
+            const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                               'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            
+            // Gerar últimos 3 meses
+            const hoje = new Date();
+            for (let i = 2; i >= 0; i--) {
+                const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                const mesNome = mesesNomes[data.getMonth()];
+                const ano = data.getFullYear();
+                
+                const salarioBruto = trabalhador.salario_bruto || 0;
+                const descontos = trabalhador.descontos || (salarioBruto * 0.05); // 5% de desconto padrão
+                const liquido = trabalhador.salario_liquido || (salarioBruto - descontos);
+                
+                meses.push({
+                    mes: `${mesNome}/${ano}`,
+                    salarioBruto: salarioBruto,
+                    descontos: descontos,
+                    liquido: liquido
+                });
+            }
+            
+            return meses;
         },
 
         /**
