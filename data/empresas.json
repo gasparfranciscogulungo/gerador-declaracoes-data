@@ -49,30 +49,6 @@
       "updatedAt": "2025-11-08T14:05:57.490Z"
     },
     {
-      "id": "empresa_1762511408657",
-      "nome": "test",
-      "nif": "6361279",
-      "endereco": {
-        "rua": "test",
-        "edificio": "test",
-        "andar": "test",
-        "sala": "test",
-        "bairro": "test",
-        "municipio": "test",
-        "provincia": "test",
-        "pais": "test"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/6361279/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/6361279/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-07T10:49:35.913Z"
-    },
-    {
       "id": "empresa_1762610857091",
       "nome": "Empresa Manuela João e filhos ",
       "nif": "50009099",
