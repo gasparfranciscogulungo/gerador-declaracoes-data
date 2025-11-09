@@ -1357,6 +1357,19 @@
                     </button>
                 </div>
                 
+                <!-- ETAPA 3.5: Botões (Seleção de Modelo) -->
+                <div x-show="fluxoEtapa === 3.5" class="w-full flex justify-between">
+                    <button @click="fluxoEtapa = 3; fluxoModeloSelecionado = null" 
+                            :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
+                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
+                        <i class="bi bi-arrow-left mr-2"></i>Voltar ao Tipo
+                    </button>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                        <i class="bi bi-info-circle mr-2"></i>
+                        Clique em um modelo para visualizar
+                    </div>
+                </div>
+                
                 <!-- ETAPA 4: Botões -->
                 <div x-show="fluxoEtapa === 4" class="w-full flex justify-between">
                     <button @click="fluxoEtapa = 3" 
