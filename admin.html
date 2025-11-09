@@ -2102,6 +2102,72 @@
                                     
                                 </div>
                                 
+                                <!-- Toggle Modo Manual -->
+                                <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" 
+                                               x-model="biModoManual"
+                                               class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                                        <span class="ml-3 font-medium" :class="darkMode ? 'text-gray-200' : 'text-gray-800'">
+                                            <i class="bi bi-pencil-square mr-1"></i>Modo Manual
+                                        </span>
+                                        <span class="ml-2 text-xs text-gray-500">(Preencher dados manualmente)</span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Campos Manuais (aparecem quando modo manual ativado) -->
+                                <div x-show="biModoManual" 
+                                     x-transition
+                                     class="mt-4 p-6 bg-white dark:bg-gray-800 border-2 border-blue-300 dark:border-blue-600 rounded-xl space-y-4">
+                                    <h4 class="font-bold text-lg mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                                        <i class="bi bi-person-vcard mr-2 text-blue-600"></i>Dados do Titular
+                                    </h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Nome -->
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                                Nome Completo
+                                            </label>
+                                            <input type="text" 
+                                                   x-model="biDadosManuais.nome"
+                                                   placeholder="Ex: João Francisco Silva"
+                                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'">
+                                        </div>
+                                        
+                                        <!-- BI / NIF (mesmo número em Angola) -->
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                                BI / NIF
+                                            </label>
+                                            <input type="text" 
+                                                   x-model="biDadosManuais.biNif"
+                                                   placeholder="Ex: 006789012LA043"
+                                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'">
+                                            <p class="text-xs text-gray-500 mt-1">Em Angola, BI e NIF são o mesmo número</p>
+                                        </div>
+                                        
+                                        <!-- Data -->
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">
+                                                Data do Documento
+                                            </label>
+                                            <input type="text" 
+                                                   x-model="biDadosManuais.data"
+                                                   placeholder="Ex: 09/11/2025"
+                                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'">
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="text-xs text-blue-600 dark:text-blue-400 flex items-center">
+                                        <i class="bi bi-info-circle mr-1"></i>
+                                        Sem modo manual, os dados vêm da empresa e cliente selecionados no fluxo
+                                    </p>
+                                </div>
+                                
                                 <!-- Botão Gerar BI -->
                                 <div class="mt-8 text-center">
                                     <button @click="gerarBIPDF()" 

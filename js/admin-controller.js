@@ -67,6 +67,12 @@ function adminApp() {
         biFoto2Preview: null,
         biFoto1Blob: null,
         biFoto2Blob: null,
+        biModoManual: false, // Se true, permite editar dados manualmente
+        biDadosManuais: {
+            nome: '',
+            biNif: '', // BI / NIF (mesmo número em Angola)
+            data: new Date().toLocaleDateString('pt-AO')
+        },
         
         // Preview de Modelo
         modeloSelecionado: null,
@@ -3291,8 +3297,16 @@ function adminApp() {
                 
                 pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(this.fluxoEmpresaSelecionada.nome, pageWidth / 2, 28, { align: 'center' });
-                pdf.text(new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 35, { align: 'center' });
+                
+                // Usar dados manuais se modo manual ativado, senão usar empresa/cliente do fluxo
+                if (this.biModoManual) {
+                    // Modo Manual: apenas data (sem empresa)
+                    pdf.text(this.biDadosManuais.data || new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 28, { align: 'center' });
+                } else {
+                    // Modo Automático: empresa + data
+                    pdf.text(this.fluxoEmpresaSelecionada?.nome || 'Empresa', pageWidth / 2, 28, { align: 'center' });
+                    pdf.text(new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 35, { align: 'center' });
+                }
                 
                 // ========== DADOS DO TITULAR ==========
                 pdf.setTextColor(0, 0, 0);
@@ -3306,28 +3320,29 @@ function adminApp() {
                 
                 pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
-                const cliente = this.fluxoClienteSelecionado;
+                
+                // Determinar dados (manual ou automático)
+                const dadosTitular = this.biModoManual ? {
+                    nome: this.biDadosManuais.nome || 'Nome não informado',
+                    biNif: this.biDadosManuais.biNif || ''
+                } : {
+                    nome: this.fluxoClienteSelecionado?.nome || 'Cliente',
+                    biNif: this.fluxoClienteSelecionado?.bi || this.fluxoClienteSelecionado?.nif || ''
+                };
+                
                 let yPos = 67;
                 
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('Nome Completo:', margin, yPos);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(cliente.nome, margin + 45, yPos);
+                pdf.text(dadosTitular.nome, margin + 45, yPos);
                 yPos += 7;
                 
-                if (cliente.bi) {
+                if (dadosTitular.biNif) {
                     pdf.setFont('helvetica', 'bold');
-                    pdf.text('Nº do BI:', margin, yPos);
+                    pdf.text('BI / NIF:', margin, yPos);
                     pdf.setFont('helvetica', 'normal');
-                    pdf.text(cliente.bi, margin + 45, yPos);
-                    yPos += 7;
-                }
-                
-                if (cliente.nif) {
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('NIF:', margin, yPos);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text(cliente.nif, margin + 45, yPos);
+                    pdf.text(dadosTitular.biNif, margin + 45, yPos);
                     yPos += 7;
                 }
                 
@@ -3377,7 +3392,15 @@ function adminApp() {
                 pdf.text('Documento gerado automaticamente - Verificar autenticidade', pageWidth / 2, rodapeY, { align: 'center' });
                 
                 // ========== SALVAR PDF ==========
-                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_BI.pdf`;
+                // Nome do arquivo: manual ou automático
+                let nomeArquivo;
+                if (this.biModoManual) {
+                    const nomeClean = this.biDadosManuais.nome.replace(/\s+/g, '_') || 'BI';
+                    nomeArquivo = `${nomeClean}_BI.pdf`;
+                } else {
+                    nomeArquivo = `${this.fluxoEmpresaSelecionada?.nome || 'Empresa'}_${this.fluxoClienteSelecionado?.nome || 'Cliente'}_BI.pdf`;
+                }
+                
                 pdf.save(nomeArquivo);
                 
                 this.loading = false;
