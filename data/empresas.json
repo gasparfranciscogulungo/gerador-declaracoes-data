@@ -25,30 +25,6 @@
       "updatedAt": "2025-11-08T10:47:05.371Z"
     },
     {
-      "id": "empresa_1762506592249",
-      "nome": "ATENÇÂO EMPRESA IMPORTANT",
-      "nif": "0821128",
-      "endereco": {
-        "rua": "test",
-        "edificio": "test",
-        "andar": "test",
-        "sala": "test",
-        "bairro": "test",
-        "municipio": "test",
-        "provincia": "test",
-        "pais": "Angola"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/0821128/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/0821128/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-08T14:05:57.490Z"
-    },
-    {
       "id": "empresa_1762610857091",
       "nome": "Empresa Manuela João e filhos ",
       "nif": "50009099",
