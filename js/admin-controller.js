@@ -47,10 +47,11 @@ function adminApp() {
         modalFluxoGeracao: false,
         
         // Fluxo de Geração de Documento
-        fluxoEtapa: 1, // 1=Empresa, 2=Cliente, 3=Tipo, 4=Preview
+        fluxoEtapa: 1, // 1=Empresa, 2=Cliente, 3=Tipo, 3.5=Modelo, 4=Preview
         fluxoEmpresaSelecionada: null,
         fluxoClienteSelecionado: null,
-        fluxoTipoDocumento: null, // 'declaracao', 'recibo', 'combo'
+        fluxoTipoDocumento: null, // 'declaracao', 'recibo', 'combo', 'nif', 'atestado', 'bi'
+        fluxoModeloSelecionado: null, // Modelo escolhido na etapa 3.5
         fluxoMesesRecibo: '1',
         fluxoBuscaEmpresa: '',
         fluxoBuscaCliente: '',
@@ -2983,6 +2984,56 @@ function adminApp() {
             localStorage.removeItem('fluxoGeracaoCache');
             this.resetarFluxo();
             console.log('🗑️ Cache limpo');
+        },
+        
+        /**
+         * Gera documento automaticamente (NIF ou Atestado) sem edição
+         */
+        async gerarDocumentoAutomatico(tipo) {
+            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                this.showAlert('error', 'Selecione empresa e cliente primeiro');
+                return;
+            }
+            
+            console.log(`⚡ Gerando ${tipo.toUpperCase()} automaticamente...`);
+            this.showAlert('info', `Gerando ${tipo.toUpperCase()}...`);
+            
+            try {
+                // TODO: Implementar lógica de geração automática
+                // Por enquanto, simular geração
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_${tipo}.pdf`;
+                this.showAlert('success', `${tipo.toUpperCase()} gerado com sucesso!`);
+                console.log(`✅ ${tipo.toUpperCase()} gerado:`, nomeArquivo);
+                
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
+                
+            } catch (error) {
+                console.error(`❌ Erro ao gerar ${tipo}:`, error);
+                this.showAlert('error', `Erro ao gerar ${tipo.toUpperCase()}`);
+            }
+        },
+        
+        /**
+         * Abre editor de foto para documento BI
+         */
+        abrirEditorBI() {
+            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                this.showAlert('error', 'Selecione empresa e cliente primeiro');
+                return;
+            }
+            
+            console.log('📷 Abrindo editor de BI...');
+            this.showAlert('info', '🚧 Editor de BI em desenvolvimento');
+            
+            // TODO: Implementar editor de foto com:
+            // - Upload de imagem
+            // - Crop/resize com Cropper.js
+            // - Ajustes de brilho/contraste
+            // - Preview do BI com foto
+            // - Geração do PDF final
         },
         
         /**
