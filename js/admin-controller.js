@@ -59,10 +59,6 @@ function adminApp() {
         // Sistema de Geração Múltipla
         modelosSelecionadosIds: [], // Array de IDs dos modelos selecionados
         
-        // Modal Pós-Geração
-        modalPosGeracao: false,
-        documentosAdicionaisSelecionados: [], // ['nif', 'atestado', 'combo', 'bi']
-        
         // Preview de Modelo
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo'
@@ -2993,27 +2989,26 @@ function adminApp() {
         /**
          * Gera documento automaticamente (NIF ou Atestado) sem edição
          */
-        async gerarDocumentoAutomatico(tipo, abrirModalApos = true) {
+        async gerarDocumentoAutomatico(tipo) {
             if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
                 this.showAlert('error', 'Selecione empresa e cliente primeiro');
                 return;
             }
             
             console.log(`⚡ Gerando ${tipo.toUpperCase()} automaticamente...`);
+            this.showAlert('info', `Gerando ${tipo.toUpperCase()}...`);
             
             try {
                 // TODO: Implementar lógica de geração automática
                 // Por enquanto, simular geração
-                await new Promise(resolve => setTimeout(resolve, 800));
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_${tipo}.pdf`;
+                this.showAlert('success', `${tipo.toUpperCase()} gerado com sucesso!`);
                 console.log(`✅ ${tipo.toUpperCase()} gerado:`, nomeArquivo);
                 
-                // Só abrir modal se for chamada direta (não batch)
-                if (abrirModalApos) {
-                    this.showAlert('success', `${tipo.toUpperCase()} gerado com sucesso!`);
-                    this.abrirModalPosGeracao();
-                }
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
                 
             } catch (error) {
                 console.error(`❌ Erro ao gerar ${tipo}:`, error);
@@ -3079,6 +3074,48 @@ function adminApp() {
         },
         
         /**
+         * Volta do modal de preview para a escolha de modelo (ETAPA 3.5)
+         */
+        voltarParaEscolhaModelo() {
+            this.modalPreviewModelo = false;
+            this.fluxoEtapa = 3.5;
+            console.log('⬅️ Voltando para escolha de modelo');
+        },
+        
+        /**
+         * Abre o modal de preview existente com os dados do fluxo
+         */
+        abrirPreviewDoFluxo() {
+            console.log('📄 Abrindo preview do fluxo...', {
+                empresa: this.fluxoEmpresaSelecionada?.nome,
+                cliente: this.fluxoClienteSelecionado?.nome,
+                tipo: this.fluxoTipoDocumento,
+                modelo: this.fluxoModeloSelecionado?.nome
+            });
+            
+            // Configurar o modelo selecionado para o modal
+            if (this.fluxoModeloSelecionado) {
+                this.modeloSelecionado = this.fluxoModeloSelecionado;
+            } else {
+                // Se não há modelo (combo), criar um modelo temporário
+                this.modeloSelecionado = {
+                    id: 'combo',
+                    nome: 'Combo Completo',
+                    descricao: 'Declaração + 3 Recibos',
+                    tiposSuportados: ['combo', 'declaracao', 'recibo']
+                };
+            }
+            
+            // Configurar o tipo de preview baseado no fluxo
+            this.tipoPreview = this.fluxoTipoDocumento;
+            
+            // Abrir o modal de preview existente
+            this.modalPreviewModelo = true;
+            
+            console.log('✅ Modal de preview aberto com dados do fluxo');
+        },
+        
+        /**
          * Gera PDF dentro do fluxo do wizard
          */
         async gerarPDFFluxo() {
@@ -3108,74 +3145,13 @@ function adminApp() {
                 this.showAlert('success', `✅ PDF gerado: ${nomeArquivo}`);
                 console.log('✅ PDF gerado com sucesso:', nomeArquivo);
                 
-                // Abrir modal pós-geração
-                this.abrirModalPosGeracao();
+                // Perguntar se deseja gerar mais documentos
+                this.perguntarGerarOutroDocumento();
                 
             } catch (error) {
                 this.loading = false;
                 console.error('❌ Erro ao gerar PDF:', error);
                 this.showAlert('error', 'Erro ao gerar PDF');
-            }
-        },
-        
-        /**
-         * Abre modal pós-geração para documentos adicionais
-         */
-        abrirModalPosGeracao() {
-            this.documentosAdicionaisSelecionados = [];
-            this.modalPosGeracao = true;
-            console.log('📋 Modal pós-geração aberto');
-        },
-        
-        /**
-         * Gera documentos adicionais selecionados
-         */
-        async gerarDocumentosAdicionais() {
-            if (this.documentosAdicionaisSelecionados.length === 0) {
-                this.showAlert('warning', 'Selecione pelo menos um documento');
-                return;
-            }
-            
-            console.log('📄 Gerando documentos adicionais:', this.documentosAdicionaisSelecionados);
-            
-            this.modalPosGeracao = false;
-            this.loading = true;
-            this.loadingMessage = `Gerando ${this.documentosAdicionaisSelecionados.length} documento(s)...`;
-            
-            try {
-                for (const tipo of this.documentosAdicionaisSelecionados) {
-                    if (tipo === 'nif' || tipo === 'atestado') {
-                        // Documentos automáticos
-                        await this.gerarDocumentoAutomatico(tipo);
-                        await new Promise(resolve => setTimeout(resolve, 500)); // Delay entre documentos
-                    } else if (tipo === 'combo') {
-                        // Combo: redirecionar para wizard
-                        this.loading = false;
-                        this.fluxoTipoDocumento = 'combo';
-                        this.fluxoEtapa = 3.5; // Ir para seleção de modelo
-                        this.showAlert('info', 'Selecione o modelo para o Combo');
-                        return;
-                    } else if (tipo === 'bi') {
-                        // BI: abrir editor
-                        this.loading = false;
-                        this.abrirEditorBI();
-                        return;
-                    }
-                }
-                
-                this.loading = false;
-                this.showAlert('success', `✅ ${this.documentosAdicionaisSelecionados.length} documento(s) gerado(s)!`);
-                this.documentosAdicionaisSelecionados = [];
-                
-                // Perguntar novamente se deseja gerar mais
-                setTimeout(() => {
-                    this.abrirModalPosGeracao();
-                }, 1000);
-                
-            } catch (error) {
-                this.loading = false;
-                console.error('❌ Erro ao gerar documentos adicionais:', error);
-                this.showAlert('error', 'Erro ao gerar documentos');
             }
         },
         
