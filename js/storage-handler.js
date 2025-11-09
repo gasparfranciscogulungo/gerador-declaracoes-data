@@ -214,8 +214,13 @@ class StorageHandler {
         }
     }
 
-    resetarTudo() {
-        if (confirm('⚠️ ATENÇÃO: Isso vai apagar TODOS os dados. Tem certeza?')) {
+    async resetarTudo() {
+        const confirmar = await showConfirm(
+            'ATENÇÃO: Isso vai apagar TODOS os dados.\n\nTem certeza?',
+            { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Resetar Tudo', cancelText: 'Cancelar' }
+        );
+        
+        if (confirmar) {
             localStorage.removeItem(this.STORAGE_KEY);
             this.criarEstrutura();
             console.log('🗑️ Todos os dados foram resetados');

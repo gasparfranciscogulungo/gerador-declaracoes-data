@@ -183,7 +183,11 @@ function usersApp() {
          * Aprovar usuário pendente
          */
         async aprovarUser(userId) {
-            if (!confirm('Aprovar este usuário?')) return;
+            const confirmar = await showConfirm(
+                'Aprovar este usuário?',
+                { type: 'info', icon: 'bi-check-circle', confirmText: 'Aprovar' }
+            );
+            if (!confirmar) return;
             
             this.loading = true;
             this.loadingMessage = 'Aprovando usuário...';
@@ -212,7 +216,11 @@ function usersApp() {
          * Bloquear usuário
          */
         async bloquearUser(userId) {
-            if (!confirm('Bloquear este usuário? Ele não poderá mais acessar o sistema.')) return;
+            const confirmar = await showConfirm(
+                'Bloquear este usuário?\n\nEle não poderá mais acessar o sistema.',
+                { type: 'danger', icon: 'bi-ban', confirmText: 'Bloquear' }
+            );
+            if (!confirmar) return;
             
             this.loading = true;
             this.loadingMessage = 'Bloqueando usuário...';
@@ -234,7 +242,11 @@ function usersApp() {
          * Desbloquear usuário
          */
         async desbloquearUser(userId) {
-            if (!confirm('Desbloquear este usuário?')) return;
+            const confirmar = await showConfirm(
+                'Desbloquear este usuário?',
+                { type: 'info', icon: 'bi-unlock', confirmText: 'Desbloquear' }
+            );
+            if (!confirmar) return;
             
             this.loading = true;
             this.loadingMessage = 'Desbloqueando usuário...';
@@ -256,7 +268,11 @@ function usersApp() {
          * Rejeitar usuário pendente (remove da lista)
          */
         async rejeitarUser(userId) {
-            if (!confirm('Rejeitar este usuário? Ele será removido permanentemente da lista.')) return;
+            const confirmar = await showConfirm(
+                'Rejeitar este usuário?\n\nEle será removido permanentemente da lista.',
+                { type: 'danger', icon: 'bi-x-circle', confirmText: 'Rejeitar' }
+            );
+            if (!confirmar) return;
             
             this.loading = true;
             this.loadingMessage = 'Rejeitando usuário...';
@@ -465,9 +481,11 @@ function usersApp() {
          * Regenerar PDF a partir do histórico
          */
         async regenerarPDF(documento) {
-            if (!confirm('Regenerar este documento? Você poderá editar os dados antes de gerar.')) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                'Regenerar este documento?\n\nVocê poderá editar os dados antes de gerar.',
+                { type: 'info', icon: 'bi-arrow-clockwise', confirmText: 'Regenerar' }
+            );
+            if (!confirmar) return;
             
             try {
                 const dadosRegeneracao = this.historicoManager.prepararRegeneracao(documento.id);

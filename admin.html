@@ -1428,15 +1428,23 @@
                 </button>
                 <button @click="tipoPreview = 'recibo'"
                         :class="tipoPreview === 'recibo' ? 'bg-green-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
-                        class="px-4 py-2 rounded-lg font-medium transition-colors"
-                        x-show="modeloSelecionado?.tiposSuportados.includes('recibo')">
+                        class="px-4 py-2 rounded-lg font-medium transition-colors">
                     <i class="bi bi-receipt mr-2"></i>Recibo
                 </button>
                 <button @click="tipoPreview = 'combo'"
                         :class="tipoPreview === 'combo' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
-                        class="px-4 py-2 rounded-lg font-medium transition-colors"
-                        x-show="modeloSelecionado?.tiposSuportados.includes('combo')">
+                        class="px-4 py-2 rounded-lg font-medium transition-colors">
                     <i class="bi bi-journals mr-2"></i>Combo
+                </button>
+                <button @click="tipoPreview = 'nif'"
+                        :class="tipoPreview === 'nif' ? 'bg-indigo-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
+                        class="px-4 py-2 rounded-lg font-medium transition-colors">
+                    <i class="bi bi-card-text mr-2"></i>NIF
+                </button>
+                <button @click="tipoPreview = 'atestado'"
+                        :class="tipoPreview === 'atestado' ? 'bg-teal-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
+                        class="px-4 py-2 rounded-lg font-medium transition-colors">
+                    <i class="bi bi-clipboard-check mr-2"></i>Atestado
                 </button>
                 <button @click="tipoPreview = 'bi'; abrirEditorBI()"
                         :class="tipoPreview === 'bi' ? 'bg-pink-600 text-white' : (darkMode ? 'bg-gray-600 text-gray-200' : 'bg-white text-gray-700 hover:bg-gray-50')"
@@ -1960,21 +1968,73 @@
                              :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'"></div>
                     </template>
 
-                    <!-- PREVIEW: RECIBO (3 MESES) -->
+                    <!-- PREVIEW: RECIBO -->
                     <template x-if="tipoPreview === 'recibo'">
-                        <div class="text-center py-12 w-full max-w-[210mm]">
-                            <i class="bi bi-receipt text-6xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 text-lg font-medium">Preview de Recibo</p>
-                            <p class="text-gray-500 text-sm mt-2">Recibo com 1-3 meses de salário</p>
+                        <div class="text-center py-20 w-full max-w-[210mm]">
+                            <div class="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-2xl p-12 border-2 border-dashed border-orange-300 dark:border-orange-700">
+                                <i class="bi bi-receipt text-8xl text-orange-400 mb-6"></i>
+                                <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">Recibo de Salário</h3>
+                                <p class="text-orange-600 dark:text-orange-400 text-lg font-medium mb-2">🚧 Em desenvolvimento brevemente</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Recibo com 1-3 meses de pagamento</p>
+                            </div>
                         </div>
                     </template>
 
-                    <!-- PREVIEW: COMBO (Declaração + 3 Recibos = 4 páginas) -->
+                    <!-- PREVIEW: COMBO -->
                     <template x-if="tipoPreview === 'combo'">
-                        <div class="text-center py-12 w-full max-w-[210mm]">
-                            <i class="bi bi-journals text-6xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 text-lg font-medium">Preview do Combo</p>
-                            <p class="text-gray-500 text-sm mt-2">1 Declaração + 3 Recibos Mensais = 4 Páginas Totais</p>
+                        <div class="text-center py-20 w-full max-w-[210mm]">
+                            <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-12 border-2 border-dashed border-purple-300 dark:border-purple-700">
+                                <i class="bi bi-journals text-8xl text-purple-400 mb-6"></i>
+                                <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">Combo Completo</h3>
+                                <p class="text-purple-600 dark:text-purple-400 text-lg font-medium mb-2">🚧 Em desenvolvimento brevemente</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Declaração + 3 Recibos = 4 páginas</p>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <!-- PREVIEW: NIF -->
+                    <template x-if="tipoPreview === 'nif'">
+                        <div class="text-center py-16 w-full max-w-[210mm]">
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-12 border border-blue-200 dark:border-blue-800 shadow-lg">
+                                <i class="bi bi-card-text text-7xl text-blue-500 mb-6 animate-pulse"></i>
+                                <h3 class="text-3xl font-bold mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                                    Número de Identificação Fiscal
+                                </h3>
+                                <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4 mb-4 inline-block">
+                                    <p class="text-blue-700 dark:text-blue-300 text-sm font-medium">
+                                        <i class="bi bi-tools mr-2"></i>Funcionalidade em desenvolvimento
+                                    </p>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 mb-2">
+                                    Documento fiscal com geração automática
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">
+                                    Em breve: Geração instantânea de documento NIF profissional
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <!-- PREVIEW: ATESTADO -->
+                    <template x-if="tipoPreview === 'atestado'">
+                        <div class="text-center py-16 w-full max-w-[210mm]">
+                            <div class="bg-gradient-to-br from-teal-50 to-green-50 dark:from-teal-900/20 dark:to-green-900/20 rounded-2xl p-12 border border-teal-200 dark:border-teal-800 shadow-lg">
+                                <i class="bi bi-clipboard-check text-7xl text-teal-500 mb-6 animate-pulse"></i>
+                                <h3 class="text-3xl font-bold mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                                    Atestado Médico/Profissional
+                                </h3>
+                                <div class="bg-teal-100 dark:bg-teal-900/30 rounded-lg p-4 mb-4 inline-block">
+                                    <p class="text-teal-700 dark:text-teal-300 text-sm font-medium">
+                                        <i class="bi bi-tools mr-2"></i>Funcionalidade em desenvolvimento
+                                    </p>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 mb-2">
+                                    Atestado com validação automática de dados
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">
+                                    Em breve: Templates profissionais para atestados médicos e de trabalho
+                                </p>
+                            </div>
                         </div>
                     </template>
                     

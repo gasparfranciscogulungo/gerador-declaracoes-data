@@ -670,7 +670,12 @@ function adminApp() {
         },
 
         async excluirTrabalhador(id) {
-            if (!confirm('Tem certeza que deseja excluir este trabalhador?')) return;
+            const confirmar = await showConfirm(
+                'Tem certeza que deseja excluir este trabalhador?',
+                { type: 'danger', icon: 'bi-trash', confirmText: 'Excluir' }
+            );
+            if (!confirmar) return;
+            
             try {
                 this.loading = true;
                 this.loadingMessage = 'Excluindo trabalhador...';
@@ -698,9 +703,11 @@ function adminApp() {
         },
 
         async resetarContador(empresaId) {
-            if (!confirm('⚠️ Resetar contador desta empresa para 0?')) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                'Resetar contador desta empresa para 0?',
+                { type: 'warning', icon: 'bi-arrow-counterclockwise', confirmText: 'Resetar' }
+            );
+            if (!confirmar) return;
             
             try {
                 this.loading = true;
@@ -750,7 +757,11 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
-            if (!confirm('⚠️ ATENÇÃO: Deletar esta empresa permanentemente?')) {
+            const confirmar = await showConfirm(
+                'ATENÇÃO: Deletar esta empresa permanentemente?\n\nEsta ação não pode ser desfeita.',
+                { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Deletar' }
+            );
+            if (!confirmar) {
                 return;
             }
             
@@ -796,9 +807,11 @@ function adminApp() {
         },
 
         async deletarModelo(modeloId) {
-            if (!confirm('⚠️ Deletar este modelo permanentemente?')) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                'Deletar este modelo permanentemente?',
+                { type: 'danger', icon: 'bi-file-earmark-x', confirmText: 'Deletar' }
+            );
+            if (!confirmar) return;
             
             try {
                 this.loading = true;
@@ -944,8 +957,12 @@ function adminApp() {
         },
 
                 // ========== UTILIDADES ==========
-        logout() {
-            if (confirm('Tem certeza que deseja sair?')) {
+        async logout() {
+            const confirmar = await showConfirm(
+                'Tem certeza que deseja sair?',
+                { type: 'info', icon: 'bi-box-arrow-right', confirmText: 'Sair', cancelText: 'Cancelar' }
+            );
+            if (confirmar) {
                 authManager.logout();
             }
         },
@@ -1248,9 +1265,11 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
-            if (!confirm('Tem certeza que deseja excluir esta empresa?\n\nEsta ação não pode ser desfeita!')) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                'Tem certeza que deseja excluir esta empresa?\n\nEsta ação não pode ser desfeita!',
+                { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Excluir' }
+            );
+            if (!confirmar) return;
 
             try {
                 this.loading = true;
@@ -1806,8 +1825,12 @@ function adminApp() {
         /**
          * Remover logo da empresa (apenas do formulário)
          */
-        removerLogoEmpresa() {
-            if (confirm('Deseja remover o logo? (O arquivo permanecerá no GitHub)')) {
+        async removerLogoEmpresa() {
+            const confirmar = await showConfirm(
+                'Deseja remover o logo?\n\n(O arquivo permanecerá no GitHub)',
+                { type: 'warning', icon: 'bi-image', confirmText: 'Remover' }
+            );
+            if (confirmar) {
                 this.empresaForm.logo = '';
                 this.empresaForm.logoPreview = '';
                 this.showAlert('success', '✅ Logo removido do formulário');
@@ -1817,8 +1840,12 @@ function adminApp() {
         /**
          * Remover carimbo da empresa (apenas do formulário)
          */
-        removerCarimboEmpresa() {
-            if (confirm('Deseja remover o carimbo? (O arquivo permanecerá no GitHub)')) {
+        async removerCarimboEmpresa() {
+            const confirmar = await showConfirm(
+                'Deseja remover o carimbo?\n\n(O arquivo permanecerá no GitHub)',
+                { type: 'warning', icon: 'bi-stamp', confirmText: 'Remover' }
+            );
+            if (confirmar) {
                 this.empresaForm.carimbo = '';
                 this.empresaForm.carimboPreview = '';
                 this.showAlert('success', '✅ Carimbo removido do formulário');
@@ -2271,9 +2298,11 @@ function adminApp() {
                 return;
             }
 
-            if (!confirm(`Tem certeza que deseja deletar "${personalizacao.nome}"?`)) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                `Tem certeza que deseja deletar "${personalizacao.nome}"?`,
+                { type: 'danger', icon: 'bi-trash', confirmText: 'Deletar' }
+            );
+            if (!confirmar) return;
 
             const modeloId = this.modeloSelecionado?.id || 'default';
 
@@ -2844,9 +2873,11 @@ function adminApp() {
          * @param {string} tipo - 'logo' ou 'carimbo'
          */
         async removerImagem(empresa, tipo) {
-            if (!confirm(`Deseja realmente remover o ${tipo} da empresa ${empresa.nome}?`)) {
-                return;
-            }
+            const confirmar = await showConfirm(
+                `Deseja realmente remover o ${tipo} da empresa ${empresa.nome}?`,
+                { type: 'warning', icon: tipo === 'logo' ? 'bi-image' : 'bi-stamp', confirmText: 'Remover' }
+            );
+            if (!confirmar) return;
 
             try {
                 this.loading = true;
@@ -4021,7 +4052,10 @@ function adminApp() {
          * Pergunta se deseja gerar outro documento
          */
         async perguntarGerarOutroDocumento() {
-            const resposta = confirm('✅ PDF gerado!\n\n📄 Deseja gerar outro documento?');
+            const resposta = await showConfirm(
+                'PDF gerado!\n\nDeseja gerar outro documento?',
+                { type: 'info', icon: 'bi-file-earmark-check', confirmText: 'Gerar Outro', cancelText: 'Não' }
+            );
             
             if (resposta) {
                 // SIM: Mantém empresa e cliente, volta para seleção de tipo
@@ -4032,7 +4066,10 @@ function adminApp() {
                 this.salvarCacheFluxo();
             } else {
                 // NÃO: Pergunta se quer gerar para outro cliente
-                const outroCliente = confirm('👤 Deseja gerar documento para outro cliente?');
+                const outroCliente = await showConfirm(
+                    'Deseja gerar documento para outro cliente?',
+                    { type: 'info', icon: 'bi-person', confirmText: 'Outro Cliente', cancelText: 'Não' }
+                );
                 
                 if (outroCliente) {
                     // SIM: Mantém empresa, volta para seleção de cliente
@@ -4092,15 +4129,12 @@ function adminApp() {
             
             // Verificar se há empresa e cliente selecionados
             if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
-                const usar = confirm(
-                    '⚠️ Nenhuma empresa/cliente selecionado no fluxo.\n\n' +
-                    'Deseja usar dados de exemplo para preview?\n\n' +
-                    '💡 Dica: Use o TAB "Gerar PDF" para selecionar dados reais.'
+                const usar = await showConfirm(
+                    'Nenhuma empresa/cliente selecionado no fluxo.\n\nDeseja usar dados de exemplo para preview?\n\nDica: Use o TAB "Gerar PDF" para selecionar dados reais.',
+                    { type: 'warning', icon: 'bi-exclamation-circle', confirmText: 'Usar Exemplo', cancelText: 'Cancelar' }
                 );
                 
-                if (!usar) {
-                    return;
-                }
+                if (!usar) return;
             }
             
             this.loading = true;

@@ -300,6 +300,35 @@ style.textContent = `
         }
     }
 
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
     .animate-pulse {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
@@ -317,3 +346,201 @@ document.head.appendChild(style);
 
 // Instância global
 const notificationSystem = new NotificationSystem();
+
+/**
+ * Sistema de Prompt Profissional (substitui prompt() nativo)
+ * Retorna uma Promise que resolve com o valor digitado ou null se cancelado
+ */
+window.showPrompt = function(message, options = {}) {
+    return new Promise((resolve) => {
+        const {
+            title = 'Entrada de dados',
+            placeholder = '',
+            defaultValue = '',
+            confirmText = 'OK',
+            cancelText = 'Cancelar',
+            type = 'text', // text, password, url, etc
+            icon = 'bi-pencil-square'
+        } = options;
+
+        // Remove modal anterior se existir
+        const oldModal = document.getElementById('custom-prompt-modal');
+        if (oldModal) oldModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'custom-prompt-modal';
+        modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm';
+        modal.style.animation = 'fadeIn 0.2s ease-out';
+        
+        modal.innerHTML = `
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all" 
+                 style="animation: scaleIn 0.2s ease-out;">
+                <div class="p-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="bi ${icon} text-2xl text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                ${title}
+                            </h3>
+                            <p class="text-sm text-gray-600 mb-4 whitespace-pre-line">
+                                ${message}
+                            </p>
+                            <input type="${type}" 
+                                   id="prompt-input" 
+                                   value="${defaultValue}"
+                                   placeholder="${placeholder}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
+                    <button id="prompt-cancel-btn" 
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                        ${cancelText}
+                    </button>
+                    <button id="prompt-ok-btn" 
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                        ${confirmText}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const inputElement = document.getElementById('prompt-input');
+        inputElement.focus();
+        inputElement.select();
+
+        const closeModal = (result) => {
+            modal.style.animation = 'fadeOut 0.2s ease-in';
+            setTimeout(() => {
+                modal.remove();
+                resolve(result);
+            }, 200);
+        };
+
+        // Event listeners
+        document.getElementById('prompt-ok-btn').addEventListener('click', () => {
+            closeModal(inputElement.value);
+        });
+        
+        document.getElementById('prompt-cancel-btn').addEventListener('click', () => {
+            closeModal(null);
+        });
+        
+        // Enter para confirmar
+        inputElement.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                closeModal(inputElement.value);
+            } else if (e.key === 'Escape') {
+                closeModal(null);
+            }
+        });
+
+        // Fechar ao clicar fora
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(null);
+        });
+    });
+};
+
+/**
+ * Sistema de Confirmação Profissional (substitui confirm() nativo)
+ * Retorna uma Promise que resolve true/false
+ */
+window.showConfirm = function(message, options = {}) {
+    return new Promise((resolve) => {
+        const {
+            title = 'Confirmação',
+            confirmText = 'Confirmar',
+            cancelText = 'Cancelar',
+            type = 'warning', // warning, danger, info
+            icon = 'bi-question-circle'
+        } = options;
+
+        // Remove modal anterior se existir
+        const oldModal = document.getElementById('custom-confirm-modal');
+        if (oldModal) oldModal.remove();
+
+        // Cores baseadas no tipo
+        const colors = {
+            warning: { bg: 'bg-orange-100', icon: 'text-orange-600', btn: 'bg-orange-600 hover:bg-orange-700' },
+            danger: { bg: 'bg-red-100', icon: 'text-red-600', btn: 'bg-red-600 hover:bg-red-700' },
+            info: { bg: 'bg-blue-100', icon: 'text-blue-600', btn: 'bg-blue-600 hover:bg-blue-700' }
+        };
+        const color = colors[type] || colors.warning;
+
+        const modal = document.createElement('div');
+        modal.id = 'custom-confirm-modal';
+        modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm';
+        modal.style.animation = 'fadeIn 0.2s ease-out';
+        
+        modal.innerHTML = `
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all" 
+                 style="animation: scaleIn 0.2s ease-out;">
+                <div class="p-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 ${color.bg} rounded-full flex items-center justify-center">
+                                <i class="bi ${icon} text-2xl ${color.icon}"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                ${title}
+                            </h3>
+                            <p class="text-sm text-gray-600 whitespace-pre-line">
+                                ${message}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
+                    <button id="confirm-cancel-btn" 
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                        ${cancelText}
+                    </button>
+                    <button id="confirm-ok-btn" 
+                            class="px-4 py-2 ${color.btn} text-white rounded-lg font-medium transition-colors">
+                        ${confirmText}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = (result) => {
+            modal.style.animation = 'fadeOut 0.2s ease-in';
+            setTimeout(() => {
+                modal.remove();
+                resolve(result);
+            }, 200);
+        };
+
+        // Event listeners
+        document.getElementById('confirm-ok-btn').addEventListener('click', () => closeModal(true));
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => closeModal(false));
+        
+        // Fechar ao clicar fora
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(false);
+        });
+
+        // ESC para cancelar
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                closeModal(false);
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+    });
+};

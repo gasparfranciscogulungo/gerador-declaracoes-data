@@ -23,7 +23,11 @@ class AuthManager {
 
     login() {
         if (!this.CLIENT_ID) {
-            alert('❌ CLIENT_ID não configurado! Configure primeiro no config.js');
+            if (typeof showAlert === 'function') {
+                showAlert('error', 'CLIENT_ID não configurado! Configure primeiro no config.js');
+            } else {
+                console.error('❌ CLIENT_ID não configurado!');
+            }
             return;
         }
 
@@ -119,10 +123,14 @@ class AuthManager {
             // Para desenvolvimento, vamos usar Personal Access Token
             // Usuário deve criar em: https://github.com/settings/tokens
             
-            const token = prompt(
-                '🔑 DESENVOLVIMENTO: Cole seu Personal Access Token do GitHub\n\n' +
-                'Crie em: https://github.com/settings/tokens\n' +
-                'Permissões necessárias: repo, user'
+            const token = await showPrompt(
+                'Cole seu Personal Access Token do GitHub\n\nCrie em: https://github.com/settings/tokens\nPermissões necessárias: repo, user',
+                {
+                    title: 'DESENVOLVIMENTO: GitHub Token',
+                    placeholder: 'ghp_xxxxxxxxxxxxxxxxxxxx',
+                    type: 'password',
+                    icon: 'bi-key'
+                }
             );
 
             if (!token) {

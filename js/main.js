@@ -258,7 +258,11 @@ function appData() {
 ℹ️ Os PDFs são gerados localmente no seu dispositivo.
             `.trim();
 
-            alert(mensagem);
+            if (typeof showAlert === 'function') {
+                showAlert('info', mensagem);
+            } else {
+                console.info('ℹ️ Sobre o sistema:', mensagem);
+            }
         }
     };
 }
