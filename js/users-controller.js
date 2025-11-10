@@ -5,6 +5,10 @@
 
 function usersApp() {
     return {
+        // UI State
+        darkMode: localStorage.getItem('darkMode') === 'true' || false,
+        mobileMenuOpen: false,
+        
         loading: false,
         loadingMessage: 'Carregando...',
         syncing: false,
