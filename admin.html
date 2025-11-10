@@ -22,11 +22,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" integrity="sha512-hvNR0F/e2J7zPPfLC9auFe3/SE0yG4aJCOd/qxew74NN7eyiSKjr7xJJMu1Jy2wf7FXITpWS1E/RY8yzuXN7VA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" integrity="sha512-9KkIqdfN7ipEW6B6k+Aq20PV31bjODg4AA52W+tYtAE0jE0kMx49bjJ3FgvS56wzmyfMUHbQ4Km2b7l9+Y/+Eg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
+    <!-- Swiper.js - Carrosséis Profissionais -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <!-- jsPDF - Geração de PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 <body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
     
@@ -106,19 +111,34 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4">
+    <!-- Header Responsivo -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 md:py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <i class="bi bi-shield-check text-3xl"></i>
+                <!-- Logo e título -->
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <!-- Menu hamburger (mobile only) -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="lg:hidden p-2 hover:bg-blue-700 rounded-lg transition-colors">
+                        <div class="w-6 h-5 flex flex-col justify-between">
+                            <span :class="mobileMenuOpen ? 'rotate-45 translate-y-2' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                            <span :class="mobileMenuOpen ? 'opacity-0' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                            <span :class="mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                        </div>
+                    </button>
+                    
+                    <i class="bi bi-shield-check text-2xl md:text-3xl"></i>
                     <div>
-                        <h1 class="text-2xl font-bold">Painel Administrativo</h1>
-                        <p class="text-blue-200 text-sm">Gerador de Declarações</p>
-                        
+                        <h1 class="text-lg md:text-2xl font-bold">Painel Admin</h1>
+                        <p class="text-blue-200 text-xs md:text-sm hidden sm:block">Gerador de Declarações</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                
+                <!-- Ações do header (desktop) -->
+                <div class="hidden lg:flex items-center space-x-4">
                     <div class="text-right">
                         <p class="text-sm text-blue-200">Administrador</p>
                         <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
@@ -132,9 +152,105 @@
                         <i class="bi bi-box-arrow-right mr-2"></i>Sair
                     </button>
                 </div>
+                
+                <!-- Ações mobile (compactas) -->
+                <div class="flex lg:hidden items-center space-x-2">
+                    <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white">
+                    <button @click="toggleDarkMode()" class="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+                        <i :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
+
+    <!-- Menu Mobile Slide-in -->
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="mobileMenuOpen = false"
+         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 lg:hidden">
+    </div>
+    
+    <nav x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="-translate-x-full"
+         :class="darkMode ? 'bg-gray-900' : 'bg-white'"
+         class="fixed top-0 left-0 h-full w-80 max-w-[85vw] shadow-2xl z-50 lg:hidden overflow-y-auto">
+        
+        <!-- Header do Menu -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Menu</h2>
+                <button @click="mobileMenuOpen = false" class="p-2 hover:bg-blue-700 rounded-lg transition-colors">
+                    <i class="bi bi-x-lg text-xl"></i>
+                </button>
+            </div>
+            <div class="flex items-center space-x-3">
+                <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-white">
+                <div>
+                    <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
+                    <p class="text-blue-200 text-sm">Administrador</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Itens do Menu -->
+        <div class="py-4">
+            <button @click="activeTab = 'empresas'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'empresas' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-l-4 border-blue-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors">
+                <i class="bi bi-building text-xl"></i>
+                <span class="font-medium">Empresas</span>
+            </button>
+            
+            <button @click="activeTab = 'clientes'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'clientes' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-l-4 border-blue-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors">
+                <i class="bi bi-people text-xl"></i>
+                <span class="font-medium">Clientes</span>
+            </button>
+            
+            <button @click="abrirFluxoGeracao(); mobileMenuOpen = false" 
+                    :class="[modalFluxoGeracao ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors">
+                <i class="bi bi-magic text-xl"></i>
+                <span class="font-medium">Gerar PDF</span>
+            </button>
+            
+            <a href="users.html"
+               :class="darkMode ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-50 text-gray-700'"
+               class="w-full px-6 py-4 flex items-center space-x-3 transition-colors relative">
+                <i class="bi bi-person-gear text-xl"></i>
+                <span class="font-medium">Usuários</span>
+                <span id="users-badge-mobile" class="hidden ml-auto bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">0</span>
+            </a>
+            
+            <button @click="activeTab = 'config'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'config' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-l-4 border-blue-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors">
+                <i class="bi bi-gear text-xl"></i>
+                <span class="font-medium">Configurações</span>
+            </button>
+        </div>
+        
+        <!-- Footer do Menu -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+            <button @click="logout()" 
+                    class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </nav>
 
     <!-- Alert System - Fixed Position Above Everything -->
     <div x-show="alert.show" 
@@ -152,97 +268,222 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
+    <!-- Main Content Responsivo -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         
-        <!-- Dashboard Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Empresas</p>
-                        <p class="text-3xl font-bold text-blue-600" x-text="stats.empresas"></p>
+        <!-- Dashboard Stats - Carrossel Responsivo -->
+        <div class="mb-6 lg:mb-8">
+            <!-- Desktop: Grid normal (lg+) -->
+            <div class="hidden lg:grid grid-cols-6 gap-6">
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Empresas</p>
+                            <p class="text-3xl font-bold text-blue-600" x-text="stats.empresas"></p>
+                        </div>
+                        <i class="bi bi-building text-4xl text-blue-200"></i>
                     </div>
-                    <i class="bi bi-building text-4xl text-blue-200"></i>
+                </div>
+
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Modelos</p>
+                            <p class="text-3xl font-bold text-green-600" x-text="stats.modelos"></p>
+                        </div>
+                        <i class="bi bi-file-earmark-text text-4xl text-green-200"></i>
+                    </div>
+                </div>
+
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Users Ativos</p>
+                            <p class="text-3xl font-bold text-purple-600" x-text="stats.users"></p>
+                        </div>
+                        <i class="bi bi-people text-4xl text-purple-200"></i>
+                    </div>
+                </div>
+
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">PDFs Hoje</p>
+                            <p class="text-3xl font-bold text-orange-600" x-text="stats.declaracoesHoje"></p>
+                        </div>
+                        <i class="bi bi-file-earmark-pdf text-4xl text-orange-200"></i>
+                    </div>
+                </div>
+
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Total Clientes</p>
+                            <p class="text-3xl font-bold text-cyan-600" x-text="stats.totalClientes || 0"></p>
+                        </div>
+                        <i class="bi bi-briefcase text-4xl text-cyan-200"></i>
+                    </div>
+                </div>
+
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Total PDFs</p>
+                            <p class="text-3xl font-bold text-pink-600" x-text="stats.totalDeclaracoes || 0"></p>
+                        </div>
+                        <i class="bi bi-graph-up-arrow text-4xl text-pink-200"></i>
+                    </div>
                 </div>
             </div>
 
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Modelos</p>
-                        <p class="text-3xl font-bold text-green-600" x-text="stats.modelos"></p>
-                    </div>
-                    <i class="bi bi-file-earmark-text text-4xl text-green-200"></i>
-                </div>
-            </div>
+            <!-- Mobile/Tablet: Carrossel Swiper Profissional (até lg) -->
+            <div class="lg:hidden stats-carousel-wrapper">
+                <div class="swiper statsSwiper">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1: Empresas -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                                            <i class="bi bi-building text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">Empresas</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-blue-600 dark:text-blue-400" x-text="stats.empresas"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Total cadastradas</p>
+                            </div>
+                        </div>
 
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Users Ativos</p>
-                        <p class="text-3xl font-bold text-purple-600" x-text="stats.users"></p>
-                    </div>
-                    <i class="bi bi-people text-4xl text-purple-200"></i>
-                </div>
-            </div>
+                        <!-- Slide 2: Modelos -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-green-50 to-green-100 border-green-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                                            <i class="bi bi-file-earmark-text text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">Modelos</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-green-600 dark:text-green-400" x-text="stats.modelos"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Templates disponíveis</p>
+                            </div>
+                        </div>
 
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">PDFs Hoje</p>
-                        <p class="text-3xl font-bold text-orange-600" x-text="stats.declaracoesHoje"></p>
-                    </div>
-                    <i class="bi bi-file-earmark-pdf text-4xl text-orange-200"></i>
-                </div>
-            </div>
+                        <!-- Slide 3: Users Ativos -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
+                                            <i class="bi bi-people text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">Usuários</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-purple-600 dark:text-purple-400" x-text="stats.users"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Ativos no sistema</p>
+                            </div>
+                        </div>
 
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Total Clientes</p>
-                        <p class="text-3xl font-bold text-cyan-600" x-text="stats.totalClientes || 0"></p>
-                    </div>
-                    <i class="bi bi-briefcase text-4xl text-cyan-200"></i>
-                </div>
-            </div>
+                        <!-- Slide 4: PDFs Hoje -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
+                                            <i class="bi bi-file-earmark-pdf text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">PDFs Hoje</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-orange-600 dark:text-orange-400" x-text="stats.declaracoesHoje"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Gerados hoje</p>
+                            </div>
+                        </div>
 
-            <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Total PDFs</p>
-                        <p class="text-3xl font-bold text-pink-600" x-text="stats.totalDeclaracoes || 0"></p>
+                        <!-- Slide 5: Total Clientes -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-cyan-500 flex items-center justify-center">
+                                            <i class="bi bi-briefcase text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">Clientes</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-cyan-600 dark:text-cyan-400" x-text="stats.totalClientes || 0"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Total cadastrados</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 6: Total PDFs -->
+                        <div class="swiper-slide">
+                            <div :class="darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 text-white border-gray-700' : 'bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200'" 
+                                 class="stat-card-swiper border">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center">
+                                            <i class="bi bi-graph-up-arrow text-white text-xl"></i>
+                                        </div>
+                                        <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium">Total PDFs</p>
+                                    </div>
+                                </div>
+                                <p class="text-4xl font-bold text-pink-600 dark:text-pink-400" x-text="stats.totalDeclaracoes || 0"></p>
+                                <p :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="text-xs mt-2">Gerados no total</p>
+                            </div>
+                        </div>
                     </div>
-                    <i class="bi bi-graph-up-arrow text-4xl text-pink-200"></i>
+                    
+                    <!-- Navegação -->
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                    
+                    <!-- Paginação -->
+                    <div class="swiper-pagination"></div>
+                </div>
+                
+                <!-- Indicador de scroll para mobile muito pequeno -->
+                <div class="stats-scroll-indicator">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Deslize para ver mais</span>
                 </div>
             </div>
         </div>
 
-        <!-- Tabs Navigation -->
+        <!-- Tabs Navigation - Responsivo -->
         <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-lg shadow-md mb-6">
-            <div class="flex border-b overflow-x-auto" :class="darkMode ? 'border-gray-700' : ''">
+            <div class="tabs-container flex border-b overflow-x-auto hide-scrollbar" :class="darkMode ? 'border-gray-700' : ''">
                 <button @click="activeTab = 'empresas'" 
                         :class="activeTab === 'empresas' ? 'border-blue-600 text-blue-600' : (darkMode ? 'border-transparent text-gray-400' : 'border-transparent text-gray-600')"
-                        class="px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap">
-                    <i class="bi bi-building mr-2"></i>Empresas
+                        class="tab-item flex-shrink-0 px-4 md:px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base">
+                    <i class="bi bi-building mr-1 md:mr-2"></i><span class="hidden sm:inline">Empresas</span><span class="sm:hidden">Emp.</span>
                 </button>
          
                 <button @click="activeTab = 'clientes'" 
                         :class="activeTab === 'clientes' ? 'border-blue-600 text-blue-600' : (darkMode ? 'border-transparent text-gray-400' : 'border-transparent text-gray-600')"
-                        class="px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap">
-                    <i class="bi bi-people mr-2"></i>Clientes
+                        class="tab-item flex-shrink-0 px-4 md:px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base">
+                    <i class="bi bi-people mr-1 md:mr-2"></i><span class="hidden sm:inline">Clientes</span><span class="sm:hidden">Cli.</span>
                 </button>
                 
                 <button @click="abrirFluxoGeracao()" 
                         :class="modalFluxoGeracao ? 'border-purple-600 text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20' : (darkMode ? 'border-transparent text-gray-400' : 'border-transparent text-gray-600')"
-                        class="px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap hover:text-purple-500">
-                    <i class="bi bi-magic mr-2"></i>Gerar PDF Profissional
+                        class="tab-item flex-shrink-0 px-4 md:px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap hover:text-purple-500 text-sm md:text-base">
+                    <i class="bi bi-magic mr-1 md:mr-2"></i><span class="hidden md:inline">Gerar PDF Profissional</span><span class="md:hidden">Gerar PDF</span>
                 </button>
                 
                 <a href="users.html"
                         :class="darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'"
-                        class="px-6 py-3 border-b-2 border-transparent hover:border-blue-300 font-medium transition-colors relative whitespace-nowrap">
-                    <i class="bi bi-person-gear mr-2"></i>Usuários
+                        class="tab-item flex-shrink-0 px-4 md:px-6 py-3 border-b-2 border-transparent hover:border-blue-300 font-medium transition-colors relative whitespace-nowrap text-sm md:text-base">
+                    <i class="bi bi-person-gear mr-1 md:mr-2"></i><span class="hidden sm:inline">Usuários</span><span class="sm:hidden">Users</span>
                     <!-- Badge de notificação -->
                     <span id="users-badge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">0</span>
                     <!-- Ícone de notificação pulsante -->
@@ -251,8 +492,8 @@
                 
                 <button @click="activeTab = 'config'" 
                         :class="activeTab === 'config' ? 'border-blue-600 text-blue-600' : (darkMode ? 'border-transparent text-gray-400' : 'border-transparent text-gray-600')"
-                        class="px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap">
-                    <i class="bi bi-gear mr-2"></i>Configurações
+                        class="tab-item flex-shrink-0 px-4 md:px-6 py-3 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base">
+                    <i class="bi bi-gear mr-1 md:mr-2"></i><span class="hidden sm:inline">Configurações</span><span class="sm:hidden">Config</span>
                 </button>
             </div>
         </div>
@@ -1034,32 +1275,32 @@
                 
                 <!-- ETAPA 1: Selecionar Empresa -->
                 <div x-show="fluxoEtapa === 1" class="space-y-4">
-                    <h4 class="text-lg font-bold mb-4">Selecione a Empresa:</h4>
+                    <h4 class="text-lg md:text-xl font-bold mb-4">Selecione a Empresa:</h4>
                     
-                    <!-- Busca -->
+                    <!-- Busca Responsiva -->
                     <input type="text" 
                            x-model="fluxoBuscaEmpresa"
-                           placeholder="🔍 Buscar empresa por nome ou NIF..."
+                           placeholder="🔍 Buscar empresa..."
                            :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
-                           class="w-full border rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-blue-500">
+                           class="w-full border rounded-lg px-4 py-3 md:py-4 mb-4 focus:ring-2 focus:ring-blue-500 text-base md:text-lg">
                     
-                    <!-- Lista de Empresas -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Lista de Empresas - Grid Responsivo -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                         <template x-for="empresa in empresasFiltradas" :key="empresa.id">
                             <div @click="selecionarEmpresa(empresa)"
                                  :class="fluxoEmpresaSelecionada?.id === empresa.id ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-300' : (darkMode ? 'border-gray-600' : 'border-gray-300')"
-                                 class="border-2 rounded-lg p-4 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h5 class="font-bold text-lg" x-text="empresa.nome"></h5>
-                                        <p class="text-sm text-gray-500">NIF: <span x-text="empresa.nif"></span></p>
-                                        <p class="text-xs text-gray-400 mt-1" x-text="empresa.endereco.municipio"></p>
+                                 class="border-2 rounded-lg p-4 md:p-5 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg active:scale-[0.98] touch-manipulation">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h5 class="font-bold text-base md:text-lg truncate" x-text="empresa.nome"></h5>
+                                        <p class="text-xs md:text-sm text-gray-500 truncate">NIF: <span x-text="empresa.nif"></span></p>
+                                        <p class="text-xs text-gray-400 mt-1 truncate" x-text="empresa.endereco.municipio"></p>
                                     </div>
-                                    <div x-show="empresa.logoPreview || empresa.logo" class="w-12 h-12 rounded border flex-shrink-0">
+                                    <div x-show="empresa.logoPreview || empresa.logo" class="w-12 h-12 md:w-14 md:h-14 rounded border flex-shrink-0">
                                         <img :src="empresa.logoPreview || empresa.logo" class="w-full h-full object-contain">
                                     </div>
                                 </div>
-                                <i x-show="fluxoEmpresaSelecionada?.id === empresa.id" class="bi bi-check-circle-fill text-blue-600 text-xl mt-2"></i>
+                                <i x-show="fluxoEmpresaSelecionada?.id === empresa.id" class="bi bi-check-circle-fill text-blue-600 text-xl md:text-2xl mt-2 block"></i>
                             </div>
                         </template>
                     </div>
@@ -2275,24 +2516,29 @@
                         <span x-text="fluxoEtapa === 4 ? 'Voltar' : 'Fechar'"></span>
                     </button>
                     
-                    <!-- Botão: Visualizar em Nova Aba -->
-                    <button @click="visualizarPDFNovaAba()" 
-                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
-                        <i class="bi bi-window mr-2"></i>Nova Aba
-                    </button>
-                    
-                    <!-- Botão: Imprimir -->
-                    <button @click="imprimirPDF()" 
-                            class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
-                        <i class="bi bi-printer mr-2"></i>Imprimir
-                    </button>
-                    
-                    <!-- Botão Principal: Baixar/Gerar PDF -->
-                    <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
-                            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-medium shadow-lg hover:shadow-xl">
-                        <i class="bi bi-download mr-2"></i>
-                        <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
-                    </button>
+                    <!-- Botões de ação (ocultos para tipos em desenvolvimento) -->
+                    <template x-if="!['nif', 'atestado', 'recibo', 'combo'].includes(tipoPreview)">
+                        <div class="flex items-center space-x-3">
+                            <!-- Botão: Visualizar em Nova Aba -->
+                            <button @click="visualizarPDFNovaAba()" 
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                                <i class="bi bi-window mr-2"></i>Nova Aba
+                            </button>
+                            
+                            <!-- Botão: Imprimir -->
+                            <button @click="imprimirPDF()" 
+                                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                                <i class="bi bi-printer mr-2"></i>Imprimir
+                            </button>
+                            
+                            <!-- Botão Principal: Baixar/Gerar PDF -->
+                            <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
+                                    class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-medium shadow-lg hover:shadow-xl">
+                                <i class="bi bi-download mr-2"></i>
+                                <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </div>
 
@@ -3002,6 +3248,120 @@
             await notificationSystem.init();
             // Exibe notificações em camadas (timing diferente)
             await notificationSystem.notifyWithLayers();
+        });
+    </script>
+
+    <!-- Inicialização do Swiper (Carrosseis Responsivos) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carrossel de Stats do Dashboard - Configuração Profissional
+            const statsSwiper = new Swiper('.statsSwiper', {
+                // Configurações básicas
+                slidesPerView: 1,
+                spaceBetween: 16,
+                loop: false,
+                grabCursor: true,
+                centeredSlides: false,
+                
+                // Autoplay inteligente
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: true,
+                    pauseOnMouseEnter: true
+                },
+                
+                // Navegação
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                
+                // Paginação profissional
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                    dynamicBullets: false,
+                    renderBullet: function (index, className) {
+                        return '<span class="' + className + '"></span>';
+                    }
+                },
+                
+                // Efeitos de transição
+                effect: 'slide',
+                speed: 600,
+                
+                // Touch events otimizados
+                touchEventsTarget: 'container',
+                simulateTouch: true,
+                touchRatio: 1,
+                touchAngle: 45,
+                shortSwipes: true,
+                longSwipes: true,
+                longSwipesRatio: 0.5,
+                
+                // Resistência nos limites
+                resistance: true,
+                resistanceRatio: 0.85,
+                
+                // Breakpoints responsivos
+                breakpoints: {
+                    // Mobile muito pequeno (320px)
+                    320: {
+                        slidesPerView: 1,
+                        spaceBetween: 12,
+                        navigation: {
+                            enabled: false
+                        }
+                    },
+                    // Mobile pequeno (375px)
+                    375: {
+                        slidesPerView: 1,
+                        spaceBetween: 14,
+                        navigation: {
+                            enabled: true
+                        }
+                    },
+                    // Mobile (480px)
+                    480: {
+                        slidesPerView: 1.3,
+                        spaceBetween: 16,
+                        centeredSlides: false
+                    },
+                    // Phablet (540px)
+                    540: {
+                        slidesPerView: 1.5,
+                        spaceBetween: 16
+                    },
+                    // Tablet pequeno (640px)
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 18
+                    },
+                    // Tablet (768px)
+                    768: {
+                        slidesPerView: 2.5,
+                        spaceBetween: 20
+                    },
+                    // Tablet grande (900px)
+                    900: {
+                        slidesPerView: 3,
+                        spaceBetween: 20
+                    }
+                },
+                
+                // Callbacks
+                on: {
+                    init: function () {
+                        console.log('✅ Carrossel de stats inicializado');
+                    },
+                    slideChange: function () {
+                        // Feedback haptico em dispositivos que suportam
+                        if ('vibrate' in navigator) {
+                            navigator.vibrate(10);
+                        }
+                    }
+                }
+            });
         });
     </script>
 

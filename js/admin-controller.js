@@ -13,6 +13,7 @@ function adminApp() {
         contador: {},
         usersData: null,
         darkMode: localStorage.getItem('darkMode') === 'true',
+        mobileMenuOpen: false, // Menu hamburger mobile
         
         activeTab: 'empresas',
         loading: false,
@@ -3088,25 +3089,11 @@ function adminApp() {
                 return;
             }
             
-            console.log(`⚡ Gerando ${tipo.toUpperCase()} automaticamente...`);
-            this.showAlert('info', `Gerando ${tipo.toUpperCase()}...`);
+            console.log(`📄 Abrindo preview de ${tipo.toUpperCase()}...`);
             
-            try {
-                // TODO: Implementar lógica de geração automática
-                // Por enquanto, simular geração
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_${tipo}.pdf`;
-                this.showAlert('success', `${tipo.toUpperCase()} gerado com sucesso!`);
-                console.log(`✅ ${tipo.toUpperCase()} gerado:`, nomeArquivo);
-                
-                // Perguntar se deseja gerar mais documentos
-                this.perguntarGerarOutroDocumento();
-                
-            } catch (error) {
-                console.error(`❌ Erro ao gerar ${tipo}:`, error);
-                this.showAlert('error', `Erro ao gerar ${tipo.toUpperCase()}`);
-            }
+            // Abrir modal de preview com o tipo selecionado
+            this.tipoPreview = tipo;
+            this.modalPreviewModelo = true;
         },
         
         /**
