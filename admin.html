@@ -443,10 +443,6 @@
                         </div>
                     </div>
                     
-                    <!-- Navegação -->
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div>
-                    
                     <!-- Paginação -->
                     <div class="swiper-pagination"></div>
                 </div>
@@ -499,112 +495,112 @@
         </div>
 
         <!-- TAB: Empresas -->
-        <div x-show="activeTab === 'empresas'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6">
-            <!-- Header -->
-            <div class="flex items-center justify-between mb-8">
+        <div x-show="activeTab === 'empresas'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-4 sm:p-6">
+            <!-- Header Responsivo -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
-                        <i class="bi bi-building mr-3 text-blue-600"></i>Gestão de Empresas
+                    <h2 class="text-2xl sm:text-3xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                        <i class="bi bi-building mr-2 sm:mr-3 text-blue-600"></i>Gestão de Empresas
                     </h2>
-                    <p class="text-sm text-gray-500 mt-1">
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">
                         <span x-text="empresas.length"></span> empresa<span x-show="empresas.length !== 1">s</span> cadastrada<span x-show="empresas.length !== 1">s</span>
                     </p>
                 </div>
                 <button @click="modalNovaEmpresa = true" 
-                        class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                        class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base w-full sm:w-auto">
                     <i class="bi bi-plus-circle mr-2"></i>Nova Empresa
                 </button>
             </div>
 
-            <!-- Grid de Empresas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Grid de Empresas Responsivo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <template x-for="empresa in empresas" :key="empresa.id">
-                    <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-blue-400 group">
+                    <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-blue-400 group">
                         
                         <!-- Header do Card com Gradiente -->
-                        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 relative overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
                             <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
                             
-                            <div class="relative flex items-start justify-between">
+                            <div class="relative flex items-start justify-between gap-3">
                                 <!-- Logo -->
                                 <div class="flex-shrink-0">
                                     <template x-if="empresa.logoPreview || empresa.logo">
-                                        <div class="w-20 h-20 rounded-xl bg-white p-2 shadow-xl border-4 border-white/30">
+                                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl bg-white p-1.5 sm:p-2 shadow-xl border-2 sm:border-4 border-white/30">
                                             <img :src="empresa.logoPreview || empresa.logo" 
                                                  :alt="empresa.nome" 
                                                  class="w-full h-full object-contain">
                                         </div>
                                     </template>
                                     <template x-if="!empresa.logoPreview && !empresa.logo">
-                                        <div class="w-20 h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl border-2 border-white/30">
-                                            <i class="bi bi-building text-3xl text-white"></i>
+                                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl border-2 border-white/30">
+                                            <i class="bi bi-building text-2xl sm:text-3xl text-white"></i>
                                         </div>
                                     </template>
                                 </div>
 
                                 <!-- Contador Badge -->
-                                <div class="bg-white/20 backdrop-blur-md rounded-xl px-4 py-2 border border-white/30 shadow-lg">
-                                    <p class="text-xs text-white/80 mb-1 font-medium">Documentos</p>
-                                    <p class="text-2xl font-bold text-white">
+                                <div class="bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border border-white/30 shadow-lg">
+                                    <p class="text-xs text-white/80 mb-0.5 sm:mb-1 font-medium">Docs</p>
+                                    <p class="text-xl sm:text-2xl font-bold text-white">
                                         <span x-text="getContador(empresa.id)"></span>
-                                        <span class="text-sm text-white/70"> / 5</span>
+                                        <span class="text-xs sm:text-sm text-white/70"> / 5</span>
                                     </p>
                                 </div>
                             </div>
 
                             <!-- Nome da Empresa -->
-                            <h3 class="text-white text-xl font-bold mt-4 mb-1" x-text="empresa.nome"></h3>
-                            <p class="text-blue-100 text-sm flex items-center">
-                                <i class="bi bi-credit-card mr-2"></i>
+                            <h3 class="text-white text-lg sm:text-xl font-bold mt-3 sm:mt-4 mb-1 line-clamp-2" x-text="empresa.nome"></h3>
+                            <p class="text-blue-100 text-xs sm:text-sm flex items-center">
+                                <i class="bi bi-credit-card mr-1.5 sm:mr-2"></i>
                                 NIF: <span x-text="empresa.nif" class="ml-1 font-medium"></span>
                             </p>
                         </div>
 
                         <!-- Corpo do Card -->
-                        <div class="p-6">
+                        <div class="p-4 sm:p-6">
                             <!-- Informações Principais -->
-                            <div class="space-y-3 mb-4">
+                            <div class="space-y-2.5 sm:space-y-3 mb-3 sm:mb-4">
                                 <!-- Endereço -->
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3">
-                                        <i class="bi bi-geo-alt-fill text-green-600 text-lg"></i>
+                                    <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-100 flex items-center justify-center mr-2 sm:mr-3">
+                                        <i class="bi bi-geo-alt-fill text-green-600 text-sm sm:text-lg"></i>
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="text-xs text-gray-500 mb-1">Endereço</p>
-                                        <p class="text-sm text-gray-800 font-medium" x-text="empresa.endereco.rua + ', ' + empresa.endereco.municipio"></p>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs text-gray-500 mb-0.5 sm:mb-1">Endereço</p>
+                                        <p class="text-xs sm:text-sm text-gray-800 font-medium line-clamp-2" x-text="empresa.endereco.rua + ', ' + empresa.endereco.municipio"></p>
                                         <p class="text-xs text-gray-600" x-show="empresa.endereco.bairro" x-text="empresa.endereco.bairro"></p>
                                     </div>
                                 </div>
 
                                 <!-- Contatos -->
-                                <div class="grid grid-cols-2 gap-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                                     <div x-show="empresa.telefone" class="flex items-center">
                                         <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center mr-2">
-                                            <i class="bi bi-telephone-fill text-orange-600"></i>
+                                            <i class="bi bi-telephone-fill text-orange-600 text-sm"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-xs text-gray-500">Telefone</p>
-                                            <p class="text-sm text-gray-800 font-medium truncate" x-text="empresa.telefone"></p>
+                                            <p class="text-xs sm:text-sm text-gray-800 font-medium truncate" x-text="empresa.telefone"></p>
                                         </div>
                                     </div>
                                     <div x-show="empresa.email" class="flex items-center">
                                         <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-2">
-                                            <i class="bi bi-envelope-fill text-purple-600"></i>
+                                            <i class="bi bi-envelope-fill text-purple-600 text-sm"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-xs text-gray-500">Email</p>
-                                            <p class="text-sm text-gray-800 font-medium truncate" x-text="empresa.email"></p>
+                                            <p class="text-xs sm:text-sm text-gray-800 font-medium truncate" x-text="empresa.email"></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Carimbo e Cores -->
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-gray-200">
                                 <!-- Carimbo -->
                                 <div x-show="empresa.carimboPreview || empresa.carimbo" class="flex items-center space-x-2">
-                                    <div class="w-12 h-12 rounded-lg border-2 border-gray-200 bg-white p-1 shadow-sm">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-gray-200 bg-white p-1 shadow-sm">
                                         <img :src="empresa.carimboPreview || empresa.carimbo" 
                                              :alt="empresa.nome + ' - Carimbo'" 
                                              class="w-full h-full object-contain">
@@ -617,15 +613,15 @@
 
                                 <!-- Paleta de Cores -->
                                 <div class="flex items-center space-x-2">
-                                    <div class="text-right mr-2">
+                                    <div class="text-left sm:text-right mr-2">
                                         <p class="text-xs text-gray-500">Cores</p>
-                                        <p class="text-xs text-gray-600 font-medium">Identidade</p>
+                                        <p class="text-xs text-gray-600 font-medium hidden sm:block">Identidade</p>
                                     </div>
                                     <div class="flex items-center space-x-1">
-                                        <div class="w-8 h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
+                                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
                                              :style="'background-color: ' + empresa.corPrimaria"
                                              :title="'Cor Primária: ' + empresa.corPrimaria"></div>
-                                        <div class="w-8 h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
+                                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-2 border-gray-300 shadow-sm" 
                                              :style="'background-color: ' + empresa.corSecundaria"
                                              :title="'Cor Secundária: ' + empresa.corSecundaria"></div>
                                     </div>
@@ -633,20 +629,20 @@
                             </div>
 
                             <!-- Botões de Ação -->
-                            <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex items-center gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                                 <button @click="editarEmpresa(empresa)" 
-                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center font-medium">
-                                    <i class="bi bi-pencil-square mr-2"></i>Editar
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2.5 sm:py-2 px-3 sm:px-4 rounded-lg transition-colors flex items-center justify-center font-medium text-sm sm:text-base touch-manipulation">
+                                    <i class="bi bi-pencil-square mr-1.5 sm:mr-2"></i>Editar
                                 </button>
                                 <button @click="resetarContador(empresa.id)" 
-                                        class="bg-orange-100 hover:bg-orange-200 text-orange-700 p-2 rounded-lg transition-colors"
+                                        class="bg-orange-100 hover:bg-orange-200 active:bg-orange-300 text-orange-700 p-2.5 sm:p-2 rounded-lg transition-colors touch-manipulation"
                                         title="Resetar contador">
-                                    <i class="bi bi-arrow-clockwise text-lg"></i>
+                                    <i class="bi bi-arrow-clockwise text-base sm:text-lg"></i>
                                 </button>
                                 <button @click="deletarEmpresa(empresa.id)" 
-                                        class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg transition-colors"
+                                        class="bg-red-100 hover:bg-red-200 active:bg-red-300 text-red-700 p-2.5 sm:p-2 rounded-lg transition-colors touch-manipulation"
                                         title="Excluir empresa">
-                                    <i class="bi bi-trash text-lg"></i>
+                                    <i class="bi bi-trash text-base sm:text-lg"></i>
                                 </button>
                             </div>
                         </div>
@@ -671,30 +667,30 @@
         <!-- TAB: Modelos REMOVIDO - Código migrado para wizard "Gerar PDF Profissional" -->
 
         <!-- TAB: Clientes (Todos) -->
-        <div x-show="activeTab === 'clientes'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+        <div x-show="activeTab === 'clientes'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+                <h2 class="text-xl sm:text-2xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
                     <i class="bi bi-people mr-2 text-purple-600"></i>Trabalhadores
                 </h2>
                 <button @click="abrirModalNovoTrabalhador()" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 py-2.5 sm:py-2 rounded-lg transition-colors w-full sm:w-auto text-sm sm:text-base touch-manipulation">
                     <i class="bi bi-person-plus mr-2"></i>Novo Trabalhador
                 </button>
             </div>
 
-            <!-- Filtros -->
-            <div class="mb-6 flex gap-4">
+            <!-- Filtros Responsivos -->
+            <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <input type="text" 
                        x-model="filtroTrabalhador"
                        @input="filtrarTrabalhadores()"
                        placeholder="🔍 Buscar por nome, NIF, função..."
                        :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
-                       class="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                       class="flex-1 border rounded-lg px-3 sm:px-4 py-2.5 sm:py-2 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                 
                 <select x-model="filtroDepartamento" 
                         @change="filtrarTrabalhadores()"
                         :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
-                        class="border rounded-lg px-4 py-2">
+                        class="border rounded-lg px-3 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-base">
                     <option value="">Todos os Departamentos</option>
                     <template x-for="dept in departamentos" :key="dept">
                         <option :value="dept" x-text="dept"></option>
@@ -704,15 +700,15 @@
                 <select x-model="filtroStatus" 
                         @change="filtrarTrabalhadores()"
                         :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
-                        class="border rounded-lg px-4 py-2">
+                        class="border rounded-lg px-3 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-base">
                     <option value="ativos">Apenas Ativos</option>
                     <option value="todos">Todos</option>
                     <option value="inativos">Apenas Inativos</option>
                 </select>
             </div>
 
-            <!-- Tabela de Trabalhadores -->
-            <div class="overflow-x-auto">
+            <!-- View Desktop: Tabela de Trabalhadores -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full">
                     <thead :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'">
                         <tr>
@@ -774,6 +770,72 @@
                         </template>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- View Mobile: Cards de Trabalhadores -->
+            <div class="md:hidden space-y-3">
+                <template x-for="trabalhador in trabalhadoresFiltrados" :key="trabalhador.id">
+                    <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'" 
+                         class="border rounded-xl p-4 hover:shadow-lg transition-all">
+                        
+                        <!-- Header do Card -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center flex-1 min-w-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold mr-3 flex-shrink-0">
+                                    <span x-text="trabalhador.nome.charAt(0)" class="text-lg"></span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-base font-bold truncate" x-text="trabalhador.nome"></h3>
+                                    <p class="text-xs opacity-70 truncate" x-text="trabalhador.email"></p>
+                                </div>
+                            </div>
+                            <span x-show="trabalhador.ativo !== false" 
+                                  class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 ml-2 flex-shrink-0">
+                                Ativo
+                            </span>
+                            <span x-show="trabalhador.ativo === false" 
+                                  class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 ml-2 flex-shrink-0">
+                                Inativo
+                            </span>
+                        </div>
+
+                        <!-- Info Grid -->
+                        <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
+                            <div>
+                                <p class="text-xs opacity-60 mb-0.5">NIF</p>
+                                <p class="font-medium truncate" x-text="trabalhador.nif"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs opacity-60 mb-0.5">Função</p>
+                                <p class="font-medium truncate" x-text="trabalhador.funcao"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs opacity-60 mb-0.5">Departamento</p>
+                                <p class="font-medium truncate" x-text="trabalhador.departamento"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs opacity-60 mb-0.5">Telefone</p>
+                                <p class="font-medium truncate" x-text="trabalhador.telefone"></p>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="flex gap-2 pt-3 border-t" :class="darkMode ? 'border-gray-600' : 'border-gray-200'">
+                            <button @click="verDetalhesTrabalhador(trabalhador)" 
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center text-sm touch-manipulation">
+                                <i class="bi bi-eye mr-1.5"></i>Ver
+                            </button>
+                            <button @click="editarTrabalhador(trabalhador)" 
+                                    class="flex-1 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center text-sm touch-manipulation">
+                                <i class="bi bi-pencil mr-1.5"></i>Editar
+                            </button>
+                            <button @click="excluirTrabalhador(trabalhador.id)" 
+                                    class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center touch-manipulation">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <!-- Estado vazio -->
@@ -1185,31 +1247,36 @@
         </div>
 
         <!-- TAB: Configurações -->
-        <div x-show="activeTab === 'config'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold mb-6" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+        <div x-show="activeTab === 'config'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-4 sm:p-6">
+            <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
                 <i class="bi bi-gear mr-2 text-gray-600"></i>Configurações do Sistema
             </h2>
             
-            <div class="space-y-6">
-                <div class="border-b pb-4">
-                    <h3 class="font-bold text-lg mb-2">Informações do Repositório</h3>
-                    <p><strong>Owner:</strong> <span x-text="config.owner"></span></p>
-                    <p><strong>Repo:</strong> <span x-text="config.repo"></span></p>
-                    <button @click="verificarRepo()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
+            <div class="space-y-4 sm:space-y-6">
+                <div class="border-b pb-3 sm:pb-4" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+                    <h3 class="font-bold text-base sm:text-lg mb-2">Informações do Repositório</h3>
+                    <div class="space-y-1 mb-3 text-sm sm:text-base">
+                        <p><strong>Owner:</strong> <span x-text="config.owner" class="break-all"></span></p>
+                        <p><strong>Repo:</strong> <span x-text="config.repo" class="break-all"></span></p>
+                    </div>
+                    <button @click="verificarRepo()" 
+                            class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 py-2.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
                         <i class="bi bi-check-circle mr-2"></i>Verificar Conexão
                     </button>
                 </div>
 
-                <div class="border-b pb-4">
-                    <h3 class="font-bold text-lg mb-2">Sincronização</h3>
-                    <button @click="sincronizarDados()" class="bg-green-600 text-white px-4 py-2 rounded">
+                <div class="border-b pb-3 sm:pb-4" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+                    <h3 class="font-bold text-base sm:text-lg mb-2">Sincronização</h3>
+                    <button @click="sincronizarDados()" 
+                            class="w-full sm:w-auto bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-4 py-2.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
                         <i class="bi bi-arrow-repeat mr-2"></i>Sincronizar Agora
                     </button>
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-lg mb-2">Rate Limit GitHub API</h3>
-                    <button @click="verificarRateLimit()" class="bg-orange-600 text-white px-4 py-2 rounded">
+                    <h3 class="font-bold text-base sm:text-lg mb-2">Rate Limit GitHub API</h3>
+                    <button @click="verificarRateLimit()" 
+                            class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-4 py-2.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
                         <i class="bi bi-speedometer2 mr-2"></i>Verificar Limite
                     </button>
                 </div>
@@ -1219,125 +1286,137 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- MODAL: FLUXO DE GERAÇÃO DE DOCUMENTO (Tela Cheia 100vh) -->
+    <!-- MODAL: FLUXO DE GERAÇÃO DE DOCUMENTO (Tela Cheia 100vh) - RESPONSIVO -->
     <!-- ===================================================================== -->
     <div x-show="modalFluxoGeracao" 
          x-transition
          :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'"
          class="fixed inset-0 z-50 flex flex-col overflow-hidden">
             
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-center justify-between">
-                <div>
-                    <h3 class="text-2xl font-bold">
-                        <i class="bi bi-magic mr-2"></i>Gerar Documento Profissional
+            <!-- Header Responsivo -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sm:p-6 flex items-center justify-between">
+                <div class="flex-1 min-w-0 mr-3">
+                    <h3 class="text-lg sm:text-2xl font-bold truncate">
+                        <i class="bi bi-magic mr-1.5 sm:mr-2"></i>Gerar Documento
                     </h3>
-                    <p class="text-blue-100 text-sm mt-1">
+                    <p class="text-blue-100 text-xs sm:text-sm mt-0.5 sm:mt-1">
                         Passo <span x-text="fluxoEtapa"></span> de 4: 
-                        <span x-show="fluxoEtapa === 1">Selecionar Empresa</span>
-                        <span x-show="fluxoEtapa === 2">Selecionar Cliente</span>
-                        <span x-show="fluxoEtapa === 3">Escolher Tipo de Documento</span>
-                        <span x-show="fluxoEtapa === 4">Preview e Edição</span>
+                        <span x-show="fluxoEtapa === 1">Empresa</span>
+                        <span x-show="fluxoEtapa === 2">Cliente</span>
+                        <span x-show="fluxoEtapa === 3">Tipo</span>
+                        <span x-show="fluxoEtapa === 4">Preview</span>
                     </p>
                 </div>
-                <button @click="fecharFluxoGeracao()" class="text-white hover:text-gray-200 text-4xl">
+                <button @click="fecharFluxoGeracao()" 
+                        class="text-white hover:text-gray-200 text-3xl sm:text-4xl flex-shrink-0 w-10 h-10 flex items-center justify-center touch-manipulation">
                     &times;
                 </button>
             </div>
 
-            <!-- Progresso -->
-            <div class="bg-gray-100 dark:bg-gray-700 px-6 py-3">
-                <div class="flex items-center justify-between text-sm">
-                    <div class="flex items-center space-x-2" :class="fluxoEtapa >= 1 ? 'text-blue-600 font-bold' : 'text-gray-400'">
-                        <i class="bi bi-building text-lg"></i>
-                        <span>Empresa</span>
+            <!-- Progresso Responsivo -->
+            <div class="bg-gray-100 dark:bg-gray-700 px-3 sm:px-6 py-2 sm:py-3">
+                <div class="flex items-center justify-between text-xs sm:text-sm">
+                    <!-- Empresa -->
+                    <div class="flex flex-col sm:flex-row items-center space-y-0.5 sm:space-y-0 sm:space-x-2" 
+                         :class="fluxoEtapa >= 1 ? 'text-blue-600 font-bold' : 'text-gray-400'">
+                        <i class="bi bi-building text-base sm:text-lg"></i>
+                        <span class="hidden sm:inline">Empresa</span>
                     </div>
-                    <div class="flex-1 h-1 mx-2 rounded" :class="fluxoEtapa >= 2 ? 'bg-blue-600' : 'bg-gray-300'"></div>
-                    <div class="flex items-center space-x-2" :class="fluxoEtapa >= 2 ? 'text-blue-600 font-bold' : 'text-gray-400'">
-                        <i class="bi bi-person text-lg"></i>
-                        <span>Cliente</span>
+                    <div class="flex-1 h-0.5 sm:h-1 mx-1 sm:mx-2 rounded" :class="fluxoEtapa >= 2 ? 'bg-blue-600' : 'bg-gray-300'"></div>
+                    
+                    <!-- Cliente -->
+                    <div class="flex flex-col sm:flex-row items-center space-y-0.5 sm:space-y-0 sm:space-x-2" 
+                         :class="fluxoEtapa >= 2 ? 'text-blue-600 font-bold' : 'text-gray-400'">
+                        <i class="bi bi-person text-base sm:text-lg"></i>
+                        <span class="hidden sm:inline">Cliente</span>
                     </div>
-                    <div class="flex-1 h-1 mx-2 rounded" :class="fluxoEtapa >= 3 ? 'bg-blue-600' : 'bg-gray-300'"></div>
-                    <div class="flex items-center space-x-2" :class="fluxoEtapa >= 3 ? 'text-blue-600 font-bold' : 'text-gray-400'">
-                        <i class="bi bi-file-earmark-text text-lg"></i>
-                        <span>Tipo</span>
+                    <div class="flex-1 h-0.5 sm:h-1 mx-1 sm:mx-2 rounded" :class="fluxoEtapa >= 3 ? 'bg-blue-600' : 'bg-gray-300'"></div>
+                    
+                    <!-- Tipo -->
+                    <div class="flex flex-col sm:flex-row items-center space-y-0.5 sm:space-y-0 sm:space-x-2" 
+                         :class="fluxoEtapa >= 3 ? 'text-blue-600 font-bold' : 'text-gray-400'">
+                        <i class="bi bi-file-earmark-text text-base sm:text-lg"></i>
+                        <span class="hidden sm:inline">Tipo</span>
                     </div>
-                    <div class="flex-1 h-1 mx-2 rounded" :class="fluxoEtapa >= 4 ? 'bg-blue-600' : 'bg-gray-300'"></div>
-                    <div class="flex items-center space-x-2" :class="fluxoEtapa >= 4 ? 'text-blue-600 font-bold' : 'text-gray-400'">
-                        <i class="bi bi-eye text-lg"></i>
-                        <span>Preview</span>
+                    <div class="flex-1 h-0.5 sm:h-1 mx-1 sm:mx-2 rounded" :class="fluxoEtapa >= 4 ? 'bg-blue-600' : 'bg-gray-300'"></div>
+                    
+                    <!-- Preview -->
+                    <div class="flex flex-col sm:flex-row items-center space-y-0.5 sm:space-y-0 sm:space-x-2" 
+                         :class="fluxoEtapa >= 4 ? 'text-blue-600 font-bold' : 'text-gray-400'">
+                        <i class="bi bi-eye text-base sm:text-lg"></i>
+                        <span class="hidden sm:inline">Preview</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Conteúdo Scrollable -->
-            <div class="flex-1 overflow-y-auto p-6">
+            <!-- Conteúdo Scrollable Responsivo -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6">
                 
                 <!-- ETAPA 1: Selecionar Empresa -->
-                <div x-show="fluxoEtapa === 1" class="space-y-4">
-                    <h4 class="text-lg md:text-xl font-bold mb-4">Selecione a Empresa:</h4>
+                <div x-show="fluxoEtapa === 1" class="space-y-3 sm:space-y-4">
+                    <h4 class="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Selecione a Empresa:</h4>
                     
                     <!-- Busca Responsiva -->
                     <input type="text" 
                            x-model="fluxoBuscaEmpresa"
                            placeholder="🔍 Buscar empresa..."
                            :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
-                           class="w-full border rounded-lg px-4 py-3 md:py-4 mb-4 focus:ring-2 focus:ring-blue-500 text-base md:text-lg">
+                           class="w-full border rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 md:py-4 mb-3 sm:mb-4 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base md:text-lg">
                     
                     <!-- Lista de Empresas - Grid Responsivo -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                         <template x-for="empresa in empresasFiltradas" :key="empresa.id">
                             <div @click="selecionarEmpresa(empresa)"
                                  :class="fluxoEmpresaSelecionada?.id === empresa.id ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-300' : (darkMode ? 'border-gray-600' : 'border-gray-300')"
-                                 class="border-2 rounded-lg p-4 md:p-5 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg active:scale-[0.98] touch-manipulation">
-                                <div class="flex items-start justify-between gap-3">
+                                 class="border-2 rounded-lg p-3 sm:p-4 md:p-5 cursor-pointer hover:border-blue-400 transition-all hover:shadow-lg active:scale-[0.98] touch-manipulation">
+                                <div class="flex items-start justify-between gap-2 sm:gap-3">
                                     <div class="flex-1 min-w-0">
-                                        <h5 class="font-bold text-base md:text-lg truncate" x-text="empresa.nome"></h5>
+                                        <h5 class="font-bold text-sm sm:text-base md:text-lg truncate" x-text="empresa.nome"></h5>
                                         <p class="text-xs md:text-sm text-gray-500 truncate">NIF: <span x-text="empresa.nif"></span></p>
-                                        <p class="text-xs text-gray-400 mt-1 truncate" x-text="empresa.endereco.municipio"></p>
+                                        <p class="text-xs text-gray-400 mt-0.5 sm:mt-1 truncate" x-text="empresa.endereco.municipio"></p>
                                     </div>
-                                    <div x-show="empresa.logoPreview || empresa.logo" class="w-12 h-12 md:w-14 md:h-14 rounded border flex-shrink-0">
+                                    <div x-show="empresa.logoPreview || empresa.logo" class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded border flex-shrink-0">
                                         <img :src="empresa.logoPreview || empresa.logo" class="w-full h-full object-contain">
                                     </div>
                                 </div>
-                                <i x-show="fluxoEmpresaSelecionada?.id === empresa.id" class="bi bi-check-circle-fill text-blue-600 text-xl md:text-2xl mt-2 block"></i>
+                                <i x-show="fluxoEmpresaSelecionada?.id === empresa.id" class="bi bi-check-circle-fill text-blue-600 text-lg sm:text-xl md:text-2xl mt-1.5 sm:mt-2 block"></i>
                             </div>
                         </template>
                     </div>
                 </div>
 
                 <!-- ETAPA 2: Selecionar Cliente -->
-                <div x-show="fluxoEtapa === 2" class="space-y-4">
-                    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 p-4 rounded-r-lg mb-4">
-                        <p class="text-sm">
+                <div x-show="fluxoEtapa === 2" class="space-y-3 sm:space-y-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600 p-3 sm:p-4 rounded-r-lg mb-3 sm:mb-4">
+                        <p class="text-xs sm:text-sm break-words">
                             <strong>Empresa selecionada:</strong> 
                             <span x-text="fluxoEmpresaSelecionada?.nome"></span>
                         </p>
                     </div>
                     
-                    <h4 class="text-lg font-bold mb-4">Selecione o Cliente/Trabalhador:</h4>
+                    <h4 class="text-base sm:text-lg font-bold mb-3 sm:mb-4">Selecione o Cliente/Trabalhador:</h4>
                     
                     <!-- Busca -->
                     <input type="text" 
                            x-model="fluxoBuscaCliente"
                            placeholder="🔍 Buscar por nome, NIF, função..."
                            :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
-                           class="w-full border rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-blue-500">
+                           class="w-full border rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 mb-3 sm:mb-4 focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                     
                     <!-- Lista de Clientes -->
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 sm:space-y-3">
                         <template x-for="cliente in clientesFiltrados" :key="cliente.id">
                             <div @click="selecionarCliente(cliente)"
                                  :class="fluxoClienteSelecionado?.id === cliente.id ? 'border-green-600 bg-green-50 dark:bg-green-900/20 ring-2 ring-green-300' : (darkMode ? 'border-gray-600' : 'border-gray-300')"
-                                 class="border-2 rounded-lg p-4 cursor-pointer hover:border-green-400 transition-all hover:shadow-lg">
+                                 class="border-2 rounded-lg p-3 sm:p-4 cursor-pointer hover:border-green-400 transition-all hover:shadow-lg active:scale-[0.99] touch-manipulation">
                                 <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <h5 class="font-bold text-lg" x-text="cliente.nome"></h5>
-                                        <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
-                                            <div><span class="text-gray-500">NIF:</span> <span x-text="cliente.nif"></span></div>
-                                            <div><span class="text-gray-500">Função:</span> <span x-text="cliente.funcao"></span></div>
-                                            <div><span class="text-gray-500">Departamento:</span> <span x-text="cliente.departamento"></span></div>
-                                            <div><span class="text-gray-500">Salário:</span> <span x-text="cliente.salario_bruto + ' ' + cliente.moeda"></span></div>
+                                    <div class="flex-1 min-w-0">
+                                        <h5 class="font-bold text-sm sm:text-base md:text-lg truncate" x-text="cliente.nome"></h5>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 text-xs sm:text-sm">
+                                            <div class="truncate"><span class="text-gray-500">NIF:</span> <span x-text="cliente.nif"></span></div>
+                                            <div class="truncate"><span class="text-gray-500">Função:</span> <span x-text="cliente.funcao"></span></div>
+                                            <div class="truncate"><span class="text-gray-500">Departamento:</span> <span x-text="cliente.departamento"></span></div>
+                                            <div class="truncate"><span class="text-gray-500">Salário:</span> <span x-text="cliente.salario_bruto + ' ' + cliente.moeda"></span></div>
                                         </div>
                                     </div>
                                     <i x-show="fluxoClienteSelecionado?.id === cliente.id" class="bi bi-check-circle-fill text-green-600 text-3xl ml-4"></i>
@@ -1556,78 +1635,86 @@
 
             </div>
             
-            <!-- Rodapé Fixo com Botões de Navegação -->
+            <!-- Rodapé Fixo com Botões de Navegação - RESPONSIVO -->
             <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'" 
-                 class="border-t px-6 py-4 flex items-center justify-between">
+                 class="border-t px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
                 
                 <!-- ETAPA 1: Botões -->
-                <div x-show="fluxoEtapa === 1" class="w-full flex justify-end space-x-3">
+                <div x-show="fluxoEtapa === 1" class="w-full flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                     <button @click="fecharFluxoGeracao()" 
-                            :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
+                            :class="darkMode ? 'bg-gray-600 hover:bg-gray-500 active:bg-gray-400' : 'bg-gray-200 hover:bg-gray-300 active:bg-gray-400'"
+                            class="px-4 sm:px-6 py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base touch-manipulation order-2 sm:order-1">
                         <i class="bi bi-x-circle mr-2"></i>Cancelar
                     </button>
                     <button @click="avancarParaClientes()" 
                             :disabled="!fluxoEmpresaSelecionada"
-                            :class="fluxoEmpresaSelecionada ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md">
-                        Próximo: Selecionar Cliente <i class="bi bi-arrow-right ml-2"></i>
+                            :class="fluxoEmpresaSelecionada ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
+                            class="px-4 sm:px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md text-sm sm:text-base touch-manipulation order-1 sm:order-2">
+                        <span class="hidden sm:inline">Próximo: Selecionar Cliente</span>
+                        <span class="sm:hidden">Próximo</span>
+                        <i class="bi bi-arrow-right ml-2"></i>
                     </button>
                 </div>
                 
                 <!-- ETAPA 2: Botões -->
-                <div x-show="fluxoEtapa === 2" class="w-full flex justify-between">
+                <div x-show="fluxoEtapa === 2" class="w-full flex justify-between gap-2">
                     <button @click="fluxoEtapa = 1" 
                             :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
-                        <i class="bi bi-arrow-left mr-2"></i>Voltar
+                            class="px-3 sm:px-6 py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base touch-manipulation">
+                        <i class="bi bi-arrow-left mr-1 sm:mr-2"></i><span class="hidden xs:inline">Voltar</span>
                     </button>
                     <button @click="avancarParaTipo()" 
                             :disabled="!fluxoClienteSelecionado"
-                            :class="fluxoClienteSelecionado ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md">
-                        Próximo: Tipo de Documento <i class="bi bi-arrow-right ml-2"></i>
+                            :class="fluxoClienteSelecionado ? 'bg-green-600 hover:bg-green-700 active:bg-green-800 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
+                            class="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md text-sm sm:text-base touch-manipulation">
+                        <span class="hidden sm:inline">Próximo: Tipo de Documento</span>
+                        <span class="sm:hidden">Próximo</span>
+                        <i class="bi bi-arrow-right ml-1 sm:ml-2"></i>
                     </button>
                 </div>
                 
                 <!-- ETAPA 3: Botões -->
-                <div x-show="fluxoEtapa === 3" class="w-full flex justify-between">
+                <div x-show="fluxoEtapa === 3" class="w-full flex justify-between gap-2">
                     <button @click="fluxoEtapa = 2" 
                             :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
-                        <i class="bi bi-arrow-left mr-2"></i>Voltar
+                            class="px-3 sm:px-6 py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base touch-manipulation">
+                        <i class="bi bi-arrow-left mr-1 sm:mr-2"></i><span class="hidden xs:inline">Voltar</span>
                     </button>
                     <button @click="gerarPreviewDocumento()" 
                             :disabled="!fluxoTipoDocumento"
-                            :class="fluxoTipoDocumento ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md">
-                        Gerar Preview <i class="bi bi-eye ml-2"></i>
+                            :class="fluxoTipoDocumento ? 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white' : 'bg-gray-400 text-gray-200 cursor-not-allowed'"
+                            class="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 rounded-lg transition-colors font-medium shadow-md text-sm sm:text-base touch-manipulation">
+                        <span class="hidden sm:inline">Gerar Preview</span>
+                        <span class="sm:hidden">Preview</span>
+                        <i class="bi bi-eye ml-1 sm:ml-2"></i>
                     </button>
                 </div>
                 
                 <!-- ETAPA 3.5: Botões (Seleção de Modelo) -->
-                <div x-show="fluxoEtapa === 3.5" class="w-full flex justify-between">
+                <div x-show="fluxoEtapa === 3.5" class="w-full flex flex-col sm:flex-row justify-between items-center gap-2">
                     <button @click="fluxoEtapa = 3; fluxoModeloSelecionado = null" 
                             :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
+                            class="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base touch-manipulation">
                         <i class="bi bi-arrow-left mr-2"></i>Voltar ao Tipo
                     </button>
-                    <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center text-center sm:text-left">
                         <i class="bi bi-info-circle mr-2"></i>
-                        Clique em um modelo para visualizar
+                        <span>Clique em um modelo</span>
                     </div>
                 </div>
                 
                 <!-- ETAPA 4: Botões -->
-                <div x-show="fluxoEtapa === 4" class="w-full flex justify-between">
+                <div x-show="fluxoEtapa === 4" class="w-full flex justify-between gap-2">
                     <button @click="fluxoEtapa = 3" 
                             :class="darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'"
-                            class="px-6 py-2.5 rounded-lg transition-colors font-medium">
-                        <i class="bi bi-arrow-left mr-2"></i>Voltar
+                            class="px-3 sm:px-6 py-2.5 rounded-lg transition-colors font-medium text-sm sm:text-base touch-manipulation">
+                        <i class="bi bi-arrow-left mr-1 sm:mr-2"></i><span class="hidden xs:inline">Voltar</span>
                     </button>
                     <button @click="gerarDocumentoFinal()" 
-                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-2.5 text-white rounded-lg transition-colors font-bold shadow-lg">
-                        <i class="bi bi-file-earmark-pdf mr-2"></i>Gerar PDF Final
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:from-blue-800 active:to-purple-800 flex-1 sm:flex-none px-4 sm:px-8 py-2.5 text-white rounded-lg transition-colors font-bold shadow-lg text-sm sm:text-base touch-manipulation">
+                        <i class="bi bi-file-earmark-pdf mr-1 sm:mr-2"></i>
+                        <span class="hidden sm:inline">Gerar PDF Final</span>
+                        <span class="sm:hidden">Gerar PDF</span>
                     </button>
                 </div>
             </div>
@@ -3268,12 +3355,6 @@
                     delay: 4000,
                     disableOnInteraction: true,
                     pauseOnMouseEnter: true
-                },
-                
-                // Navegação
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
                 },
                 
                 // Paginação profissional
