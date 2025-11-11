@@ -1722,10 +1722,23 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MODAL: PREVIEW DE MODELO (FULL SCREEN) - RESPONSIVO -->
+    <!-- MODAL: PREVIEW DE MODELO (FULL SCREEN) - RESPONSIVO COM ATALHO H -->
     <!-- ===================================================================== -->
     <div x-show="modalPreviewModelo" 
          x-transition
+         @keydown.window.h="
+             if (modalPreviewModelo) {
+                 const area = document.getElementById('preview-area');
+                 if (area) {
+                     area.style.cursor = area.style.cursor === 'grab' ? 'default' : 'grab';
+                     const msg = area.style.cursor === 'grab' ? '✋ Modo Pan Ativado (H)' : '🖱️ Modo Normal (H)';
+                     alert.show = true;
+                     alert.type = 'success';
+                     alert.message = msg;
+                     setTimeout(() => { alert.show = false; }, 1500);
+                 }
+             }
+         "
          class="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
         
         <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" 
@@ -2519,61 +2532,74 @@
 
                 </div>
 
-                <!-- ÁREA DE PREVIEW - 100% RESPONSIVO -->
+                <!-- ÁREA DE PREVIEW - PROFISSIONAL -->
                 <div :class="darkMode ? 'bg-gray-900' : 'bg-gray-200'" 
-                     class="flex-1 overflow-auto p-2 sm:p-4 lg:p-8 flex items-center justify-center relative">
+                     class="flex-1 overflow-auto relative"
+                     id="preview-area"
+                     style="scroll-behavior: smooth;">
                     
-                    <!-- CONTROLES DE ZOOM MOBILE - Touch Optimized -->
-                    <div class="absolute top-3 right-3 z-20 flex flex-col gap-2 lg:hidden">
-                        <!-- Indicador de Zoom -->
-                        <div class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 shadow-lg text-xs font-bold text-center"
-                             :class="darkMode ? 'text-gray-200' : 'text-gray-800'">
-                            <span x-text="previewConfig.zoom + '%'"></span>
+                    <!-- Container com padding que respeita o zoom -->
+                    <div class="w-full min-h-full flex items-start justify-center"
+                         :style="'padding: ' + Math.max(40, previewConfig.zoom * 0.5) + 'px 20px;'">
+                    
+                        <!-- CONTROLES DE ZOOM - FLOATING PROFISSIONAL -->
+                        <div class="fixed top-24 right-4 z-30 flex flex-col gap-2">
+                            <!-- Indicador de Zoom com Gradiente -->
+                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl px-4 py-2.5 shadow-2xl backdrop-blur-md">
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="bi bi-zoom-in text-lg"></i>
+                                    <span class="font-bold text-base" x-text="previewConfig.zoom + '%'"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Botão Zoom In -->
+                            <button @click="previewConfig.zoom = Math.min(200, previewConfig.zoom + 10)"
+                                    :disabled="previewConfig.zoom >= 200"
+                                    :class="previewConfig.zoom >= 200 ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105 active:scale-95'"
+                                    class="bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-xl w-14 h-14 flex items-center justify-center shadow-xl transition-all"
+                                    title="Aumentar Zoom (+10%)">
+                                <i class="bi bi-plus-lg text-2xl text-blue-600 dark:text-blue-400"></i>
+                            </button>
+                            
+                            <!-- Botão Reset Zoom -->
+                            <button @click="previewConfig.zoom = 100"
+                                    class="bg-white dark:bg-gray-800 border-2 border-gray-400 dark:border-gray-500 rounded-xl w-14 h-14 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all"
+                                    title="Resetar Zoom (100%)">
+                                <i class="bi bi-arrow-counterclockwise text-xl text-gray-600 dark:text-gray-300"></i>
+                            </button>
+                            
+                            <!-- Botão Zoom Out -->
+                            <button @click="previewConfig.zoom = Math.max(30, previewConfig.zoom - 10)"
+                                    :disabled="previewConfig.zoom <= 30"
+                                    :class="previewConfig.zoom <= 30 ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105 active:scale-95'"
+                                    class="bg-white dark:bg-gray-800 border-2 border-red-500 rounded-xl w-14 h-14 flex items-center justify-center shadow-xl transition-all"
+                                    title="Diminuir Zoom (-10%)">
+                                <i class="bi bi-dash-lg text-2xl text-red-600 dark:text-red-400"></i>
+                            </button>
+                            
+                            <!-- Fit to Screen -->
+                            <button @click="previewConfig.zoom = 60"
+                                    class="bg-white dark:bg-gray-800 border-2 border-green-500 rounded-xl w-14 h-14 flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all"
+                                    title="Ajustar à Tela (60%)">
+                                <i class="bi bi-arrows-angle-contract text-xl text-green-600 dark:text-green-400"></i>
+                            </button>
                         </div>
-                        
-                        <!-- Botão Zoom In -->
-                        <button @click="previewConfig.zoom = Math.min(200, previewConfig.zoom + 10)"
-                                :disabled="previewConfig.zoom >= 200"
-                                :class="previewConfig.zoom >= 200 ? 'opacity-50 cursor-not-allowed' : ''"
-                                class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-full w-14 h-14 flex items-center justify-center shadow-xl active:scale-95 touch-manipulation transition-all"
-                                :style="darkMode ? 'color: #fff;' : 'color: #111;'">
-                            <i class="bi bi-zoom-in text-2xl"></i>
-                        </button>
-                        
-                        <!-- Botão Reset Zoom -->
-                        <button @click="previewConfig.zoom = 100"
-                                class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-full w-14 h-14 flex items-center justify-center shadow-xl active:scale-95 touch-manipulation transition-all"
-                                :style="darkMode ? 'color: #fff;' : 'color: #111;'">
-                            <i class="bi bi-arrow-repeat text-xl"></i>
-                        </button>
-                        
-                        <!-- Botão Zoom Out -->
-                        <button @click="previewConfig.zoom = Math.max(30, previewConfig.zoom - 10)"
-                                :disabled="previewConfig.zoom <= 30"
-                                :class="previewConfig.zoom <= 30 ? 'opacity-50 cursor-not-allowed' : ''"
-                                class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-full w-14 h-14 flex items-center justify-center shadow-xl active:scale-95 touch-manipulation transition-all"
-                                :style="darkMode ? 'color: #fff;' : 'color: #111;'">
-                            <i class="bi bi-zoom-out text-2xl"></i>
-                        </button>
                     </div>
-                    <!-- PREVIEW: DECLARAÇÃO - 100% RESPONSIVO COM A4 PERFEITO -->
-                    <template x-if="tipoPreview === 'declaracao'">
-                        <!-- Container com escala responsiva -->
-                        <div class="w-full flex items-start justify-center">
-                            <!-- Folha A4 com escala calculada automaticamente para mobile -->
-                            <div class="a4-sheet-container"
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center; transition: transform 0.3s ease;'">
+                        <!-- PREVIEW: DECLARAÇÃO - PROFISSIONAL -->
+                        <template x-if="tipoPreview === 'declaracao'">
+                            <div class="w-full max-w-[210mm] mx-auto transition-transform duration-300" 
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
                                 <div id="preview-render"
                                      x-html="renderizarModelo()" 
-                                     class="a4-sheet bg-white dark:bg-gray-950 shadow-2xl"
-                                     style="width: 210mm; min-height: 297mm; margin: 0 auto; box-shadow: 0 8px 40px rgba(0,0,0,0.2); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1);"></div>
+                                     class="w-full min-h-[297mm] bg-white dark:bg-gray-950 shadow-2xl rounded-lg overflow-hidden"
+                                     style="box-shadow: 0 10px 50px rgba(0,0,0,0.25); border: 1px solid rgba(0,0,0,0.1);"></div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
 
-                    <!-- PREVIEW: RECIBO - RESPONSIVO -->
-                    <template x-if="tipoPreview === 'recibo'">
-                        <div class="text-center py-8 sm:py-12 lg:py-20 w-full max-w-[210mm] px-4">
+                        <!-- PREVIEW: RECIBO - PROFISSIONAL -->
+                        <template x-if="tipoPreview === 'recibo'">
+                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
                             <div class="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border-2 border-dashed border-orange-300 dark:border-orange-700">
                                 <i class="bi bi-receipt text-5xl sm:text-6xl lg:text-8xl text-orange-400 mb-4 sm:mb-6"></i>
                                 <h3 class="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2 sm:mb-3">Recibo de Salário</h3>
@@ -2583,9 +2609,10 @@
                         </div>
                     </template>
 
-                    <!-- PREVIEW: COMBO - RESPONSIVO -->
-                    <template x-if="tipoPreview === 'combo'">
-                        <div class="text-center py-8 sm:py-12 lg:py-20 w-full max-w-[210mm] px-4">
+                        <!-- PREVIEW: COMBO - PROFISSIONAL -->
+                        <template x-if="tipoPreview === 'combo'">
+                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
                             <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border-2 border-dashed border-purple-300 dark:border-purple-700">
                                 <i class="bi bi-journals text-5xl sm:text-6xl lg:text-8xl text-purple-400 mb-4 sm:mb-6"></i>
                                 <h3 class="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2 sm:mb-3">Combo Completo</h3>
@@ -2594,10 +2621,11 @@
                             </div>
                         </div>
                     </template>
-                    
-                    <!-- PREVIEW: NIF - RESPONSIVO -->
-                    <template x-if="tipoPreview === 'nif'">
-                        <div class="text-center py-8 sm:py-12 lg:py-16 w-full max-w-[210mm] px-4">
+                        
+                        <!-- PREVIEW: NIF - PROFISSIONAL -->
+                        <template x-if="tipoPreview === 'nif'">
+                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border border-blue-200 dark:border-blue-800 shadow-lg">
                                 <i class="bi bi-card-text text-5xl sm:text-6xl lg:text-7xl text-blue-500 mb-4 sm:mb-6 animate-pulse"></i>
                                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
@@ -2619,9 +2647,10 @@
                         </div>
                     </template>
                     
-                    <!-- PREVIEW: ATESTADO - RESPONSIVO -->
-                    <template x-if="tipoPreview === 'atestado'">
-                        <div class="text-center py-8 sm:py-12 lg:py-16 w-full max-w-[210mm] px-4">
+                        <!-- PREVIEW: ATESTADO - PROFISSIONAL -->
+                        <template x-if="tipoPreview === 'atestado'">
+                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
                             <div class="bg-gradient-to-br from-teal-50 to-green-50 dark:from-teal-900/20 dark:to-green-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border border-teal-200 dark:border-teal-800 shadow-lg">
                                 <i class="bi bi-clipboard-check text-5xl sm:text-6xl lg:text-7xl text-teal-500 mb-4 sm:mb-6 animate-pulse"></i>
                                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
