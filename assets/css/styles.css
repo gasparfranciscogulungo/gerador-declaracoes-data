@@ -50,3 +50,58 @@ body {
 body, input, select, textarea {
     transition: all 0.3s ease;
 }
+
+/* ==== A4 RESPONSIVO - CORREÇÃO MOBILE ==== */
+.a4-sheet-container {
+    width: 210mm;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.a4-sheet {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Mobile: Escala automática para caber na tela */
+@media (max-width: 768px) {
+    .a4-sheet-container {
+        /* No mobile, calcula a escala para caber 100% da largura com padding */
+        width: 100vw;
+        max-width: calc(100vw - 16px);
+        padding: 8px;
+        overflow: visible;
+    }
+    
+    .a4-sheet {
+        /* Mantém proporções A4 (210mm x 297mm = ratio 1:1.414) */
+        width: 100%;
+        min-height: 141.4vw; /* 297/210 = 1.414 */
+        max-height: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+}
+
+/* Tablet pequeno */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .a4-sheet-container {
+        width: 210mm;
+        max-width: 90vw;
+    }
+}
+
+/* Desktop: tamanho real A4 */
+@media (min-width: 1024px) {
+    .a4-sheet-container {
+        width: 210mm;
+    }
+    
+    .a4-sheet {
+        width: 210mm;
+        min-height: 297mm;
+    }
+}

@@ -79,6 +79,7 @@ function adminApp() {
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo', 'bi'
         mostrarPersonalizacao: false,
+        menuPreviewOpen: false, // Menu hamburger para tipos de documento
         
         // Customização do Preview
         previewConfig: {
