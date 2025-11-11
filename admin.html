@@ -2532,18 +2532,34 @@
 
                 </div>
 
-                <!-- ÁREA DE PREVIEW - PROFISSIONAL -->
+                <!-- ÁREA DE PREVIEW - PROFISSIONAL COM SCROLL H+V -->
                 <div :class="darkMode ? 'bg-gray-900' : 'bg-gray-200'" 
                      class="flex-1 overflow-auto relative"
                      id="preview-area"
-                     style="scroll-behavior: smooth;">
+                     x-data="{ mostrarControlesZoom: false }"
+                     style="scroll-behavior: smooth; overflow-x: auto; overflow-y: auto;">
                     
-                    <!-- Container com padding que respeita o zoom -->
-                    <div class="w-full min-h-full flex items-start justify-center"
-                         :style="'padding: ' + Math.max(40, previewConfig.zoom * 0.5) + 'px 20px;'">
+                    <!-- Container com padding que respeita o zoom - MARGEM ESQUERDA MAIOR PARA SCROLL -->
+                    <div class="inline-block min-w-full min-h-full"
+                         :style="'padding: ' + Math.max(40, previewConfig.zoom * 0.5) + 'px 60px ' + Math.max(40, previewConfig.zoom * 0.5) + 'px 80px;'">
                     
+                        <!-- BOTÃO TOGGLE: FERRAMENTAS DE ZOOM (Mobile) -->
+                        <button @click="mostrarControlesZoom = !mostrarControlesZoom"
+                                class="md:hidden fixed top-20 right-4 z-40 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-2xl active:scale-95 transition-all"
+                                title="Ferramentas de Zoom">
+                            <i class="bi bi-tools text-lg"></i>
+                        </button>
+
                         <!-- CONTROLES DE ZOOM - FLOATING PROFISSIONAL -->
-                        <div class="fixed top-24 right-4 z-30 flex flex-col gap-2">
+                        <div x-show="mostrarControlesZoom || window.innerWidth >= 768"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-90"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-90"
+                             class="fixed top-24 md:top-24 right-4 z-30 flex flex-col gap-2">
+                            
                             <!-- Indicador de Zoom com Gradiente -->
                             <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl px-4 py-2.5 shadow-2xl backdrop-blur-md">
                                 <div class="flex items-center justify-center gap-2">
@@ -2587,8 +2603,8 @@
                     </div>
                         <!-- PREVIEW: DECLARAÇÃO - PROFISSIONAL -->
                         <template x-if="tipoPreview === 'declaracao'">
-                            <div class="w-full max-w-[210mm] mx-auto transition-transform duration-300" 
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
+                            <div class="w-[210mm] mx-auto transition-transform duration-300" 
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top left;'">
                                 <div id="preview-render"
                                      x-html="renderizarModelo()" 
                                      class="w-full min-h-[297mm] bg-white dark:bg-gray-950 shadow-2xl rounded-lg overflow-hidden"
@@ -2598,8 +2614,8 @@
 
                         <!-- PREVIEW: RECIBO - PROFISSIONAL -->
                         <template x-if="tipoPreview === 'recibo'">
-                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
+                            <div class="text-center py-12 w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top left;'">
                             <div class="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border-2 border-dashed border-orange-300 dark:border-orange-700">
                                 <i class="bi bi-receipt text-5xl sm:text-6xl lg:text-8xl text-orange-400 mb-4 sm:mb-6"></i>
                                 <h3 class="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2 sm:mb-3">Recibo de Salário</h3>
@@ -2611,8 +2627,8 @@
 
                         <!-- PREVIEW: COMBO - PROFISSIONAL -->
                         <template x-if="tipoPreview === 'combo'">
-                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
+                            <div class="text-center py-12 w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top left;'">
                             <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border-2 border-dashed border-purple-300 dark:border-purple-700">
                                 <i class="bi bi-journals text-5xl sm:text-6xl lg:text-8xl text-purple-400 mb-4 sm:mb-6"></i>
                                 <h3 class="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2 sm:mb-3">Combo Completo</h3>
@@ -2624,8 +2640,8 @@
                         
                         <!-- PREVIEW: NIF - PROFISSIONAL -->
                         <template x-if="tipoPreview === 'nif'">
-                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
+                            <div class="text-center py-12 w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top left;'">
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border border-blue-200 dark:border-blue-800 shadow-lg">
                                 <i class="bi bi-card-text text-5xl sm:text-6xl lg:text-7xl text-blue-500 mb-4 sm:mb-6 animate-pulse"></i>
                                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
@@ -2649,8 +2665,8 @@
                     
                         <!-- PREVIEW: ATESTADO - PROFISSIONAL -->
                         <template x-if="tipoPreview === 'atestado'">
-                            <div class="text-center py-12 w-full max-w-[210mm] mx-auto transition-transform duration-300"
-                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top center;'">
+                            <div class="text-center py-12 w-[210mm] mx-auto transition-transform duration-300"
+                                 :style="'transform: scale(' + (previewConfig.zoom / 100) + '); transform-origin: top left;'">
                             <div class="bg-gradient-to-br from-teal-50 to-green-50 dark:from-teal-900/20 dark:to-green-900/20 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border border-teal-200 dark:border-teal-800 shadow-lg">
                                 <i class="bi bi-clipboard-check text-5xl sm:text-6xl lg:text-7xl text-teal-500 mb-4 sm:mb-6 animate-pulse"></i>
                                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
@@ -2849,8 +2865,9 @@
             
             </div>
 
-            <!-- FOOTER: Ações de PDF - 100% RESPONSIVO -->
-            <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
+            <!-- FOOTER: Ações de PDF - 100% RESPONSIVO COM TOGGLE MOBILE -->
+            <div x-data="{ mostrarAcoesPDF: false }"
+                 :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
                  class="px-3 sm:px-6 py-3 sm:py-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 border-t">
                 
                 <!-- Badge de Status - Mobile: Full width, Desktop: Auto -->
@@ -2883,24 +2900,50 @@
                     
                     <!-- Botões de ação (ocultos para tipos em desenvolvimento) -->
                     <template x-if="!['nif', 'atestado', 'recibo', 'combo'].includes(tipoPreview)">
-                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                             
-                            <!-- Mobile: Botões em grid 2 colunas -->
-                            <div class="grid grid-cols-2 gap-2 sm:hidden">
-                                <!-- Botão: Nova Aba -->
-                                <button @click="visualizarPDFNovaAba()" 
-                                        class="px-3 py-3 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md touch-manipulation text-sm">
-                                    <i class="bi bi-window mr-1"></i>Nova Aba
+                            <!-- MOBILE: Toggle + Ações Dropdown -->
+                            <div class="sm:hidden flex flex-col gap-2">
+                                <!-- Botão Toggle Ações -->
+                                <button @click="mostrarAcoesPDF = !mostrarAcoesPDF"
+                                        :class="mostrarAcoesPDF ? 'from-indigo-600 to-purple-600' : 'from-purple-600 to-indigo-600'"
+                                        class="px-4 py-3 bg-gradient-to-r text-white rounded-lg transition-all font-bold shadow-lg active:scale-95 touch-manipulation flex items-center justify-center gap-2">
+                                    <i :class="mostrarAcoesPDF ? 'bi bi-chevron-up' : 'bi bi-tools'" class="text-lg"></i>
+                                    <span x-text="mostrarAcoesPDF ? 'Ocultar Ações' : 'Mostrar Ações PDF'"></span>
                                 </button>
                                 
-                                <!-- Botão: Imprimir -->
-                                <button @click="imprimirPDF()" 
-                                        class="px-3 py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md touch-manipulation text-sm">
-                                    <i class="bi bi-printer mr-1"></i>Imprimir
-                                </button>
+                                <!-- Menu de Ações (Toggle) -->
+                                <div x-show="mostrarAcoesPDF"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 scale-100"
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     class="grid grid-cols-2 gap-2">
+                                    
+                                    <!-- Botão: Nova Aba -->
+                                    <button @click="visualizarPDFNovaAba(); mostrarAcoesPDF = false" 
+                                            class="px-3 py-3 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md touch-manipulation text-sm">
+                                        <i class="bi bi-window mr-1"></i>Nova Aba
+                                    </button>
+                                    
+                                    <!-- Botão: Imprimir -->
+                                    <button @click="imprimirPDF(); mostrarAcoesPDF = false" 
+                                            class="px-3 py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md touch-manipulation text-sm">
+                                        <i class="bi bi-printer mr-1"></i>Imprimir
+                                    </button>
+                                    
+                                    <!-- Botão: Baixar PDF (Full Width) -->
+                                    <button @click="(fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()); mostrarAcoesPDF = false" 
+                                            class="col-span-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg touch-manipulation text-sm">
+                                        <i class="bi bi-download mr-2"></i>
+                                        <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
+                                    </button>
+                                </div>
                             </div>
                             
-                            <!-- Desktop: Botões inline -->
+                            <!-- DESKTOP: Botões inline -->
                             <div class="hidden sm:flex items-center gap-3">
                                 <button @click="visualizarPDFNovaAba()" 
                                         class="px-4 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg touch-manipulation">
@@ -2911,14 +2954,14 @@
                                         class="px-4 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg touch-manipulation">
                                     <i class="bi bi-printer mr-2"></i>Imprimir
                                 </button>
+                                
+                                <!-- Botão Principal: Gerar/Baixar PDF -->
+                                <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
+                                        class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg hover:shadow-xl touch-manipulation">
+                                    <i class="bi bi-download mr-2"></i>
+                                    <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
+                                </button>
                             </div>
-                            
-                            <!-- Botão Principal: Gerar/Baixar PDF (Full width mobile, auto desktop) -->
-                            <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
-                                    class="px-4 sm:px-6 py-3 sm:py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg hover:shadow-xl touch-manipulation text-sm sm:text-base">
-                                <i class="bi bi-download mr-2"></i>
-                                <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
-                            </button>
                         </div>
                     </template>
                 </div>

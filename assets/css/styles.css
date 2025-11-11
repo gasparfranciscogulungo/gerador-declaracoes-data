@@ -97,6 +97,12 @@ body, input, select, textarea {
 
 /* Mobile: scrollbar menor */
 @media (max-width: 768px) {
+    #preview-area {
+        /* Garante que o conteúdo inteiro seja visível com scroll */
+        min-width: 100%;
+        width: 100%;
+    }
+    
     #preview-area::-webkit-scrollbar {
         width: 8px;
         height: 8px;
