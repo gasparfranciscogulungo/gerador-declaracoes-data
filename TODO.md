@@ -9,7 +9,7 @@ Este documento lista **todas as funcionalidades pendentes** e melhorias futuras.
 ### 1. Implementar Tipos de Documento Adicionais
 
 **Status:** 🔴 Pendente
-
+  
 **Tipos a implementar:**
 
 #### a) **Recibo de Salário** 🔴

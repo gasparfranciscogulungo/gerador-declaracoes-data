@@ -80,6 +80,8 @@ function adminApp() {
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo', 'bi'
         mostrarPersonalizacao: false,
         menuPreviewOpen: false, // Menu hamburger para tipos de documento
+        mostrarControlesZoom: false, // Controles de zoom (toggle)
+        mostrarAcoesPDF: false, // Ações PDF: Nova Aba, Imprimir, Baixar (toggle)
         
         // Customização do Preview
         previewConfig: {
