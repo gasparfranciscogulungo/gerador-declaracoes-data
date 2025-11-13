@@ -383,7 +383,7 @@ function adminApp() {
                 // 2.5. Pré-carregar imagens das empresas no cache
                 if (typeof imageCacheManager !== 'undefined') {
                     this.loadingMessage = 'Otimizando imagens...';
-                    await this.preloadEmpresasImages();
+                    await this. dEmpresasImages();
                 }
                 
                 // 3. Carregar modelos

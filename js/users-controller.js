@@ -131,8 +131,14 @@ function usersApp() {
             this.loadingMessage = 'Carregando usuários...';
             
             try {
-                const data = await githubAPI.readJSON('data/users.json');
-                this.users = data.users || [];
+                // ✅ CORRIGIDO: Método correto é lerJSON, não readJSON
+                const result = await githubAPI.lerJSON('data/users.json');
+                
+                if (result && result.data) {
+                    this.users = result.data.users || [];
+                } else {
+                    this.users = [];
+                }
                 
                 // Atualiza stats
                 this.atualizarStats();
@@ -140,7 +146,8 @@ function usersApp() {
                 console.log(`✅ ${this.users.length} usuários carregados`);
             } catch (error) {
                 console.error('❌ Erro ao carregar usuários:', error);
-                this.showAlert('Erro ao carregar usuários', 'error');
+                this.showAlert('Erro ao carregar usuários: ' + error.message, 'error');
+                this.users = [];
             } finally {
                 this.loading = false;
             }
@@ -187,11 +194,8 @@ function usersApp() {
          * Aprovar usuário pendente
          */
         async aprovarUser(userId) {
-            const confirmar = await showConfirm(
-                'Aprovar este usuário?',
-                { type: 'info', icon: 'bi-check-circle', confirmText: 'Aprovar' }
-            );
-            if (!confirmar) return;
+            // ✅ CORRIGIDO: Usar confirm nativo do navegador
+            if (!confirm('Aprovar este usuário? Ele terá acesso ao sistema.')) return;
             
             this.loading = true;
             this.loadingMessage = 'Aprovando usuário...';
@@ -220,11 +224,8 @@ function usersApp() {
          * Bloquear usuário
          */
         async bloquearUser(userId) {
-            const confirmar = await showConfirm(
-                'Bloquear este usuário?\n\nEle não poderá mais acessar o sistema.',
-                { type: 'danger', icon: 'bi-ban', confirmText: 'Bloquear' }
-            );
-            if (!confirmar) return;
+            // ✅ CORRIGIDO: Usar confirm nativo
+            if (!confirm('Bloquear este usuário? Ele não poderá mais acessar o sistema.')) return;
             
             this.loading = true;
             this.loadingMessage = 'Bloqueando usuário...';
@@ -246,11 +247,8 @@ function usersApp() {
          * Desbloquear usuário
          */
         async desbloquearUser(userId) {
-            const confirmar = await showConfirm(
-                'Desbloquear este usuário?',
-                { type: 'info', icon: 'bi-unlock', confirmText: 'Desbloquear' }
-            );
-            if (!confirmar) return;
+            // ✅ CORRIGIDO: Usar confirm nativo
+            if (!confirm('Desbloquear este usuário? Ele poderá acessar o sistema novamente.')) return;
             
             this.loading = true;
             this.loadingMessage = 'Desbloqueando usuário...';
@@ -272,11 +270,8 @@ function usersApp() {
          * Rejeitar usuário pendente (remove da lista)
          */
         async rejeitarUser(userId) {
-            const confirmar = await showConfirm(
-                'Rejeitar este usuário?\n\nEle será removido permanentemente da lista.',
-                { type: 'danger', icon: 'bi-x-circle', confirmText: 'Rejeitar' }
-            );
-            if (!confirmar) return;
+            // ✅ CORRIGIDO: Usar confirm nativo
+            if (!confirm('Rejeitar este usuário? Ele será removido permanentemente da lista.')) return;
             
             this.loading = true;
             this.loadingMessage = 'Rejeitando usuário...';
@@ -482,14 +477,11 @@ function usersApp() {
         },
         
         /**
-         * Regenerar PDF a partir do histórico
+         * Regenerar PDF de um documento do histórico
          */
         async regenerarPDF(documento) {
-            const confirmar = await showConfirm(
-                'Regenerar este documento?\n\nVocê poderá editar os dados antes de gerar.',
-                { type: 'info', icon: 'bi-arrow-clockwise', confirmText: 'Regenerar' }
-            );
-            if (!confirmar) return;
+            // ✅ CORRIGIDO: Usar confirm nativo
+            if (!confirm('Regenerar este PDF? Os dados originais serão usados para criar um novo documento.')) return;
             
             try {
                 const dadosRegeneracao = this.historicoManager.prepararRegeneracao(documento.id);
@@ -504,9 +496,7 @@ function usersApp() {
                 console.error('❌ Erro ao preparar regeneração:', error);
                 this.showAlert('Erro ao preparar regeneração do PDF', 'error');
             }
-        },
-        
-        /**
+        },        /**
          * Alterna para tab Analytics e inicializa gráficos
          */
         abrirAnalytics() {
