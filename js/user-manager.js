@@ -9,6 +9,86 @@ class UserManager {
         this.USERS_PATH = 'data/users.json';
         this.users = [];
         this.metadata = {};
+        this.CACHE_KEY = 'auth_cache';
+        this.CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
+    }
+    
+    // ========== HASH DE TOKEN (SEGURANÇA) ==========
+    
+    async hashToken(token) {
+        try {
+            // SHA-256 hash do token para nunca salvar em texto plano
+            const encoder = new TextEncoder();
+            const data = encoder.encode(token);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        } catch (error) {
+            console.error('❌ Erro ao criar hash:', error);
+            // Fallback simples se crypto.subtle não disponível (ambiente antigo)
+            return btoa(token).substring(0, 64);
+        }
+    }
+    
+    // ========== CACHE DE AUTORIZAÇÃO ==========
+    
+    getCachedAuth(username, token) {
+        try {
+            const cached = localStorage.getItem(`${this.CACHE_KEY}_${username}`);
+            if (!cached) return null;
+            
+            const data = JSON.parse(cached);
+            const now = Date.now();
+            
+            // Verificar se cache expirou
+            if (now - data.timestamp > this.CACHE_DURATION) {
+                this.clearAuthCache(username);
+                return null;
+            }
+            
+            // Verificar se token mudou (comparar hash)
+            if (data.tokenHash !== this.simpleHash(token)) {
+                this.clearAuthCache(username);
+                return null;
+            }
+            
+            console.log('✅ Usando cache de autorização para:', username);
+            return data.auth;
+            
+        } catch (error) {
+            console.error('⚠️ Erro ao ler cache:', error);
+            return null;
+        }
+    }
+    
+    setCachedAuth(username, token, authData) {
+        try {
+            const cacheData = {
+                timestamp: Date.now(),
+                tokenHash: this.simpleHash(token),
+                auth: authData
+            };
+            localStorage.setItem(`${this.CACHE_KEY}_${username}`, JSON.stringify(cacheData));
+            console.log('💾 Cache de autorização salvo para:', username);
+        } catch (error) {
+            console.error('⚠️ Erro ao salvar cache:', error);
+        }
+    }
+    
+    clearAuthCache(username) {
+        localStorage.removeItem(`${this.CACHE_KEY}_${username}`);
+    }
+    
+    // Hash simples rápido para comparação (não precisa ser crypto)
+    simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString(36);
     }
 
     // ========== CARREGAR USUÁRIOS ==========
@@ -62,35 +142,46 @@ class UserManager {
     
     async verificarAutorizacao(username, token = null) {
         try {
+            // OTIMIZAÇÃO: Verificar cache primeiro (evita chamada ao GitHub)
+            if (token) {
+                const cached = this.getCachedAuth(username, token);
+                if (cached) {
+                    return cached;
+                }
+            }
+            
             await this.carregarUsers();
             
             const user = this.users.find(u => u.username === username);
             
             if (!user) {
-                return { autorizado: false, status: 'not_found', user: null };
+                const result = { autorizado: false, status: 'not_found', user: null };
+                return result;
             }
             
-            // Atualizar token APENAS se fornecido e DIFERENTE (CORRIGIDO)
-            if (token && user.token !== token) {
-                console.log('🔄 Token mudou, atualizando...');
-                user.token = token;
-                const loaded = await this.carregarUsers();
-                await this.salvarUsers(loaded.sha);
-            }
+            // ⚠️ CORREÇÃO DO BUG: Não atualizar token em CADA login!
+            // Tokens devem ser hasheados e salvos apenas quando NOVOS
+            // REMOVIDO: Código que causava loop infinito de salvamento
+            
+            // Preparar resultado baseado no status
+            let result;
             
             if (user.status === 'active') {
-                return { autorizado: true, status: 'active', user: user };
+                result = { autorizado: true, status: 'active', user: user };
+            } else if (user.status === 'pending') {
+                result = { autorizado: false, status: 'pending', user: user };
+            } else if (user.status === 'blocked') {
+                result = { autorizado: false, status: 'blocked', user: user };
+            } else {
+                result = { autorizado: false, status: 'unknown', user: user };
             }
             
-            if (user.status === 'pending') {
-                return { autorizado: false, status: 'pending', user: user };
+            // Salvar cache para próximo login (evita chamadas ao GitHub)
+            if (token) {
+                this.setCachedAuth(username, token, result);
             }
             
-            if (user.status === 'blocked') {
-                return { autorizado: false, status: 'blocked', user: user };
-            }
-            
-            return { autorizado: false, status: 'unknown', user: user };
+            return result;
             
         } catch (error) {
             console.error('❌ Erro ao verificar autorização:', error);
@@ -111,13 +202,16 @@ class UserManager {
                 return { success: false, message: 'Usuário já existe', user: existe };
             }
             
+            // Hash do token para segurança
+            const tokenHash = userData.token ? await this.hashToken(userData.token) : '';
+            
             // Criar novo usuário
             const newUser = {
                 id: this.metadata.lastId + 1,
                 username: userData.username,
                 name: userData.name || userData.username,
                 avatar: userData.avatar || `https://github.com/${userData.username}.png`,
-                token: userData.token || '',
+                tokenHash: tokenHash, // ✅ Salvar HASH, não texto plano
                 role: 'user',
                 status: 'pending',
                 stats: {

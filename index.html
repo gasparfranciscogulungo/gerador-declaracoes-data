@@ -286,8 +286,9 @@
                 authManager.salvarToken(token);
                 localStorage.setItem('username', user.login);
                 
-                // Atualizar último acesso
-                await userManager.atualizarAcesso(user.login);
+                // ⚠️ CORREÇÃO: Não atualizar acesso a cada login (causava commits desnecessários)
+                // A atualização de acesso deve ser periódica, não em CADA login
+                // REMOVIDO: await userManager.atualizarAcesso(user.login);
                 
                 // Verificar role
                 const isAdmin = autorizacao.user.role === 'admin';
@@ -299,6 +300,9 @@
                 
                 mostrarSucesso(`Bem-vindo, ${user.login}! ${isAdmin ? '👑 Admin' : '👤 User'}`);
                 
+                // Limpar contador de tentativas
+                localStorage.setItem('login_tentativas', '0');
+                
                 // Redirecionar (mais rápido: 600ms)
                 setTimeout(() => {
                     window.location.href = isAdmin ? 'admin.html' : 'user-panel.html';
@@ -307,22 +311,43 @@
             } catch (error) {
                 console.error('Erro no login:', error);
                 
-                // Mensagens mais profissionais baseadas no tipo de erro
+                // Detectar tipo de erro e fornecer mensagem profissional
                 let mensagemErro = '❌ Erro desconhecido. Por favor, tente novamente.';
                 
                 if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-                    mensagemErro = '🌐 Erro de conexão: Verifique sua internet e tente novamente. Se o erro persistir, limpe o cache do navegador (Ctrl+Shift+Delete).';
+                    // Detectar se pode ser rate limit (muitas tentativas)
+                    const tentativas = parseInt(localStorage.getItem('login_tentativas') || '0');
+                    if (tentativas > 5) {
+                        mensagemErro = '⏱️ Limite de tentativas excedido: O sistema detectou múltiplas tentativas de login. Aguarde 5 minutos e tente novamente. Se o problema persistir, limpe o cache (Ctrl+Shift+Delete).';
+                    } else {
+                        mensagemErro = '🌐 Erro de conexão: Verifique sua internet. Se estiver conectado, pode ser um problema temporário do GitHub. Aguarde 1 minuto e tente novamente.';
+                    }
                 } else if (error.message.includes('401') || error.message.includes('Bad credentials')) {
-                    mensagemErro = '🔑 Token inválido ou expirado: Gere um novo token no GitHub e tente novamente.';
+                    mensagemErro = '🔑 Token inválido ou expirado: Seu token não é válido. Gere um novo token no GitHub (permissões "repo") e tente novamente.';
                 } else if (error.message.includes('403')) {
-                    mensagemErro = '🚫 Permissões insuficientes: Seu token não tem acesso ao repositório. Verifique as permissões "repo".';
+                    if (error.message.includes('rate limit')) {
+                        mensagemErro = '⏱️ Limite de requisições excedido: O GitHub está bloqueando temporariamente as requisições. Aguarde 15 minutos e tente novamente. Isso pode ocorrer por múltiplas tentativas de login.';
+                    } else {
+                        mensagemErro = '🚫 Permissões insuficientes: Seu token não tem acesso ao repositório. Verifique se possui permissão "repo" e se o repositório é acessível.';
+                    }
                 } else if (error.message.includes('404')) {
-                    mensagemErro = '📂 Repositório não encontrado: Entre em contato com o administrador do sistema.';
-                } else if (error.message.includes('rate limit')) {
-                    mensagemErro = '⏱️ Limite de requisições excedido: Aguarde alguns minutos e tente novamente.';
+                    mensagemErro = '📂 Repositório não encontrado: O sistema está mal configurado. Entre em contato com o administrador.';
+                } else if (error.message.includes('Aguardando aprovação') || error.message.includes('pendente')) {
+                    mensagemErro = '⏳ Acesso pendente: Sua solicitação de acesso está aguardando aprovação do administrador.';
+                } else if (error.message.includes('bloqueado')) {
+                    mensagemErro = '🚫 Acesso bloqueado: Seu usuário foi bloqueado. Entre em contato com o administrador.';
                 } else if (error.message) {
                     mensagemErro = `❌ ${error.message}`;
                 }
+                
+                // Contar tentativas para detectar loop
+                const tentativasAtuais = parseInt(localStorage.getItem('login_tentativas') || '0') + 1;
+                localStorage.setItem('login_tentativas', tentativasAtuais.toString());
+                
+                // Resetar contador após 5 minutos
+                setTimeout(() => {
+                    localStorage.setItem('login_tentativas', '0');
+                }, 5 * 60 * 1000);
                 
                 mostrarErro(mensagemErro);
                 btn.disabled = false;
