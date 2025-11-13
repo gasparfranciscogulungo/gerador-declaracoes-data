@@ -74,7 +74,7 @@ async function inicializarSistema() {
     // Configurar GitHub API
     if (typeof githubAPI !== 'undefined') {
         githubAPI.configurar({
-            owner: CONFIG.github.owner,
+            owner: CONFIG.github.owner,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
             repo: CONFIG.github.repo,
             branch: CONFIG.github.branch
         });
