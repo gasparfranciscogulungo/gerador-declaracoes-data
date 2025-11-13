@@ -10,6 +10,15 @@
 </head>
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600">
     
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl text-center">
+            <div class="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-700 font-semibold">Carregando sistema...</p>
+            <p class="text-gray-500 text-sm mt-2">Aguarde um momento</p>
+        </div>
+    </div>
+    
     <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl m-4">
         
         <!-- Header -->
@@ -99,12 +108,46 @@
         </div>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/github-api.js"></script>
-    <script src="js/auth-manager.js"></script>
-    <script src="js/user-manager.js"></script>
-    
     <script>
+        // Sistema de carregamento de scripts com tratamento de erro
+        let scriptsCarregados = false;
+        let erroCarregamento = null;
+
+        function carregarScripts() {
+            return new Promise((resolve, reject) => {
+                const scripts = [
+                    'js/config.js',
+                    'js/github-api.js',
+                    'js/auth-manager.js',
+                    'js/user-manager.js'
+                ];
+                
+                let carregados = 0;
+                let erros = [];
+                
+                scripts.forEach(src => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    
+                    script.onload = () => {
+                        carregados++;
+                        if (carregados === scripts.length) {
+                            scriptsCarregados = true;
+                            resolve();
+                        }
+                    };
+                    
+                    script.onerror = () => {
+                        erros.push(src);
+                        erroCarregamento = `Erro ao carregar: ${src}`;
+                        reject(new Error(erroCarregamento));
+                    };
+                    
+                    document.body.appendChild(script);
+                });
+            });
+        }
+
         function toggleToken() {
             const input = document.getElementById('token');
             const icon = document.getElementById('toggleIcon');
@@ -153,10 +196,27 @@
         async function fazerLogin(e) {
             e.preventDefault();
             
+            // Verificar se scripts carregaram
+            if (!scriptsCarregados) {
+                mostrarErro('⚠️ Sistema ainda está carregando. Aguarde alguns segundos e tente novamente.');
+                return;
+            }
+            
+            // Verificar se objetos estão disponíveis
+            if (typeof githubAPI === 'undefined' || typeof authManager === 'undefined' || typeof userManager === 'undefined') {
+                mostrarErro('❌ Erro crítico: Módulos do sistema não carregados. Recarregue a página (Ctrl+R).');
+                return;
+            }
+            
             const token = document.getElementById('token').value.trim();
             
+            if (!token) {
+                mostrarErro('⚠️ Por favor, insira seu token do GitHub.');
+                return;
+            }
+            
             if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-                mostrarErro('Token inválido. Deve começar com "ghp_" ou "github_pat_"');
+                mostrarErro('❌ Token inválido. Deve começar com "ghp_" ou "github_pat_".');
                 return;
             }
             
@@ -197,7 +257,7 @@
                     
                     btn.disabled = false;
                     btn.innerHTML = originalHTML;
-                    mostrarErro('⏳ Seu acesso está pendente de aprovação. O administrador foi notificado e você receberá acesso em breve.');
+                    mostrarErro('⏳ Aguardando aprovação: Seu acesso foi registrado e está pendente de autorização pelo administrador. Você será notificado quando aprovado.');
                     return;
                 }
                 
@@ -205,7 +265,7 @@
                 if (autorizacao.status === 'pending') {
                     btn.disabled = false;
                     btn.innerHTML = originalHTML;
-                    mostrarErro('⏳ Seu acesso está aguardando aprovação do administrador.');
+                    mostrarErro('⏳ Acesso pendente: Sua solicitação está aguardando aprovação do administrador. Por favor, aguarde ou entre em contato.');
                     return;
                 }
                 
@@ -213,7 +273,7 @@
                 if (autorizacao.status === 'blocked') {
                     btn.disabled = false;
                     btn.innerHTML = originalHTML;
-                    mostrarErro('🚫 Seu acesso foi bloqueado. Entre em contato com o administrador.');
+                    mostrarErro('🚫 Acesso bloqueado: Seu usuário foi bloqueado pelo administrador. Entre em contato para mais informações.');
                     return;
                 }
                 
@@ -245,8 +305,26 @@
                 }, 600);
                 
             } catch (error) {
-                console.error('Erro:', error);
-                mostrarErro(error.message || 'Token inválido ou sem permissões. Verifique seu token.');
+                console.error('Erro no login:', error);
+                
+                // Mensagens mais profissionais baseadas no tipo de erro
+                let mensagemErro = '❌ Erro desconhecido. Por favor, tente novamente.';
+                
+                if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                    mensagemErro = '🌐 Erro de conexão: Verifique sua internet e tente novamente. Se o erro persistir, limpe o cache do navegador (Ctrl+Shift+Delete).';
+                } else if (error.message.includes('401') || error.message.includes('Bad credentials')) {
+                    mensagemErro = '🔑 Token inválido ou expirado: Gere um novo token no GitHub e tente novamente.';
+                } else if (error.message.includes('403')) {
+                    mensagemErro = '🚫 Permissões insuficientes: Seu token não tem acesso ao repositório. Verifique as permissões "repo".';
+                } else if (error.message.includes('404')) {
+                    mensagemErro = '📂 Repositório não encontrado: Entre em contato com o administrador do sistema.';
+                } else if (error.message.includes('rate limit')) {
+                    mensagemErro = '⏱️ Limite de requisições excedido: Aguarde alguns minutos e tente novamente.';
+                } else if (error.message) {
+                    mensagemErro = `❌ ${error.message}`;
+                }
+                
+                mostrarErro(mensagemErro);
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
             }
@@ -254,28 +332,59 @@
 
         document.getElementById('loginForm').addEventListener('submit', fazerLogin);
         
-        // Carregar token salvo e fazer login automático
+        // Carregar scripts e inicializar
         window.addEventListener('DOMContentLoaded', async () => {
-            const savedToken = authManager.carregarToken();
-            const savedUsername = localStorage.getItem('username');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const form = document.getElementById('loginForm');
+            const btn = form.querySelector('button[type="submit"]');
             
-            if (savedToken) {
-                document.getElementById('token').value = savedToken;
+            try {
+                // Carregar scripts
+                await carregarScripts();
                 
-                // Mostrar botão de usar outro token
-                document.getElementById('btnUsarOutroToken').classList.remove('hidden');
+                // Remover loading overlay
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => loadingOverlay.remove(), 300);
                 
-                // Mostrar mensagem com username se disponível
-                const mensagem = savedUsername 
-                    ? `Bem-vindo de volta, ${savedUsername}! Entrando...`
-                    : 'Token salvo encontrado! Entrando automaticamente...';
+                // Habilitar botão
+                btn.disabled = false;
                 
-                mostrarSucesso(mensagem);
+                // Verificar token salvo
+                const savedToken = authManager.carregarToken();
+                const savedUsername = localStorage.getItem('username');
                 
-                // Login automático IMEDIATO (300ms apenas para UX)
-                setTimeout(() => {
-                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-                }, 300);
+                if (savedToken) {
+                    document.getElementById('token').value = savedToken;
+                    
+                    // Mostrar botão de usar outro token
+                    document.getElementById('btnUsarOutroToken').classList.remove('hidden');
+                    
+                    // Mostrar mensagem com username se disponível
+                    const mensagem = savedUsername 
+                        ? `✅ Bem-vindo de volta, ${savedUsername}! Entrando automaticamente...`
+                        : '✅ Token salvo encontrado! Entrando automaticamente...';
+                    
+                    mostrarSucesso(mensagem);
+                    
+                    // Login automático (500ms para UX)
+                    setTimeout(() => {
+                        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                    }, 500);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar sistema:', error);
+                
+                // Remover loading overlay
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => loadingOverlay.remove(), 300);
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-x-circle mr-2"></i>Sistema indisponível';
+                btn.classList.remove('from-purple-600', 'to-indigo-600');
+                btn.classList.add('from-red-600', 'to-red-700', 'cursor-not-allowed');
+                
+                mostrarErro(`❌ Erro crítico ao carregar o sistema: ${error.message}. Por favor, recarregue a página (Ctrl+R) ou limpe o cache do navegador (Ctrl+Shift+Delete).`);
             }
         });
     </script>
