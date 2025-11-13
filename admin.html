@@ -37,16 +37,30 @@
     <script>
         // Bloqueia acesso ao painel se não houver token válido
         (function() {
-            const token = localStorage.getItem('github_token');
+            // ✅ CORRIGIDO: Usar o mesmo nome que auth-manager.js salva
+            const authData = localStorage.getItem('github_auth');
             
-            if (!token || token.trim() === '') {
+            if (!authData || authData.trim() === '') {
                 console.warn('🚫 Acesso negado: Token não encontrado');
                 console.warn('↩️  Redirecionando para página de login...');
                 window.location.href = 'index.html';
                 return;
             }
             
-            console.log('✅ Token encontrado - Prosseguindo com carregamento do painel admin');
+            // Validar que é JSON válido
+            try {
+                const parsed = JSON.parse(authData);
+                if (!parsed.token || parsed.token.trim() === '') {
+                    throw new Error('Token vazio');
+                }
+                console.log('✅ Token válido encontrado - Prosseguindo com carregamento do painel admin');
+            } catch (error) {
+                console.warn('🚫 Acesso negado: Token inválido ou corrompido');
+                console.warn('↩️  Redirecionando para página de login...');
+                localStorage.removeItem('github_auth'); // Limpar token corrompido
+                window.location.href = 'index.html';
+                return;
+            }
         })();
     </script>
 </head>

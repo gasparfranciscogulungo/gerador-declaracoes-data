@@ -116,35 +116,46 @@
         function carregarScripts() {
             return new Promise((resolve, reject) => {
                 const scripts = [
-                    'js/config.js',
                     'js/github-api.js',
                     'js/auth-manager.js',
-                    'js/user-manager.js'
+                    'js/user-manager.js',
+                    'js/config.js'
                 ];
                 
                 let carregados = 0;
                 let erros = [];
                 
-                scripts.forEach(src => {
+                // Carregar scripts SEQUENCIALMENTE para evitar problemas de ordem
+                const carregarProximo = (index) => {
+                    if (index >= scripts.length) {
+                        scriptsCarregados = true;
+                        console.log('✅ Todos os scripts carregados');
+                        resolve();
+                        return;
+                    }
+                    
+                    const src = scripts[index];
                     const script = document.createElement('script');
                     script.src = src;
                     
                     script.onload = () => {
+                        console.log(`✅ ${src} carregado`);
                         carregados++;
-                        if (carregados === scripts.length) {
-                            scriptsCarregados = true;
-                            resolve();
-                        }
+                        // Pequeno delay para garantir que o script foi processado
+                        setTimeout(() => carregarProximo(index + 1), 50);
                     };
                     
                     script.onerror = () => {
+                        console.error(`❌ Erro ao carregar ${src}`);
                         erros.push(src);
                         erroCarregamento = `Erro ao carregar: ${src}`;
                         reject(new Error(erroCarregamento));
                     };
                     
                     document.body.appendChild(script);
-                });
+                };
+                
+                carregarProximo(0);
             });
         }
 
@@ -173,6 +184,12 @@
         }
 
         function usarOutroToken() {
+            // Verificar se authManager existe
+            if (typeof authManager === 'undefined') {
+                mostrarErro('❌ Sistema não inicializado. Recarregue a página (Ctrl+R).');
+                return;
+            }
+            
             // Limpar token salvo
             authManager.logout();
             localStorage.removeItem('username');
@@ -303,6 +320,9 @@
                 // Limpar contador de tentativas
                 localStorage.setItem('login_tentativas', '0');
                 
+                // ✅ Limpar flag de login em andamento (evita loop)
+                sessionStorage.removeItem('login_em_andamento');
+                
                 // Redirecionar (mais rápido: 600ms)
                 setTimeout(() => {
                     window.location.href = isAdmin ? 'admin.html' : 'user-panel.html';
@@ -344,6 +364,9 @@
                 const tentativasAtuais = parseInt(localStorage.getItem('login_tentativas') || '0') + 1;
                 localStorage.setItem('login_tentativas', tentativasAtuais.toString());
                 
+                // ✅ Limpar flag de login em andamento (para permitir nova tentativa)
+                sessionStorage.removeItem('login_em_andamento');
+                
                 // Resetar contador após 5 minutos
                 setTimeout(() => {
                     localStorage.setItem('login_tentativas', '0');
@@ -367,6 +390,40 @@
                 // Carregar scripts
                 await carregarScripts();
                 
+                // Aguardar um pouco para garantir que tudo foi processado
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // ✅ VERIFICAR se todos os objetos necessários existem
+                console.log('🔍 Verificando objetos carregados...');
+                console.log('- githubAPI:', typeof githubAPI);
+                console.log('- authManager:', typeof authManager);
+                console.log('- userManager:', typeof userManager);
+                console.log('- inicializarSistema:', typeof inicializarSistema);
+                
+                // Se algum objeto essencial não existe, lançar erro
+                if (typeof githubAPI === 'undefined') {
+                    throw new Error('githubAPI não carregado');
+                }
+                if (typeof authManager === 'undefined') {
+                    throw new Error('authManager não carregado');
+                }
+                if (typeof userManager === 'undefined') {
+                    throw new Error('userManager não carregado');
+                }
+                
+                // ✅ INICIALIZAR SISTEMA
+                if (typeof inicializarSistema === 'function') {
+                    await inicializarSistema();
+                } else {
+                    console.warn('⚠️ inicializarSistema não encontrado, inicializando manualmente...');
+                    // Inicializar manualmente
+                    githubAPI.configurar({
+                        owner: 'gasparfranciscogulungo',
+                        repo: 'gerador-declaracoes-data',
+                        branch: 'master'
+                    });
+                }
+                
                 // Remover loading overlay
                 loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => loadingOverlay.remove(), 300);
@@ -374,11 +431,14 @@
                 // Habilitar botão
                 btn.disabled = false;
                 
-                // Verificar token salvo
-                const savedToken = authManager.carregarToken();
+                // Verificar token salvo (com segurança)
+                const savedToken = (typeof authManager !== 'undefined') ? authManager.carregarToken() : null;
                 const savedUsername = localStorage.getItem('username');
                 
-                if (savedToken) {
+                // ⚠️ CORREÇÃO DO LOOP: Verificar se já está em processo de login
+                const loginEmAndamento = sessionStorage.getItem('login_em_andamento');
+                
+                if (savedToken && !loginEmAndamento) {
                     document.getElementById('token').value = savedToken;
                     
                     // Mostrar botão de usar outro token
@@ -391,10 +451,19 @@
                     
                     mostrarSucesso(mensagem);
                     
+                    // Marcar que login está em andamento
+                    sessionStorage.setItem('login_em_andamento', 'true');
+                    
                     // Login automático (500ms para UX)
                     setTimeout(() => {
                         document.getElementById('loginForm').dispatchEvent(new Event('submit'));
                     }, 500);
+                } else if (loginEmAndamento) {
+                    console.log('⚠️ Login já em andamento, ignorando auto-login');
+                    // Limpar flag após 10 segundos (caso algo dê errado)
+                    setTimeout(() => {
+                        sessionStorage.removeItem('login_em_andamento');
+                    }, 10000);
                 }
                 
             } catch (error) {

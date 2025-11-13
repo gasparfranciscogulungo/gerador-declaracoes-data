@@ -64,22 +64,26 @@ async function inicializarSistema() {
 ╚═══════════════════════════════════════╝
     `);
 
-    // Configurar Auth Manager
-    authManager.configurar(CONFIG.github.clientId);
+    // Verificar se os objetos existem antes de configurar
+    if (typeof authManager !== 'undefined') {
+        authManager.configurar(CONFIG.github.clientId);
+    } else {
+        console.warn('⚠️ authManager não disponível ainda');
+    }
 
     // Configurar GitHub API
-    githubAPI.configurar({
-        owner: CONFIG.github.owner,
-        repo: CONFIG.github.repo,
-        branch: CONFIG.github.branch
-    });
+    if (typeof githubAPI !== 'undefined') {
+        githubAPI.configurar({
+            owner: CONFIG.github.owner,
+            repo: CONFIG.github.repo,
+            branch: CONFIG.github.branch
+        });
+    } else {
+        console.warn('⚠️ githubAPI não disponível ainda');
+    }
 
     console.log('✅ Sistema inicializado');
 }
 
-// Auto-inicializar quando carregar
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarSistema);
-} else {
-    inicializarSistema();
-}
+// NÃO auto-inicializar - deixar o index.html controlar
+// Remover listeners automáticos para evitar conflitos
