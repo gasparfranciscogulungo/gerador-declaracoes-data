@@ -27,6 +27,23 @@
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- ⚠️ VERIFICAÇÃO CRÍTICA DE SEGURANÇA - Executada ANTES do Alpine.js carregar -->
+    <script>
+        // Bloqueia acesso ao painel se não houver token válido
+        (function() {
+            const token = localStorage.getItem('github_token');
+            
+            if (!token || token.trim() === '') {
+                console.warn('🚫 Acesso negado: Token não encontrado');
+                console.warn('↩️  Redirecionando para página de login...');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            console.log('✅ Token encontrado - Prosseguindo com carregamento do gerenciador de users');
+        })();
+    </script>
 </head>
 <body :class="darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'" class="transition-colors duration-300" x-data="usersApp()">
     
@@ -1065,6 +1082,14 @@
     <script src="js/user-manager.js"></script>
     <script src="js/historico-manager.js"></script>
     <script src="js/notification-system.js"></script>
+    <script>
+        // Instâncias globais necessárias
+        const githubAPI = new GitHubAPI();
+        const authManager = new AuthManager();
+        const userManager = new UserManager();
+        const historicoManager = new HistoricoManager();
+        const notificationSystem = new NotificationSystem();
+    </script>
     <script src="js/users-controller.js"></script>
     <script src="js/dark-mode.js"></script>
 

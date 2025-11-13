@@ -603,8 +603,8 @@ function finalizarComSucesso(username, isAdmin) {
     document.getElementById('user-name').textContent = username;
     
     setTimeout(() => {
-        // Determinar página de destino
-        const targetPage = isAdmin ? 'admin.html' : 'user.html';
+        // Determinar página de destino baseado no role
+        const targetPage = isAdmin ? 'admin.html' : 'user-panel.html';
         
         // Construir URL completa
         const currentPath = window.location.pathname;

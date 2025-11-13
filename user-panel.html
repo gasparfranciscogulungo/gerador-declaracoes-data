@@ -1,0 +1,649 @@
+                                                                                                                                                                                                                                                                                                                                                    <!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Painel - Gerador de Declarações</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- ⚠️ VERIFICAÇÃO CRÍTICA DE SEGURANÇA - Executada ANTES do Alpine.js carregar -->
+    <script>
+        // Bloqueia acesso ao painel se não houver token válido
+        (function() {
+            const token = localStorage.getItem('github_token');
+            
+            if (!token || token.trim() === '') {
+                console.warn('🚫 Acesso negado: Token não encontrado');
+                console.warn('↩️  Redirecionando para página de login...');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            console.log('✅ Token encontrado - Prosseguindo com carregamento do painel');
+        })();
+    </script>
+</head>
+<body class="transition-colors duration-300" x-data="userPanelApp()" x-init="init()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
+    
+    <!-- Loading Overlay -->
+    <div x-show="loading" 
+         x-transition.opacity
+         class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4">
+            <div class="flex flex-col items-center">
+                <div class="relative mb-6">
+                    <div class="w-24 h-24 border-4 border-blue-200 rounded-full animate-spin border-t-blue-600"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="bi bi-hourglass-split text-4xl text-blue-600 animate-pulse"></i>
+                    </div>
+                </div>
+                <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg text-center" x-text="loadingMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificação -->
+    <div x-show="alert.show"
+         x-transition
+         class="fixed top-4 right-4 z-50 max-w-sm"
+         @click="alert.show = false">
+        <div :class="{
+            'bg-green-500': alert.type === 'success',
+            'bg-red-500': alert.type === 'error',
+            'bg-yellow-500': alert.type === 'warning',
+            'bg-blue-500': alert.type === 'info'
+        }" class="text-white px-6 py-4 rounded-lg shadow-lg cursor-pointer">
+            <p x-text="alert.message"></p>
+        </div>
+    </div>
+
+    <!-- MODAL: AGUARDANDO APROVAÇÃO (FULLSCREEN) -->
+    <div x-show="modalAguardando" 
+         x-transition
+         class="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center z-[10000] p-4">
+        <div class="text-center max-w-2xl mx-auto">
+            <!-- Ícone Animado -->
+            <div class="mb-8 flex justify-center">
+                <div class="relative">
+                    <template x-if="statusAguardando === 'pending'">
+                        <div>
+                            <div class="w-32 h-32 border-8 border-yellow-200 rounded-full animate-spin border-t-yellow-500"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="bi bi-clock-history text-6xl text-yellow-500 animate-pulse"></i>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <template x-if="statusAguardando === 'blocked'">
+                        <div>
+                            <i class="bi bi-ban text-9xl text-red-500"></i>
+                        </div>
+                    </template>
+                    
+                    <template x-if="statusAguardando === 'not_found'">
+                        <div>
+                            <i class="bi bi-question-circle text-9xl text-gray-400"></i>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- Mensagem -->
+            <h2 class="text-4xl font-bold text-white mb-6" x-text="statusAguardando === 'pending' ? 'Aguardando Aprovação' : (statusAguardando === 'blocked' ? 'Conta Bloqueada' : 'Conta Não Encontrada')"></h2>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+                <p class="text-xl text-gray-200 whitespace-pre-line leading-relaxed" x-text="mensagemAguardando"></p>
+            </div>
+            
+            <!-- Info Box -->
+            <div class="bg-blue-500/20 border-2 border-blue-400 rounded-xl p-6 mb-8">
+                <div class="flex items-center justify-center gap-3 text-blue-300">
+                    <i class="bi bi-info-circle-fill text-2xl"></i>
+                    <p class="text-sm">
+                        <template x-if="statusAguardando === 'pending'">
+                            <span>O administrador foi notificado. Você receberá um email quando sua conta for aprovada.</span>
+                        </template>
+                        <template x-if="statusAguardando === 'blocked'">
+                            <span>Para solicitar desbloqueio, entre em contato: admin@example.com</span>
+                        </template>
+                        <template x-if="statusAguardando === 'not_found'">
+                            <span>Verifique se você está usando o token correto ou entre em contato com o administrador.</span>
+                        </template>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Botão Sair -->
+            <div class="flex justify-center gap-4">
+                <button @click="window.location.href = 'index.html'" 
+                        class="px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
+                    <i class="bi bi-box-arrow-right mr-2"></i>Voltar ao Login
+                </button>
+                
+                <template x-if="statusAguardando === 'pending'">
+                    <button @click="init()" 
+                            class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
+                        <i class="bi bi-arrow-clockwise mr-2"></i>Verificar Novamente
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'" style="border-bottom-width: 1px;">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo/Título -->
+                <div class="flex items-center gap-3">
+                    <i class="bi bi-file-earmark-pdf text-3xl text-blue-600"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">Meu Painel</h1>
+                        <p class="text-sm opacity-70" x-text="usuario?.username"></p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <!-- Dark Mode Toggle -->
+                    <button @click="toggleDarkMode()" 
+                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
+                    </button>
+
+                    <!-- Logout -->
+                    <button @click="logout()" 
+                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="ml-2 hidden sm:inline">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        
+        <!-- Tabs -->
+        <div class="mb-6">
+            <div class="flex gap-2 overflow-x-auto pb-2">
+                <button @click="activeTab = 'dashboard'"
+                        :class="activeTab === 'dashboard' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
+                        class="px-4 py-2 rounded-lg whitespace-nowrap">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </button>
+                
+                <button @click="activeTab = 'empresas'"
+                        :class="activeTab === 'empresas' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
+                        class="px-4 py-2 rounded-lg whitespace-nowrap">
+                    <i class="bi bi-building"></i> Empresas
+                </button>
+                
+                <button @click="activeTab = 'trabalhadores'"
+                        :class="activeTab === 'trabalhadores' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
+                        class="px-4 py-2 rounded-lg whitespace-nowrap">
+                    <i class="bi bi-people"></i> Meus Trabalhadores
+                </button>
+                
+                <button @click="activeTab = 'historico'"
+                        :class="activeTab === 'historico' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
+                        class="px-4 py-2 rounded-lg whitespace-nowrap">
+                    <i class="bi bi-clock-history"></i> Histórico
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB: DASHBOARD -->
+        <div x-show="activeTab === 'dashboard'" x-transition>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- Card: Meus Trabalhadores -->
+                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-70">Meus Trabalhadores</p>
+                            <h3 class="text-3xl font-bold" x-text="stats.totalTrabalhadores"></h3>
+                        </div>
+                        <i class="bi bi-people text-4xl text-blue-600"></i>
+                    </div>
+                </div>
+
+                <!-- Card: PDFs Este Mês -->
+                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-70">PDFs Este Mês</p>
+                            <h3 class="text-3xl font-bold" x-text="stats.pdfsMesAtual"></h3>
+                        </div>
+                        <i class="bi bi-file-earmark-pdf text-4xl text-green-600"></i>
+                    </div>
+                </div>
+
+                <!-- Card: Limite Restante -->
+                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-70">Limite Restante</p>
+                            <h3 class="text-3xl font-bold" x-text="stats.limiteRestante"></h3>
+                        </div>
+                        <i class="bi bi-graph-up text-4xl text-yellow-600"></i>
+                    </div>
+                </div>
+
+                <!-- Card: Empresas Disponíveis -->
+                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-70">Empresas Disponíveis</p>
+                            <h3 class="text-3xl font-bold" x-text="stats.empresasDisponiveis"></h3>
+                        </div>
+                        <i class="bi bi-building text-4xl text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão Gerar Documento -->
+            <div class="text-center">
+                <button @click="abrirFluxoGeracao()" 
+                        class="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg">
+                    <i class="bi bi-file-earmark-plus text-2xl"></i>
+                    <span class="ml-2 text-lg font-semibold">Gerar Documento</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB: EMPRESAS (READ-ONLY) -->
+        <div x-show="activeTab === 'empresas'" x-transition>
+            <div class="mb-4">
+                <div class="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <i class="bi bi-info-circle text-blue-600"></i>
+                    <p class="text-sm">As empresas são gerenciadas pelo administrador. Você pode visualizá-las e usá-las para gerar documentos.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="empresa in empresasDisponiveis" :key="empresa.id">
+                    <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                        <div class="flex items-start gap-4">
+                            <!-- Logo -->
+                            <div class="w-16 h-16 flex-shrink-0">
+                                <img x-show="empresa.logo" :src="empresa.logo" class="w-full h-full object-contain rounded" />
+                                <div x-show="!empresa.logo" class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                    <i class="bi bi-building text-2xl opacity-50"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Info -->
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg mb-1" x-text="empresa.nome"></h3>
+                                <p class="text-sm opacity-70">NIF: <span x-text="empresa.nif"></span></p>
+                                <p class="text-sm opacity-70 mt-1" x-text="empresa.endereco?.municipio + ', ' + empresa.endereco?.provincia"></p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="empresasDisponiveis.length === 0" class="col-span-full text-center py-12">
+                    <i class="bi bi-inbox text-6xl opacity-30"></i>
+                    <p class="mt-4 opacity-70">Nenhuma empresa disponível</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: MEUS TRABALHADORES -->
+        <div x-show="activeTab === 'trabalhadores'" x-transition>
+            <div class="mb-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Meus Trabalhadores</h2>
+                <button @click="abrirModalNovoTrabalhador()" 
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="bi bi-plus-circle"></i> Novo Trabalhador
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="trabalhador in meusTrabalhadores" :key="trabalhador.id">
+                    <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg" x-text="trabalhador.nome"></h3>
+                                <p class="text-sm opacity-70" x-text="trabalhador.funcao"></p>
+                            </div>
+                            <span :class="trabalhador.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" 
+                                  class="px-2 py-1 rounded text-xs">
+                                <span x-text="trabalhador.ativo ? 'Ativo' : 'Inativo'"></span>
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-1 text-sm mb-4">
+                            <p><strong>BI:</strong> <span x-text="trabalhador.documento"></span></p>
+                            <p><strong>NIF:</strong> <span x-text="trabalhador.nif || '-'"></span></p>
+                            <p><strong>Salário:</strong> <span x-text="formatarSalario(trabalhador.salario_bruto) + ' ' + trabalhador.moeda"></span></p>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button @click="abrirModalEditarTrabalhador(trabalhador)" 
+                                    class="flex-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button @click="excluirTrabalhador(trabalhador.id)" 
+                                    class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="meusTrabalhadores.length === 0" class="col-span-full text-center py-12">
+                    <i class="bi bi-inbox text-6xl opacity-30"></i>
+                    <p class="mt-4 opacity-70">Nenhum trabalhador cadastrado</p>
+                    <button @click="abrirModalNovoTrabalhador()" 
+                            class="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        <i class="bi bi-plus-circle"></i> Cadastrar Primeiro Trabalhador
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: HISTÓRICO -->
+        <div x-show="activeTab === 'historico'" x-transition>
+            <h2 class="text-2xl font-bold mb-4">Meu Histórico de Documentos</h2>
+            
+            <div x-show="meuHistorico.length === 0" class="text-center py-12">
+                <i class="bi bi-clock-history text-6xl opacity-30"></i>
+                <p class="mt-4 opacity-70">Nenhum documento gerado ainda</p>
+            </div>
+            
+            <!-- TODO: Implementar tabela de histórico -->
+        </div>
+
+    </main>
+
+    <!-- MODAL: NOVO/EDITAR TRABALHADOR -->
+    <div x-show="modalNovoTrabalhador || modalEditarTrabalhador"
+         x-transition
+         @click="modalNovoTrabalhador = false; modalEditarTrabalhador = false"
+         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div @click.stop 
+             :class="darkMode ? 'bg-gray-800' : 'bg-white'"
+             class="rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            
+            <!-- Header -->
+            <div class="sticky top-0 bg-inherit border-b p-6 flex justify-between items-center">
+                <h3 class="text-2xl font-bold">
+                    <span x-show="!trabalhadorEmEdicao">Novo Trabalhador</span>
+                    <span x-show="trabalhadorEmEdicao">Editar Trabalhador</span>
+                </h3>
+                <button @click="modalNovoTrabalhador = false; modalEditarTrabalhador = false" 
+                        class="text-2xl">&times;</button>
+            </div>
+
+            <!-- Form -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Nome -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2">Nome Completo *</label>
+                        <input type="text" x-model="formTrabalhador.nome" 
+                               class="w-full px-4 py-2 rounded-lg border" 
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="João Silva Santos">
+                    </div>
+
+                    <!-- Documento -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Documento *</label>
+                        <input type="text" x-model="formTrabalhador.documento" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="010167533LA046">
+                    </div>
+
+                    <!-- NIF -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NIF</label>
+                        <input type="text" x-model="formTrabalhador.nif" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="1234567890">
+                    </div>
+
+                    <!-- Empresa -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2">Empresa *</label>
+                        <select x-model="formTrabalhador.empresa_id" 
+                                class="w-full px-4 py-2 rounded-lg border"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'">
+                            <option value="">Selecione uma empresa</option>
+                            <template x-for="empresa in empresasDisponiveis" :key="empresa.id">
+                                <option :value="empresa.id" x-text="empresa.nome"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <!-- Função -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Função</label>
+                        <input type="text" x-model="formTrabalhador.funcao" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="Desenvolvedor">
+                    </div>
+
+                    <!-- Departamento -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Departamento</label>
+                        <input type="text" x-model="formTrabalhador.departamento" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="TI">
+                    </div>
+
+                    <!-- Salário Bruto -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Salário Bruto</label>
+                        <input type="number" x-model="formTrabalhador.salario_bruto" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="150000">
+                    </div>
+
+                    <!-- Moeda -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Moeda</label>
+                        <select x-model="formTrabalhador.moeda" 
+                                class="w-full px-4 py-2 rounded-lg border"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'">
+                            <option value="AKZ">Kwanza (AKZ)</option>
+                            <option value="USD">Dólar (USD)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                        </select>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" x-model="formTrabalhador.email" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="joao@email.com">
+                    </div>
+
+                    <!-- Telefone -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Telefone</label>
+                        <input type="tel" x-model="formTrabalhador.telefone" 
+                               class="w-full px-4 py-2 rounded-lg border"
+                               :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'"
+                               placeholder="+244 923 456 789">
+                    </div>
+
+                    <!-- Ativo -->
+                    <div class="md:col-span-2">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" x-model="formTrabalhador.ativo" class="w-5 h-5">
+                            <span>Trabalhador Ativo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end gap-3 mt-6">
+                    <button @click="modalNovoTrabalhador = false; modalEditarTrabalhador = false" 
+                            class="px-6 py-2 rounded-lg border" 
+                            :class="darkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'">
+                        Cancelar
+                    </button>
+                    <button @click="salvarTrabalhador()" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: FLUXO DE GERAÇÃO -->
+    <div x-show="modalFluxoGeracao"
+         x-transition
+         @click="modalFluxoGeracao = false"
+         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div @click.stop 
+             :class="darkMode ? 'bg-gray-800' : 'bg-white'"
+             class="rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            
+            <!-- Header -->
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-2xl font-bold">Gerar Documento</h3>
+                <button @click="modalFluxoGeracao = false" class="text-2xl">&times;</button>
+            </div>
+
+            <!-- Steps -->
+            <div class="p-6">
+                <!-- Step Indicator -->
+                <div class="flex items-center justify-center mb-8">
+                    <div class="flex items-center">
+                        <div :class="fluxoEtapa >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'" 
+                             class="w-10 h-10 rounded-full flex items-center justify-center">1</div>
+                        <div :class="fluxoEtapa >= 2 ? 'bg-blue-600' : 'bg-gray-300'" 
+                             class="w-16 h-1"></div>
+                        <div :class="fluxoEtapa >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300'" 
+                             class="w-10 h-10 rounded-full flex items-center justify-center">2</div>
+                        <div :class="fluxoEtapa >= 3 ? 'bg-blue-600' : 'bg-gray-300'" 
+                             class="w-16 h-1"></div>
+                        <div :class="fluxoEtapa >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300'" 
+                             class="w-10 h-10 rounded-full flex items-center justify-center">3</div>
+                    </div>
+                </div>
+
+                <!-- ETAPA 1: Selecionar Empresa -->
+                <div x-show="fluxoEtapa === 1" x-transition>
+                    <h4 class="text-xl font-bold mb-4">Selecione a Empresa</h4>
+                    <input type="text" x-model="fluxoBuscaEmpresa" 
+                           placeholder="Buscar empresa..." 
+                           class="w-full px-4 py-2 rounded-lg border mb-4"
+                           :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                        <template x-for="empresa in empresasFiltradas" :key="empresa.id">
+                            <div @click="selecionarEmpresaFluxo(empresa)"
+                                 class="p-4 border rounded-lg cursor-pointer hover:border-blue-600"
+                                 :class="darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'">
+                                <h5 class="font-bold" x-text="empresa.nome"></h5>
+                                <p class="text-sm opacity-70">NIF: <span x-text="empresa.nif"></span></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- ETAPA 2: Selecionar Trabalhador -->
+                <div x-show="fluxoEtapa === 2" x-transition>
+                    <h4 class="text-xl font-bold mb-4">Selecione o Trabalhador</h4>
+                    <input type="text" x-model="fluxoBuscaTrabalhador" 
+                           placeholder="Buscar trabalhador..." 
+                           class="w-full px-4 py-2 rounded-lg border mb-4"
+                           :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                        <template x-for="trabalhador in trabalhadoresFiltrados" :key="trabalhador.id">
+                            <div @click="selecionarTrabalhadorFluxo(trabalhador)"
+                                 class="p-4 border rounded-lg cursor-pointer hover:border-blue-600"
+                                 :class="darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'">
+                                <h5 class="font-bold" x-text="trabalhador.nome"></h5>
+                                <p class="text-sm opacity-70" x-text="trabalhador.funcao"></p>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <button @click="voltarEtapa()" 
+                            class="mt-4 px-4 py-2 border rounded-lg"
+                            :class="darkMode ? 'border-gray-600' : 'border-gray-300'">
+                        ← Voltar
+                    </button>
+                </div>
+
+                <!-- ETAPA 3: Selecionar Tipo -->
+                <div x-show="fluxoEtapa === 3" x-transition>
+                    <h4 class="text-xl font-bold mb-4">Selecione o Tipo de Documento</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div @click="selecionarTipoDocumento('declaracao')"
+                             class="p-6 border rounded-lg cursor-pointer hover:border-blue-600 text-center"
+                             :class="darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'">
+                            <i class="bi bi-file-earmark-text text-4xl text-blue-600 mb-2"></i>
+                            <h5 class="font-bold">Declaração</h5>
+                            <p class="text-sm opacity-70">De serviço ou vencimento</p>
+                        </div>
+                        
+                        <div class="p-6 border rounded-lg opacity-50 cursor-not-allowed text-center"
+                             :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                            <i class="bi bi-receipt text-4xl text-gray-400 mb-2"></i>
+                            <h5 class="font-bold">Recibo</h5>
+                            <p class="text-sm opacity-70">Em breve</p>
+                        </div>
+                    </div>
+                    
+                    <button @click="voltarEtapa()" 
+                            class="mt-4 px-4 py-2 border rounded-lg"
+                            :class="darkMode ? 'border-gray-600' : 'border-gray-300'">
+                        ← Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/user-manager.js"></script>
+    <script src="js/notification-system.js"></script>
+    <script src="js/image-uploader.js"></script>
+    <script>
+        const githubAPI = new GitHubAPI();
+        const authManager = new AuthManager();
+        const userManager = new UserManager(githubAPI);
+        const notificationSystem = new NotificationSystem();
+    </script>
+    <script src="js/calculo-salario.js"></script>
+    <script src="js/cliente-manager.js"></script>
+    <script src="js/modelos/declaracao-executivo.js"></script>
+    <script src="js/user-panel-controller.js"></script>
+</body>
+</html>

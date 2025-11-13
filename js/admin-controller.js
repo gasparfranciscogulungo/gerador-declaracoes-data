@@ -8,6 +8,7 @@ function adminApp() {
     return {
         // ========== ESTADO ==========
         usuario: null,
+        usuarioData: null, // Dados completos do users.json (role, status, etc)
         empresas: [],
         modelos: [],
         contador: {},
@@ -31,6 +32,7 @@ function adminApp() {
             empresas: 0,
             modelos: 0,
             users: 0,
+            usersPendentes: 0, // Número de usuários aguardando aprovação
             declaracoesHoje: 0,
             totalClientes: 0,
             totalDeclaracoes: 0
@@ -267,16 +269,80 @@ function adminApp() {
             this.loadingMessage = 'Carregando perfil...';
             try {
                 this.usuario = await githubAPI.getAuthenticatedUser();
-                console.log('✅ Usuário:', this.usuario.login);
+                console.log('✅ Usuário GitHub:', this.usuario.login);
             } catch (error) {
                 console.error('❌ Erro ao obter usuário:', error);
                 this.showAlert('error', 'Erro ao carregar perfil. Token inválido?');
-                authManager.logout(); // USA O MÉTODO DO AUTH-MANAGER
+                authManager.logout();
+                window.location.href = 'index.html';
                 return;
             }
             
-            // Inicializar managers
+            // ========== VERIFICAÇÃO DE AUTORIZAÇÃO ==========
+            this.loadingMessage = 'Verificando autorização...';
             this.userManager = new UserManager();
+            
+            try {
+                const autorizacao = await this.userManager.verificarAutorizacao(
+                    this.usuario.login, 
+                    token
+                );
+                
+                console.log('🔐 Autorização:', autorizacao);
+                
+                // Verificar se usuário existe no sistema
+                if (autorizacao.status === 'not_found') {
+                    console.error('❌ Usuário não cadastrado no sistema');
+                    this.showAlert('error', '❌ Acesso negado: Usuário não cadastrado. Entre em contato com o administrador.');
+                    authManager.logout();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Verificar se conta está ativa
+                if (autorizacao.status === 'pending') {
+                    console.warn('⏳ Conta aguardando aprovação');
+                    this.showAlert('error', '⏳ Sua conta está aguardando aprovação do administrador.');
+                    authManager.logout();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                if (autorizacao.status === 'blocked') {
+                    console.error('🚫 Conta bloqueada');
+                    this.showAlert('error', '🚫 Sua conta foi bloqueada. Entre em contato com o administrador.');
+                    authManager.logout();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Verificar se é admin
+                if (autorizacao.user.role !== 'admin') {
+                    console.warn('⚠️ Usuário não é administrador, redirecionando...');
+                    this.showAlert('error', '⚠️ Acesso restrito a administradores. Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = 'user-panel.html';
+                    }, 2000);
+                    return;
+                }
+                
+                // Usuário autorizado!
+                this.usuarioData = autorizacao.user;
+                console.log('✅ Acesso autorizado:', {
+                    username: this.usuario.login,
+                    role: autorizacao.user.role,
+                    status: autorizacao.status
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro na verificação de autorização:', error);
+                this.showAlert('error', 'Erro ao verificar autorização. Tente novamente.');
+                authManager.logout();
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Inicializar outros managers
             this.clienteManager = new ClienteManager();
             
             // Inicializar HistoricoManager
@@ -305,6 +371,10 @@ function adminApp() {
                 // 1. Carregar usuários (para stats reais)
                 this.loadingMessage = 'Carregando usuários...';
                 await this.carregarUsuarios();
+                
+                // 1.5. Carregar usuários pendentes e atualizar badges
+                this.loadingMessage = 'Verificando usuários pendentes...';
+                await this.carregarUsuariosPendentes();
                 
                 // 2. Carregar empresas
                 this.loadingMessage = 'Carregando empresas...';
@@ -348,6 +418,68 @@ function adminApp() {
             } catch (error) {
                 console.error('❌ Erro ao carregar users.json:', error);
                 this.usersData = { users: [], metadata: {} };
+            }
+        },
+        
+        // ========== CARREGAR USUÁRIOS PENDENTES ==========
+        async carregarUsuariosPendentes() {
+            try {
+                // Se não tem userManager, inicializar
+                if (!this.userManager) {
+                    this.userManager = new UserManager();
+                }
+                
+                // Carregar users do GitHub
+                await this.userManager.carregarUsers();
+                
+                // Filtrar pendentes
+                const pendentes = this.userManager.users.filter(u => u.status === 'pending');
+                this.stats.usersPendentes = pendentes.length;
+                
+                // Atualizar badges visuais
+                this.atualizarBadges(pendentes.length);
+                
+                if (pendentes.length > 0) {
+                    console.log(`⏳ ${pendentes.length} usuário(s) aguardando aprovação:`, 
+                        pendentes.map(u => u.username)
+                    );
+                } else {
+                    console.log('✅ Nenhum usuário pendente');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar pendentes:', error);
+                this.stats.usersPendentes = 0;
+            }
+        },
+        
+        // ========== ATUALIZAR BADGES DE NOTIFICAÇÃO ==========
+        atualizarBadges(quantidade) {
+            try {
+                const badgeMobile = document.getElementById('users-badge-mobile');
+                const badgeDesktop = document.getElementById('users-badge');
+                
+                if (badgeMobile) {
+                    if (quantidade > 0) {
+                        badgeMobile.textContent = quantidade;
+                        badgeMobile.classList.remove('hidden');
+                    } else {
+                        badgeMobile.classList.add('hidden');
+                    }
+                }
+                
+                if (badgeDesktop) {
+                    if (quantidade > 0) {
+                        badgeDesktop.textContent = quantidade;
+                        badgeDesktop.classList.remove('hidden');
+                    } else {
+                        badgeDesktop.classList.add('hidden');
+                    }
+                }
+                
+                console.log(`🔔 Badges atualizados: ${quantidade} pendentes`);
+            } catch (error) {
+                console.error('❌ Erro ao atualizar badges:', error);
             }
         },
 

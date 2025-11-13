@@ -32,6 +32,23 @@
     <!-- CSS Custom -->
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- ⚠️ VERIFICAÇÃO CRÍTICA DE SEGURANÇA - Executada ANTES do Alpine.js carregar -->
+    <script>
+        // Bloqueia acesso ao painel se não houver token válido
+        (function() {
+            const token = localStorage.getItem('github_token');
+            
+            if (!token || token.trim() === '') {
+                console.warn('🚫 Acesso negado: Token não encontrado');
+                console.warn('↩️  Redirecionando para página de login...');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            console.log('✅ Token encontrado - Prosseguindo com carregamento do painel admin');
+        })();
+    </script>
 </head>
 <body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
     
@@ -3620,6 +3637,12 @@
     <script src="js/user-manager.js"></script>
     <script src="js/notification-system.js"></script>
     <script src="js/image-uploader.js"></script>
+    <script>
+        // Instâncias globais necessárias
+        const githubAPI = new GitHubAPI();
+        const authManager = new AuthManager();
+        const notificationSystem = new NotificationSystem();
+    </script>
     
     <!-- Sistema de Cálculo de Salários -->
     <script src="js/calculo-salario.js"></script>
