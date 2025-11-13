@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Adicionar Usuário Pendente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">🧪 Teste: Adicionar Usuário Pendente</h1>
+        
+        <div id="resultado" class="mb-4 p-4 rounded hidden"></div>
+        
+        <form id="formAddUser" class="space-y-4">
+            <div>
+                <label class="block font-semibold mb-2">Token do Admin:</label>
+                <input type="password" id="adminToken" class="w-full border rounded px-3 py-2" required 
+                       placeholder="ghp_xxxx (seu token de admin)">
+            </div>
+            
+            <div>
+                <label class="block font-semibold mb-2">Username do Novo Usuário:</label>
+                <input type="text" id="username" class="w-full border rounded px-3 py-2" required 
+                       placeholder="Ex: joaosilva">
+            </div>
+            
+            <div>
+                <label class="block font-semibold mb-2">Nome Completo:</label>
+                <input type="text" id="name" class="w-full border rounded px-3 py-2" required 
+                       placeholder="Ex: João Silva">
+            </div>
+            
+            <div>
+                <label class="block font-semibold mb-2">Token do Usuário (opcional):</label>
+                <input type="password" id="userToken" class="w-full border rounded px-3 py-2" 
+                       placeholder="ghp_xxxx (token dele, se tiver)">
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                Adicionar Usuário Pendente
+            </button>
+        </form>
+        
+        <div class="mt-6 p-4 bg-gray-50 rounded">
+            <h3 class="font-bold mb-2">📋 Log:</h3>
+            <pre id="log" class="text-xs bg-gray-800 text-green-400 p-3 rounded overflow-auto max-h-96"></pre>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script src="js/user-manager.js"></script>
+    <script>
+        const log = (msg) => {
+            const logEl = document.getElementById('log');
+            logEl.textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(msg);
+        };
+        
+        const mostrarResultado = (msg, tipo = 'success') => {
+            const div = document.getElementById('resultado');
+            div.className = `mb-4 p-4 rounded ${tipo === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            div.textContent = msg;
+            div.classList.remove('hidden');
+        };
+        
+        document.getElementById('formAddUser').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const adminToken = document.getElementById('adminToken').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const userToken = document.getElementById('userToken').value.trim();
+            
+            log('🚀 Iniciando processo...');
+            
+            try {
+                // Configurar GitHub API
+                log('🔧 Configurando GitHub API...');
+                githubAPI.setToken(adminToken);
+                githubAPI.configurar(CONFIG.github);
+                
+                // Verificar se token do admin é válido
+                log('🔐 Verificando token do admin...');
+                const adminUser = await githubAPI.getAuthenticatedUser();
+                log(`✅ Admin autenticado: ${adminUser.login}`);
+                
+                // Criar UserManager
+                log('👥 Inicializando UserManager...');
+                const userManager = new UserManager();
+                
+                // Adicionar usuário pendente
+                log(`📝 Adicionando usuário: ${username}`);
+                const result = await userManager.adicionarPendente({
+                    username: username,
+                    name: name,
+                    avatar: `https://github.com/${username}.png`,
+                    token: userToken || ''
+                });
+                
+                if (result.success) {
+                    log('✅ Usuário adicionado com sucesso!');
+                    log(JSON.stringify(result.user, null, 2));
+                    mostrarResultado(`✅ Usuário "${username}" adicionado como PENDENTE com sucesso!`, 'success');
+                } else {
+                    log('⚠️ ' + result.message);
+                    mostrarResultado(`⚠️ ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                log('❌ ERRO: ' + error.message);
+                log(error.stack);
+                mostrarResultado(`❌ Erro: ${error.message}`, 'error');
+            }
+        });
+        
+        log('✅ Página carregada. Preencha o formulário.');
+    </script>
+</body>
+</html>
