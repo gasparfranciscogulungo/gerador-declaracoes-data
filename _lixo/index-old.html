@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Simples - Gerador de Declarações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600">
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl text-center">
+            <div class="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-700 font-semibold">Carregando sistema...</p>
+            <p class="text-gray-500 text-sm mt-2">Aguarde um momento</p>
+        </div>
+    </div>
+    
+    <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl m-4">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="bi bi-file-earmark-text text-white text-4xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Gerador de Declarações</h1>
+            <p class="text-gray-600">Sistema Simplificado</p>
+        </div>
+
+        <!-- Área de Erro -->
+        <div id="erro" class="hidden mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+            <div class="flex">
+                <i class="bi bi-exclamation-circle-fill text-red-500 text-xl mr-3"></i>
+                <p class="text-red-700 text-sm" id="erro-msg"></p>
+            </div>
+        </div>
+
+        <!-- Área de Sucesso -->
+        <div id="sucesso" class="hidden mb-4 p-4 bg-green-50 border-l-4 border-green-500 rounded">
+            <div class="flex">
+                <i class="bi bi-check-circle-fill text-green-500 text-xl mr-3"></i>
+                <p class="text-green-700 text-sm" id="sucesso-msg"></p>
+            </div>
+        </div>
+
+        <!-- Formulário -->
+        <form id="loginForm" class="space-y-6">
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="bi bi-key-fill mr-1"></i>GitHub Personal Access Token
+                </label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="token" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm"
+                        placeholder="ghp_xxxxxxxxxx..."
+                        required
+                    >
+                    <button 
+                        type="button" 
+                        onclick="toggleToken()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                        <i id="toggleIcon" class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <p class="mt-2 text-xs text-gray-500">
+                    Cole seu GitHub Personal Access Token
+                </p>
+            </div>
+
+            <button 
+                type="submit"
+                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl"
+            >
+                <i class="bi bi-box-arrow-in-right mr-2"></i>Entrar
+            </button>
+        </form>
+
+        <!-- Botão Usar Outro Token (aparece quando já tem token salvo) -->
+        <button 
+            id="btnUsarOutroToken"
+            onclick="usarOutroToken()"
+            class="hidden w-full mt-3 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition text-sm"
+        >
+            <i class="bi bi-arrow-repeat mr-2"></i>Usar outro token
+        </button>
+
+        <!-- Como obter token -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm font-semibold text-blue-800 mb-2">
+                <i class="bi bi-info-circle-fill mr-2"></i>Como obter seu token:
+            </p>
+            <ol class="text-xs text-blue-700 space-y-1 ml-4 list-decimal">
+                <li>Acesse <a href="https://github.com/settings/tokens/new" target="_blank" class="underline font-semibold">github.com/settings/tokens/new</a></li>
+                <li>Crie um token com permissão <strong>"repo"</strong></li>
+                <li>Copie e cole aqui</li>
+            </ol>
+        </div>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+            <i class="bi bi-github mr-1"></i>Powered by GitHub API
+        </div>
+    </div>
+
+    <script>
+        // Sistema de carregamento de scripts com tratamento de erro
+        let scriptsCarregados = false;
+        let erroCarregamento = null;
+
+        function carregarScripts() {
+            return new Promise((resolve, reject) => {
+                const scripts = [
+                    'js/github-api.js',
+                    'js/auth-manager.js',
+                    'js/user-manager.js',
+                    'js/config.js'
+                ];
+                
+                let carregados = 0;
+                let erros = [];
+                
+                // Carregar scripts SEQUENCIALMENTE para evitar problemas de ordem
+                const carregarProximo = (index) => {
+                    if (index >= scripts.length) {
+                        scriptsCarregados = true;
+                        console.log('✅ Todos os scripts carregados');
+                        resolve();
+                        return;
+                    }
+                    
+                    const src = scripts[index];
+                    const script = document.createElement('script');
+                    script.src = src;
+                    
+                    script.onload = () => {
+                        console.log(`✅ ${src} carregado`);
+                        carregados++;
+                        // Pequeno delay para garantir que o script foi processado
+                        setTimeout(() => carregarProximo(index + 1), 50);
+                    };
+                    
+                    script.onerror = () => {
+                        console.error(`❌ Erro ao carregar ${src}`);
+                        erros.push(src);
+                        erroCarregamento = `Erro ao carregar: ${src}`;
+                        reject(new Error(erroCarregamento));
+                    };
+                    
+                    document.body.appendChild(script);
+                };
+                
+                carregarProximo(0);
+            });
+        }
+
+        function toggleToken() {
+            const input = document.getElementById('token');
+            const icon = document.getElementById('toggleIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
+
+        function mostrarErro(msg) {
+            document.getElementById('sucesso').classList.add('hidden');
+            document.getElementById('erro-msg').textContent = msg;
+            document.getElementById('erro').classList.remove('hidden');
+        }
+
+        function mostrarSucesso(msg) {
+            document.getElementById('erro').classList.add('hidden');
+            document.getElementById('sucesso-msg').textContent = msg;
+            document.getElementById('sucesso').classList.remove('hidden');
+        }
+
+        function usarOutroToken() {
+            // Verificar se authManager existe
+            if (typeof authManager === 'undefined') {
+                mostrarErro('❌ Sistema não inicializado. Recarregue a página (Ctrl+R).');
+                return;
+            }
+            
+            // Limpar token salvo
+            authManager.logout();
+            localStorage.removeItem('username');
+            
+            // Limpar campo e focar
+            document.getElementById('token').value = '';
+            document.getElementById('token').type = 'password';
+            document.getElementById('token').focus();
+            
+            // Esconder botão
+            document.getElementById('btnUsarOutroToken').classList.add('hidden');
+            
+            mostrarSucesso('Token removido. Cole um novo token.');
+            
+            // Limpar mensagem após 3s
+            setTimeout(() => {
+                document.getElementById('sucesso').classList.add('hidden');
+            }, 3000);
+        }
+
+        async function fazerLogin(e) {
+            e.preventDefault();
+            
+            // Verificar se scripts carregaram
+            if (!scriptsCarregados) {
+                mostrarErro('⚠️ Sistema ainda está carregando. Aguarde alguns segundos e tente novamente.');
+                return;
+            }
+            
+            // Verificar se objetos estão disponíveis
+            if (typeof githubAPI === 'undefined' || typeof authManager === 'undefined' || typeof userManager === 'undefined') {
+                mostrarErro('❌ Erro crítico: Módulos do sistema não carregados. Recarregue a página (Ctrl+R).');
+                return;
+            }
+            
+            const token = document.getElementById('token').value.trim();
+            
+            if (!token) {
+                mostrarErro('⚠️ Por favor, insira seu token do GitHub.');
+                return;
+            }
+            
+            if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+                mostrarErro('❌ Token inválido. Deve começar com "ghp_" ou "github_pat_".');
+                return;
+            }
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Verificando...';
+            
+            try {
+                // Configurar GitHub API
+                githubAPI.setToken(token);
+                githubAPI.configurar({
+                    owner: CONFIG.github.owner,
+                    repo: CONFIG.github.repo,
+                    branch: CONFIG.github.branch
+                });
+                
+                // Obter usuário
+                btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Autenticando...';
+                const user = await githubAPI.getAuthenticatedUser();
+                
+                if (!user || !user.login) {
+                    throw new Error('Token inválido');
+                }
+                
+                // Verificar autorização
+                btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin mr-2"></i>Verificando autorização...';
+                const autorizacao = await userManager.verificarAutorizacao(user.login, token);
+                
+                // Se não encontrado, adicionar como pendente
+                if (autorizacao.status === 'not_found') {
+                    await userManager.adicionarPendente({
+                        username: user.login,
+                        name: user.name || user.login,
+                        avatar: user.avatar_url,
+                        token: token
+                    });
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('⏳ Aguardando aprovação: Seu acesso foi registrado e está pendente de autorização pelo administrador. Você será notificado quando aprovado.');
+                    return;
+                }
+                
+                // Se pendente
+                if (autorizacao.status === 'pending') {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('⏳ Acesso pendente: Sua solicitação está aguardando aprovação do administrador. Por favor, aguarde ou entre em contato.');
+                    return;
+                }
+                
+                // Se bloqueado
+                if (autorizacao.status === 'blocked') {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                    mostrarErro('🚫 Acesso bloqueado: Seu usuário foi bloqueado pelo administrador. Entre em contato para mais informações.');
+                    return;
+                }
+                
+                // Se autorizado (active)
+                if (!autorizacao.autorizado) {
+                    throw new Error('Erro na verificação de autorização');
+                }
+                
+                // Salvar token
+                authManager.salvarToken(token);
+                localStorage.setItem('username', user.login);
+                
+                // ⚠️ CORREÇÃO: Não atualizar acesso a cada login (causava commits desnecessários)
+                // A atualização de acesso deve ser periódica, não em CADA login
+                // REMOVIDO: await userManager.atualizarAcesso(user.login);
+                
+                // Verificar role
+                const isAdmin = autorizacao.user.role === 'admin';
+                
+                // Sucesso
+                btn.innerHTML = '<i class="bi bi-check-circle mr-2"></i>Sucesso!';
+                btn.classList.remove('from-purple-600', 'to-indigo-600');
+                btn.classList.add('from-green-600', 'to-emerald-600');
+                
+                mostrarSucesso(`Bem-vindo, ${user.login}! ${isAdmin ? '👑 Admin' : '👤 User'}`);
+                
+                // Limpar contador de tentativas
+                localStorage.setItem('login_tentativas', '0');
+                
+                // ✅ Limpar flag de login em andamento (evita loop)
+                sessionStorage.removeItem('login_em_andamento');
+                
+                // Redirecionar (mais rápido: 600ms)
+                setTimeout(() => {
+                    window.location.href = isAdmin ? 'admin.html' : 'user-panel.html';
+                }, 600);
+                
+            } catch (error) {
+                console.error('Erro no login:', error);
+                
+                // Detectar tipo de erro e fornecer mensagem profissional
+                let mensagemErro = '❌ Erro desconhecido. Por favor, tente novamente.';
+                
+                if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                    // Detectar se pode ser rate limit (muitas tentativas)
+                    const tentativas = parseInt(localStorage.getItem('login_tentativas') || '0');
+                    if (tentativas > 5) {
+                        mensagemErro = '⏱️ Limite de tentativas excedido: O sistema detectou múltiplas tentativas de login. Aguarde 5 minutos e tente novamente. Se o problema persistir, limpe o cache (Ctrl+Shift+Delete).';
+                    } else {
+                        mensagemErro = '🌐 Erro de conexão: Verifique sua internet. Se estiver conectado, pode ser um problema temporário do GitHub. Aguarde 1 minuto e tente novamente.';
+                    }
+                } else if (error.message.includes('401') || error.message.includes('Bad credentials')) {
+                    mensagemErro = '🔑 Token inválido ou expirado: Seu token não é válido. Gere um novo token no GitHub (permissões "repo") e tente novamente.';
+                } else if (error.message.includes('403')) {
+                    if (error.message.includes('rate limit')) {
+                        mensagemErro = '⏱️ Limite de requisições excedido: O GitHub está bloqueando temporariamente as requisições. Aguarde 15 minutos e tente novamente. Isso pode ocorrer por múltiplas tentativas de login.';
+                    } else {
+                        mensagemErro = '🚫 Permissões insuficientes: Seu token não tem acesso ao repositório. Verifique se possui permissão "repo" e se o repositório é acessível.';
+                    }
+                } else if (error.message.includes('404')) {
+                    mensagemErro = '📂 Repositório não encontrado: O sistema está mal configurado. Entre em contato com o administrador.';
+                } else if (error.message.includes('Aguardando aprovação') || error.message.includes('pendente')) {
+                    mensagemErro = '⏳ Acesso pendente: Sua solicitação de acesso está aguardando aprovação do administrador.';
+                } else if (error.message.includes('bloqueado')) {
+                    mensagemErro = '🚫 Acesso bloqueado: Seu usuário foi bloqueado. Entre em contato com o administrador.';
+                } else if (error.message) {
+                    mensagemErro = `❌ ${error.message}`;
+                }
+                
+                // Contar tentativas para detectar loop
+                const tentativasAtuais = parseInt(localStorage.getItem('login_tentativas') || '0') + 1;
+                localStorage.setItem('login_tentativas', tentativasAtuais.toString());
+                
+                // ✅ Limpar flag de login em andamento (para permitir nova tentativa)
+                sessionStorage.removeItem('login_em_andamento');
+                
+                // Resetar contador após 5 minutos
+                setTimeout(() => {
+                    localStorage.setItem('login_tentativas', '0');
+                }, 5 * 60 * 1000);
+                
+                mostrarErro(mensagemErro);
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', fazerLogin);
+        
+        // Carregar scripts e inicializar
+        window.addEventListener('DOMContentLoaded', async () => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const form = document.getElementById('loginForm');
+            const btn = form.querySelector('button[type="submit"]');
+            
+            try {
+                // Carregar scripts
+                await carregarScripts();
+                
+                // Aguardar um pouco para garantir que tudo foi processado
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // ✅ VERIFICAR se todos os objetos necessários existem
+                console.log('🔍 Verificando objetos carregados...');
+                console.log('- githubAPI:', typeof githubAPI);
+                console.log('- authManager:', typeof authManager);
+                console.log('- userManager:', typeof userManager);
+                console.log('- inicializarSistema:', typeof inicializarSistema);
+                
+                // Se algum objeto essencial não existe, lançar erro
+                if (typeof githubAPI === 'undefined') {
+                    throw new Error('githubAPI não carregado');
+                }
+                if (typeof authManager === 'undefined') {
+                    throw new Error('authManager não carregado');
+                }
+                if (typeof userManager === 'undefined') {
+                    throw new Error('userManager não carregado');
+                }
+                
+                // ✅ INICIALIZAR SISTEMA
+                if (typeof inicializarSistema === 'function') {
+                    await inicializarSistema();
+                } else {
+                    console.warn('⚠️ inicializarSistema não encontrado, inicializando manualmente...');
+                    // Inicializar manualmente
+                    githubAPI.configurar({
+                        owner: 'gasparfranciscogulungo',
+                        repo: 'gerador-declaracoes-data',
+                        branch: 'master'
+                    });
+                }
+                
+                // Remover loading overlay
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => loadingOverlay.remove(), 300);
+                
+                // Habilitar botão
+                btn.disabled = false;
+                
+                // Verificar token salvo (com segurança)
+                const savedToken = (typeof authManager !== 'undefined') ? authManager.carregarToken() : null;
+                const savedUsername = localStorage.getItem('username');
+                
+                // ⚠️ CORREÇÃO DO LOOP: Verificar se já está em processo de login
+                const loginEmAndamento = sessionStorage.getItem('login_em_andamento');
+                
+                if (savedToken && !loginEmAndamento) {
+                    document.getElementById('token').value = savedToken;
+                    
+                    // Mostrar botão de usar outro token
+                    document.getElementById('btnUsarOutroToken').classList.remove('hidden');
+                    
+                    // Mostrar mensagem com username se disponível
+                    const mensagem = savedUsername 
+                        ? `✅ Bem-vindo de volta, ${savedUsername}! Entrando automaticamente...`
+                        : '✅ Token salvo encontrado! Entrando automaticamente...';
+                    
+                    mostrarSucesso(mensagem);
+                    
+                    // Marcar que login está em andamento
+                    sessionStorage.setItem('login_em_andamento', 'true');
+                    
+                    // Login automático (500ms para UX)
+                    setTimeout(() => {
+                        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                    }, 500);
+                } else if (loginEmAndamento) {
+                    console.log('⚠️ Login já em andamento, ignorando auto-login');
+                    // Limpar flag após 10 segundos (caso algo dê errado)
+                    setTimeout(() => {
+                        sessionStorage.removeItem('login_em_andamento');
+                    }, 10000);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar sistema:', error);
+                
+                // Remover loading overlay
+                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => loadingOverlay.remove(), 300);
+                
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-x-circle mr-2"></i>Sistema indisponível';
+                btn.classList.remove('from-purple-600', 'to-indigo-600');
+                btn.classList.add('from-red-600', 'to-red-700', 'cursor-not-allowed');
+                
+                mostrarErro(`❌ Erro crítico ao carregar o sistema: ${error.message}. Por favor, recarregue a página (Ctrl+R) ou limpe o cache do navegador (Ctrl+Shift+Delete).`);
+            }
+        });
+    </script>
+    
+</body>
+</html>
