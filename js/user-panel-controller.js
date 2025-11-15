@@ -222,20 +222,13 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 [EMPRESAS] Carregando...');
+                console.log('📂 [EMPRESAS] Carregando via jsDelivr CDN...');
                 
-                // Cache-bust: adiciona timestamp para forçar reload
-                const timestamp = new Date().getTime();
-                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/empresas.json?t=${timestamp}`;
-                console.log('📍 URL:', rawUrl);
+                // USAR JSDELIVR CDN (sem CORS, com cache)
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/empresas.json`;
+                console.log('📍 URL:', cdnUrl);
                 
-                const response = await fetch(rawUrl, {
-                    cache: 'no-cache',
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
-                });
+                const response = await fetch(cdnUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -244,13 +237,13 @@ function userPanelApp() {
                 const data = await response.json();
                 this.empresasDisponiveis = data.empresas || [];
                 
-                console.log(`✅ ${this.empresasDisponiveis.length} empresas OK!`);
+                console.log(`✅ ${this.empresasDisponiveis.length} empresas carregadas!`);
                 this.calcularStats();
                 
             } catch (error) {
-                console.error('❌ ERRO:', error);
+                console.error('❌ ERRO empresas:', error);
                 this.empresasDisponiveis = [];
-                this.showAlert('error', 'Erro: ' + error.message);
+                this.showAlert('error', 'Erro ao carregar empresas');
             }
         },
         
@@ -262,13 +255,12 @@ function userPanelApp() {
         
         async carregarMeusTrabalhadores() {
             try {
-                console.log('📂 Carregando trabalhadores...');
+                console.log('📂 Carregando trabalhadores via CDN...');
                 
-                // RAW URL com cache-bust
-                const timestamp = new Date().getTime();
-                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/trabalhadores.json?t=${timestamp}`;
+                // USAR JSDELIVR CDN (sem CORS)
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/trabalhadores.json`;
                 
-                const response = await fetch(rawUrl, { cache: 'no-cache' });
+                const response = await fetch(cdnUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -283,7 +275,7 @@ function userPanelApp() {
                     t.criado_por === this.usuario.username
                 );
                 
-                console.log(`✅ ${this.meusTrabalhadores.length} meus`);
+                console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores meus!`);
                 this.calcularStats();
                 
             } catch (error) {
@@ -301,9 +293,11 @@ function userPanelApp() {
                 this.loading = true;
                 this.loadingMessage = 'Salvando trabalhador...';
                 
-                // Carregar todos os trabalhadores
-                const arquivo = await githubAPI.lerJSON('data/trabalhadores.json');
-                let trabalhadores = arquivo?.data?.trabalhadores || [];
+                // Carregar todos os trabalhadores via CDN
+                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/trabalhadores.json`;
+                const response = await fetch(cdnUrl);
+                const data = response.ok ? await response.json() : { trabalhadores: [] };
+                let trabalhadores = data.trabalhadores || [];
                 
                 if (this.trabalhadorEmEdicao) {
                     // Editar existente
@@ -329,11 +323,25 @@ function userPanelApp() {
                     trabalhadores.push(novoTrabalhador);
                 }
                 
+                // Buscar SHA do arquivo atual via API
+                const shaResponse = await fetch(
+                    `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`,
+                    {
+                        headers: {
+                            'Authorization': `token ${localStorage.getItem('token')}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                const shaData = await shaResponse.json();
+                const sha = shaData.sha;
+                
                 // Salvar no GitHub
                 await githubAPI.salvarArquivo(
                     'data/trabalhadores.json',
                     JSON.stringify({ trabalhadores }, null, 2),
-                    `${this.trabalhadorEmEdicao ? 'Update' : 'Add'} trabalhador: ${this.formTrabalhador.nome}`
+                    `${this.trabalhadorEmEdicao ? 'Update' : 'Add'} trabalhador: ${this.formTrabalhador.nome}`,
+                    sha
                 );
                 
                 // Recarregar
