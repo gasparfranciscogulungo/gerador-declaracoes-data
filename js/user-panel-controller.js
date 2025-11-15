@@ -222,31 +222,14 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 [EMPRESAS] Carregando via GitHub API...');
-                
-                // Usar GitHub API diretamente com autenticação
-                const token = localStorage.getItem('token');
-                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/empresas.json`;
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3.raw' // Retorna JSON direto
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                this.empresasDisponiveis = data.empresas || [];
-                
-                console.log(`✅ ${this.empresasDisponiveis.length} empresas!`);
+                console.log('📂 Carregando empresas...');
+                const response = await githubAPI.lerJSON('data/empresas.json');
+                const empresasData = response.data;
+                this.empresasDisponiveis = empresasData.empresas || [];
+                console.log(`✅ ${this.empresasDisponiveis.length} empresas`);
                 this.calcularStats();
-                
             } catch (error) {
-                console.error('❌ ERRO empresas:', error);
+                console.error('❌ Erro:', error);
                 this.empresasDisponiveis = [];
             }
         },
@@ -260,23 +243,8 @@ function userPanelApp() {
         async carregarMeusTrabalhadores() {
             try {
                 console.log('📂 Carregando trabalhadores...');
-                
-                // Usar GitHub API com autenticação
-                const token = localStorage.getItem('token');
-                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`;
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3.raw'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
+                const response = await githubAPI.lerJSON('data/trabalhadores.json');
+                const data = response.data;
                 const todos = data.trabalhadores || [];
                 
                 // Filtrar: Só os trabalhadores criados por MIM
@@ -285,9 +253,8 @@ function userPanelApp() {
                     t.criado_por === this.usuario.username
                 );
                 
-                console.log(`✅ ${this.meusTrabalhadores.length} meus!`);
+                console.log(`✅ ${this.meusTrabalhadores.length} meus`);
                 this.calcularStats();
-                
             } catch (error) {
                 console.error('❌ Erro:', error);
                 this.meusTrabalhadores = [];
@@ -303,19 +270,9 @@ function userPanelApp() {
                 this.loading = true;
                 this.loadingMessage = 'Salvando trabalhador...';
                 
-                // Carregar todos os trabalhadores via GitHub API
-                const token = localStorage.getItem('token');
-                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`;
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3.raw'
-                    }
-                });
-                
-                const data = response.ok ? await response.json() : { trabalhadores: [] };
-                let trabalhadores = data.trabalhadores || [];
+                // Carregar todos os trabalhadores
+                const arquivo = await githubAPI.lerJSON('data/trabalhadores.json');
+                let trabalhadores = arquivo?.data?.trabalhadores || [];
                 
                 if (this.trabalhadorEmEdicao) {
                     // Editar existente
@@ -341,22 +298,12 @@ function userPanelApp() {
                     trabalhadores.push(novoTrabalhador);
                 }
                 
-                // Buscar SHA do arquivo (sem .raw para pegar metadados)
-                const shaResponse = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json' // Retorna com SHA
-                    }
-                });
-                const shaData = await shaResponse.json();
-                const sha = shaData.sha;
-                
-                // Salvar no GitHub
+                // Salvar no GitHub (o SHA é pego automaticamente pelo githubAPI)
                 await githubAPI.salvarArquivo(
                     'data/trabalhadores.json',
                     JSON.stringify({ trabalhadores }, null, 2),
                     `${this.trabalhadorEmEdicao ? 'Update' : 'Add'} trabalhador: ${this.formTrabalhador.nome}`,
-                    sha
+                    arquivo?.sha
                 );
                 
                 // Recarregar
