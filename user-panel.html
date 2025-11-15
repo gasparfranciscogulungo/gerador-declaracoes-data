@@ -276,10 +276,67 @@
 
             <!-- Botão Gerar Documento -->
             <div class="text-center">
-                <button @click="abrirFluxoGeracao()" 
-                        class="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg">
+                <button @click="abrirModalFluxoGeracao()" 
+                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl hover:from-purple-700 hover:to-indigo-800 shadow-lg transform hover:scale-105 transition-all">
                     <i class="bi bi-file-earmark-plus text-2xl"></i>
                     <span class="ml-2 text-lg font-semibold">Gerar Documento</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation - Responsivo (Desktop only - Mobile usa drawer) -->
+        <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-lg shadow-md mb-6 hidden lg:block">
+            <div class="tabs-container flex border-b overflow-x-auto hide-scrollbar" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+                <button @click="activeTab = 'dashboard'" 
+                        :class="activeTab === 'dashboard' ? 
+                            (darkMode ? 'border-purple-500 text-purple-400 bg-purple-900/20' : 'border-purple-600 text-purple-600 bg-purple-50') : 
+                            (darkMode ? 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50')"
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap">
+                    <i class="bi bi-speedometer2 text-lg"></i>
+                    <span>Dashboard</span>
+                </button>
+                
+                <button @click="activeTab = 'empresas'" 
+                        :class="activeTab === 'empresas' ? 
+                            (darkMode ? 'border-purple-500 text-purple-400 bg-purple-900/20' : 'border-purple-600 text-purple-600 bg-purple-50') : 
+                            (darkMode ? 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50')"
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap">
+                    <i class="bi bi-building text-lg"></i>
+                    <span>Empresas</span>
+                    <i class="bi bi-lock-fill text-xs text-gray-400"></i>
+                </button>
+                
+                <button @click="activeTab = 'trabalhadores'" 
+                        :class="activeTab === 'trabalhadores' ? 
+                            (darkMode ? 'border-purple-500 text-purple-400 bg-purple-900/20' : 'border-purple-600 text-purple-600 bg-purple-50') : 
+                            (darkMode ? 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50')"
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap">
+                    <i class="bi bi-people text-lg"></i>
+                    <span>Meus Trabalhadores</span>
+                </button>
+                
+                <button @click="abrirModalFluxoGeracao()" 
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent font-medium text-sm transition-all whitespace-nowrap text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/20">
+                    <i class="bi bi-magic text-lg"></i>
+                    <span>Gerar PDF</span>
+                </button>
+                
+                <button @click="activeTab = 'historico'" 
+                        :class="activeTab === 'historico' ? 
+                            (darkMode ? 'border-purple-500 text-purple-400 bg-purple-900/20' : 'border-purple-600 text-purple-600 bg-purple-50') : 
+                            (darkMode ? 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50')"
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap">
+                    <i class="bi bi-clock-history text-lg"></i>
+                    <span>Histórico</span>
+                </button>
+                
+                <button @click="activeTab = 'config'" 
+                        :class="activeTab === 'config' ? 
+                            (darkMode ? 'border-purple-500 text-purple-400 bg-purple-900/20' : 'border-purple-600 text-purple-600 bg-purple-50') : 
+                            (darkMode ? 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50')"
+                        class="flex items-center gap-2 px-6 py-4 border-b-2 font-medium text-sm transition-all whitespace-nowrap">
+                    <i class="bi bi-gear text-lg"></i>
+                    <span>Configurações</span>
                 </button>
             </div>
         </div>
