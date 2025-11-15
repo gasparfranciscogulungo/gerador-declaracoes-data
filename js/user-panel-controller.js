@@ -222,41 +222,27 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 [EMPRESAS] Iniciando carregamento...');
-                console.log('📍 [EMPRESAS] Token existe?', !!localStorage.getItem('token'));
-                console.log('📍 [EMPRESAS] Configuração GitHub:', {
-                    owner: CONFIG.github.owner,
-                    repo: CONFIG.github.repo,
-                    branch: CONFIG.github.branch
-                });
+                console.log('📂 [EMPRESAS] Carregando via RAW GitHub...');
                 
-                const arquivo = await githubAPI.lerJSON('data/empresas.json');
-                console.log('📄 [EMPRESAS] Resposta githubAPI.lerJSON:', arquivo);
-                console.log('📄 [EMPRESAS] Tipo da resposta:', typeof arquivo);
-                console.log('📄 [EMPRESAS] Tem .data?', arquivo?.data);
+                // USAR URL DIRETA (mais confiável que API)
+                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/empresas.json`;
+                console.log('📍 URL:', rawUrl);
                 
-                if (arquivo && arquivo.data) {
-                    console.log('📦 [EMPRESAS] Estrutura arquivo.data:', Object.keys(arquivo.data));
-                    console.log('📦 [EMPRESAS] arquivo.data.empresas:', arquivo.data.empresas);
-                    
-                    // Carregar TODAS as empresas (criadas pelo admin)
-                    this.empresasDisponiveis = arquivo.data.empresas || [];
-                    console.log(`✅ [EMPRESAS] ${this.empresasDisponiveis.length} empresas carregadas`);
-                    console.log('✅ [EMPRESAS] Primeira empresa:', this.empresasDisponiveis[0]);
-                    
-                    if (this.empresasDisponiveis.length === 0) {
-                        console.warn('⚠️ Array de empresas está vazio no JSON');
-                    }
-                } else {
-                    console.warn('⚠️ Arquivo ou arquivo.data é null/undefined');
-                    this.empresasDisponiveis = [];
+                const response = await fetch(rawUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
+                const data = await response.json();
+                this.empresasDisponiveis = data.empresas || [];
+                
+                console.log(`✅ ${this.empresasDisponiveis.length} empresas carregadas!`);
+                
             } catch (error) {
-                console.error('❌ Erro ao carregar empresas:', error);
-                console.error('❌ Stack trace:', error.stack);
+                console.error('❌ ERRO:', error);
                 this.empresasDisponiveis = [];
-                this.showAlert('error', 'Erro ao carregar empresas: ' + error.message);
+                this.showAlert('error', 'Erro ao carregar empresas');
             }
         },
         
@@ -411,10 +397,7 @@ function userPanelApp() {
                 return false;
             }
             
-            if (!this.formTrabalhador.empresa_id) {
-                this.showAlert('error', 'Selecione uma empresa');
-                return false;
-            }
+            // Empresa não é obrigatória - será atribuída no fluxo de geração
             
             return true;
         },
