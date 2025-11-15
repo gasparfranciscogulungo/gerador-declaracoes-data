@@ -509,6 +509,319 @@ function userPanelApp() {
             );
         },
         
+        // ========== FLUXO DE GERAÇÃO PROFISSIONAL ==========
+        
+        /**
+         * Abre o modal de fluxo de geração
+         */
+        abrirModalFluxoGeracao() {
+            this.fluxoEtapa = 1;
+            this.fluxoEmpresaSelecionada = null;
+            this.fluxoTrabalhadorSelecionado = null;
+            this.fluxoTipoDocumento = null;
+            this.fluxoModeloSelecionado = null;
+            this.modalFluxoGeracao = true;
+            console.log('📂 Modal Fluxo Geração aberto');
+        },
+        
+        /**
+         * Fecha o modal de fluxo
+         */
+        fecharFluxoGeracao() {
+            this.modalFluxoGeracao = false;
+            console.log('🔒 Modal Fluxo Geração fechado');
+        },
+        
+        /**
+         * Seleciona uma empresa no fluxo
+         */
+        selecionarEmpresa(empresa) {
+            this.fluxoEmpresaSelecionada = empresa;
+            console.log('✅ Empresa selecionada:', empresa.nome);
+        },
+        
+        /**
+         * Avança para seleção de trabalhadores
+         */
+        avancarParaTrabalhadores() {
+            if (!this.fluxoEmpresaSelecionada) {
+                this.showAlert('error', 'Por favor, selecione uma empresa');
+                return;
+            }
+            this.fluxoEtapa = 2;
+            this.fluxoBuscaTrabalhador = '';
+            console.log('➡️ Avançou para seleção de trabalhadores');
+        },
+        
+        /**
+         * Seleciona um trabalhador
+         */
+        selecionarTrabalhador(trabalhador) {
+            this.fluxoTrabalhadorSelecionado = trabalhador;
+            console.log('✅ Trabalhador selecionado:', trabalhador.nome);
+        },
+        
+        /**
+         * Avança para escolha do tipo
+         */
+        avancarParaTipo() {
+            if (!this.fluxoTrabalhadorSelecionado) {
+                this.showAlert('error', 'Por favor, selecione um trabalhador');
+                return;
+            }
+            this.fluxoEtapa = 3;
+            console.log('➡️ Avançou para seleção de tipo');
+        },
+        
+        /**
+         * Gera preview do documento (ETAPA 4)
+         */
+        async gerarPreviewDocumento() {
+            if (!this.fluxoTipoDocumento) {
+                this.showAlert('error', 'Por favor, escolha o tipo de documento');
+                return;
+            }
+            
+            this.fluxoEtapa = 4;
+            
+            console.log('📄 Preview preparado:', {
+                empresa: this.fluxoEmpresaSelecionada.nome,
+                trabalhador: this.fluxoTrabalhadorSelecionado.nome,
+                tipo: this.fluxoTipoDocumento
+            });
+        },
+        
+        /**
+         * Abre preview após selecionar modelo (Etapa 3.5 → 4)
+         */
+        abrirPreviewDoFluxo() {
+            this.tipoPreview = this.fluxoTipoDocumento;
+            this.modalPreviewModelo = true;
+            this.modalFluxoGeracao = false;
+            console.log('👁️ Preview aberto para:', this.fluxoTipoDocumento);
+        },
+        
+        /**
+         * Fecha modal de preview
+         */
+        fecharModalPreview() {
+            this.modalPreviewModelo = false;
+            this.mostrarControlesZoom = false;
+            console.log('🔒 Modal Preview fechado');
+        },
+        
+        /**
+         * Volta para escolha de modelo (da etapa 4 para 3.5)
+         */
+        voltarParaEscolhaModelo() {
+            this.modalPreviewModelo = false;
+            this.modalFluxoGeracao = true;
+            this.fluxoEtapa = 3.5;
+            console.log('⬅️ Voltou para escolha de modelo');
+        },
+        
+        /**
+         * Variável para controlar modelos disponíveis
+         */
+        modelos: [
+            {
+                id: 'modelo_executivo',
+                nome: 'Executivo',
+                descricao: 'Layout moderno com cores da empresa',
+                estilo: 'Moderno',
+                categoria: 'declaracao',
+                tiposSuportados: ['declaracao']
+            },
+            {
+                id: 'modelo_classico',
+                nome: 'Clássico',
+                descricao: 'Layout tradicional simples',
+                estilo: 'Tradicional',
+                categoria: 'declaracao',
+                tiposSuportados: ['declaracao']
+            },
+            {
+                id: 'modelo_formal',
+                nome: 'Formal',
+                descricao: 'Layout corporativo elegante',
+                estilo: 'Elegante',
+                categoria: 'declaracao',
+                tiposSuportados: ['declaracao']
+            }
+        ],
+        
+        fluxoModeloSelecionado: null,
+        modeloSelecionado: null,
+        mostrarControlesZoom: false,
+        
+        /**
+         * Renderiza o modelo no preview
+         */
+        renderizarModelo() {
+            const modelo = this.fluxoModeloSelecionado || this.modeloSelecionado;
+            
+            if (!modelo) {
+                return `
+                    <div style="text-align: center; padding: 100px 20px; color: #666;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">📄</div>
+                        <h2 style="font-size: 24px; margin-bottom: 10px;">Nenhum Modelo Selecionado</h2>
+                        <p style="font-size: 14px;">Selecione um modelo para visualizar</p>
+                    </div>
+                `;
+            }
+            
+            const empresa = this.fluxoEmpresaSelecionada;
+            const trabalhador = this.fluxoTrabalhadorSelecionado;
+            
+            // Verificar se temos dados reais
+            if (!empresa || !trabalhador) {
+                return `
+                    <div style="text-align: center; padding: 100px 20px; color: #666;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">⚠️</div>
+                        <h2 style="font-size: 24px; margin-bottom: 10px;">Dados Incompletos</h2>
+                        <p style="font-size: 14px;">Selecione empresa e trabalhador no fluxo</p>
+                    </div>
+                `;
+            }
+            
+            // Usar modelo Executivo (único implementado)
+            if (modelo.id === 'modelo_executivo' && typeof ModeloDeclaracaoExecutivo !== 'undefined') {
+                return ModeloDeclaracaoExecutivo.renderizar(empresa, trabalhador, this.previewConfig);
+            }
+            
+            // Fallback: modelo não implementado
+            return `
+                <div style="text-align: center; padding: 100px 20px; color: #666;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🚧</div>
+                    <h2 style="font-size: 24px; margin-bottom: 10px;">Modelo em Desenvolvimento</h2>
+                    <p style="font-size: 14px;">${modelo.nome || 'Este modelo'} será implementado em breve</p>
+                </div>
+            `;
+        },
+        
+        /**
+         * Gera PDF para download
+         */
+        async gerarPDF() {
+            try {
+                const modelo = this.fluxoModeloSelecionado || this.modeloSelecionado;
+                
+                if (!modelo) {
+                    this.showAlert('error', '❌ Nenhum modelo selecionado');
+                    return;
+                }
+
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada. Recarregue a página.');
+                    return;
+                }
+
+                this.loading = true;
+                this.loadingMessage = 'Gerando PDF profissional...';
+
+                const previewElement = document.getElementById('preview-render');
+                if (!previewElement) {
+                    throw new Error('Elemento de preview não encontrado');
+                }
+
+                const modeloHtml = previewElement.innerHTML;
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = modeloHtml;
+                tempContainer.style.cssText = `
+                    width: 210mm;
+                    min-height: 297mm;
+                    max-height: 297mm;
+                    margin: 0 auto;
+                    padding: 0;
+                    box-sizing: border-box;
+                    position: relative;
+                    overflow: hidden;
+                    background: white;
+                `;
+                
+                document.body.appendChild(tempContainer);
+
+                const empresa = this.fluxoEmpresaSelecionada;
+                const trabalhador = this.fluxoTrabalhadorSelecionado;
+                const dataAtual = new Date().toISOString().split('T')[0];
+                
+                const nomeArquivo = `Declaracao_${empresa.nome.replace(/\s+/g, '_')}_${trabalhador.nome.replace(/\s+/g, '_')}_${dataAtual}.pdf`;
+
+                const opcoesPDF = {
+                    margin: 0,
+                    filename: nomeArquivo,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        windowHeight: 1123
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+
+                console.log('📄 Gerando PDF:', nomeArquivo);
+
+                await html2pdf()
+                    .set(opcoesPDF)
+                    .from(tempContainer)
+                    .save();
+
+                document.body.removeChild(tempContainer);
+
+                this.showAlert('success', `✅ PDF gerado!\n📄 ${nomeArquivo}`);
+                
+                console.log('✅ PDF baixado com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao gerar PDF:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        /**
+         * Gera documento final (rota alternativa para gerarPDF)
+         */
+        async gerarDocumentoFinal() {
+            await this.gerarPDF();
+        },
+        
+        /**
+         * Cropper BI - funções placeholder
+         */
+        fecharCropperBI() {
+            this.modalCropperBI = false;
+            console.log('🔒 Modal Cropper BI fechado');
+        },
+        
+        rotacionarCropper(graus) {
+            console.log('🔄 Rotacionar:', graus);
+            // TODO: Implementar Cropper.js
+        },
+        
+        resetarCropper() {
+            console.log('🔄 Resetar cropper');
+            // TODO: Implementar Cropper.js
+        },
+        
+        aplicarCorte() {
+            console.log('✂️ Aplicar corte');
+            // TODO: Implementar Cropper.js
+            this.fecharCropperBI();
+        },
+        
         // ========== DARK MODE ==========
         
         toggleDarkMode() {
