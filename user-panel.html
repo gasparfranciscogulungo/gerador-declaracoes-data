@@ -870,9 +870,9 @@
                 <!-- ETAPA 3.5: Seleção de Modelo (apenas para declaracao) -->
                 <div x-show="fluxoEtapa === 3.5" class="space-y-4">
                     <div class="bg-gradient-to-r from-purple-50 via-green-50 to-purple-50 dark:from-purple-900/20 dark:via-green-900/20 dark:to-purple-900/20 border-l-4 border-purple-600 p-4 rounded-r-lg mb-4">
-                        <p class="text-sm"><strong>Empresa:</strong> <span x-text="fluxoEmpresaSelecionada?.nome"></span></p>
-                        <p class="text-sm"><strong>Trabalhador:</strong> <span x-text="fluxoTrabalhadorSelecionado?.nome"></span></p>
-                        <p class="text-sm"><strong>Tipo:</strong> <span x-text="fluxoTipoDocumento.toUpperCase()"></span></p>
+                        <p class="text-sm"><strong>Empresa:</strong> <span x-text="fluxoEmpresaSelecionada?.nome || 'N/A'"></span></p>
+                        <p class="text-sm"><strong>Trabalhador:</strong> <span x-text="fluxoTrabalhadorSelecionado?.nome || 'N/A'"></span></p>
+                        <p class="text-sm"><strong>Tipo:</strong> <span x-text="fluxoTipoDocumento ? fluxoTipoDocumento.toUpperCase() : 'N/A'"></span></p>
                     </div>
                     
                     <h4 class="text-lg font-bold mb-4">Escolha o Modelo:</h4>
@@ -1125,9 +1125,9 @@
                     <i class="bi bi-info-circle mr-2"></i>
                     <span x-show="fluxoEmpresaSelecionada && fluxoTrabalhadorSelecionado">
                         <strong class="hidden sm:inline">Dados: </strong>
-                        <strong x-text="fluxoEmpresaSelecionada.nome" class="hidden sm:inline"></strong>
+                        <strong x-text="fluxoEmpresaSelecionada?.nome || ''" class="hidden sm:inline"></strong>
                         <strong class="hidden sm:inline"> + </strong>
-                        <strong x-text="fluxoTrabalhadorSelecionado.nome" class="hidden sm:inline"></strong>
+                        <strong x-text="fluxoTrabalhadorSelecionado?.nome || ''" class="hidden sm:inline"></strong>
                         <strong class="sm:hidden">Dados Reais</strong>
                     </span>
                 </div>
@@ -1220,9 +1220,6 @@
     <script src="js/github-api.js"></script>
     <!-- ✅ SIMPLIFICADO: Sem auth/user/notification managers -->
     <script src="js/image-uploader.js"></script>
-    <script>
-        const githubAPI = new GitHubAPI();
-    </script>
     <script src="js/calculo-salario.js"></script>
     <script src="js/cliente-manager.js"></script>
     <script src="js/modelos/declaracao-executivo.js"></script>
