@@ -58,7 +58,7 @@
                     >
                     <button 
                         type="button" 
-                        onclick="toggleToken()"
+                        id="btnToggleToken"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                         <i id="toggleIcon" class="bi bi-eye"></i>
@@ -84,7 +84,7 @@
                 <i class="bi bi-info-circle-fill mr-2"></i>Como obter seu token:
             </p>
             <ol class="text-xs text-blue-700 space-y-1 ml-4 list-decimal">
-                <li>Acesse <a href="https://github.com/settings/tokens/new" target="_blank" class="underline font-semibold">github.com/settings/tokens/new</a></li>
+                <li>Acesse <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer" class="underline font-semibold hover:text-blue-900">github.com/settings/tokens/new</a></li>
                 <li>Crie um token com permissão <strong>"repo"</strong></li>
                 <li>Copie e cole aqui</li>
             </ol>
@@ -98,17 +98,20 @@
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
     <script>
-        function toggleToken() {
-            const input = document.getElementById('token');
-            const icon = document.getElementById('toggleIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.replace('bi-eye', 'bi-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.replace('bi-eye-slash', 'bi-eye');
-            }
-        }
+        // Toggle mostrar/ocultar token
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btnToggleToken').addEventListener('click', () => {
+                const input = document.getElementById('token');
+                const icon = document.getElementById('toggleIcon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('bi-eye', 'bi-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('bi-eye-slash', 'bi-eye');
+                }
+            });
+        });
 
         function mostrarErro(msg) {
             document.getElementById('sucesso').classList.add('hidden');
@@ -166,9 +169,9 @@
                     throw new Error('Token inválido ou expirado');
                 }
                 
-                // Salvar token
-                localStorage.setItem('github_token', token);
-                localStorage.setItem('github_username', user.login);
+                // Salvar token (padrão simples)
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', user.login);
                 
                 // Verificar se é admin
                 const isAdmin = CONFIG.admins.includes(user.login);
@@ -205,6 +208,40 @@
                 mostrarErro(mensagemErro);
                 btnEntrar.disabled = false;
                 btnEntrar.innerHTML = '<i class="bi bi-box-arrow-in-right mr-2"></i>Entrar';
+            }
+        });
+
+        // Auto-login se já tem token salvo
+        window.addEventListener('DOMContentLoaded', async () => {
+            const savedToken = localStorage.getItem('token');
+            const savedUsername = localStorage.getItem('username');
+            
+            if (savedToken && savedUsername) {
+                console.log('✅ Token salvo encontrado, verificando...');
+                
+                try {
+                    // Verificar se token ainda é válido
+                    githubAPI.setToken(savedToken);
+                    githubAPI.configurar({
+                        owner: CONFIG.github.owner,
+                        repo: CONFIG.github.repo,
+                        branch: CONFIG.github.branch
+                    });
+                    
+                    const user = await githubAPI.getAuthenticatedUser();
+                    
+                    if (user && user.login === savedUsername) {
+                        const isAdmin = CONFIG.admins.includes(user.login);
+                        console.log(`✅ Auto-login: ${user.login} (${isAdmin ? 'Admin' : 'User'})`);
+                        
+                        // Redirecionar
+                        window.location.href = isAdmin ? 'admin.html' : 'user-panel.html';
+                    }
+                } catch (error) {
+                    console.log('⚠️ Token salvo inválido, limpando...');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                }
             }
         });
     </script>
