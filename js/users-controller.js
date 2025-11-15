@@ -205,6 +205,25 @@ function usersApp() {
                     })
                 );
                 
+                // ✅ ADICIONAL: Incluir admin atual se não estiver na lista
+                const adminAtual = localStorage.getItem('username');
+                if (adminAtual && !this.users.find(u => u.username === adminAtual)) {
+                    console.log(`📌 Adicionando admin atual à lista: ${adminAtual}`);
+                    this.users.push({
+                        id: adminAtual,
+                        username: adminAtual,
+                        name: adminAtual,
+                        avatar: `https://github.com/${adminAtual}.png`,
+                        role: CONFIG.admins.includes(adminAtual) ? 'admin' : 'user',
+                        status: 'active',
+                        stats: {
+                            clientes: 0,
+                            declaracoes: 0,
+                            ultimoAcesso: new Date().toISOString()
+                        }
+                    });
+                }
+                
                 // Ordenar por mais ativo (mais documentos)
                 this.users.sort((a, b) => b.stats.declaracoes - a.stats.declaracoes);
                 
