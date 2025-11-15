@@ -129,6 +129,7 @@ class GitHubAPI {
             const arquivo = await this.lerArquivo(path);
             
             if (!arquivo) {
+                console.warn(`⚠️ Arquivo não encontrado: ${path}`);
                 return null;
             }
 
@@ -138,8 +139,13 @@ class GitHubAPI {
             };
 
         } catch (error) {
+            // Se for 404, não é erro crítico
+            if (error.message && error.message.includes('404')) {
+                console.warn(`⚠️ Arquivo não encontrado no GitHub: ${path}`);
+                return null;
+            }
             console.error(`❌ Erro ao ler JSON ${path}:`, error);
-            throw error;
+            return null; // Retorna null ao invés de lançar erro
         }
     }
 
