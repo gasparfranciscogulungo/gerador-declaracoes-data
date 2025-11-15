@@ -218,8 +218,8 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 
-        <!-- TAB: DASHBOARD -->
-        <div x-show="activeTab === 'dashboard'" x-transition>
+        <!-- DASHBOARD (Sempre visível) -->
+        <div class="mb-6 lg:mb-8">
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8">
                 <!-- Card: Meus Trabalhadores -->
@@ -266,6 +266,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <!-- FIM: Dashboard Stats -->
 
         <!-- Tabs Navigation - Responsivo (Desktop only - Mobile usa drawer) -->
         <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-lg shadow-md mb-6 hidden lg:block">
