@@ -22,7 +22,7 @@ function userPanelApp() {
         mensagemAguardando: '',
         statusAguardando: '', // pending, blocked, not_found
         
-        activeTab: 'dashboard',
+        activeTab: 'empresas',
         loading: false,
         loadingMessage: 'Carregando...',
         uploadProgress: null,
