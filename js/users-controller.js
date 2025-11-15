@@ -103,11 +103,7 @@ function usersApp() {
             githubAPI.setToken(token);
             githubAPI.configurar(CONFIG.github);
             
-            // ✅ Inicializa managers (SIMPLIFICADO)
-            this.historicoManager = historicoManager;
-            
-            // ✅ Skip historicoManager.inicializar - modo simplificado
-            // await this.historicoManager.inicializar(githubAPI, authManager);
+            // ✅ Modo simplificado - sem managers complexos
             
             // Carrega dados
             await this.carregarUsuarios();
@@ -501,23 +497,11 @@ function usersApp() {
         /**
          * Regenerar PDF de um documento do histórico
          */
+        /**
+         * ✅ DESABILITADO: Regeneração de PDF (requer historicoManager)
+         */
         async regenerarPDF(documento) {
-            // ✅ CORRIGIDO: Usar confirm nativo
-            if (!confirm('Regenerar este PDF? Os dados originais serão usados para criar um novo documento.')) return;
-            
-            try {
-                const dadosRegeneracao = this.historicoManager.prepararRegeneracao(documento.id);
-                
-                // Salva dados no localStorage para o admin.html usar
-                localStorage.setItem('regenerar_pdf_dados', JSON.stringify(dadosRegeneracao));
-                
-                // Redireciona para admin.html
-                window.location.href = 'admin.html?action=regenerar';
-                
-            } catch (error) {
-                console.error('❌ Erro ao preparar regeneração:', error);
-                this.showAlert('Erro ao preparar regeneração do PDF', 'error');
-            }
+            this.showAlert('Função de regeneração desabilitada no modo simplificado.', 'error');
         },        /**
          * Alterna para tab Analytics e inicializa gráficos
          */
