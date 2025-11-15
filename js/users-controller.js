@@ -137,21 +137,26 @@ function usersApp() {
                 // 3. Extrair usuários únicos dos trabalhadores (campo usuario_id ou criado_por)
                 const usuariosMap = new Map();
                 
+                // ✅ AJUSTE: Pegar username atual do admin logado para trabalhadores sem usuario_id
+                const adminUsername = localStorage.getItem('username') || 'gasparfranciscogulungo';
+                
                 console.log('🔍 Processando trabalhadores...');
+                console.log(`📌 Admin atual: ${adminUsername}`);
+                
                 listaTrabalhadores.forEach(t => {
-                    const username = t.usuario_id || t.criado_por;
+                    // Se não tem usuario_id, atribuir ao admin atual (trabalhadores antigos)
+                    const username = t.usuario_id || t.criado_por || adminUsername;
                     console.log('   Trabalhador:', t.nome, '→ Usuario:', username);
-                    if (username) {
-                        if (!usuariosMap.has(username)) {
-                            usuariosMap.set(username, {
-                                username: username,
-                                clientes: 0,
-                                documentos: 0,
-                                ultimoAcesso: null
-                            });
-                        }
-                        usuariosMap.get(username).clientes++;
+                    
+                    if (!usuariosMap.has(username)) {
+                        usuariosMap.set(username, {
+                            username: username,
+                            clientes: 0,
+                            documentos: 0,
+                            ultimoAcesso: null
+                        });
                     }
+                    usuariosMap.get(username).clientes++;
                 });
                 console.log(`✅ ${usuariosMap.size} usuários únicos encontrados nos trabalhadores`);
                 
