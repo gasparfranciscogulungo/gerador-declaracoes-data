@@ -72,181 +72,198 @@
         </div>
     </div>
 
-    <!-- MODAL: AGUARDANDO APROVAÇÃO (FULLSCREEN) -->
-    <div x-show="modalAguardando" 
-         x-transition
-         class="fixed inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center z-[10000] p-4">
-        <div class="text-center max-w-2xl mx-auto">
-            <!-- Ícone Animado -->
-            <div class="mb-8 flex justify-center">
-                <div class="relative">
-                    <template x-if="statusAguardando === 'pending'">
-                        <div>
-                            <div class="w-32 h-32 border-8 border-yellow-200 rounded-full animate-spin border-t-yellow-500"></div>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <i class="bi bi-clock-history text-6xl text-yellow-500 animate-pulse"></i>
-                            </div>
-                        </div>
-                    </template>
-                    
-                    <template x-if="statusAguardando === 'blocked'">
-                        <div>
-                            <i class="bi bi-ban text-9xl text-red-500"></i>
-                        </div>
-                    </template>
-                    
-                    <template x-if="statusAguardando === 'not_found'">
-                        <div>
-                            <i class="bi bi-question-circle text-9xl text-gray-400"></i>
-                        </div>
-                    </template>
-                </div>
-            </div>
-            
-            <!-- Mensagem -->
-            <h2 class="text-4xl font-bold text-white mb-6" x-text="statusAguardando === 'pending' ? 'Aguardando Aprovação' : (statusAguardando === 'blocked' ? 'Conta Bloqueada' : 'Conta Não Encontrada')"></h2>
-            
-            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-                <p class="text-xl text-gray-200 whitespace-pre-line leading-relaxed" x-text="mensagemAguardando"></p>
-            </div>
-            
-            <!-- Info Box -->
-            <div class="bg-blue-500/20 border-2 border-blue-400 rounded-xl p-6 mb-8">
-                <div class="flex items-center justify-center gap-3 text-blue-300">
-                    <i class="bi bi-info-circle-fill text-2xl"></i>
-                    <p class="text-sm">
-                        <template x-if="statusAguardando === 'pending'">
-                            <span>O administrador foi notificado. Você receberá um email quando sua conta for aprovada.</span>
-                        </template>
-                        <template x-if="statusAguardando === 'blocked'">
-                            <span>Para solicitar desbloqueio, entre em contato: admin@example.com</span>
-                        </template>
-                        <template x-if="statusAguardando === 'not_found'">
-                            <span>Verifique se você está usando o token correto ou entre em contato com o administrador.</span>
-                        </template>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Botão Sair -->
-            <div class="flex justify-center gap-4">
-                <button @click="window.location.href = 'index.html'" 
-                        class="px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                    <i class="bi bi-box-arrow-right mr-2"></i>Voltar ao Login
-                </button>
-                
-                <template x-if="statusAguardando === 'pending'">
-                    <button @click="init()" 
-                            class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                        <i class="bi bi-arrow-clockwise mr-2"></i>Verificar Novamente
-                    </button>
-                </template>
-            </div>
-        </div>
-    </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-40" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'" style="border-bottom-width: 1px;">
-        <div class="container mx-auto px-4 py-4">
+
+    <!-- Header Responsivo -->
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 md:py-4">
             <div class="flex items-center justify-between">
-                <!-- Logo/Título -->
-                <div class="flex items-center gap-3">
-                    <i class="bi bi-file-earmark-pdf text-3xl text-blue-600"></i>
+                <!-- Logo e título -->
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <!-- Menu hamburger (mobile only) -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="lg:hidden p-2 hover:bg-purple-700 rounded-lg transition-colors touch-manipulation">
+                        <div class="w-6 h-5 flex flex-col justify-between">
+                            <span :class="mobileMenuOpen ? 'rotate-45 translate-y-2' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                            <span :class="mobileMenuOpen ? 'opacity-0' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                            <span :class="mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''"
+                                  class="block h-0.5 w-full bg-white transition-all duration-300"></span>
+                        </div>
+                    </button>
+                    
+                    <i class="bi bi-person-circle text-2xl md:text-3xl"></i>
                     <div>
-                        <h1 class="text-xl font-bold">Meu Painel</h1>
-                        <p class="text-sm opacity-70" x-text="usuario?.username"></p>
+                        <h1 class="text-lg md:text-2xl font-bold">Meu Painel</h1>
+                        <p class="text-purple-200 text-xs md:text-sm hidden sm:block">Gerador de Documentos</p>
                     </div>
                 </div>
-
-                <!-- Actions -->
-                <div class="flex items-center gap-2">
-                    <!-- Dark Mode Toggle -->
-                    <button @click="toggleDarkMode()" 
-                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
+                
+                <!-- Ações do header (desktop) -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-purple-200">Usuário</p>
+                        <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
+                    </div>
+                    <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-white">
+                    <button @click="toggleDarkMode()" class="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg transition-colors">
+                        <i :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'" class="mr-2"></i>
+                        <span x-text="darkMode ? 'Claro' : 'Escuro'"></span>
                     </button>
-
-                    <!-- Logout -->
-                    <button @click="logout()" 
-                            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span class="ml-2 hidden sm:inline">Sair</span>
+                    <button @click="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
+                        <i class="bi bi-box-arrow-right mr-2"></i>Sair
+                    </button>
+                </div>
+                
+                <!-- Ações mobile (compactas) -->
+                <div class="flex lg:hidden items-center space-x-2">
+                    <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white">
+                    <button @click="toggleDarkMode()" class="p-2 bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors touch-manipulation">
+                        <i :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-6">
+    <!-- Menu Mobile Slide-in -->
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="mobileMenuOpen = false"
+         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 lg:hidden">
+    </div>
+    
+    <nav x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="-translate-x-full"
+         :class="darkMode ? 'bg-gray-900' : 'bg-white'"
+         class="fixed top-0 left-0 h-full w-80 max-w-[85vw] shadow-2xl z-50 lg:hidden overflow-y-auto">
         
-        <!-- Tabs -->
-        <div class="mb-6">
-            <div class="flex gap-2 overflow-x-auto pb-2">
-                <button @click="activeTab = 'dashboard'"
-                        :class="activeTab === 'dashboard' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
-                        class="px-4 py-2 rounded-lg whitespace-nowrap">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </button>
-                
-                <button @click="activeTab = 'empresas'"
-                        :class="activeTab === 'empresas' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
-                        class="px-4 py-2 rounded-lg whitespace-nowrap">
-                    <i class="bi bi-building"></i> Empresas
-                </button>
-                
-                <button @click="activeTab = 'trabalhadores'"
-                        :class="activeTab === 'trabalhadores' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
-                        class="px-4 py-2 rounded-lg whitespace-nowrap">
-                    <i class="bi bi-people"></i> Meus Trabalhadores
-                </button>
-                
-                <button @click="activeTab = 'historico'"
-                        :class="activeTab === 'historico' ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700')"
-                        class="px-4 py-2 rounded-lg whitespace-nowrap">
-                    <i class="bi bi-clock-history"></i> Histórico
+        <!-- Header do Menu -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Menu</h2>
+                <button @click="mobileMenuOpen = false" class="p-2 hover:bg-purple-700 rounded-lg transition-colors touch-manipulation">
+                    <i class="bi bi-x-lg text-xl"></i>
                 </button>
             </div>
+            <div class="flex items-center space-x-3">
+                <img x-show="usuario" :src="usuario?.avatar_url" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-white">
+                <div>
+                    <p class="font-medium" x-text="usuario ? usuario.login : 'Carregando...'"></p>
+                    <p class="text-purple-200 text-sm">Usuário</p>
+                </div>
+            </div>
         </div>
+        
+        <!-- Itens do Menu -->
+        <div class="py-4">
+            <button @click="activeTab = 'dashboard'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'dashboard' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation">
+                <i class="bi bi-speedometer2 text-xl"></i>
+                <span class="font-medium">Dashboard</span>
+            </button>
+            
+            <button @click="activeTab = 'empresas'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'empresas' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation relative">
+                <i class="bi bi-building text-xl"></i>
+                <span class="font-medium">Empresas</span>
+                <i class="bi bi-lock-fill text-xs text-gray-400 ml-auto"></i>
+            </button>
+            
+            <button @click="activeTab = 'trabalhadores'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'trabalhadores' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation">
+                <i class="bi bi-people text-xl"></i>
+                <span class="font-medium">Meus Trabalhadores</span>
+            </button>
+            
+            <button @click="abrirModalFluxoGeracao(); mobileMenuOpen = false" 
+                    :class="[modalFluxoGeracao ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-l-4 border-green-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation">
+                <i class="bi bi-magic text-xl"></i>
+                <span class="font-medium">Gerar PDF</span>
+            </button>
+            
+            <button @click="activeTab = 'historico'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'historico' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation">
+                <i class="bi bi-clock-history text-xl"></i>
+                <span class="font-medium">Histórico</span>
+            </button>
+            
+            <button @click="activeTab = 'config'; mobileMenuOpen = false" 
+                    :class="[activeTab === 'config' ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-l-4 border-purple-600' : 'text-gray-700 dark:text-gray-300', darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50']"
+                    class="w-full px-6 py-4 flex items-center space-x-3 transition-colors touch-manipulation">
+                <i class="bi bi-gear text-xl"></i>
+                <span class="font-medium">Configurações</span>
+            </button>
+        </div>
+        
+        <!-- Footer do Menu -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+            <button @click="logout()" 
+                    class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg transition-colors flex items-center justify-center space-x-2 touch-manipulation">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 
         <!-- TAB: DASHBOARD -->
         <div x-show="activeTab === 'dashboard'" x-transition>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8">
                 <!-- Card: Meus Trabalhadores -->
-                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm opacity-70">Meus Trabalhadores</p>
-                            <h3 class="text-3xl font-bold" x-text="stats.totalTrabalhadores"></h3>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Meus Trabalhadores</p>
+                            <h3 class="text-3xl font-bold text-purple-600" x-text="stats.totalTrabalhadores"></h3>
                         </div>
-                        <i class="bi bi-people text-4xl text-blue-600"></i>
+                        <i class="bi bi-people text-4xl text-purple-200"></i>
                     </div>
                 </div>
 
                 <!-- Card: PDFs Este Mês -->
-                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm opacity-70">PDFs Este Mês</p>
-                            <h3 class="text-3xl font-bold" x-text="stats.pdfsMesAtual"></h3>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">PDFs Este Mês</p>
+                            <h3 class="text-3xl font-bold text-green-600" x-text="stats.pdfsMesAtual"></h3>
                         </div>
-                        <i class="bi bi-file-earmark-pdf text-4xl text-green-600"></i>
+                        <i class="bi bi-file-earmark-pdf text-4xl text-green-200"></i>
                     </div>
                 </div>
 
                 <!-- Card: Limite Restante -->
-                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm opacity-70">Limite Restante</p>
-                            <h3 class="text-3xl font-bold" x-text="stats.limiteRestante"></h3>
+                            <p :class="darkMode ? 'text-gray-400' : 'text-gray-500'" class="text-sm">Limite Restante</p>
+                            <h3 class="text-3xl font-bold text-yellow-600" x-text="stats.limiteRestante"></h3>
                         </div>
-                        <i class="bi bi-graph-up text-4xl text-yellow-600"></i>
+                        <i class="bi bi-graph-up text-4xl text-yellow-200"></i>
                     </div>
                 </div>
 
                 <!-- Card: Empresas Disponíveis -->
-                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
+                <div :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm opacity-70">Empresas Disponíveis</p>
