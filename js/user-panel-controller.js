@@ -118,9 +118,11 @@ function userPanelApp() {
             this.loadingMessage = 'Verificando autenticação...';
             
             try {
-                // Verificar token
-                const token = authManager.carregarToken();
-                if (!token) {
+                // ✅ Verificação simplificada
+                const token = localStorage.getItem('token');
+                const username = localStorage.getItem('username');
+                
+                if (!token || !username) {
                     console.log('❌ Token não encontrado');
                     window.location.href = 'index.html';
                     return;
@@ -135,26 +137,8 @@ function userPanelApp() {
                 this.usuario = await githubAPI.getAuthenticatedUser();
                 console.log('✅ Usuário GitHub:', this.usuario.login);
                 
-                // ========== VERIFICAÇÃO DE AUTORIZAÇÃO ==========
-                this.loadingMessage = 'Verificando autorização...';
-                const userManager = new UserManager();
-                
-                const autorizacao = await userManager.verificarAutorizacao(
-                    this.usuario.login,
-                    token
-                );
-                
-                console.log('🔐 Autorização:', autorizacao);
-                
-                // Se não encontrado, redirecionar
-                if (autorizacao.status === 'not_found') {
-                    console.error('❌ Usuário não cadastrado');
-                    this.mostrarTelaAguardando('not_found');
-                    return;
-                }
-                
-                // Se é admin, redirecionar para admin.html
-                if (autorizacao.user.role === 'admin') {
+                // ✅ VERIFICAÇÃO SIMPLIFICADA - Se é admin, redirecionar
+                if (CONFIG.admins.includes(this.usuario.login)) {
                     console.log('⚠️ Admin detectado, redirecionando...');
                     this.showAlert('success', 'Redirecionando para painel administrativo...');
                     setTimeout(() => {
@@ -163,19 +147,19 @@ function userPanelApp() {
                     return;
                 }
                 
-                // Se não está ativo, mostrar tela de aguardando
-                if (autorizacao.status !== 'active') {
-                    console.warn(`⏳ Conta com status: ${autorizacao.status}`);
-                    this.mostrarTelaAguardando(autorizacao.status);
-                    return;
-                }
-                
-                // Usuário autorizado!
-                this.usuarioData = autorizacao.user;
-                console.log('✅ Acesso autorizado:', {
+                // ✅ Usuário normal autorizado (sistema simplificado: todos podem entrar)
+                this.usuarioData = {
                     username: this.usuario.login,
-                    role: autorizacao.user.role,
-                    status: autorizacao.status
+                    name: this.usuario.name || this.usuario.login,
+                    avatar: this.usuario.avatar_url,
+                    role: 'user',
+                    status: 'active'
+                };
+                
+                console.log('✅ Acesso autorizado:', {
+                    username: this.usuarioData.username,
+                    role: this.usuarioData.role,
+                    status: this.usuarioData.status
                 });
                 
                 // Carregar dados

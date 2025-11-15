@@ -37,30 +37,18 @@
     <script>
         // Bloqueia acesso ao painel se não houver token válido
         (function() {
-            // ✅ CORRIGIDO: Usar o mesmo nome que auth-manager.js salva
-            const authData = localStorage.getItem('github_auth');
+            // ✅ Sistema simplificado: apenas 'token' no localStorage
+            const token = localStorage.getItem('token');
             
-            if (!authData || authData.trim() === '') {
+            if (!token || token.trim() === '') {
                 console.warn('🚫 Acesso negado: Token não encontrado');
                 console.warn('↩️  Redirecionando para página de login...');
                 window.location.href = 'index.html';
                 return;
             }
             
-            // Validar que é JSON válido
-            try {
-                const parsed = JSON.parse(authData);
-                if (!parsed.token || parsed.token.trim() === '') {
-                    throw new Error('Token vazio');
-                }
-                console.log('✅ Token válido encontrado - Prosseguindo com carregamento do painel admin');
-            } catch (error) {
-                console.warn('🚫 Acesso negado: Token inválido ou corrompido');
-                console.warn('↩️  Redirecionando para página de login...');
-                localStorage.removeItem('github_auth'); // Limpar token corrompido
-                window.location.href = 'index.html';
-                return;
-            }
+            // Token existe, prosseguir
+            console.log('✅ Token encontrado - Carregando painel admin...');
         })();
     </script>
 </head>
@@ -3647,15 +3635,12 @@
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/github-api.js"></script>
-    <script src="js/auth-manager.js"></script>
-    <script src="js/user-manager.js"></script>
-    <script src="js/notification-system.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/image-uploader.js"></script>
     <script>
         // Instâncias globais necessárias
         const githubAPI = new GitHubAPI();
-        const authManager = new AuthManager();
-        const notificationSystem = new NotificationSystem();
+        const auth = new SimpleAuth();
     </script>
     
     <!-- Sistema de Cálculo de Salários -->

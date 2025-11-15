@@ -254,7 +254,7 @@ function adminApp() {
             this.loadingMessage = 'Verificando autenticação...';
             
             // Verificar se tem token (USAR A MESMA CHAVE DO AUTH-MANAGER)
-            const token = authManager.carregarToken();
+            const token = localStorage.getItem("token");
             if (!token) {
                 console.log('❌ Token não encontrado, redirecionando...');
                 window.location.href = 'index.html';
@@ -273,82 +273,38 @@ function adminApp() {
             } catch (error) {
                 console.error('❌ Erro ao obter usuário:', error);
                 this.showAlert('error', 'Erro ao carregar perfil. Token inválido?');
-                authManager.logout();
+                // Limpar e redirecionar
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
                 window.location.href = 'index.html';
                 return;
             }
             
-            // ========== VERIFICAÇÃO DE AUTORIZAÇÃO ==========
-            this.loadingMessage = 'Verificando autorização...';
-            this.userManager = new UserManager();
+            // ========== VERIFICAÇÃO SIMPLES DE ADMIN ==========
+            this.loadingMessage = 'Verificando permissões...';
             
-            try {
-                const autorizacao = await this.userManager.verificarAutorizacao(
-                    this.usuario.login, 
-                    token
-                );
-                
-                console.log('🔐 Autorização:', autorizacao);
-                
-                // Verificar se usuário existe no sistema
-                if (autorizacao.status === 'not_found') {
-                    console.error('❌ Usuário não cadastrado no sistema');
-                    this.showAlert('error', '❌ Acesso negado: Usuário não cadastrado. Entre em contato com o administrador.');
-                    authManager.logout();
-                    window.location.href = 'index.html';
-                    return;
-                }
-                
-                // Verificar se conta está ativa
-                if (autorizacao.status === 'pending') {
-                    console.warn('⏳ Conta aguardando aprovação');
-                    this.showAlert('error', '⏳ Sua conta está aguardando aprovação do administrador.');
-                    authManager.logout();
-                    window.location.href = 'index.html';
-                    return;
-                }
-                
-                if (autorizacao.status === 'blocked') {
-                    console.error('🚫 Conta bloqueada');
-                    this.showAlert('error', '🚫 Sua conta foi bloqueada. Entre em contato com o administrador.');
-                    authManager.logout();
-                    window.location.href = 'index.html';
-                    return;
-                }
-                
-                // Verificar se é admin
-                if (autorizacao.user.role !== 'admin') {
-                    console.warn('⚠️ Usuário não é administrador, redirecionando...');
-                    this.showAlert('error', '⚠️ Acesso restrito a administradores. Redirecionando...');
-                    setTimeout(() => {
-                        window.location.href = 'user-panel.html';
-                    }, 2000);
-                    return;
-                }
-                
-                // Usuário autorizado!
-                this.usuarioData = autorizacao.user;
-                console.log('✅ Acesso autorizado:', {
-                    username: this.usuario.login,
-                    role: autorizacao.user.role,
-                    status: autorizacao.status
-                });
-                
-            } catch (error) {
-                console.error('❌ Erro na verificação de autorização:', error);
-                this.showAlert('error', 'Erro ao verificar autorização. Tente novamente.');
-                authManager.logout();
-                window.location.href = 'index.html';
+            // Verificar se usuário é admin (lista em CONFIG.admins)
+            const isAdmin = CONFIG.admins.includes(this.usuario.login);
+            
+            if (!isAdmin) {
+                console.warn('⚠️ Usuário não é administrador');
+                this.showAlert('error', '⚠️ Acesso restrito a administradores. Redirecionando para painel de usuário...');
+                setTimeout(() => {
+                    window.location.href = 'user-panel.html';
+                }, 2000);
                 return;
             }
+            
+            // Admin confirmado!
+            console.log('✅ Admin confirmado:', this.usuario.login);
             
             // Inicializar outros managers
             this.clienteManager = new ClienteManager();
             
-            // Inicializar HistoricoManager
+            // Inicializar HistoricoManager (SIMPLIFICADO - sem authManager)
             if (typeof historicoManager !== 'undefined') {
-                await historicoManager.inicializar(githubAPI, authManager);
-                console.log('✅ HistoricoManager inicializado');
+                // Skip - não precisa inicializar com authManager no modo simplificado
+                console.log('⏭️  HistoricoManager: modo simplificado');
             }
             
             // Carregar TODOS os dados
@@ -422,35 +378,10 @@ function adminApp() {
         },
         
         // ========== CARREGAR USUÁRIOS PENDENTES ==========
+        // DESATIVADO: Sistema simplificado não usa aprovação
         async carregarUsuariosPendentes() {
-            try {
-                // Se não tem userManager, inicializar
-                if (!this.userManager) {
-                    this.userManager = new UserManager();
-                }
-                
-                // Carregar users do GitHub
-                await this.userManager.carregarUsers();
-                
-                // Filtrar pendentes
-                const pendentes = this.userManager.users.filter(u => u.status === 'pending');
-                this.stats.usersPendentes = pendentes.length;
-                
-                // Atualizar badges visuais
-                this.atualizarBadges(pendentes.length);
-                
-                if (pendentes.length > 0) {
-                    console.log(`⏳ ${pendentes.length} usuário(s) aguardando aprovação:`, 
-                        pendentes.map(u => u.username)
-                    );
-                } else {
-                    console.log('✅ Nenhum usuário pendente');
-                }
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar pendentes:', error);
-                this.stats.usersPendentes = 0;
-            }
+            this.stats.usersPendentes = 0;
+            console.log('⏭️  Sistema de aprovação desativado (modo simplificado)');
         },
         
         // ========== ATUALIZAR BADGES DE NOTIFICAÇÃO ==========
@@ -1066,7 +997,7 @@ function adminApp() {
                 
                 const response = await fetch('https://api.github.com/rate_limit', {
                     headers: {
-                        'Authorization': `token ${authManager.getToken()}`,
+                        'Authorization': `token ${localStorage.getItem("token")}`,
                         'Accept': 'application/vnd.github.v3+json'
                     }
                 });
@@ -1094,12 +1025,11 @@ function adminApp() {
 
                 // ========== UTILIDADES ==========
         async logout() {
-            const confirmar = await showConfirm(
-                'Tem certeza que deseja sair?',
-                { type: 'info', icon: 'bi-box-arrow-right', confirmText: 'Sair', cancelText: 'Cancelar' }
-            );
-            if (confirmar) {
-                authManager.logout();
+            if (confirm('Tem certeza que deseja sair?')) {
+                // Limpar dados e redirecionar
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                window.location.href = 'index.html';
             }
         },
 
