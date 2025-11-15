@@ -222,13 +222,20 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 [EMPRESAS] Carregando via RAW GitHub...');
+                console.log('📂 [EMPRESAS] Carregando...');
                 
-                // USAR URL DIRETA (mais confiável que API)
-                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/empresas.json`;
+                // Cache-bust: adiciona timestamp para forçar reload
+                const timestamp = new Date().getTime();
+                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/empresas.json?t=${timestamp}`;
                 console.log('📍 URL:', rawUrl);
                 
-                const response = await fetch(rawUrl);
+                const response = await fetch(rawUrl, {
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -237,12 +244,13 @@ function userPanelApp() {
                 const data = await response.json();
                 this.empresasDisponiveis = data.empresas || [];
                 
-                console.log(`✅ ${this.empresasDisponiveis.length} empresas carregadas!`);
+                console.log(`✅ ${this.empresasDisponiveis.length} empresas OK!`);
+                this.calcularStats();
                 
             } catch (error) {
                 console.error('❌ ERRO:', error);
                 this.empresasDisponiveis = [];
-                this.showAlert('error', 'Erro ao carregar empresas');
+                this.showAlert('error', 'Erro: ' + error.message);
             }
         },
         
@@ -254,26 +262,32 @@ function userPanelApp() {
         
         async carregarMeusTrabalhadores() {
             try {
-                console.log('📂 Carregando meus trabalhadores...');
+                console.log('📂 Carregando trabalhadores...');
                 
-                const arquivo = await githubAPI.lerJSON('data/trabalhadores.json');
+                // RAW URL com cache-bust
+                const timestamp = new Date().getTime();
+                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.github.owner}/${CONFIG.github.repo}/${CONFIG.github.branch}/data/trabalhadores.json?t=${timestamp}`;
                 
-                if (arquivo && arquivo.data) {
-                    const todos = arquivo.data.trabalhadores || [];
-                    
-                    // Filtrar: Só os trabalhadores criados por MIM
-                    this.meusTrabalhadores = todos.filter(t => 
-                        t.usuario_id === this.usuario.username || 
-                        t.criado_por === this.usuario.username
-                    );
-                    
-                    console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores meus`);
-                } else {
-                    this.meusTrabalhadores = [];
+                const response = await fetch(rawUrl, { cache: 'no-cache' });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
+                const data = await response.json();
+                const todos = data.trabalhadores || [];
+                
+                // Filtrar: Só os trabalhadores criados por MIM
+                this.meusTrabalhadores = todos.filter(t => 
+                    t.usuario_id === this.usuario.username || 
+                    t.criado_por === this.usuario.username
+                );
+                
+                console.log(`✅ ${this.meusTrabalhadores.length} meus`);
+                this.calcularStats();
+                
             } catch (error) {
-                console.error('❌ Erro ao carregar trabalhadores:', error);
+                console.error('❌ Erro trabalhadores:', error);
                 this.meusTrabalhadores = [];
             }
         },
