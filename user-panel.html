@@ -331,12 +331,24 @@
                     </button>
                 </div>
                 
-                <div class="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
                     <i class="bi bi-info-circle text-blue-600 dark:text-blue-400"></i>
                     <p class="text-sm text-gray-700 dark:text-gray-300">
                         As empresas são gerenciadas pelo administrador. Você pode visualizá-las e usá-las para gerar documentos.
                         <span class="font-semibold" x-text="`Total: ${empresasDisponiveis.length}`"></span>
                     </p>
+                </div>
+                
+                <!-- Debug Info (temporário) -->
+                <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg mb-4 text-xs font-mono">
+                    <p class="font-bold mb-2">🔍 Debug Info:</p>
+                    <p>Array length: <span class="text-purple-600" x-text="empresasDisponiveis.length"></span></p>
+                    <p>Loading: <span class="text-purple-600" x-text="loading"></span></p>
+                    <p>Active Tab: <span class="text-purple-600" x-text="activeTab"></span></p>
+                    <button @click="console.log('Empresas:', empresasDisponiveis)" 
+                            class="mt-2 px-3 py-1 bg-purple-600 text-white rounded text-xs">
+                        Log no Console
+                    </button>
                 </div>
             </div>
 

@@ -222,21 +222,41 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 Carregando empresas...');
+                console.log('📂 [EMPRESAS] Iniciando carregamento...');
+                console.log('📍 [EMPRESAS] Token existe?', !!localStorage.getItem('token'));
+                console.log('📍 [EMPRESAS] Configuração GitHub:', {
+                    owner: CONFIG.github.owner,
+                    repo: CONFIG.github.repo,
+                    branch: CONFIG.github.branch
+                });
                 
                 const arquivo = await githubAPI.lerJSON('data/empresas.json');
+                console.log('📄 [EMPRESAS] Resposta githubAPI.lerJSON:', arquivo);
+                console.log('📄 [EMPRESAS] Tipo da resposta:', typeof arquivo);
+                console.log('📄 [EMPRESAS] Tem .data?', arquivo?.data);
                 
                 if (arquivo && arquivo.data) {
+                    console.log('📦 [EMPRESAS] Estrutura arquivo.data:', Object.keys(arquivo.data));
+                    console.log('📦 [EMPRESAS] arquivo.data.empresas:', arquivo.data.empresas);
+                    
                     // Carregar TODAS as empresas (criadas pelo admin)
                     this.empresasDisponiveis = arquivo.data.empresas || [];
-                    console.log(`✅ ${this.empresasDisponiveis.length} empresas disponíveis`);
+                    console.log(`✅ [EMPRESAS] ${this.empresasDisponiveis.length} empresas carregadas`);
+                    console.log('✅ [EMPRESAS] Primeira empresa:', this.empresasDisponiveis[0]);
+                    
+                    if (this.empresasDisponiveis.length === 0) {
+                        console.warn('⚠️ Array de empresas está vazio no JSON');
+                    }
                 } else {
+                    console.warn('⚠️ Arquivo ou arquivo.data é null/undefined');
                     this.empresasDisponiveis = [];
                 }
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar empresas:', error);
+                console.error('❌ Stack trace:', error.stack);
                 this.empresasDisponiveis = [];
+                this.showAlert('error', 'Erro ao carregar empresas: ' + error.message);
             }
         },
         

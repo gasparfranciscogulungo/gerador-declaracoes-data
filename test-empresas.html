@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Empresas</title>
+</head>
+<body>
+    <h1>Teste de Carregamento de Empresas</h1>
+    <div id="resultado"></div>
+    
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script>
+        async function testar() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<p>Carregando...</p>';
+            
+            try {
+                // Pegar token do localStorage
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    resultado.innerHTML = '<p style="color: red;">❌ Token não encontrado no localStorage</p>';
+                    return;
+                }
+                
+                // Configurar API
+                githubAPI.setToken(token);
+                githubAPI.configurar(CONFIG.github);
+                
+                // Tentar carregar empresas
+                console.log('Tentando carregar empresas...');
+                const arquivo = await githubAPI.lerJSON('data/empresas.json');
+                
+                console.log('Arquivo recebido:', arquivo);
+                
+                if (arquivo && arquivo.data) {
+                    const empresas = arquivo.data.empresas || [];
+                    resultado.innerHTML = `
+                        <p style="color: green;">✅ ${empresas.length} empresas carregadas!</p>
+                        <pre>${JSON.stringify(empresas, null, 2)}</pre>
+                    `;
+                } else {
+                    resultado.innerHTML = '<p style="color: orange;">⚠️ Arquivo vazio ou formato inválido</p>';
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                resultado.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p><pre>${error.stack}</pre>`;
+            }
+        }
+        
+        // Executar teste ao carregar
+        testar();
+    </script>
+</body>
+</html>
