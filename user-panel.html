@@ -319,38 +319,135 @@
 
         <!-- TAB: EMPRESAS (READ-ONLY) -->
         <div x-show="activeTab === 'empresas'" x-transition>
-            <div class="mb-4">
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold">Empresas Disponíveis</h2>
+                    <button @click="carregarEmpresas()" 
+                            :disabled="loading"
+                            :class="darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'"
+                            class="px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
+                        <i class="bi bi-arrow-clockwise" :class="{'animate-spin': loading}"></i>
+                        <span>Atualizar</span>
+                    </button>
+                </div>
+                
                 <div class="flex items-center gap-2 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <i class="bi bi-info-circle text-blue-600"></i>
-                    <p class="text-sm">As empresas são gerenciadas pelo administrador. Você pode visualizá-las e usá-las para gerar documentos.</p>
+                    <i class="bi bi-info-circle text-blue-600 dark:text-blue-400"></i>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        As empresas são gerenciadas pelo administrador. Você pode visualizá-las e usá-las para gerar documentos.
+                        <span class="font-semibold" x-text="`Total: ${empresasDisponiveis.length}`"></span>
+                    </p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <template x-for="empresa in empresasDisponiveis" :key="empresa.id">
-                    <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl p-6 shadow">
-                        <div class="flex items-start gap-4">
+                    <div :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'" 
+                         class="rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-500 cursor-pointer group">
+                        
+                        <!-- Header com Logo e Cor Primária -->
+                        <div class="flex items-start gap-4 mb-4">
                             <!-- Logo -->
-                            <div class="w-16 h-16 flex-shrink-0">
-                                <img x-show="empresa.logo" :src="empresa.logo" class="w-full h-full object-contain rounded" />
-                                <div x-show="!empresa.logo" class="w-full h-full bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                    <i class="bi bi-building text-2xl opacity-50"></i>
+                            <div class="w-16 h-16 flex-shrink-0 relative">
+                                <img x-show="empresa.logo" 
+                                     :src="empresa.logo" 
+                                     :alt="`Logo ${empresa.nome}`"
+                                     class="w-full h-full object-contain rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white p-1"
+                                     @error="$el.style.display='none'" />
+                                <div x-show="!empresa.logo" 
+                                     class="w-full h-full rounded-lg flex items-center justify-center"
+                                     :style="`background: linear-gradient(135deg, ${empresa.corPrimaria || '#6366f1'}, ${empresa.corSecundaria || '#8b5cf6'})`">
+                                    <i class="bi bi-building text-2xl text-white"></i>
                                 </div>
                             </div>
                             
-                            <!-- Info -->
-                            <div class="flex-1">
-                                <h3 class="font-bold text-lg mb-1" x-text="empresa.nome"></h3>
-                                <p class="text-sm opacity-70">NIF: <span x-text="empresa.nif"></span></p>
-                                <p class="text-sm opacity-70 mt-1" x-text="empresa.endereco?.municipio + ', ' + empresa.endereco?.provincia"></p>
+                            <!-- Info Básica -->
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-lg mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2" 
+                                    x-text="empresa.nome"></h3>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                                          :style="`background: ${empresa.corPrimaria || '#6366f1'}20; color: ${empresa.corPrimaria || '#6366f1'}`">
+                                        <i class="bi bi-building-fill mr-1"></i>
+                                        <span x-text="empresa.nif"></span>
+                                    </span>
+                                </div>
                             </div>
+                        </div>
+                        
+                        <!-- Detalhes -->
+                        <div class="space-y-2 text-sm">
+                            <!-- Endereço -->
+                            <div class="flex items-start gap-2">
+                                <i class="bi bi-geo-alt-fill text-purple-500 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-gray-100" x-text="empresa.endereco?.rua || 'N/A'"></p>
+                                    <p class="text-gray-600 dark:text-gray-400" 
+                                       x-text="`${empresa.endereco?.municipio || 'N/A'}, ${empresa.endereco?.provincia || 'N/A'}`"></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Contatos (se existir) -->
+                            <div x-show="empresa.telefone || empresa.email" class="flex items-center gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                <div x-show="empresa.telefone" class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <i class="bi bi-telephone-fill text-xs"></i>
+                                    <span class="text-xs" x-text="empresa.telefone"></span>
+                                </div>
+                                <div x-show="empresa.email" class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <i class="bi bi-envelope-fill text-xs"></i>
+                                    <span class="text-xs truncate" x-text="empresa.email"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Badge de cores (indicador visual) -->
+                            <div class="flex items-center gap-2 pt-2">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Cores da empresa:</span>
+                                <div class="flex gap-1">
+                                    <div class="w-6 h-6 rounded border-2 border-gray-300 dark:border-gray-600"
+                                         :style="`background: ${empresa.corPrimaria || '#6366f1'}`"
+                                         :title="`Cor Primária: ${empresa.corPrimaria}`"></div>
+                                    <div class="w-6 h-6 rounded border-2 border-gray-300 dark:border-gray-600"
+                                         :style="`background: ${empresa.corSecundaria || '#8b5cf6'}`"
+                                         :title="`Cor Secundária: ${empresa.corSecundaria}`"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer com ações -->
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <i class="bi bi-check-circle-fill text-green-500"></i>
+                                Disponível
+                            </span>
+                            <button @click="abrirModalFluxoGeracao(); selecionarEmpresa(empresa)"
+                                    class="text-xs font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-1">
+                                Usar empresa
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
                 </template>
 
-                <div x-show="empresasDisponiveis.length === 0" class="col-span-full text-center py-12">
-                    <i class="bi bi-inbox text-6xl opacity-30"></i>
-                    <p class="mt-4 opacity-70">Nenhuma empresa disponível</p>
+                <!-- Loading State -->
+                <div x-show="loading && empresasDisponiveis.length === 0" 
+                     class="col-span-full text-center py-12">
+                    <div class="animate-spin inline-block w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full"></div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">Carregando empresas...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div x-show="!loading && empresasDisponiveis.length === 0" 
+                     class="col-span-full text-center py-16">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                        <i class="bi bi-building text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Nenhuma empresa disponível</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">O administrador ainda não cadastrou nenhuma empresa.</p>
+                    <button @click="carregarEmpresas()" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        <i class="bi bi-arrow-clockwise mr-2"></i>
+                        Tentar novamente
+                    </button>
                 </div>
             </div>
         </div>
