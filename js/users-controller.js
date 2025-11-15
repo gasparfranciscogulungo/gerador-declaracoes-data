@@ -122,19 +122,25 @@ function usersApp() {
             this.loadingMessage = 'Rastreando atividade de usuários...';
             
             try {
+                console.log('📂 Carregando trabalhadores...');
                 // 1. Carregar trabalhadores
                 const trabalhadores = await githubAPI.lerJSON('data/trabalhadores.json');
                 const listaTrabalhadores = trabalhadores?.data?.trabalhadores || [];
+                console.log(`✅ ${listaTrabalhadores.length} trabalhadores carregados`);
                 
+                console.log('📂 Carregando histórico...');
                 // 2. Carregar histórico
                 const historico = await githubAPI.lerJSON('data/historico.json');
                 const listaHistorico = historico?.data?.historico || [];
+                console.log(`✅ ${listaHistorico.length} documentos no histórico`);
                 
                 // 3. Extrair usuários únicos dos trabalhadores (campo usuario_id ou criado_por)
                 const usuariosMap = new Map();
                 
+                console.log('🔍 Processando trabalhadores...');
                 listaTrabalhadores.forEach(t => {
                     const username = t.usuario_id || t.criado_por;
+                    console.log('   Trabalhador:', t.nome, '→ Usuario:', username);
                     if (username) {
                         if (!usuariosMap.has(username)) {
                             usuariosMap.set(username, {
@@ -147,10 +153,13 @@ function usersApp() {
                         usuariosMap.get(username).clientes++;
                     }
                 });
+                console.log(`✅ ${usuariosMap.size} usuários únicos encontrados nos trabalhadores`);
                 
                 // 4. Contar documentos por usuário no histórico
+                console.log('🔍 Processando histórico...');
                 listaHistorico.forEach(h => {
                     const username = h.usuario || h.criado_por;
+                    console.log('   Documento:', h.trabalhador_nome, '→ Usuario:', username);
                     if (username) {
                         if (!usuariosMap.has(username)) {
                             usuariosMap.set(username, {
@@ -170,6 +179,7 @@ function usersApp() {
                         }
                     }
                 });
+                console.log(`✅ ${usuariosMap.size} usuários únicos totais`);
                 
                 // 5. Converter Map para array e adicionar avatar do GitHub
                 this.users = await Promise.all(
@@ -197,6 +207,8 @@ function usersApp() {
                 this.atualizarStats();
                 
                 console.log(`✅ ${this.users.length} usuários ativos rastreados`);
+                console.log('📊 Usuários:', this.users);
+                console.log('📊 Stats:', this.stats);
             } catch (error) {
                 console.error('❌ Erro ao carregar usuários:', error);
                 this.showAlert('Erro ao carregar usuários: ' + error.message, 'error');
