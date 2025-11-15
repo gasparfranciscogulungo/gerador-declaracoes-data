@@ -222,13 +222,18 @@ function userPanelApp() {
         
         async carregarEmpresas() {
             try {
-                console.log('📂 [EMPRESAS] Carregando via jsDelivr CDN...');
+                console.log('📂 [EMPRESAS] Carregando via GitHub API...');
                 
-                // USAR JSDELIVR CDN (sem CORS, com cache)
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/empresas.json`;
-                console.log('📍 URL:', cdnUrl);
+                // Usar GitHub API diretamente com autenticação
+                const token = localStorage.getItem('token');
+                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/empresas.json`;
                 
-                const response = await fetch(cdnUrl);
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3.raw' // Retorna JSON direto
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -237,13 +242,12 @@ function userPanelApp() {
                 const data = await response.json();
                 this.empresasDisponiveis = data.empresas || [];
                 
-                console.log(`✅ ${this.empresasDisponiveis.length} empresas carregadas!`);
+                console.log(`✅ ${this.empresasDisponiveis.length} empresas!`);
                 this.calcularStats();
                 
             } catch (error) {
                 console.error('❌ ERRO empresas:', error);
                 this.empresasDisponiveis = [];
-                this.showAlert('error', 'Erro ao carregar empresas');
             }
         },
         
@@ -255,12 +259,18 @@ function userPanelApp() {
         
         async carregarMeusTrabalhadores() {
             try {
-                console.log('📂 Carregando trabalhadores via CDN...');
+                console.log('📂 Carregando trabalhadores...');
                 
-                // USAR JSDELIVR CDN (sem CORS)
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/trabalhadores.json`;
+                // Usar GitHub API com autenticação
+                const token = localStorage.getItem('token');
+                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`;
                 
-                const response = await fetch(cdnUrl);
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3.raw'
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -275,11 +285,11 @@ function userPanelApp() {
                     t.criado_por === this.usuario.username
                 );
                 
-                console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores meus!`);
+                console.log(`✅ ${this.meusTrabalhadores.length} meus!`);
                 this.calcularStats();
                 
             } catch (error) {
-                console.error('❌ Erro trabalhadores:', error);
+                console.error('❌ Erro:', error);
                 this.meusTrabalhadores = [];
             }
         },
@@ -293,9 +303,17 @@ function userPanelApp() {
                 this.loading = true;
                 this.loadingMessage = 'Salvando trabalhador...';
                 
-                // Carregar todos os trabalhadores via CDN
-                const cdnUrl = `https://cdn.jsdelivr.net/gh/${CONFIG.github.owner}/${CONFIG.github.repo}@${CONFIG.github.branch}/data/trabalhadores.json`;
-                const response = await fetch(cdnUrl);
+                // Carregar todos os trabalhadores via GitHub API
+                const token = localStorage.getItem('token');
+                const url = `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3.raw'
+                    }
+                });
+                
                 const data = response.ok ? await response.json() : { trabalhadores: [] };
                 let trabalhadores = data.trabalhadores || [];
                 
@@ -323,16 +341,13 @@ function userPanelApp() {
                     trabalhadores.push(novoTrabalhador);
                 }
                 
-                // Buscar SHA do arquivo atual via API
-                const shaResponse = await fetch(
-                    `https://api.github.com/repos/${CONFIG.github.owner}/${CONFIG.github.repo}/contents/data/trabalhadores.json`,
-                    {
-                        headers: {
-                            'Authorization': `token ${localStorage.getItem('token')}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
+                // Buscar SHA do arquivo (sem .raw para pegar metadados)
+                const shaResponse = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json' // Retorna com SHA
                     }
-                );
+                });
                 const shaData = await shaResponse.json();
                 const sha = shaData.sha;
                 
