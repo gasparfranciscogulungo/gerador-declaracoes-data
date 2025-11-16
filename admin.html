@@ -33,6 +33,60 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
     
+    <!-- Animações Personalizadas -->
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Pulse suave para badges de limite */
+        @keyframes pulse-soft {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* Smooth transitions globais */
+        * {
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Scrollbar customizada para área de conteúdo */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.5);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.8);
+        }
+    </style>
+    
     <!-- ⚠️ VERIFICAÇÃO CRÍTICA DE SEGURANÇA - Executada ANTES do Alpine.js carregar -->
     <script>
         // Bloqueia acesso ao painel se não houver token válido
@@ -545,8 +599,9 @@
 
             <!-- Grid de Empresas Responsivo -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                <template x-for="empresa in empresas" :key="empresa.id">
-                    <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-blue-400 group">
+                <template x-for="(empresa, index) in empresas" :key="empresa.id">
+                    <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-blue-400 hover:-translate-y-1 group animate-fade-in-up"
+                         :style="`animation-delay: ${index * 50}ms`">
                         
                         <!-- Header do Card com Gradiente -->
                         <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 relative overflow-hidden">
@@ -570,12 +625,18 @@
                                     </template>
                                 </div>
 
-                                <!-- Contador Badge -->
-                                <div class="bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border border-white/30 shadow-lg">
-                                    <p class="text-xs text-white/80 mb-0.5 sm:mb-1 font-medium">Docs</p>
-                                    <p class="text-xl sm:text-2xl font-bold text-white">
+                                <!-- Contador Badge com Indicador de Limite -->
+                                <div :class="getContador(empresa.id) >= 3 ? 'bg-red-500/90 border-red-400 ring-2 ring-red-300' : (getContador(empresa.id) === 2 ? 'bg-orange-500/90 border-orange-400' : 'bg-white/20 border-white/30')" 
+                                     class="backdrop-blur-md rounded-lg sm:rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border shadow-lg transition-all duration-300">
+                                    <p class="text-xs mb-0.5 sm:mb-1 font-medium" :class="getContador(empresa.id) >= 2 ? 'text-white' : 'text-white/80'">
+                                        <span x-show="getContador(empresa.id) >= 3" class="mr-1">⚠️</span>Docs
+                                    </p>
+                                    <p class="text-xl sm:text-2xl font-bold" :class="getContador(empresa.id) >= 3 ? 'text-white' : 'text-white'">
                                         <span x-text="getContador(empresa.id)"></span>
-                                        <span class="text-xs sm:text-sm text-white/70"> / 5</span>
+                                        <span class="text-xs sm:text-sm" :class="getContador(empresa.id) >= 3 ? 'text-white/90' : 'text-white/70'"> / 3</span>
+                                    </p>
+                                    <p x-show="getContador(empresa.id) >= 3" class="text-[10px] sm:text-xs text-white/90 mt-1 font-semibold animate-pulse">
+                                        LIMITE
                                     </p>
                                 </div>
                             </div>
@@ -1924,6 +1985,91 @@
                         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
                     Entendi!
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: AVISO DE LIMITE DE DECLARAÇÕES -->
+    <!-- ===================================================================== -->
+    <div x-show="modalLimiteEmpresa" 
+         x-transition
+         @click.self="modalLimiteEmpresa = false"
+         class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div @click.stop 
+             :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+             class="rounded-2xl max-w-md w-full border-2 shadow-2xl overflow-hidden transform transition-all">
+            
+            <!-- Header com Gradiente de Alerta -->
+            <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 text-center">
+                <div class="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                    <i class="bi bi-exclamation-triangle-fill text-white text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">
+                    Limite Atingido!
+                </h3>
+                <p class="text-white/90 text-sm">
+                    Esta empresa já atingiu o limite de documentos
+                </p>
+            </div>
+
+            <!-- Corpo -->
+            <div class="p-6">
+                <!-- Informações da Empresa -->
+                <div :class="darkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-orange-50 border-orange-200'" 
+                     class="rounded-xl p-4 mb-6 border-2">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                            <i class="bi bi-building text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-sm font-medium mb-1">Empresa</p>
+                            <p class="font-bold text-lg truncate" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="empresaLimiteAtingido?.nome"></p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md bg-red-100 text-red-700 text-xs font-semibold">
+                                    <i class="bi bi-file-earmark-text mr-1"></i>
+                                    <span x-text="getContador(empresaLimiteAtingido?.id)"></span> / 3 Documentos
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-md bg-orange-100 text-orange-700 text-xs font-semibold animate-pulse">
+                                    ⚠️ LIMITE
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem -->
+                <div :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="mb-6 text-center">
+                    <p class="text-base leading-relaxed">
+                        A empresa <strong x-text="empresaLimiteAtingido?.nome"></strong> já gerou 
+                        <strong class="text-orange-600">3 declarações</strong> (limite máximo).
+                    </p>
+                    <p class="text-sm mt-2" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                        Deseja continuar mesmo assim ou selecionar outra empresa?
+                    </p>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button @click="cancelarEmpresaComLimite()" 
+                            :class="darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                            class="flex-1 px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 group">
+                        <i class="bi bi-arrow-left-circle group-hover:-translate-x-1 transition-transform"></i>
+                        <span>Selecionar Outra</span>
+                    </button>
+                    <button @click="confirmarEmpresaComLimite()" 
+                            class="flex-1 px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
+                        <i class="bi bi-check-circle group-hover:scale-110 transition-transform"></i>
+                        <span>Continuar Assim</span>
+                    </button>
+                </div>
+
+                <!-- Aviso Extra -->
+                <div :class="darkMode ? 'bg-gray-700/30 border-gray-600' : 'bg-blue-50 border-blue-200'" 
+                     class="mt-4 p-3 rounded-lg border text-xs" :class="darkMode ? 'text-gray-400' : 'text-blue-700'">
+                    <i class="bi bi-info-circle mr-1"></i>
+                    <span>Você pode resetar o contador no card da empresa para liberar novas gerações.</span>
+                </div>
             </div>
         </div>
     </div>

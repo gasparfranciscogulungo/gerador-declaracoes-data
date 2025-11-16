@@ -49,6 +49,8 @@ function adminApp() {
         modalPreviewModelo: false,
         modalFluxoGeracao: false,
         modalGuiaTokens: false,
+        modalLimiteEmpresa: false,
+        empresaLimiteAtingido: null,
         
         // Colaboradores
         colaboradores: [],
@@ -874,10 +876,22 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
-            const confirmar = await showConfirm(
-                'ATENÇÃO: Deletar esta empresa permanentemente?\n\nEsta ação não pode ser desfeita.',
-                { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Deletar' }
+            const empresa = this.empresas.find(e => e.id === empresaId);
+            if (!empresa) {
+                this.showAlert('error', '❌ Empresa não encontrada!');
+                return;
+            }
+
+            // Usar confirm nativo com mensagem clara
+            const confirmar = confirm(
+                `⚠️ ATENÇÃO: Deletar "${empresa.nome}" permanentemente?\n\n` +
+                `Esta ação não pode ser desfeita e irá remover:\n` +
+                `• Logo e carimbo da empresa\n` +
+                `• Todas as declarações geradas\n` +
+                `• Contador de documentos\n\n` +
+                `Tem certeza que deseja continuar?`
             );
+            
             if (!confirmar) {
                 return;
             }
@@ -887,7 +901,6 @@ function adminApp() {
                 this.loadingMessage = 'Deletando empresa...';
                 
                 // Remover da lista
-                const empresaRemovida = this.empresas.find(e => e.id === empresaId);
                 this.empresas = this.empresas.filter(e => e.id !== empresaId);
                 
                 // Carregar dados atuais
@@ -901,11 +914,11 @@ function adminApp() {
                 await githubAPI.salvarJSON(
                     'data/empresas.json',
                     empresasData,
-                    `🗑️ Admin deletou empresa: ${empresaRemovida?.nome || empresaId}`,
+                    `🗑️ Admin deletou empresa: ${empresa.nome}`,
                     response.sha
                 );
                 
-                this.showAlert('success', '✅ Empresa deletada com sucesso!');
+                this.showAlert('success', `✅ Empresa "${empresa.nome}" deletada com sucesso!`);
                 await this.atualizarStatsReais();
                 
             } catch (error) {
@@ -4056,9 +4069,44 @@ function adminApp() {
          * Seleciona uma empresa
          */
         selecionarEmpresa(empresa) {
+            // Verificar limite de declarações (3 por empresa)
+            const contador = this.getContador(empresa.id);
+            const LIMITE_DECLARACOES = 3;
+            
+            if (contador >= LIMITE_DECLARACOES) {
+                // Mostrar modal de aviso de limite
+                this.empresaLimiteAtingido = empresa;
+                this.modalLimiteEmpresa = true;
+                return;
+            }
+            
+            // Selecionar normalmente
             this.fluxoEmpresaSelecionada = empresa;
             this.salvarCacheFluxo();
             console.log('✅ Empresa selecionada:', empresa.nome);
+        },
+        
+        /**
+         * Confirmar seleção de empresa mesmo com limite atingido
+         */
+        confirmarEmpresaComLimite() {
+            if (this.empresaLimiteAtingido) {
+                this.fluxoEmpresaSelecionada = this.empresaLimiteAtingido;
+                this.salvarCacheFluxo();
+                console.log('⚠️ Empresa selecionada (limite excedido):', this.empresaLimiteAtingido.nome);
+                this.modalLimiteEmpresa = false;
+                this.empresaLimiteAtingido = null;
+            }
+        },
+        
+        /**
+         * Cancelar e selecionar outra empresa
+         */
+        cancelarEmpresaComLimite() {
+            this.modalLimiteEmpresa = false;
+            this.empresaLimiteAtingido = null;
+            // Voltar para a etapa de seleção de empresa
+            this.fluxoEtapa = 1;
         },
         
         /**
