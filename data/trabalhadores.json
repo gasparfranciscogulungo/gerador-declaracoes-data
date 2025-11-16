@@ -128,7 +128,7 @@
       "salario_liquido": "0.00",
       "moeda": "AKZ",
       "iban": "",
-      "ativo": true,
+      "ativo": false,
       "observacoes": ""
     },
     {
