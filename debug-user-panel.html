@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>🔄 Force Reset - User Panel</title>
+    <style>
+        body {
+            background: #1a202c;
+            color: #fff;
+            font-family: 'Monaco', 'Consolas', monospace;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #48bb78; margin-bottom: 30px; }
+        button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #38a169; }
+        .danger { background: #f56565; }
+        .danger:hover { background: #e53e3e; }
+        .log {
+            background: #2d3748;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log div { margin: 5px 0; }
+        .success { color: #48bb78; }
+        .error { color: #f56565; }
+        .warning { color: #ed8936; }
+        .info { color: #63b3ed; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Force Reset - User Panel Debug</h1>
+        
+        <div>
+            <button onclick="verificarToken()">🔍 Verificar Token Atual</button>
+            <button onclick="forcarToken()">💉 Forçar Token Correto</button>
+            <button onclick="limparTudo()" class="danger">🗑️ Limpar TUDO</button>
+            <button onclick="testarAPI()">🧪 Testar API</button>
+            <button onclick="abrirUserPanel()">▶️ Abrir User Panel</button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        // Token USER atualizado
+        const TOKEN_CORRETO = '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';
+        const TOKEN_ADMIN = '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';
+        
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('log').appendChild(div);
+        }
+
+        function verificarToken() {
+            log('=== VERIFICANDO TOKENS ===', 'warning');
+            
+            const githubToken = localStorage.getItem('github_token');
+            const token = localStorage.getItem('token');
+            
+            log(`github_token: ${githubToken ? githubToken.substring(0, 20) + '...' : 'NÃO EXISTE'}`, 'info');
+            log(`token: ${token ? token.substring(0, 20) + '...' : 'NÃO EXISTE'}`, 'info');
+            
+            if (githubToken === TOKEN_CORRETO) {
+                log('✅ github_token está CORRETO', 'success');
+            } else {
+                log('❌ github_token está ERRADO!', 'error');
+            }
+            
+            if (token === TOKEN_CORRETO) {
+                log('✅ token está CORRETO', 'success');
+            } else {
+                log('❌ token está ERRADO!', 'error');
+            }
+            
+            // Verificar outras chaves
+            log('', 'info');
+            log('Outras chaves no localStorage:', 'info');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                log(`  - ${key}`, 'info');
+            }
+        }
+
+        function forcarToken() {
+            log('=== FORÇANDO TOKEN CORRETO ===', 'warning');
+            
+            // Salvar em TODAS as possíveis variações
+            localStorage.setItem('github_token', TOKEN_CORRETO);
+            localStorage.setItem('token', TOKEN_CORRETO);
+            localStorage.setItem('githubToken', TOKEN_CORRETO);
+            
+            log('✅ Token salvo em:', 'success');
+            log('  - github_token', 'success');
+            log('  - token', 'success');
+            log('  - githubToken', 'success');
+            
+            verificarToken();
+        }
+
+        function limparTudo() {
+            if (confirm('⚠️ Isso vai DELETAR TUDO do localStorage e sessionStorage. Continuar?')) {
+                log('=== LIMPANDO TUDO ===', 'error');
+                
+                const before = localStorage.length;
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                log(`✅ ${before} itens removidos do localStorage`, 'success');
+                log('✅ sessionStorage limpo', 'success');
+                log('🔄 Recarregue a página e configure novamente', 'warning');
+            }
+        }
+
+        async function testarAPI() {
+            log('=== TESTANDO GITHUB API ===', 'warning');
+            
+            const token = localStorage.getItem('github_token') || localStorage.getItem('token');
+            
+            if (!token) {
+                log('❌ Nenhum token encontrado!', 'error');
+                return;
+            }
+            
+            log(`🔑 Usando token: ${token.substring(0, 20)}...`, 'info');
+            
+            try {
+                // Testar autenticação
+                log('🧪 Testando autenticação...', 'info');
+                const userResponse = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!userResponse.ok) {
+                    log(`❌ Autenticação falhou: ${userResponse.status}`, 'error');
+                    return;
+                }
+                
+                const user = await userResponse.json();
+                log(`✅ Autenticado como: ${user.login}`, 'success');
+                
+                // Testar acesso ao arquivo
+                log('', 'info');
+                log('🧪 Testando acesso a empresas.json...', 'info');
+                const fileResponse = await fetch('https://api.github.com/repos/gasparfranciscogulungo/gerador-declaracoes-data/contents/data/empresas.json', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!fileResponse.ok) {
+                    log(`❌ Acesso ao arquivo falhou: ${fileResponse.status}`, 'error');
+                    const errorText = await fileResponse.text();
+                    log(`Resposta: ${errorText}`, 'error');
+                    return;
+                }
+                
+                const fileData = await fileResponse.json();
+                log(`✅ Arquivo acessado com sucesso!`, 'success');
+                log(`  - Tamanho: ${fileData.size} bytes`, 'success');
+                log(`  - SHA: ${fileData.sha}`, 'success');
+                
+                // Decodificar e contar empresas
+                const content = atob(fileData.content.replace(/\n/g, ''));
+                const empresas = JSON.parse(content);
+                log(`✅ ${empresas.empresas.length} empresas encontradas!`, 'success');
+                
+                log('', 'info');
+                log('🎉 TODOS OS TESTES PASSARAM!', 'success');
+                log('👉 Agora clique em "Abrir User Panel"', 'warning');
+                
+            } catch (error) {
+                log(`❌ Erro: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function abrirUserPanel() {
+            log('🚀 Abrindo user-panel.html...', 'success');
+            window.open('user-panel.html', '_blank');
+        }
+
+        // Auto-executar verificação ao carregar
+        window.onload = () => {
+            log('🔧 Debug Tool Carregado', 'success');
+            log('Clique nos botões acima para diagnosticar', 'info');
+            log('', 'info');
+            verificarToken();
+        };
+    </script>
+</body>
+</html>

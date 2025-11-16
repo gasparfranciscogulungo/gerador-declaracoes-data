@@ -299,19 +299,25 @@ function userPanelApp() {
                 const todos = data.trabalhadores || [];
                 console.log(`Total de trabalhadores no sistema: ${todos.length}`);
                 
-                // TEMPORÁRIO: Mostrar TODOS os trabalhadores
-                // (No futuro, filtrar por usuario_id quando implementarmos permissões)
-                this.meusTrabalhadores = todos;
-                console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores carregados (modo: ver todos)`);
+                // ✅ FILTRAR POR USUÁRIO: Cada user vê apenas seus trabalhadores
+                const meuUsername = this.usuario.login;
+                console.log(`👤 Filtrando para usuário: ${meuUsername}`);
                 
-                // FUTURO: Descomentar quando adicionar campo usuario_id
-                /*
-                this.meusTrabalhadores = todos.filter(t => 
-                    t.usuario_id === this.usuario.login || 
-                    t.criado_por === this.usuario.login
-                );
-                console.log(`✅ ${this.meusTrabalhadores.length} meus trabalhadores`);
-                */
+                this.meusTrabalhadores = todos.filter(t => {
+                    // Trabalhador pertence ao usuário se:
+                    // 1. Tem usuario_id igual ao login atual, OU
+                    // 2. Tem criado_por igual ao login atual
+                    const pertenceAoUser = t.usuario_id === meuUsername || t.criado_por === meuUsername;
+                    
+                    if (pertenceAoUser) {
+                        console.log(`  ✅ ${t.nome} pertence a ${meuUsername}`);
+                    }
+                    
+                    return pertenceAoUser;
+                });
+                
+                console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores do usuário ${meuUsername}`);
+                console.log(`📊 Total no sistema: ${todos.length}, Meus: ${this.meusTrabalhadores.length}`);
                 
                 this.calcularStats();
             } catch (error) {

@@ -48,6 +48,20 @@ function adminApp() {
         modalNovoModelo: false,
         modalPreviewModelo: false,
         modalFluxoGeracao: false,
+        modalGuiaTokens: false,
+        
+        // Colaboradores
+        colaboradores: [],
+        loadingColab: false,
+        novoColaborador: {
+            username: '',
+            permission: 'push'
+        },
+        usuariosTeste: [
+            { username: 'Maicky42', token: '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' },
+            { username: 'luisafernandotiago-cmd', token: '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' }
+        ],
+        logTestes: [],
         
         // Fluxo de Geração de Documento
         fluxoEtapa: 1, // 1=Empresa, 2=Cliente, 3=Tipo, 3.5=Modelo, 4=Preview
@@ -309,6 +323,9 @@ function adminApp() {
             
             // Carregar TODOS os dados
             await this.carregarTodosDados();
+            
+            // Carregar colaboradores
+            await this.carregarColaboradores();
             
             // Configurar autosave (a cada 10 segundos)
             setInterval(() => {
@@ -4229,6 +4246,255 @@ function adminApp() {
             } finally {
                 this.loading = false;
             }
+        },
+        
+        // ========== GESTÃO DE COLABORADORES ==========
+        
+        /**
+         * Carrega lista de colaboradores do repositório
+         */
+        async carregarColaboradores() {
+            this.loadingColab = true;
+            this.logTest('🔄 Carregando colaboradores...', 'info');
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(
+                    `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/collaborators`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: Sem permissão para listar colaboradores`);
+                }
+                
+                this.colaboradores = await response.json();
+                this.logTest(`✅ ${this.colaboradores.length} colaboradores carregados`, 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar colaboradores:', error);
+                this.logTest(`❌ Erro: ${error.message}`, 'error');
+                this.showAlert('error', error.message);
+            } finally {
+                this.loadingColab = false;
+            }
+        },
+        
+        /**
+         * Adiciona novo colaborador ao repositório
+         */
+        async adicionarColaborador() {
+            if (!this.novoColaborador.username) {
+                this.showAlert('error', '❌ Insira o username do GitHub!');
+                return;
+            }
+            
+            this.loadingColab = true;
+            this.logTest(`🔍 Verificando usuário: ${this.novoColaborador.username}`, 'info');
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                // 1. Verificar se usuário existe
+                const userCheck = await fetch(`https://api.github.com/users/${this.novoColaborador.username}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!userCheck.ok) {
+                    throw new Error(`Usuário "${this.novoColaborador.username}" não encontrado no GitHub`);
+                }
+                
+                const userData = await userCheck.json();
+                this.logTest(`✅ Usuário encontrado: ${userData.name || userData.login}`, 'success');
+                
+                // 2. Adicionar como colaborador
+                this.logTest(`➕ Adicionando como colaborador (${this.novoColaborador.permission})...`, 'info');
+                
+                const response = await fetch(
+                    `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/collaborators/${this.novoColaborador.username}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ permission: this.novoColaborador.permission })
+                    }
+                );
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(`Erro ${response.status}: ${error.message}`);
+                }
+                
+                this.logTest('✅ Colaborador adicionado com sucesso!', 'success');
+                this.logTest(`📧 Convite enviado para ${this.novoColaborador.username}`, 'warning');
+                this.logTest(`🔗 Aceitar em: https://github.com/${this.config.owner}/${this.config.repo}/invitations`, 'info');
+                
+                this.showAlert('success', `✅ Convite enviado para ${this.novoColaborador.username}!`);
+                
+                // Limpar formulário
+                this.novoColaborador.username = '';
+                this.novoColaborador.permission = 'push';
+                
+                // Recarregar lista
+                await this.carregarColaboradores();
+                
+            } catch (error) {
+                console.error('❌ Erro ao adicionar colaborador:', error);
+                this.logTest(`❌ Erro: ${error.message}`, 'error');
+                this.showAlert('error', error.message);
+            } finally {
+                this.loadingColab = false;
+            }
+        },
+        
+        /**
+         * Testa um usuário específico
+         */
+        async testarUsuario(userIdentifier) {
+            this.logTestes = []; // Limpar log anterior
+            this.logTest(`🧪 Testando ${userIdentifier}...`, 'warning');
+            
+            try {
+                let token, username;
+                
+                if (userIdentifier === 'admin') {
+                    token = localStorage.getItem('token');
+                    username = this.usuario.login;
+                } else {
+                    const user = this.usuariosTeste.find(u => u.username === userIdentifier);
+                    if (!user) {
+                        throw new Error(`Usuário ${userIdentifier} não encontrado`);
+                    }
+                    token = user.token;
+                    username = user.username;
+                }
+                
+                // 1. Testar autenticação
+                this.logTest('1️⃣ Verificando autenticação...', 'info');
+                const authResponse = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!authResponse.ok) {
+                    throw new Error(`Token inválido: ${authResponse.status}`);
+                }
+                
+                const userData = await authResponse.json();
+                this.logTest(`✅ Autenticado: ${userData.login}`, 'success');
+                
+                // 2. Testar permissões do repositório
+                this.logTest('2️⃣ Verificando permissões...', 'info');
+                const repoResponse = await fetch(
+                    `https://api.github.com/repos/${this.config.owner}/${this.config.repo}`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                const repoData = await repoResponse.json();
+                const perms = repoData.permissions;
+                
+                this.logTest(`✅ Permissões:`, 'success');
+                this.logTest(`   - push: ${perms.push} ${perms.push ? '✅' : '❌'}`, perms.push ? 'success' : 'error');
+                this.logTest(`   - pull: ${perms.pull} ${perms.pull ? '✅' : '❌'}`, perms.pull ? 'success' : 'info');
+                this.logTest(`   - admin: ${perms.admin} ${perms.admin ? '✅' : '❌'}`, perms.admin ? 'success' : 'info');
+                
+                // 3. Testar leitura de empresas
+                this.logTest('3️⃣ Testando leitura de empresas...', 'info');
+                const empresasResponse = await fetch(
+                    `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/data/empresas.json`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                if (!empresasResponse.ok) {
+                    throw new Error(`Erro ao ler empresas: ${empresasResponse.status}`);
+                }
+                
+                const empresasData = await empresasResponse.json();
+                const empresasContent = JSON.parse(atob(empresasData.content.replace(/\n/g, '')));
+                this.logTest(`✅ ${empresasContent.empresas.length} empresas carregadas`, 'success');
+                
+                // 4. Testar leitura de trabalhadores
+                this.logTest('4️⃣ Testando leitura de trabalhadores...', 'info');
+                const trabResponse = await fetch(
+                    `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/data/trabalhadores.json`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+                
+                const trabData = await trabResponse.json();
+                const trabContent = JSON.parse(atob(trabData.content.replace(/\n/g, '')));
+                
+                // Filtrar por usuário
+                const meusTrab = trabContent.trabalhadores.filter(t => 
+                    t.usuario_id === userData.login || userIdentifier === 'admin'
+                );
+                
+                this.logTest(`✅ ${trabContent.trabalhadores.length} total, ${meusTrab.length} seus`, 'success');
+                
+                // Resultado final
+                this.logTest('', 'info');
+                this.logTest('🎉 TODOS OS TESTES PASSARAM!', 'success');
+                
+            } catch (error) {
+                this.logTest(`❌ ERRO: ${error.message}`, 'error');
+                console.error(error);
+            }
+        },
+        
+        /**
+         * Adiciona log de teste
+         */
+        logTest(message, type = 'info') {
+            this.logTestes.push({
+                timestamp: new Date().toLocaleTimeString(),
+                message: message,
+                type: type
+            });
+        },
+        
+        /**
+         * Abre o painel admin (atual)
+         */
+        abrirPainelAdmin() {
+            this.logTest('🚀 Abrindo Admin Panel...', 'success');
+            window.location.reload();
+        },
+        
+        /**
+         * Abre o painel de usuário com token específico
+         */
+        abrirPainelUser(token) {
+            localStorage.setItem('github_token', token);
+            localStorage.setItem('token', token);
+            this.logTest('🚀 Abrindo User Panel...', 'success');
+            window.open('user-panel.html', '_blank');
         }
     };
 }

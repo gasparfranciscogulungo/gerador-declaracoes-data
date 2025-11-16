@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➕ Adicionar Colaboradores - Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; line-height: 1.6; }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log div { margin: 3px 0; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+        .info { color: #63b3ed; }
+        .colaboradores-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .colaborador-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .colaborador-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .colaborador-info {
+            flex: 1;
+        }
+        .colaborador-nome {
+            font-weight: 600;
+            color: #333;
+        }
+        .colaborador-username {
+            color: #666;
+            font-size: 14px;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-admin { background: #ffeaa7; color: #d63031; }
+        .badge-write { background: #dfe6e9; color: #2d3436; }
+        .badge-read { background: #a29bfe; color: #6c5ce7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Adicionar Colaboradores</h1>
+        <p class="subtitle">Gerencie o acesso de usuários ao repositório de dados</p>
+
+        <div class="info-box">
+            <h3>📋 Permissões Disponíveis:</h3>
+            <p><strong>pull</strong> (read) - Apenas visualizar empresas e seus trabalhadores</p>
+            <p><strong>push</strong> (write) - Criar e editar seus trabalhadores + ver empresas</p>
+            <p><strong>admin</strong> - Controle total (apenas para administradores)</p>
+        </div>
+
+        <!-- Token Admin -->
+        <div class="form-group">
+            <label for="adminToken">Token Administrativo:</label>
+            <input type="password" id="adminToken" placeholder="ghp_..." value="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">
+            <small style="color: #666; display: block; margin-top: 5px;">
+                Necessário para adicionar colaboradores
+            </small>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group">
+            <label for="username">Username do GitHub:</label>
+            <input type="text" id="username" placeholder="exemplo: Maicky42">
+        </div>
+
+        <!-- Permissão -->
+        <div class="form-group">
+            <label for="permission">Nível de Permissão:</label>
+            <select id="permission">
+                <option value="push">push - User Normal (Recomendado)</option>
+                <option value="pull">pull - Apenas Leitura</option>
+                <option value="admin">admin - Administrador Total</option>
+            </select>
+        </div>
+
+        <!-- Botões -->
+        <div class="btn-group">
+            <button class="btn-primary" onclick="adicionarColaborador()" id="btnAdicionar">
+                ➕ Adicionar Colaborador
+            </button>
+            <button class="btn-secondary" onclick="listarColaboradores()">
+                📋 Listar Existentes
+            </button>
+        </div>
+
+        <!-- Log -->
+        <div class="log" id="log"></div>
+
+        <!-- Lista de Colaboradores -->
+        <div class="colaboradores-list" id="colaboradoresList" style="display: none;">
+            <h3 style="margin-bottom: 15px;">👥 Colaboradores Atuais:</h3>
+            <div id="colaboradoresContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const REPO = 'gasparfranciscogulungo/gerador-declaracoes-data';
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('log').appendChild(div);
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+
+        async function adicionarColaborador() {
+            const token = document.getElementById('adminToken').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const permission = document.getElementById('permission').value;
+            const btn = document.getElementById('btnAdicionar');
+
+            if (!token) {
+                alert('❌ Insira o token administrativo!');
+                return;
+            }
+
+            if (!username) {
+                alert('❌ Insira o username do GitHub!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Adicionando...';
+            document.getElementById('log').innerHTML = '';
+
+            try {
+                log(`🔍 Verificando usuário: ${username}`, 'info');
+
+                // Verificar se usuário existe
+                const userCheck = await fetch(`https://api.github.com/users/${username}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!userCheck.ok) {
+                    throw new Error(`Usuário "${username}" não encontrado no GitHub`);
+                }
+
+                const userData = await userCheck.json();
+                log(`✅ Usuário encontrado: ${userData.name || username}`, 'success');
+                log(`   Avatar: ${userData.avatar_url}`, 'info');
+
+                // Adicionar como colaborador
+                log(`➕ Adicionando como colaborador (${permission})...`, 'info');
+
+                const response = await fetch(
+                    `https://api.github.com/repos/${REPO}/collaborators/${username}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ permission })
+                    }
+                );
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(`Erro ${response.status}: ${error.message}`);
+                }
+
+                const result = await response.json();
+
+                log('✅ Colaborador adicionado com sucesso!', 'success');
+                log('', 'info');
+                log('📧 PRÓXIMO PASSO:', 'warning');
+                log(`   O usuário ${username} recebeu um convite por email`, 'warning');
+                log(`   Ele precisa aceitar em: https://github.com/${REPO}/invitations`, 'warning');
+                log('', 'info');
+                log('🔐 Permissões concedidas:', 'info');
+                log(`   - Permissão: ${permission}`, 'info');
+                
+                if (permission === 'push') {
+                    log('   - Pode: Ler empresas + Criar/editar SEUS trabalhadores', 'success');
+                } else if (permission === 'pull') {
+                    log('   - Pode: Apenas ler empresas (sem editar)', 'warning');
+                } else if (permission === 'admin') {
+                    log('   - Pode: TUDO (cuidado!)', 'error');
+                }
+
+                // Limpar campos
+                document.getElementById('username').value = '';
+
+            } catch (error) {
+                log(`❌ ERRO: ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '➕ Adicionar Colaborador';
+            }
+        }
+
+        async function listarColaboradores() {
+            const token = document.getElementById('adminToken').value.trim();
+            
+            if (!token) {
+                alert('❌ Insira o token administrativo!');
+                return;
+            }
+
+            document.getElementById('log').innerHTML = '';
+            log('📋 Carregando colaboradores...', 'info');
+
+            try {
+                const response = await fetch(
+                    `https://api.github.com/repos/${REPO}/collaborators`,
+                    {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}`);
+                }
+
+                const colaboradores = await response.json();
+
+                log(`✅ ${colaboradores.length} colaboradores encontrados`, 'success');
+
+                const listDiv = document.getElementById('colaboradoresList');
+                const contentDiv = document.getElementById('colaboradoresContent');
+                
+                listDiv.style.display = 'block';
+                contentDiv.innerHTML = '';
+
+                colaboradores.forEach(colab => {
+                    const permissao = colab.permissions.admin ? 'admin' : 
+                                     colab.permissions.push ? 'write' : 'read';
+                    
+                    const badgeClass = permissao === 'admin' ? 'badge-admin' : 
+                                      permissao === 'write' ? 'badge-write' : 'badge-read';
+
+                    const item = document.createElement('div');
+                    item.className = 'colaborador-item';
+                    item.innerHTML = `
+                        <img src="${colab.avatar_url}" class="colaborador-avatar" alt="${colab.login}">
+                        <div class="colaborador-info">
+                            <div class="colaborador-nome">${colab.name || colab.login}</div>
+                            <div class="colaborador-username">@${colab.login}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${permissao}</span>
+                    `;
+                    contentDiv.appendChild(item);
+
+                    log(`   - ${colab.login} (${permissao})`, 'info');
+                });
+
+            } catch (error) {
+                log(`❌ ERRO: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // Auto-listar ao carregar se token existir
+        window.onload = () => {
+            const token = document.getElementById('adminToken').value;
+            if (token) {
+                listarColaboradores();
+            }
+        };
+
+        // Enter para adicionar
+        document.getElementById('username').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                adicionarColaborador();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronizar Dados para GitHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #4f46e5; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log div { margin: 5px 0; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Sincronizar Dados para GitHub</h1>
+        <p>Este script vai enviar os arquivos de dados locais para o repositório GitHub.</p>
+        
+        <div>
+            <label>Token do GitHub:</label><br>
+            <input type="password" id="token" placeholder="ghp_..." style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <button onclick="sincronizar()" id="btnSync">Sincronizar Agora</button>
+        <button onclick="limparLog()">Limpar Log</button>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/github-api.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(div);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function limparLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function sincronizar() {
+            const token = document.getElementById('token').value;
+            const btn = document.getElementById('btnSync');
+            
+            if (!token) {
+                alert('Por favor, insira o token do GitHub!');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = 'Sincronizando...';
+            limparLog();
+            
+            try {
+                log('🔧 Configurando GitHub API...', 'info');
+                githubAPI.setToken(token);
+                githubAPI.configurar({
+                    owner: 'gasparfranciscogulungo',
+                    repo: 'gerador-declaracoes-data',
+                    branch: 'master'
+                });
+                
+                // Ler arquivos locais
+                log('📂 Lendo empresas.json local...', 'info');
+                const empresasResponse = await fetch('data/empresas.json');
+                const empresasData = await empresasResponse.json();
+                log(`✅ ${empresasData.empresas.length} empresas encontradas`, 'success');
+                
+                log('📂 Lendo trabalhadores.json local...', 'info');
+                const trabalhadoresResponse = await fetch('data/trabalhadores.json');
+                const trabalhadoresData = await trabalhadoresResponse.json();
+                log(`✅ ${trabalhadoresData.trabalhadores.length} trabalhadores encontrados`, 'success');
+                
+                // Enviar para GitHub
+                log('📤 Enviando empresas.json para GitHub...', 'info');
+                await githubAPI.salvarArquivo(
+                    'data/empresas.json',
+                    JSON.stringify(empresasData, null, 2),
+                    'feat: sincronizar empresas.json'
+                );
+                log('✅ empresas.json enviado com sucesso!', 'success');
+                
+                log('📤 Enviando trabalhadores.json para GitHub...', 'info');
+                await githubAPI.salvarArquivo(
+                    'data/trabalhadores.json',
+                    JSON.stringify(trabalhadoresData, null, 2),
+                    'feat: sincronizar trabalhadores.json'
+                );
+                log('✅ trabalhadores.json enviado com sucesso!', 'success');
+                
+                log('🎉 SINCRONIZAÇÃO COMPLETA!', 'success');
+                log('🔄 Agora recarregue o user-panel.html', 'warning');
+                
+            } catch (error) {
+                log(`❌ ERRO: ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sincronizar Agora';
+            }
+        }
+    </script>
+</body>
+</html>
