@@ -860,9 +860,11 @@ function adminApp() {
                 
                 console.log('✅ Trabalhador excluído do JSON!');
                 
-                // Recarregar lista
-                await this.carregarTrabalhadores();
-                this.filtrarTrabalhadores();
+                // ATUALIZAÇÃO OTIMISTA: Remover da lista local imediatamente
+                this.trabalhadores = this.trabalhadores.filter(t => t.id !== id);
+                this.trabalhadoresFiltrados = this.trabalhadoresFiltrados.filter(t => t.id !== id);
+                
+                console.log('📋 Listas atualizadas localmente');
                 
                 alert('✅ Trabalhador excluído com sucesso!');
                 this.showAlert('success', 'Trabalhador excluído com sucesso');
@@ -1008,8 +1010,12 @@ function adminApp() {
                 
                 console.log('✅ Salvo com sucesso!');
                 
-                // Recarregar empresas do GitHub
-                await this.carregarEmpresas();
+                // ATUALIZAÇÃO OTIMISTA: Remover da lista local imediatamente
+                this.empresas = this.empresas.filter(e => e.id !== empresaId);
+                
+                console.log('📋 Lista local atualizada');
+                
+                // Atualizar stats
                 await this.atualizarStatsReais();
                 
                 alert(`✅ Empresa "${empresa.nome}" deletada com sucesso!`);
