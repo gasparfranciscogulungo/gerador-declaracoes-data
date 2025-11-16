@@ -1,28 +1,6 @@
 {
   "trabalhadores": [
     {
-      "id": "trab004",
-      "nome": "Ana Sofia Martins",
-      "documento": "55667788",
-      "tipo_documento": "CC",
-      "nif": "556677889",
-      "data_nascimento": "05/02/1993",
-      "nacionalidade": "Portuguesa",
-      "morada": "Rua Nova, 56 - 1ÃÂÃÂº Esq",
-      "cidade": "2700-000 Amadora",
-      "telefone": "+351 96 556 6778",
-      "email": "ana.martins@email.pt",
-      "funcao": "Designer UX/UI",
-      "departamento": "Design",
-      "data_admissao": "10/03/2022",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "2200.00",
-      "salario_liquido": "1680.00",
-      "moeda": "EUR",
-      "iban": "PT50 0018 0000 0000 5566 7788 9",
-      "ativo": false
-    },
-    {
       "id": "trab005",
       "nome": "Ricardo Jorge Almeida",
       "documento": "99887766",
