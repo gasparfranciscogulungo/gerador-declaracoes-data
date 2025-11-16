@@ -176,7 +176,7 @@
       "moeda": "AKZ",
       "iban": "",
       "empresa_id": "",
-      "ativo": true,
+      "ativo": false,
       "observacoes": "",
       "id": "TRAB-1763293553844-754",
       "usuario_id": "luisafernandotiago-cmd",
