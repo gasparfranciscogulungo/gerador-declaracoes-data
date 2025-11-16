@@ -829,23 +829,20 @@ function adminApp() {
         },
 
         async excluirTrabalhador(id) {
-            console.log('🔍 excluirTrabalhador chamada com ID:', id);
-            
             const trabalhador = this.trabalhadoresFiltrados.find(t => t.id === id);
-            console.log('📦 Trabalhador encontrado:', trabalhador);
             
-            // Usar confirm nativo temporariamente para debug
-            const confirmar = confirm(
-                `⚠️ EXCLUIR TRABALHADOR\n\n` +
-                `Tem certeza que deseja excluir "${trabalhador?.nome || 'este trabalhador'}"?\n\n` +
-                `Esta ação não pode ser desfeita.\n\n` +
-                `Clique OK para confirmar`
+            // Usar modal profissional de confirmação
+            const confirmar = await this.showConfirm(
+                'Excluir Trabalhador',
+                `Tem certeza que deseja excluir permanentemente "${trabalhador?.nome || 'este trabalhador'}"?\n\nEsta ação não pode ser desfeita.`,
+                {
+                    textoBotaoConfirmar: 'Sim, Excluir',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: true
+                }
             );
             
-            console.log('✅ Usuário confirmou?', confirmar);
-            
             if (!confirmar) {
-                console.log('❌ Usuário cancelou');
                 return;
             }
             
@@ -853,25 +850,25 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Excluindo trabalhador...';
                 
-                console.log('🗑️ Excluindo trabalhador DEFINITIVAMENTE...');
-                
                 // Passar TRUE para excluir definitivamente (não só marcar como inativo)
                 await this.clienteManager.excluir(id, true);
-                
-                console.log('✅ Trabalhador excluído do JSON!');
                 
                 // ATUALIZAÇÃO OTIMISTA: Remover da lista local imediatamente
                 this.trabalhadores = this.trabalhadores.filter(t => t.id !== id);
                 this.trabalhadoresFiltrados = this.trabalhadoresFiltrados.filter(t => t.id !== id);
                 
-                console.log('📋 Listas atualizadas localmente');
-                
-                alert('✅ Trabalhador excluído com sucesso!');
-                this.showAlert('success', 'Trabalhador excluído com sucesso');
+                await this.showConfirm(
+                    'Sucesso',
+                    'Trabalhador excluído com sucesso!',
+                    { textoBotaoConfirmar: 'OK', tipoPerigo: false }
+                );
             } catch (e) {
                 console.error('❌ Erro ao excluir:', e);
-                alert('❌ Erro: ' + (e.message || 'Erro ao excluir'));
-                this.showAlert('error', e.message || 'Erro ao excluir');
+                await this.showConfirm(
+                    'Erro ao Excluir',
+                    e.message || 'Ocorreu um erro ao excluir o trabalhador.',
+                    { textoBotaoConfirmar: 'OK', tipoPerigo: true }
+                );
             } finally {
                 this.loading = false;
             }
@@ -948,32 +945,29 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
-            console.log('🔍 deletarEmpresa chamada com ID:', empresaId);
-            
             const empresa = this.empresas.find(e => e.id === empresaId);
-            console.log('📦 Empresa encontrada:', empresa);
             
             if (!empresa) {
-                alert('❌ Empresa não encontrada!');
-                this.showAlert('error', '❌ Empresa não encontrada!');
+                await this.showConfirm(
+                    'Erro',
+                    'Empresa não encontrada no sistema.',
+                    { textoBotaoConfirmar: 'OK', tipoPerigo: false }
+                );
                 return;
             }
 
-            // Usar confirm nativo temporariamente para debug
-            const confirmar = confirm(
-                `⚠️ DELETAR EMPRESA\n\n` +
-                `Tem certeza que deseja deletar permanentemente "${empresa.nome}"?\n\n` +
-                `Esta ação não pode ser desfeita e irá remover:\n` +
-                `• Logo e carimbo da empresa\n` +
-                `• Todas as declarações geradas\n` +
-                `• Contador de documentos\n\n` +
-                `Digite OK para confirmar`
+            // Usar modal profissional de confirmação
+            const confirmar = await this.showConfirm(
+                'Deletar Empresa',
+                `Tem certeza que deseja deletar permanentemente "${empresa.nome}"?\n\nEsta ação não pode ser desfeita e irá remover:\n• Logo e carimbo da empresa\n• Todas as declarações geradas\n• Contador de documentos`,
+                {
+                    textoBotaoConfirmar: 'Sim, Deletar',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: true
+                }
             );
             
-            console.log('✅ Usuário confirmou?', confirmar);
-            
             if (!confirmar) {
-                console.log('❌ Usuário cancelou');
                 return;
             }
             
@@ -981,17 +975,12 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Deletando empresa...';
                 
-                console.log('📥 Carregando empresas.json do GitHub...');
-                
                 // Carregar dados atuais do GitHub
                 const response = await githubAPI.lerJSON('data/empresas.json');
-                console.log('📦 Dados carregados:', response.data);
-                
                 const empresasData = response.data;
                 
                 // Remover empresa da lista
                 empresasData.empresas = empresasData.empresas.filter(e => e.id !== empresaId);
-                console.log('🗑️ Empresa removida. Total restante:', empresasData.empresas.length);
                 
                 // Atualizar metadata se existir
                 if (empresasData.metadata) {
@@ -1000,7 +989,6 @@ function adminApp() {
                 }
                 
                 // Salvar no GitHub
-                console.log('💾 Salvando no GitHub...');
                 await githubAPI.salvarJSON(
                     'data/empresas.json',
                     empresasData,
@@ -1008,22 +996,25 @@ function adminApp() {
                     response.sha
                 );
                 
-                console.log('✅ Salvo com sucesso!');
-                
                 // ATUALIZAÇÃO OTIMISTA: Remover da lista local imediatamente
                 this.empresas = this.empresas.filter(e => e.id !== empresaId);
-                
-                console.log('📋 Lista local atualizada');
                 
                 // Atualizar stats
                 await this.atualizarStatsReais();
                 
-                alert(`✅ Empresa "${empresa.nome}" deletada com sucesso!`);
-                this.showAlert('success', `✅ Empresa "${empresa.nome}" deletada com sucesso!`);
+                await this.showConfirm(
+                    'Sucesso',
+                    `Empresa "${empresa.nome}" deletada com sucesso!`,
+                    { textoBotaoConfirmar: 'OK', tipoPerigo: false }
+                );
                 
             } catch (error) {
                 console.error('❌ Erro ao deletar empresa:', error);
-                this.showAlert('error', 'Erro ao deletar empresa');
+                await this.showConfirm(
+                    'Erro',
+                    'Ocorreu um erro ao deletar a empresa. Tente novamente.',
+                    { textoBotaoConfirmar: 'OK', tipoPerigo: true }
+                );
                 await this.carregarEmpresas(); // Recarregar
             } finally {
                 this.loading = false;
@@ -1194,7 +1185,17 @@ function adminApp() {
 
                 // ========== UTILIDADES ==========
         async logout() {
-            if (confirm('Tem certeza que deseja sair?')) {
+            const confirmar = await this.showConfirm(
+                'Sair do Sistema',
+                'Tem certeza que deseja sair do painel administrativo?',
+                {
+                    textoBotaoConfirmar: 'Sim, Sair',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: false
+                }
+            );
+            
+            if (confirmar) {
                 // Limpar dados e redirecionar
                 localStorage.removeItem('token');
                 localStorage.removeItem('username');
