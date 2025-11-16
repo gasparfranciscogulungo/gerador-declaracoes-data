@@ -59,8 +59,8 @@ function adminApp() {
             permission: 'push'
         },
         usuariosTeste: [
-            { username: 'Maicky42', token: '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' },
-            { username: 'luisafernandotiago-cmd', token: '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' }
+            { username: 'Maicky42', token: 'SEU_TOKEN_AQUI' },
+            { username: 'luisafernandotiago-cmd', token: 'SEU_TOKEN_AQUI' }
         ],
         logTestes: [],
         
