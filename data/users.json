@@ -5,22 +5,66 @@
       "username": "gasparfranciscogulungo",
       "name": "Gaspar Gulungo",
       "avatar": "https://github.com/gasparfranciscogulungo.png",
-      "token": "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",
       "role": "admin",
       "status": "active",
       "stats": {
         "clientes": 0,
         "declaracoes": 0,
-        "ultimoAcesso": "2025-11-13T00:41:49.521Z"
+        "ultimoAcesso": "2025-11-16T00:00:00.000Z"
       },
       "createdAt": "2025-11-05T00:00:00Z",
       "authorizedBy": "system"
+    },
+    {
+      "id": 2,
+      "username": "ndungisidraceugeniodacosta-cmd",
+      "name": "Sidrac Ndunga",
+      "avatar": "https://github.com/ndungisidraceugeniodacosta-cmd.png",
+      "role": "user",
+      "status": "active",
+      "stats": {
+        "clientes": 0,
+        "declaracoes": 0,
+        "ultimoAcesso": "2025-11-16T00:00:00.000Z"
+      },
+      "createdAt": "2025-11-16T00:00:00Z",
+      "authorizedBy": "gasparfranciscogulungo"
+    },
+    {
+      "id": 3,
+      "username": "luisafernandotiago-cmd",
+      "name": "Luisa Fernando",
+      "avatar": "https://github.com/luisafernandotiago-cmd.png",
+      "role": "user",
+      "status": "active",
+      "stats": {
+        "clientes": 0,
+        "declaracoes": 0,
+        "ultimoAcesso": "2025-11-16T00:00:00.000Z"
+      },
+      "createdAt": "2025-11-16T00:00:00Z",
+      "authorizedBy": "gasparfranciscogulungo"
+    },
+    {
+      "id": 4,
+      "username": "DanielGoncalves666",
+      "name": "Daniel Gonçalves",
+      "avatar": "https://github.com/DanielGoncalves666.png",
+      "role": "user",
+      "status": "active",
+      "stats": {
+        "clientes": 0,
+        "declaracoes": 0,
+        "ultimoAcesso": "2025-11-16T00:00:00.000Z"
+      },
+      "createdAt": "2025-11-16T00:00:00Z",
+      "authorizedBy": "gasparfranciscogulungo"
     }
   ],
   "metadata": {
-    "lastId": 1,
-    "totalUsers": 1,
-    "totalActive": 1,
+    "lastId": 4,
+    "totalUsers": 4,
+    "totalActive": 4,
     "totalPending": 0,
     "totalBlocked": 0
   }

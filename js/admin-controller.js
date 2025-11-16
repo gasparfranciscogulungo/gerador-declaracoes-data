@@ -59,9 +59,9 @@ function adminApp() {
             permission: 'push'
         },
         usuariosTeste: [
-            { username: 'ndungisidraceugeniodacosta-cmd', token: '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' },
-            { username: 'luisafernandotiago-cmd', token: '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' },
-            { username: 'DanielGoncalves666', token: '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' }
+            { username: 'ndungisidraceugeniodacosta-cmd', token: '' },
+            { username: 'luisafernandotiago-cmd', token: '' },
+            { username: 'DanielGoncalves666', token: '' }
         ],
         logTestes: [],
         
