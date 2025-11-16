@@ -1,28 +1,6 @@
 {
   "trabalhadores": [
     {
-      "id": "trab002",
-      "nome": "Maria Fernanda Costa",
-      "documento": "87654321",
-      "tipo_documento": "BI",
-      "nif": "987654321",
-      "data_nascimento": "22/07/1990",
-      "nacionalidade": "Portuguesa",
-      "morada": "Avenida Central, 145 - 2ÃÂÃÂº Dto",
-      "cidade": "4000-100 Porto",
-      "telefone": "+351 92 876 5432",
-      "email": "maria.costa@email.pt",
-      "funcao": "Gestora de Projetos",
-      "departamento": "Gestão",
-      "data_admissao": "15/06/2019",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "3200.00",
-      "salario_liquido": "2280.00",
-      "moeda": "EUR",
-      "iban": "PT50 0010 0000 0000 9876 5432 1",
-      "ativo": false
-    },
-    {
       "id": "trab003",
       "nome": "Carlos Manuel Rodrigues",
       "documento": "11223344",
