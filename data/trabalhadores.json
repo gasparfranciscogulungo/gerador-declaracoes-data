@@ -228,7 +228,7 @@
       "moeda": "AKZ",
       "iban": "",
       "empresa_id": "",
-      "ativo": true,
+      "ativo": false,
       "observacoes": "",
       "id": "TRAB-1763299741667-213",
       "usuario_id": "ndungisidraceugeniodacosta-cmd",
