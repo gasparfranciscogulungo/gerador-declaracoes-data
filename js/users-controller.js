@@ -280,31 +280,70 @@ function usersApp() {
         },
         
         /**
-         * ✅ DESABILITADO: Sistema de aprovação removido
-         */
-        async aprovarUser(userId) {
-            this.showAlert('Sistema de aprovação foi removido. Usuários entram automaticamente.', 'error');
-        },
-        
-        /**
-         * ✅ DESABILITADO: Sistema de bloqueio removido
+         * Bloquear usuário
          */
         async bloquearUser(userId) {
-            this.showAlert('Sistema de bloqueio foi removido. Use CONFIG.admins para controle.', 'error');
+            if (!confirm('Tem certeza que deseja bloquear este usuário?')) return;
+            
+            try {
+                const user = this.users.find(u => u.id === userId);
+                if (!user) {
+                    this.showAlert('Usuário não encontrado', 'error');
+                    return;
+                }
+                
+                // Atualizar status
+                user.status = 'blocked';
+                user.bloqueado_em = new Date().toISOString();
+                
+                // Salvar no GitHub
+                await githubAPI.salvarArquivo(
+                    'data/users.json',
+                    JSON.stringify({ users: this.users }, null, 2),
+                    `Bloqueio de usuário: ${user.username}`
+                );
+                
+                this.showAlert(`✅ Usuário @${user.username} bloqueado com sucesso!`, 'success');
+                await this.carregarUsuarios();
+                
+            } catch (error) {
+                console.error('❌ Erro ao bloquear usuário:', error);
+                this.showAlert('Erro ao bloquear usuário: ' + error.message, 'error');
+            }
         },
         
         /**
-         * ✅ DESABILITADO: Sistema de bloqueio removido
+         * Desbloquear usuário
          */
         async desbloquearUser(userId) {
-            this.showAlert('Sistema de bloqueio foi removido.', 'error');
-        },
-        
-        /**
-         * ✅ DESABILITADO: Sistema de rejeição removido
-         */
-        async rejeitarUser(userId) {
-            this.showAlert('Sistema de rejeição foi removido.', 'error');
+            if (!confirm('Tem certeza que deseja desbloquear este usuário?')) return;
+            
+            try {
+                const user = this.users.find(u => u.id === userId);
+                if (!user) {
+                    this.showAlert('Usuário não encontrado', 'error');
+                    return;
+                }
+                
+                // Atualizar status
+                user.status = 'active';
+                user.desbloqueado_em = new Date().toISOString();
+                delete user.bloqueado_em;
+                
+                // Salvar no GitHub
+                await githubAPI.salvarArquivo(
+                    'data/users.json',
+                    JSON.stringify({ users: this.users }, null, 2),
+                    `Desbloqueio de usuário: ${user.username}`
+                );
+                
+                this.showAlert(`✅ Usuário @${user.username} desbloqueado com sucesso!`, 'success');
+                await this.carregarUsuarios();
+                
+            } catch (error) {
+                console.error('❌ Erro ao desbloquear usuário:', error);
+                this.showAlert('Erro ao desbloquear usuário: ' + error.message, 'error');
+            }
         },
         
         /**
@@ -376,80 +415,153 @@ function usersApp() {
         },
         
         /**
-         * Carrega histórico de documentos
-         */
-        /**
-         * ✅ SIMPLIFICADO: Carrega histórico direto do GitHub
+         * ✅ FUNCIONAL: Carrega histórico completo do GitHub
          */
         async carregarHistorico() {
+            console.log('📂 Carregando histórico de documentos...');
+            this.loadingHistorico = true;
+            
             try {
                 const result = await githubAPI.lerJSON('data/historico.json');
                 this.historico = result?.data?.historico || [];
-                this.historicoFiltrado = this.historico;
+                console.log(`✅ ${this.historico.length} documentos carregados do histórico`);
                 
-                // Calcular estatísticas manualmente
-                this.statsHistorico = {
-                    totalDocumentos: this.historico.length,
-                    porTipo: {},
-                    porEmpresa: {},
-                    porUsuario: {},
-                    porDia: {}
-                };
+                // Aplicar filtros
+                this.aplicarFiltrosHistorico();
                 
-                // Processar cada documento
-                this.historico.forEach(doc => {
-                    // Por tipo
-                    const tipo = doc.tipo || 'desconhecido';
-                    this.statsHistorico.porTipo[tipo] = (this.statsHistorico.porTipo[tipo] || 0) + 1;
-                    
-                    // Por usuário
-                    const usuario = doc.usuario || doc.criado_por || 'desconhecido';
-                    this.statsHistorico.porUsuario[usuario] = (this.statsHistorico.porUsuario[usuario] || 0) + 1;
-                    
-                    // Por empresa
-                    const empresaId = doc.empresa_id || doc.empresaId;
-                    const empresaNome = doc.empresa_nome || `Empresa ${empresaId}`;
-                    if (empresaId) {
-                        if (!this.statsHistorico.porEmpresa[empresaId]) {
-                            this.statsHistorico.porEmpresa[empresaId] = { nome: empresaNome, total: 0 };
-                        }
-                        this.statsHistorico.porEmpresa[empresaId].total++;
-                    }
-                    
-                    // Por dia
-                    const data = (doc.data || doc.created_at || '').split('T')[0];
-                    if (data) {
-                        this.statsHistorico.porDia[data] = (this.statsHistorico.porDia[data] || 0) + 1;
-                    }
-                });
+                // Calcular estatísticas completas
+                this.calcularStatsHistorico();
                 
-                // Preencher últimos 30 dias com zeros se não houver dados
-                if (Object.keys(this.statsHistorico.porDia).length === 0) {
-                    const hoje = new Date();
-                    for (let i = 29; i >= 0; i--) {
-                        const data = new Date(hoje);
-                        data.setDate(data.getDate() - i);
-                        const key = data.toISOString().split('T')[0];
-                        this.statsHistorico.porDia[key] = 0;
-                    }
-                }
+                console.log('📊 Stats histórico:', this.statsHistorico);
                 
-                // Calcula insights
-                this.calcularInsights();
-                
-                console.log(`✅ ${this.historico.length} documentos no histórico`);
-                console.log('📊 Stats:', this.statsHistorico);
             } catch (error) {
                 console.error('❌ Erro ao carregar histórico:', error);
+                this.showAlert('Erro ao carregar histórico: ' + error.message, 'error');
                 this.historico = [];
-                this.statsHistorico = {
-                    totalDocumentos: 0,
-                    porTipo: {},
-                    porEmpresa: {},
-                    porUsuario: {},
-                    porDia: {}
-                };
+                this.historicoFiltrado = [];
+            } finally {
+                this.loadingHistorico = false;
             }
+        },
+        
+        /**
+         * Calcula estatísticas do histórico
+         */
+        calcularStatsHistorico() {
+            console.log('🔢 Calculando estatísticas...');
+            
+            this.statsHistorico = {
+                totalDocumentos: this.historico.length,
+                porTipo: {
+                    declaracao: 0,
+                    recibo: 0,
+                    combo: 0,
+                    nif: 0,
+                    atestado: 0
+                },
+                porEmpresa: {},
+                porUsuario: {},
+                porDia: {}
+            };
+            
+            this.historico.forEach(doc => {
+                // Por tipo
+                const tipo = doc.tipo_documento || doc.tipo || 'declaracao';
+                if (this.statsHistorico.porTipo.hasOwnProperty(tipo)) {
+                    this.statsHistorico.porTipo[tipo]++;
+                }
+                
+                // Por usuário
+                const usuario = doc.usuario || doc.criado_por || 'desconhecido';
+                this.statsHistorico.porUsuario[usuario] = (this.statsHistorico.porUsuario[usuario] || 0) + 1;
+                
+                // Por empresa
+                const empresaNome = doc.dados_documento?.empresa_nome || doc.empresa_nome || 'Empresa Desconhecida';
+                const empresaId = doc.dados_documento?.empresa_id || doc.empresa_id || empresaNome;
+                if (empresaId) {
+                    if (!this.statsHistorico.porEmpresa[empresaId]) {
+                        this.statsHistorico.porEmpresa[empresaId] = { nome: empresaNome, total: 0 };
+                    }
+                    this.statsHistorico.porEmpresa[empresaId].total++;
+                }
+                
+                // Por dia
+                const data = (doc.data || doc.created_at || '').split('T')[0];
+                if (data) {
+                    this.statsHistorico.porDia[data] = (this.statsHistorico.porDia[data] || 0) + 1;
+                }
+            });
+            
+            // Preencher últimos 30 dias com zeros se não houver dados
+            if (Object.keys(this.statsHistorico.porDia).length === 0) {
+                const hoje = new Date();
+                for (let i = 29; i >= 0; i--) {
+                    const data = new Date(hoje);
+                    data.setDate(data.getDate() - i);
+                    const key = data.toISOString().split('T')[0];
+                    this.statsHistorico.porDia[key] = 0;
+                }
+            }
+            
+            // Calcula insights
+            this.calcularInsights();
+            
+            console.log(`📊 Total de documentos: ${this.statsHistorico.totalDocumentos}`);
+            console.log(`📊 Por tipo:`, this.statsHistorico.porTipo);
+        },
+        
+        /**
+         * Aplica filtros ao histórico
+         */
+        aplicarFiltrosHistorico() {
+            let filtrado = [...this.historico];
+            
+            // Filtro por usuário
+            if (this.filtrosHistorico.usuario) {
+                filtrado = filtrado.filter(doc => 
+                    (doc.usuario || doc.criado_por) === this.filtrosHistorico.usuario
+                );
+            }
+            
+            // Filtro por tipo de documento
+            if (this.filtrosHistorico.tipo_documento) {
+                filtrado = filtrado.filter(doc => 
+                    (doc.tipo_documento || doc.tipo) === this.filtrosHistorico.tipo_documento
+                );
+            }
+            
+            // Filtro por data início
+            if (this.filtrosHistorico.data_inicio) {
+                const dataInicio = new Date(this.filtrosHistorico.data_inicio);
+                filtrado = filtrado.filter(doc => {
+                    const dataDoc = new Date(doc.data || doc.created_at);
+                    return dataDoc >= dataInicio;
+                });
+            }
+            
+            // Filtro por data fim
+            if (this.filtrosHistorico.data_fim) {
+                const dataFim = new Date(this.filtrosHistorico.data_fim);
+                dataFim.setHours(23, 59, 59, 999); // Fim do dia
+                filtrado = filtrado.filter(doc => {
+                    const dataDoc = new Date(doc.data || doc.created_at);
+                    return dataDoc <= dataFim;
+                });
+            }
+            
+            // Busca textual
+            if (this.filtrosHistorico.busca) {
+                const busca = this.filtrosHistorico.busca.toLowerCase();
+                filtrado = filtrado.filter(doc => {
+                    const nif = (doc.dados_documento?.trabalhador_nif || doc.nif || '').toLowerCase();
+                    const empresa = (doc.dados_documento?.empresa_nome || doc.empresa_nome || '').toLowerCase();
+                    const trabalhador = (doc.dados_documento?.trabalhador_nome || doc.trabalhador_nome || '').toLowerCase();
+                    return nif.includes(busca) || empresa.includes(busca) || trabalhador.includes(busca);
+                });
+            }
+            
+            this.historicoFiltrado = filtrado;
+            console.log(`✅ ${filtrado.length} documentos após filtros`);
         },
         
         /**

@@ -53,6 +53,7 @@ function adminApp() {
         // Colaboradores
         colaboradores: [],
         loadingColab: false,
+        pesquisaColaborador: '',
         novoColaborador: {
             username: '',
             permission: 'push'
@@ -62,6 +63,37 @@ function adminApp() {
             { username: 'luisafernandotiago-cmd', token: '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' }
         ],
         logTestes: [],
+        
+        // Histórico e Analytics (Admin Panel)
+        historicoAdmin: [],
+        historicoAdminRecente: [],
+        loadingHistoricoAdmin: false,
+        statsHistoricoAdmin: {
+            totalDocumentos: 0,
+            porTipo: {},
+            porEmpresa: {},
+            porUsuario: {},
+            porDia: {}
+        },
+        chartsAdmin: {
+            documentosPorDia: null,
+            tiposDocumentos: null,
+            empresas: null,
+            usuarios: null
+        },
+        
+        // Computed: Colaboradores filtrados
+        get colaboradoresFiltrados() {
+            if (!this.pesquisaColaborador) {
+                return this.colaboradores;
+            }
+            const search = this.pesquisaColaborador.toLowerCase();
+            return this.colaboradores.filter(colab => {
+                const name = (colab.name || '').toLowerCase();
+                const login = (colab.login || '').toLowerCase();
+                return name.includes(search) || login.includes(search);
+            });
+        },
         
         // Fluxo de Geração de Documento
         fluxoEtapa: 1, // 1=Empresa, 2=Cliente, 3=Tipo, 3.5=Modelo, 4=Preview
@@ -4370,11 +4402,13 @@ function adminApp() {
                 
                 if (userIdentifier === 'admin') {
                     token = localStorage.getItem('token');
-                    username = this.usuario.login;
+                    username = this.usuario?.login || localStorage.getItem('username');
                 } else {
                     const user = this.usuariosTeste.find(u => u.username === userIdentifier);
                     if (!user) {
-                        throw new Error(`Usuário ${userIdentifier} não encontrado`);
+                        this.logTest(`⚠️ Usuário "${userIdentifier}" não tem token cadastrado`, 'warning');
+                        this.showAlert('warning', `Para testar @${userIdentifier}, adicione o token dele em "usuariosTeste" no código ou use a aba Colaboradores para gerenciar.`);
+                        return;
                     }
                     token = user.token;
                     username = user.username;
@@ -4480,6 +4514,14 @@ function adminApp() {
         },
         
         /**
+         * Limpa o log de testes
+         */
+        limparLogTestes() {
+            this.logTestes = [];
+            this.showAlert('success', '🗑️ Log limpo com sucesso!');
+        },
+        
+        /**
          * Abre o painel admin (atual)
          */
         abrirPainelAdmin() {
@@ -4495,6 +4537,341 @@ function adminApp() {
             localStorage.setItem('token', token);
             this.logTest('🚀 Abrindo User Panel...', 'success');
             window.open('user-panel.html', '_blank');
+        },
+        
+        /**
+         * Abre o painel de um colaborador específico (busca token automaticamente)
+         */
+        async abrirPainelColaborador(username) {
+            this.logTest(`🔍 Buscando token para @${username}...`, 'info');
+            
+            // Verifica se está nos usuários de teste
+            const userTest = this.usuariosTeste.find(u => u.username === username);
+            
+            if (userTest) {
+                this.abrirPainelUser(userTest.token);
+            } else {
+                this.logTest(`⚠️ Token não configurado para @${username}`, 'warning');
+                this.showAlert('warning', `Token de @${username} não está cadastrado nos testes. Adicione-o manualmente em usuariosTeste.`);
+            }
+        },
+        
+        // ========== HISTÓRICO E ANALYTICS (ADMIN PANEL) ==========
+        
+        /**
+         * Carrega histórico de documentos para o admin panel
+         */
+        async carregarHistoricoAdmin() {
+            console.log('📂 Carregando histórico no admin panel...');
+            this.loadingHistoricoAdmin = true;
+            
+            try {
+                const result = await githubAPI.lerJSON('data/historico.json');
+                this.historicoAdmin = result?.data?.historico || [];
+                console.log(`✅ ${this.historicoAdmin.length} documentos carregados`);
+                
+                // Ordenar por data (mais recente primeiro)
+                this.historicoAdminRecente = [...this.historicoAdmin].sort((a, b) => {
+                    const dataA = new Date(a.data || a.created_at);
+                    const dataB = new Date(b.data || b.created_at);
+                    return dataB - dataA;
+                });
+                
+                // Calcular estatísticas
+                this.calcularStatsHistoricoAdmin();
+                
+                // Criar gráficos
+                setTimeout(() => this.criarGraficosAdmin(), 100);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar histórico:', error);
+                this.showAlert('error', 'Erro ao carregar histórico: ' + error.message);
+            } finally {
+                this.loadingHistoricoAdmin = false;
+            }
+        },
+        
+        /**
+         * Calcula estatísticas do histórico
+         */
+        calcularStatsHistoricoAdmin() {
+            this.statsHistoricoAdmin = {
+                totalDocumentos: this.historicoAdmin.length,
+                porTipo: {
+                    declaracao: 0,
+                    recibo: 0,
+                    combo: 0,
+                    nif: 0,
+                    atestado: 0
+                },
+                porEmpresa: {},
+                porUsuario: {},
+                porDia: {}
+            };
+            
+            this.historicoAdmin.forEach(doc => {
+                // Por tipo
+                const tipo = doc.tipo_documento || doc.tipo || 'declaracao';
+                if (this.statsHistoricoAdmin.porTipo.hasOwnProperty(tipo)) {
+                    this.statsHistoricoAdmin.porTipo[tipo]++;
+                }
+                
+                // Por usuário
+                const usuario = doc.usuario || doc.criado_por || 'desconhecido';
+                this.statsHistoricoAdmin.porUsuario[usuario] = (this.statsHistoricoAdmin.porUsuario[usuario] || 0) + 1;
+                
+                // Por empresa
+                const empresaNome = doc.dados_documento?.empresa_nome || doc.empresa_nome || 'Desconhecida';
+                const empresaId = doc.dados_documento?.empresa_id || doc.empresa_id || empresaNome;
+                if (!this.statsHistoricoAdmin.porEmpresa[empresaId]) {
+                    this.statsHistoricoAdmin.porEmpresa[empresaId] = { nome: empresaNome, total: 0 };
+                }
+                this.statsHistoricoAdmin.porEmpresa[empresaId].total++;
+                
+                // Por dia
+                const data = (doc.data || doc.created_at || '').split('T')[0];
+                if (data) {
+                    this.statsHistoricoAdmin.porDia[data] = (this.statsHistoricoAdmin.porDia[data] || 0) + 1;
+                }
+            });
+            
+            console.log('📊 Stats calculadas:', this.statsHistoricoAdmin);
+        },
+        
+        /**
+         * Cria gráficos do histórico
+         */
+        criarGraficosAdmin() {
+            console.log('📈 Criando gráficos...');
+            
+            try {
+                this.criarGraficoDocumentosPorDiaAdmin();
+                this.criarGraficoTiposDocumentosAdmin();
+                this.criarGraficoEmpresasAdmin();
+                this.criarGraficoUsuariosAdmin();
+                console.log('✅ Gráficos criados!');
+            } catch (error) {
+                console.error('❌ Erro ao criar gráficos:', error);
+            }
+        },
+        
+        /**
+         * Gráfico: Documentos por Dia
+         */
+        criarGraficoDocumentosPorDiaAdmin() {
+            const canvas = document.getElementById('chartDocumentosPorDiaAdmin');
+            if (!canvas) return;
+            
+            // Destruir gráfico anterior
+            if (this.chartsAdmin.documentosPorDia) {
+                this.chartsAdmin.documentosPorDia.destroy();
+            }
+            
+            // Preparar dados dos últimos 30 dias
+            const dias = [];
+            const valores = [];
+            const hoje = new Date();
+            
+            for (let i = 29; i >= 0; i--) {
+                const data = new Date(hoje);
+                data.setDate(data.getDate() - i);
+                const key = data.toISOString().split('T')[0];
+                const dia = data.getDate() + '/' + (data.getMonth() + 1);
+                
+                dias.push(dia);
+                valores.push(this.statsHistoricoAdmin.porDia[key] || 0);
+            }
+            
+            const ctx = canvas.getContext('2d');
+            this.chartsAdmin.documentosPorDia = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dias,
+                    datasets: [{
+                        label: 'Documentos Gerados',
+                        data: valores,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        
+        /**
+         * Gráfico: Tipos de Documentos
+         */
+        criarGraficoTiposDocumentosAdmin() {
+            const canvas = document.getElementById('chartTiposDocumentosAdmin');
+            if (!canvas) return;
+            
+            if (this.chartsAdmin.tiposDocumentos) {
+                this.chartsAdmin.tiposDocumentos.destroy();
+            }
+            
+            const tipos = Object.keys(this.statsHistoricoAdmin.porTipo);
+            const valores = tipos.map(t => this.statsHistoricoAdmin.porTipo[t]);
+            
+            const ctx = canvas.getContext('2d');
+            this.chartsAdmin.tiposDocumentos = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: tipos.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: [
+                            'rgb(34, 197, 94)',  // green
+                            'rgb(59, 130, 246)',  // blue
+                            'rgb(168, 85, 247)',  // purple
+                            'rgb(249, 115, 22)',  // orange
+                            'rgb(236, 72, 153)'   // pink
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        },
+        
+        /**
+         * Gráfico: Top 5 Empresas
+         */
+        criarGraficoEmpresasAdmin() {
+            const canvas = document.getElementById('chartEmpresasAdmin');
+            if (!canvas) return;
+            
+            if (this.chartsAdmin.empresas) {
+                this.chartsAdmin.empresas.destroy();
+            }
+            
+            // Top 5 empresas
+            const empresas = Object.values(this.statsHistoricoAdmin.porEmpresa)
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 5);
+            
+            const labels = empresas.map(e => e.nome);
+            const valores = empresas.map(e => e.total);
+            
+            const ctx = canvas.getContext('2d');
+            this.chartsAdmin.empresas = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Documentos',
+                        data: valores,
+                        backgroundColor: 'rgb(168, 85, 247)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        
+        /**
+         * Gráfico: Top 5 Usuários
+         */
+        criarGraficoUsuariosAdmin() {
+            const canvas = document.getElementById('chartUsuariosAdmin');
+            if (!canvas) return;
+            
+            if (this.chartsAdmin.usuarios) {
+                this.chartsAdmin.usuarios.destroy();
+            }
+            
+            // Top 5 usuários
+            const usuarios = Object.entries(this.statsHistoricoAdmin.porUsuario)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            const labels = usuarios.map(u => '@' + u[0]);
+            const valores = usuarios.map(u => u[1]);
+            
+            const ctx = canvas.getContext('2d');
+            this.chartsAdmin.usuarios = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Documentos',
+                        data: valores,
+                        backgroundColor: 'rgb(249, 115, 22)'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        
+        /**
+         * Formata data de forma simples
+         */
+        formatarDataSimples(isoString) {
+            if (!isoString) return 'N/A';
+            const data = new Date(isoString);
+            return data.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
     };
 }
