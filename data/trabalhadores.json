@@ -94,33 +94,6 @@
       "usuario_id": "luisafernandotiago-cmd",
       "criado_por": "luisafernandotiago-cmd",
       "data_criacao": "2025-11-16T11:45:53.844Z"
-    },
-    {
-      "nome": "test",
-      "documento": "test",
-      "tipo_documento": "BI",
-      "nif": "test",
-      "data_nascimento": "",
-      "nacionalidade": "Angolana",
-      "morada": "",
-      "cidade": "",
-      "telefone": "37373733",
-      "email": "gaspar@gmail.com",
-      "funcao": "test",
-      "departamento": "test",
-      "data_admissao": "",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "192191",
-      "salario_liquido": "",
-      "moeda": "AKZ",
-      "iban": "",
-      "empresa_id": "",
-      "ativo": false,
-      "observacoes": "",
-      "id": "TRAB-1763294809036-593",
-      "usuario_id": "luisafernandotiago-cmd",
-      "criado_por": "luisafernandotiago-cmd",
-      "data_criacao": "2025-11-16T12:06:49.036Z"
     }
   ]
 }
