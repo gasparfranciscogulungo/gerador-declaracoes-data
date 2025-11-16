@@ -21,29 +21,6 @@
       "moeda": "EUR",
       "iban": "PT50 0007 0000 0000 9988 7766 5",
       "ativo": false
-    },
-    {
-      "id": "TRAB-1762604534395-585",
-      "nome": "Gaspar fraancisco gulungo",
-      "documento": "010167533LA046",
-      "tipo_documento": "BI",
-      "nif": "293939322",
-      "data_nascimento": "0380482039",
-      "nacionalidade": "Angolana",
-      "morada": "90890348093",
-      "cidade": "",
-      "telefone": "8930843092",
-      "email": "gaspa@gmail.com",
-      "funcao": "43234dsfsdf",
-      "departamento": "sdfsfsd",
-      "data_admissao": "asdfasdfa",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "200000",
-      "salario_liquido": "0.00",
-      "moeda": "AKZ",
-      "iban": "",
-      "ativo": false,
-      "observacoes": ""
     }
   ]
 }
