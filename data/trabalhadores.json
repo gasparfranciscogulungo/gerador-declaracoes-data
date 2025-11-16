@@ -67,33 +67,6 @@
       "iban": "Gaowgahsvaggxgshxhsbs",
       "ativo": false,
       "observacoes": ""
-    },
-    {
-      "nome": "Joao da silva test",
-      "documento": "1019310932",
-      "tipo_documento": "BI",
-      "nif": "0923019023",
-      "data_nascimento": "",
-      "nacionalidade": "Angolana",
-      "morada": "",
-      "cidade": "",
-      "telefone": "9469669670",
-      "email": "gasashda@gmail,com",
-      "funcao": "Gestor ",
-      "departamento": "Desenvolcvidor",
-      "data_admissao": "",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "1003030",
-      "salario_liquido": "",
-      "moeda": "AKZ",
-      "iban": "",
-      "empresa_id": "",
-      "ativo": false,
-      "observacoes": "",
-      "id": "TRAB-1763293553844-754",
-      "usuario_id": "luisafernandotiago-cmd",
-      "criado_por": "luisafernandotiago-cmd",
-      "data_criacao": "2025-11-16T11:45:53.844Z"
     }
   ]
 }
