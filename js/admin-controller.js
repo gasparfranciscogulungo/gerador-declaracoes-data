@@ -829,17 +829,25 @@ function adminApp() {
         },
 
         async excluirTrabalhador(id) {
+            console.log('🔍 excluirTrabalhador chamada com ID:', id);
+            
             const trabalhador = this.trabalhadoresFiltrados.find(t => t.id === id);
-            const confirmar = await this.showConfirm(
-                '⚠️ Excluir Trabalhador',
-                `Tem certeza que deseja excluir "${trabalhador?.nome || 'este trabalhador'}"?\n\nEsta ação não pode ser desfeita.`,
-                {
-                    textoBotaoConfirmar: 'Sim, Excluir',
-                    textoBotaoCancelar: 'Cancelar',
-                    tipoPerigo: true
-                }
+            console.log('📦 Trabalhador encontrado:', trabalhador);
+            
+            // Usar confirm nativo temporariamente para debug
+            const confirmar = confirm(
+                `⚠️ EXCLUIR TRABALHADOR\n\n` +
+                `Tem certeza que deseja excluir "${trabalhador?.nome || 'este trabalhador'}"?\n\n` +
+                `Esta ação não pode ser desfeita.\n\n` +
+                `Clique OK para confirmar`
             );
-            if (!confirmar) return;
+            
+            console.log('✅ Usuário confirmou?', confirmar);
+            
+            if (!confirmar) {
+                console.log('❌ Usuário cancelou');
+                return;
+            }
             
             try {
                 this.loading = true;
@@ -928,28 +936,32 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
+            console.log('🔍 deletarEmpresa chamada com ID:', empresaId);
+            
             const empresa = this.empresas.find(e => e.id === empresaId);
+            console.log('📦 Empresa encontrada:', empresa);
+            
             if (!empresa) {
+                alert('❌ Empresa não encontrada!');
                 this.showAlert('error', '❌ Empresa não encontrada!');
                 return;
             }
 
-            // Usar modal de confirmação personalizado
-            const confirmar = await this.showConfirm(
-                '⚠️ Deletar Empresa',
+            // Usar confirm nativo temporariamente para debug
+            const confirmar = confirm(
+                `⚠️ DELETAR EMPRESA\n\n` +
                 `Tem certeza que deseja deletar permanentemente "${empresa.nome}"?\n\n` +
                 `Esta ação não pode ser desfeita e irá remover:\n` +
                 `• Logo e carimbo da empresa\n` +
                 `• Todas as declarações geradas\n` +
-                `• Contador de documentos`,
-                {
-                    textoBotaoConfirmar: 'Sim, Deletar',
-                    textoBotaoCancelar: 'Cancelar',
-                    tipoPerigo: true
-                }
+                `• Contador de documentos\n\n` +
+                `Digite OK para confirmar`
             );
             
+            console.log('✅ Usuário confirmou?', confirmar);
+            
             if (!confirmar) {
+                console.log('❌ Usuário cancelou');
                 return;
             }
             
