@@ -1,30 +1,6 @@
 {
   "empresas": [
     {
-      "id": "empresa_1762398563451",
-      "nome": "Angola Tech Prestacao de servico ",
-      "nif": "930209393",
-      "endereco": {
-        "rua": "avenida da maianga",
-        "edificio": "32",
-        "andar": "83",
-        "sala": "saida 49",
-        "bairro": "talatona",
-        "municipio": "Luanda",
-        "provincia": "Luanda",
-        "pais": "Angola"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/930209393/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/930209393/carimbo.png",
-      "corPrimaria": "#06bc1b",
-      "corSecundaria": "#5a7baa",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-16T22:14:59.721Z"
-    },
-    {
       "id": "empresa_1762610857091",
       "nome": "Empresa Manuela João e filhos ",
       "nif": "50009099",
