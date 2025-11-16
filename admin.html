@@ -2175,9 +2175,9 @@
                 <!-- ETAPA 3.5: Seleção de Modelo (apenas para tipos editáveis: declaracao, recibo, combo) -->
                 <div x-show="fluxoEtapa === 3.5" class="space-y-4">
                     <div class="bg-gradient-to-r from-blue-50 via-green-50 to-purple-50 dark:from-blue-900/20 dark:via-green-900/20 dark:to-purple-900/20 border-l-4 border-purple-600 p-4 rounded-r-lg mb-4">
-                        <p class="text-sm"><strong>Empresa:</strong> <span x-text="fluxoEmpresaSelecionada?.nome"></span></p>
-                        <p class="text-sm"><strong>Cliente:</strong> <span x-text="fluxoClienteSelecionado?.nome"></span></p>
-                        <p class="text-sm"><strong>Tipo:</strong> <span x-text="fluxoTipoDocumento.toUpperCase()"></span></p>
+                        <p class="text-sm"><strong>Empresa:</strong> <span x-text="fluxoEmpresaSelecionada?.nome || 'N/A'"></span></p>
+                        <p class="text-sm"><strong>Cliente:</strong> <span x-text="fluxoClienteSelecionado?.nome || 'N/A'"></span></p>
+                        <p class="text-sm"><strong>Tipo:</strong> <span x-text="fluxoTipoDocumento ? fluxoTipoDocumento.toUpperCase() : 'N/A'"></span></p>
                     </div>
                     
                     <h4 class="text-lg font-bold mb-4">Escolha o Modelo:</h4>
