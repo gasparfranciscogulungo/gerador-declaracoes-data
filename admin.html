@@ -3526,9 +3526,9 @@
                     <i :class="(fluxoEmpresaSelecionada && fluxoClienteSelecionado) ? 'bi bi-check-circle-fill text-green-500' : 'bi bi-lightbulb text-yellow-500'" class="mr-2 flex-shrink-0"></i>
                     <span x-show="fluxoEmpresaSelecionada && fluxoClienteSelecionado" class="truncate">
                         <strong class="hidden sm:inline">Dados Reais: </strong>
-                        <strong x-text="fluxoEmpresaSelecionada.nome" class="hidden sm:inline"></strong>
+                        <strong x-text="fluxoEmpresaSelecionada?.nome || 'N/A'" class="hidden sm:inline"></strong>
                         <strong class="hidden sm:inline"> + </strong>
-                        <strong x-text="fluxoClienteSelecionado.nome" class="hidden sm:inline"></strong>
+                        <strong x-text="fluxoClienteSelecionado?.nome || 'N/A'" class="hidden sm:inline"></strong>
                         <strong class="sm:hidden">Dados Reais</strong>
                     </span>
                     <span x-show="!fluxoEmpresaSelecionada || !fluxoClienteSelecionado" class="truncate text-center">
@@ -4337,16 +4337,6 @@
     <!-- Scripts -->
     <script src="js/historico-manager.js"></script>
     <script src="js/image-cache-manager.js"></script>
-
-    <!-- Inicialização do Sistema de Notificações -->
-    <script>
-        // Inicializa notificações quando a página carregar
-        document.addEventListener('DOMContentLoaded', async () => {
-            await notificationSystem.init();
-            // Exibe notificações em camadas (timing diferente)
-            await notificationSystem.notifyWithLayers();
-        });
-    </script>
 
     <!-- Inicialização do Swiper (Carrosseis Responsivos) -->
     <script>
