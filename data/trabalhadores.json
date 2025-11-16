@@ -1,28 +1,6 @@
 {
   "trabalhadores": [
     {
-      "id": "trab003",
-      "nome": "Carlos Manuel Rodrigues",
-      "documento": "11223344",
-      "tipo_documento": "CC",
-      "nif": "112233445",
-      "data_nascimento": "10/11/1988",
-      "nacionalidade": "Portuguesa",
-      "morada": "Praceta do Sol, 8",
-      "cidade": "3000-234 Coimbra",
-      "telefone": "+351 93 112 2334",
-      "email": "carlos.rodrigues@email.pt",
-      "funcao": "Analista de Dados",
-      "departamento": "Business Intelligence",
-      "data_admissao": "01/09/2021",
-      "tipo_contrato": "Contrato a termo certo",
-      "salario_bruto": "2800.00",
-      "salario_liquido": "2050.00",
-      "moeda": "EUR",
-      "iban": "PT50 0033 0000 0000 1122 3344 5",
-      "ativo": false
-    },
-    {
       "id": "trab004",
       "nome": "Ana Sofia Martins",
       "documento": "55667788",
