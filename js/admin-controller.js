@@ -853,12 +853,22 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Excluindo trabalhador...';
                 
-                await this.clienteManager.excluir(id);
+                console.log('🗑️ Excluindo trabalhador DEFINITIVAMENTE...');
+                
+                // Passar TRUE para excluir definitivamente (não só marcar como inativo)
+                await this.clienteManager.excluir(id, true);
+                
+                console.log('✅ Trabalhador excluído do JSON!');
+                
+                // Recarregar lista
                 await this.carregarTrabalhadores();
                 this.filtrarTrabalhadores();
                 
+                alert('✅ Trabalhador excluído com sucesso!');
                 this.showAlert('success', 'Trabalhador excluído com sucesso');
             } catch (e) {
+                console.error('❌ Erro ao excluir:', e);
+                alert('❌ Erro: ' + (e.message || 'Erro ao excluir'));
                 this.showAlert('error', e.message || 'Erro ao excluir');
             } finally {
                 this.loading = false;
@@ -969,17 +979,26 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Deletando empresa...';
                 
-                // Remover da lista
-                this.empresas = this.empresas.filter(e => e.id !== empresaId);
+                console.log('📥 Carregando empresas.json do GitHub...');
                 
-                // Carregar dados atuais
+                // Carregar dados atuais do GitHub
                 const response = await githubAPI.lerJSON('data/empresas.json');
-                const empresasData = response.data;
-                empresasData.empresas = this.empresas;
-                empresasData.metadata.totalEmpresas = this.empresas.length;
-                empresasData.metadata.atualizadoEm = new Date().toISOString();
+                console.log('📦 Dados carregados:', response.data);
                 
-                // Salvar
+                const empresasData = response.data;
+                
+                // Remover empresa da lista
+                empresasData.empresas = empresasData.empresas.filter(e => e.id !== empresaId);
+                console.log('🗑️ Empresa removida. Total restante:', empresasData.empresas.length);
+                
+                // Atualizar metadata se existir
+                if (empresasData.metadata) {
+                    empresasData.metadata.totalEmpresas = empresasData.empresas.length;
+                    empresasData.metadata.atualizadoEm = new Date().toISOString();
+                }
+                
+                // Salvar no GitHub
+                console.log('💾 Salvando no GitHub...');
                 await githubAPI.salvarJSON(
                     'data/empresas.json',
                     empresasData,
@@ -987,8 +1006,14 @@ function adminApp() {
                     response.sha
                 );
                 
-                this.showAlert('success', `✅ Empresa "${empresa.nome}" deletada com sucesso!`);
+                console.log('✅ Salvo com sucesso!');
+                
+                // Recarregar empresas do GitHub
+                await this.carregarEmpresas();
                 await this.atualizarStatsReais();
+                
+                alert(`✅ Empresa "${empresa.nome}" deletada com sucesso!`);
+                this.showAlert('success', `✅ Empresa "${empresa.nome}" deletada com sucesso!`);
                 
             } catch (error) {
                 console.error('❌ Erro ao deletar empresa:', error);
