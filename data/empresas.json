@@ -23,32 +23,6 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-11-08T14:13:56.096Z"
-    },
-    {
-      "id": "empresa_1763242096862",
-      "nome": "Nome da empresa",
-      "nif": "nifi da empresa ",
-      "endereco": {
-        "rua": "rua x",
-        "edificio": "edificio x",
-        "andar": "andar x ",
-        "sala": "sala x",
-        "bairro": "bairro x",
-        "municipio": "municipio x ",
-        "provincia": "luanda ",
-        "pais": "Angola"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/nifidaempresa/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/nifidaempresa/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "createdAt": "2025-11-15T21:28:16.862Z",
-      "updatedAt": "2025-11-15T21:28:16.862Z",
-      "contador": 0
     }
   ]
 }
