@@ -1456,50 +1456,6 @@ function adminApp() {
             this.modalNovaEmpresa = true;
         },
 
-        async deletarEmpresa(empresaId) {
-            const confirmar = await this.showConfirm(
-                'Tem certeza que deseja excluir esta empresa?\n\nEsta ação não pode ser desfeita!',
-                { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Excluir' }
-            );
-            if (!confirmar) return;
-
-            try {
-                this.loading = true;
-                this.loadingMessage = 'Excluindo empresa...';
-
-                // Carregar empresas
-                const response = await githubAPI.lerJSON('data/empresas.json');
-                const empresasData = response.data;
-                let empresas = empresasData.empresas || [];
-                
-                const empresaIndex = empresas.findIndex(e => e.id === empresaId);
-                const empresaNome = empresas[empresaIndex]?.nome;
-                
-                // Remover empresa
-                empresas = empresas.filter(e => e.id !== empresaId);
-
-                // Salvar
-                await githubAPI.salvarJSON(
-                    'data/empresas.json',
-                    { empresas },
-                    `Excluir empresa: ${empresaNome}`,
-                    response.sha
-                );
-
-                this.showAlert('success', '✅ Empresa excluída com sucesso!');
-                
-                // Recarregar
-                await this.carregarEmpresas();
-                await this.atualizarStatsReais();
-
-            } catch (error) {
-                console.error('❌ Erro ao excluir empresa:', error);
-                this.showAlert('error', 'Erro ao excluir empresa: ' + error.message);
-            } finally {
-                this.loading = false;
-            }
-        },
-
         fecharModalEmpresa() {
             this.modalNovaEmpresa = false;
             
