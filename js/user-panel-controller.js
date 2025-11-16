@@ -128,12 +128,21 @@ function userPanelApp() {
                     return;
                 }
                 
-                // Configurar GitHub API
+                // Configurar GitHub API PRIMEIRO
+                console.log('🔧 Configurando GitHub API...');
                 githubAPI.setToken(token);
-                githubAPI.configurar(CONFIG.github);
+                
+                const githubConfig = {
+                    owner: 'gasparfranciscogulungo',
+                    repo: 'gerador-declaracoes-data',
+                    branch: 'master'
+                };
+                console.log('Config:', githubConfig);
+                githubAPI.configurar(githubConfig);
                 
                 // Obter usuário do GitHub
                 this.loadingMessage = 'Carregando perfil...';
+                console.log('👤 Obtendo usuário autenticado...');
                 this.usuario = await githubAPI.getAuthenticatedUser();
                 console.log('✅ Usuário GitHub:', this.usuario.login);
                 
@@ -221,17 +230,47 @@ function userPanelApp() {
         // ========== EMPRESAS (READ-ONLY) ==========
         
         async carregarEmpresas() {
+            console.group('🔍 DEBUG: carregarEmpresas()');
             try {
-                console.log('📂 Carregando empresas...');
+                console.log('1️⃣ Iniciando carregamento de empresas...');
+                console.log('Token existe?', localStorage.getItem('token') ? '✅ Sim' : '❌ Não');
+                console.log('Config GitHub:', CONFIG.github);
+                
+                console.log('2️⃣ Chamando githubAPI.lerJSON()...');
                 const response = await githubAPI.lerJSON('data/empresas.json');
+                
+                console.log('3️⃣ Resposta recebida:', response);
+                
+                if (!response || !response.data) {
+                    console.warn('⚠️ Resposta vazia ou inválida');
+                    this.empresasDisponiveis = [];
+                    this.showAlert('warning', 'Nenhuma empresa encontrada no sistema');
+                    this.calcularStats();
+                    console.groupEnd();
+                    return;
+                }
+                
                 const empresasData = response.data;
-                this.empresasDisponiveis = empresasData.empresas || [];
-                console.log(`✅ ${this.empresasDisponiveis.length} empresas`);
+                console.log('4️⃣ Dados parseados:', empresasData);
+                
+                if (empresasData && empresasData.empresas) {
+                    this.empresasDisponiveis = empresasData.empresas;
+                    console.log(`✅ ${this.empresasDisponiveis.length} empresas carregadas com sucesso!`);
+                    this.showAlert('success', `${this.empresasDisponiveis.length} empresas carregadas`);
+                } else {
+                    console.warn('⚠️ Estrutura de dados inesperada:', empresasData);
+                    this.empresasDisponiveis = [];
+                    this.showAlert('warning', 'Formato de dados inválido');
+                }
+                
                 this.calcularStats();
             } catch (error) {
-                console.error('❌ Erro:', error);
+                console.error('❌ Erro completo ao carregar empresas:', error);
+                console.error('Stack trace:', error.stack);
                 this.empresasDisponiveis = [];
+                this.showAlert('error', 'Erro ao carregar empresas: ' + error.message);
             }
+            console.groupEnd();
         },
         
         getEmpresaPorId(id) {
@@ -241,72 +280,117 @@ function userPanelApp() {
         // ========== TRABALHADORES (MEUS) ==========
         
         async carregarMeusTrabalhadores() {
+            console.group('🔍 DEBUG: carregarMeusTrabalhadores()');
             try {
                 console.log('📂 Carregando trabalhadores...');
+                
                 const response = await githubAPI.lerJSON('data/trabalhadores.json');
-                const data = response.data;
-                const todos = data.trabalhadores || [];
+                console.log('Resposta:', response);
                 
-                // Filtrar: Só os trabalhadores criados por MIM
-                this.meusTrabalhadores = todos.filter(t => 
-                    t.usuario_id === this.usuario.username || 
-                    t.criado_por === this.usuario.username
-                );
-                
-                console.log(`✅ ${this.meusTrabalhadores.length} meus`);
-                this.calcularStats();
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                this.meusTrabalhadores = [];
-            }
-        },
-        
-        async salvarTrabalhador() {
-            try {
-                if (!this.validarFormTrabalhador()) {
+                if (!response || !response.data) {
+                    console.warn('⚠️ Resposta vazia');
+                    this.meusTrabalhadores = [];
+                    this.calcularStats();
+                    console.groupEnd();
                     return;
                 }
                 
+                const data = response.data;
+                const todos = data.trabalhadores || [];
+                console.log(`Total de trabalhadores no sistema: ${todos.length}`);
+                
+                // TEMPORÁRIO: Mostrar TODOS os trabalhadores
+                // (No futuro, filtrar por usuario_id quando implementarmos permissões)
+                this.meusTrabalhadores = todos;
+                console.log(`✅ ${this.meusTrabalhadores.length} trabalhadores carregados (modo: ver todos)`);
+                
+                // FUTURO: Descomentar quando adicionar campo usuario_id
+                /*
+                this.meusTrabalhadores = todos.filter(t => 
+                    t.usuario_id === this.usuario.login || 
+                    t.criado_por === this.usuario.login
+                );
+                console.log(`✅ ${this.meusTrabalhadores.length} meus trabalhadores`);
+                */
+                
+                this.calcularStats();
+            } catch (error) {
+                console.error('❌ Erro ao carregar trabalhadores:', error);
+                this.meusTrabalhadores = [];
+                this.showAlert('error', 'Erro ao carregar trabalhadores');
+            }
+            console.groupEnd();
+        },
+        
+        async salvarTrabalhador() {
+            console.group('💾 DEBUG: salvarTrabalhador()');
+            try {
+                console.log('1️⃣ Validando formulário...');
+                if (!this.validarFormTrabalhador()) {
+                    console.warn('⚠️ Validação falhou');
+                    console.groupEnd();
+                    return;
+                }
+                
+                console.log('2️⃣ Formulário válido, iniciando salvamento...');
                 this.loading = true;
                 this.loadingMessage = 'Salvando trabalhador...';
                 
                 // Carregar todos os trabalhadores
+                console.log('3️⃣ Carregando trabalhadores existentes...');
                 const arquivo = await githubAPI.lerJSON('data/trabalhadores.json');
+                console.log('Arquivo carregado:', arquivo);
+                
                 let trabalhadores = arquivo?.data?.trabalhadores || [];
+                console.log(`Total de trabalhadores existentes: ${trabalhadores.length}`);
                 
                 if (this.trabalhadorEmEdicao) {
                     // Editar existente
+                    console.log('4️⃣ Modo: EDITAR trabalhador existente');
                     const index = trabalhadores.findIndex(t => t.id === this.trabalhadorEmEdicao.id);
                     if (index !== -1) {
                         trabalhadores[index] = {
                             ...this.formTrabalhador,
                             id: this.trabalhadorEmEdicao.id,
-                            usuario_id: this.usuario.username,
-                            criado_por: this.usuario.username,
+                            usuario_id: this.usuario.login,
+                            criado_por: this.usuario.login,
                             data_atualizacao: new Date().toISOString()
                         };
+                        console.log('✅ Trabalhador atualizado:', trabalhadores[index]);
                     }
                 } else {
                     // Criar novo
+                    console.log('4️⃣ Modo: CRIAR novo trabalhador');
                     const novoTrabalhador = {
                         ...this.formTrabalhador,
                         id: `TRAB-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-                        usuario_id: this.usuario.username,
-                        criado_por: this.usuario.username,
-                        data_criacao: new Date().toISOString()
+                        usuario_id: this.usuario.login,
+                        criado_por: this.usuario.login,
+                        data_criacao: new Date().toISOString(),
+                        ativo: true
                     };
                     trabalhadores.push(novoTrabalhador);
+                    console.log('✅ Novo trabalhador criado:', novoTrabalhador);
                 }
                 
-                // Salvar no GitHub (o SHA é pego automaticamente pelo githubAPI)
+                console.log(`5️⃣ Total após operação: ${trabalhadores.length} trabalhadores`);
+                
+                // Salvar no GitHub
+                console.log('6️⃣ Salvando no GitHub...');
+                const jsonContent = JSON.stringify({ trabalhadores }, null, 2);
+                console.log('Conteúdo a salvar (preview):', jsonContent.substring(0, 200) + '...');
+                
                 await githubAPI.salvarArquivo(
                     'data/trabalhadores.json',
-                    JSON.stringify({ trabalhadores }, null, 2),
+                    jsonContent,
                     `${this.trabalhadorEmEdicao ? 'Update' : 'Add'} trabalhador: ${this.formTrabalhador.nome}`,
                     arquivo?.sha
                 );
                 
+                console.log('✅ Salvo no GitHub com sucesso!');
+                
                 // Recarregar
+                console.log('7️⃣ Recarregando lista...');
                 await this.carregarMeusTrabalhadores();
                 this.calcularStats();
                 
@@ -315,13 +399,16 @@ function userPanelApp() {
                 this.modalEditarTrabalhador = false;
                 this.limparFormTrabalhador();
                 
-                this.showAlert('success', 'Trabalhador salvo com sucesso!');
+                this.showAlert('success', '✅ Trabalhador salvo com sucesso!');
+                console.log('🎉 Operação concluída com sucesso!');
                 
             } catch (error) {
-                console.error('❌ Erro ao salvar trabalhador:', error);
-                this.showAlert('error', 'Erro ao salvar trabalhador');
+                console.error('❌ ERRO COMPLETO ao salvar trabalhador:', error);
+                console.error('Stack:', error.stack);
+                this.showAlert('error', 'Erro ao salvar: ' + error.message);
             } finally {
                 this.loading = false;
+                console.groupEnd();
             }
         },
         
