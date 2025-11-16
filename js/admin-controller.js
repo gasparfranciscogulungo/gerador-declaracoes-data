@@ -52,6 +52,17 @@ function adminApp() {
         modalLimiteEmpresa: false,
         empresaLimiteAtingido: null,
         
+        // Modal de Confirmação
+        modalConfirm: false,
+        confirmData: {
+            titulo: '',
+            mensagem: '',
+            textoBotaoConfirmar: 'Confirmar',
+            textoBotaoCancelar: 'Cancelar',
+            tipoPerigo: false, // true = botão vermelho
+            resolve: null
+        },
+        
         // Colaboradores
         colaboradores: [],
         loadingColab: false,
@@ -371,6 +382,35 @@ function adminApp() {
             
             this.loading = false;
             console.log('✅ Painel admin iniciado com SUCESSO!');
+        },
+
+        // ========== MODAL DE CONFIRMAÇÃO ==========
+        showConfirm(titulo, mensagem, opcoes = {}) {
+            return new Promise((resolve) => {
+                this.confirmData = {
+                    titulo: titulo || 'Confirmação',
+                    mensagem: mensagem || 'Tem certeza?',
+                    textoBotaoConfirmar: opcoes.textoBotaoConfirmar || 'Confirmar',
+                    textoBotaoCancelar: opcoes.textoBotaoCancelar || 'Cancelar',
+                    tipoPerigo: opcoes.tipoPerigo || false,
+                    resolve: resolve
+                };
+                this.modalConfirm = true;
+            });
+        },
+
+        confirmarModal() {
+            if (this.confirmData.resolve) {
+                this.confirmData.resolve(true);
+            }
+            this.modalConfirm = false;
+        },
+
+        cancelarModal() {
+            if (this.confirmData.resolve) {
+                this.confirmData.resolve(false);
+            }
+            this.modalConfirm = false;
         },
 
         // ========== CARREGAR TODOS OS DADOS ==========
@@ -789,9 +829,15 @@ function adminApp() {
         },
 
         async excluirTrabalhador(id) {
-            const confirmar = await showConfirm(
-                'Tem certeza que deseja excluir este trabalhador?',
-                { type: 'danger', icon: 'bi-trash', confirmText: 'Excluir' }
+            const trabalhador = this.trabalhadoresFiltrados.find(t => t.id === id);
+            const confirmar = await this.showConfirm(
+                '⚠️ Excluir Trabalhador',
+                `Tem certeza que deseja excluir "${trabalhador?.nome || 'este trabalhador'}"?\n\nEsta ação não pode ser desfeita.`,
+                {
+                    textoBotaoConfirmar: 'Sim, Excluir',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: true
+                }
             );
             if (!confirmar) return;
             
@@ -822,9 +868,15 @@ function adminApp() {
         },
 
         async resetarContador(empresaId) {
-            const confirmar = await showConfirm(
-                'Resetar contador desta empresa para 0?',
-                { type: 'warning', icon: 'bi-arrow-counterclockwise', confirmText: 'Resetar' }
+            const empresa = this.empresas.find(e => e.id === empresaId);
+            const confirmar = await this.showConfirm(
+                '🔄 Resetar Contador',
+                `Resetar contador da empresa "${empresa?.nome || empresaId}" para 0?`,
+                {
+                    textoBotaoConfirmar: 'Sim, Resetar',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: false
+                }
             );
             if (!confirmar) return;
             
@@ -882,14 +934,19 @@ function adminApp() {
                 return;
             }
 
-            // Usar confirm nativo com mensagem clara
-            const confirmar = confirm(
-                `⚠️ ATENÇÃO: Deletar "${empresa.nome}" permanentemente?\n\n` +
+            // Usar modal de confirmação personalizado
+            const confirmar = await this.showConfirm(
+                '⚠️ Deletar Empresa',
+                `Tem certeza que deseja deletar permanentemente "${empresa.nome}"?\n\n` +
                 `Esta ação não pode ser desfeita e irá remover:\n` +
                 `• Logo e carimbo da empresa\n` +
                 `• Todas as declarações geradas\n` +
-                `• Contador de documentos\n\n` +
-                `Tem certeza que deseja continuar?`
+                `• Contador de documentos`,
+                {
+                    textoBotaoConfirmar: 'Sim, Deletar',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: true
+                }
             );
             
             if (!confirmar) {
@@ -937,9 +994,15 @@ function adminApp() {
         },
 
         async deletarModelo(modeloId) {
-            const confirmar = await showConfirm(
-                'Deletar este modelo permanentemente?',
-                { type: 'danger', icon: 'bi-file-earmark-x', confirmText: 'Deletar' }
+            const modelo = this.modelos.find(m => m.id === modeloId);
+            const confirmar = await this.showConfirm(
+                '⚠️ Deletar Modelo',
+                `Tem certeza que deseja deletar o modelo "${modelo?.nome || modeloId}"?\n\nEsta ação não pode ser desfeita.`,
+                {
+                    textoBotaoConfirmar: 'Sim, Deletar',
+                    textoBotaoCancelar: 'Cancelar',
+                    tipoPerigo: true
+                }
             );
             if (!confirmar) return;
             
@@ -1394,7 +1457,7 @@ function adminApp() {
         },
 
         async deletarEmpresa(empresaId) {
-            const confirmar = await showConfirm(
+            const confirmar = await this.showConfirm(
                 'Tem certeza que deseja excluir esta empresa?\n\nEsta ação não pode ser desfeita!',
                 { type: 'danger', icon: 'bi-exclamation-triangle', confirmText: 'Excluir' }
             );
@@ -1955,7 +2018,7 @@ function adminApp() {
          * Remover logo da empresa (apenas do formulário)
          */
         async removerLogoEmpresa() {
-            const confirmar = await showConfirm(
+            const confirmar = await this.showConfirm(
                 'Deseja remover o logo?\n\n(O arquivo permanecerá no GitHub)',
                 { type: 'warning', icon: 'bi-image', confirmText: 'Remover' }
             );
@@ -1970,7 +2033,7 @@ function adminApp() {
          * Remover carimbo da empresa (apenas do formulário)
          */
         async removerCarimboEmpresa() {
-            const confirmar = await showConfirm(
+            const confirmar = await this.showConfirm(
                 'Deseja remover o carimbo?\n\n(O arquivo permanecerá no GitHub)',
                 { type: 'warning', icon: 'bi-stamp', confirmText: 'Remover' }
             );
@@ -2427,7 +2490,7 @@ function adminApp() {
                 return;
             }
 
-            const confirmar = await showConfirm(
+            const confirmar = await this.showConfirm(
                 `Tem certeza que deseja deletar "${personalizacao.nome}"?`,
                 { type: 'danger', icon: 'bi-trash', confirmText: 'Deletar' }
             );
@@ -3002,7 +3065,7 @@ function adminApp() {
          * @param {string} tipo - 'logo' ou 'carimbo'
          */
         async removerImagem(empresa, tipo) {
-            const confirmar = await showConfirm(
+            const confirmar = await this.showConfirm(
                 `Deseja realmente remover o ${tipo} da empresa ${empresa.nome}?`,
                 { type: 'warning', icon: tipo === 'logo' ? 'bi-image' : 'bi-stamp', confirmText: 'Remover' }
             );
@@ -4202,7 +4265,7 @@ function adminApp() {
          * Pergunta se deseja gerar outro documento
          */
         async perguntarGerarOutroDocumento() {
-            const resposta = await showConfirm(
+            const resposta = await this.showConfirm(
                 'PDF gerado!\n\nDeseja gerar outro documento?',
                 { type: 'info', icon: 'bi-file-earmark-check', confirmText: 'Gerar Outro', cancelText: 'Não' }
             );
@@ -4216,7 +4279,7 @@ function adminApp() {
                 this.salvarCacheFluxo();
             } else {
                 // NÃO: Pergunta se quer gerar para outro cliente
-                const outroCliente = await showConfirm(
+                const outroCliente = await this.showConfirm(
                     'Deseja gerar documento para outro cliente?',
                     { type: 'info', icon: 'bi-person', confirmText: 'Outro Cliente', cancelText: 'Não' }
                 );
@@ -4279,7 +4342,7 @@ function adminApp() {
             
             // Verificar se há empresa e cliente selecionados
             if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
-                const usar = await showConfirm(
+                const usar = await this.showConfirm(
                     'Nenhuma empresa/cliente selecionado no fluxo.\n\nDeseja usar dados de exemplo para preview?\n\nDica: Use o TAB "Gerar PDF" para selecionar dados reais.',
                     { type: 'warning', icon: 'bi-exclamation-circle', confirmText: 'Usar Exemplo', cancelText: 'Cancelar' }
                 );
