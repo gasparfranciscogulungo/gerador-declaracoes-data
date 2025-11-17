@@ -4,32 +4,46 @@
 
 This is a **PWA for generating PDF documents** (Declarations, Receipts, NIF, etc.) for Angolan businesses. It uses **GitHub API as the backend** (no traditional server), Alpine.js for reactivity, and Tailwind CSS for styling. Currently **85% complete** - core infrastructure done, needs document type implementations.
 
+**Critical Constraint:** No build process, no npm, no backend server. Everything runs from static files + GitHub API. This architectural decision drives all implementation patterns below.
+
 ## Critical Architecture Patterns
 
 ### 1. GitHub-as-Backend Pattern
 **DO NOT** write code assuming traditional REST APIs. All data persistence goes through `js/github-api.js`:
 
 ```javascript
-// ✅ Correct: Use GitHub API
-await githubAPI.salvarArquivo('data/empresas.json', jsonContent, 'Update companies');
-const empresas = await githubAPI.lerArquivo('data/empresas.json');
+// ✅ Correct: Use GitHub API wrapper
+const result = await githubAPI.lerJSON('data/empresas.json');
+const empresas = result.data; // returns { data: [...], sha: "..." }
+
+await githubAPI.salvarJSON('data/empresas.json', empresas, 'Update companies');
+
+// For images: Upload returns GitHub raw URL
+const logoUrl = await githubAPI.uploadImagem(base64Data, 'assets/empresas/123/logo.png');
+// Returns: https://raw.githubusercontent.com/owner/repo/master/assets/empresas/123/logo.png
 
 // ❌ Wrong: Traditional fetch/POST
 fetch('/api/empresas', { method: 'POST', body: data });
 ```
 
-**Rate limits:** 5000 req/hr authenticated. Cache aggressively in LocalStorage for images and frequently accessed data.
+**Critical Details:**
+- **Rate limits:** 5000 req/hr authenticated. Cache aggressively in LocalStorage.
+- **Configuration:** Set in `js/config.js` via `CONFIG.github.owner` and `CONFIG.github.repo`
+- **Token:** User's Personal Access Token (scope: `repo`) stored in LocalStorage, set via `githubAPI.setToken()`
+- **Branch:** Defaults to `master`, configurable via `CONFIG.github.branch`
 
 ### 2. Alpine.js State Management
-All app state lives in the `adminApp()` function in `js/admin-controller.js` (4170 lines). When adding features:
+All app state lives in the `adminApp()` function in `js/admin-controller.js` (5330 lines). When adding features:
 
 ```javascript
-// ✅ Correct: Add to adminApp() return object
-return {
-  minhaNovaVariavel: false,
-  
-  minhaNovaFuncao() {
-    this.minhaNovaVariavel = true; // Use 'this.'
+// ✅ Correct: Add to adminApp() return object (line 7)
+function adminApp() {
+  return {
+    minhaNovaVariavel: false,
+    
+    minhaNovaFuncao() {
+      this.minhaNovaVariavel = true; // Use 'this.' to access state
+    }
   }
 }
 
@@ -38,6 +52,16 @@ let minhaVariavel = false;
 ```
 
 **No separation of concerns** - everything is in one massive Alpine component. This is intentional for simplicity.
+
+**Accessing from HTML:**
+```html
+<!-- In admin.html, bound via x-data="adminApp()" -->
+<button @click="minhaNovaFuncao()">Click</button>
+<div x-show="minhaNovaVariavel">Visible when true</div>
+
+<!-- From onclick attributes (for inline handlers) -->
+<button onclick="adminApp().cropperFoto1?.zoom(0.1)">Zoom+</button>
+```
 
 ### 3. Modal-Heavy UI Pattern
 The app uses **fullscreen modals** for all major workflows:
@@ -152,12 +176,19 @@ Follow this **mobile-first** progression:
 ## File Navigation
 
 ### Where to Find Things
-- **Main app logic:** `js/admin-controller.js` (4170 lines, search by function name)
+- **Main app logic:** `js/admin-controller.js` (5330 lines, search by function name)
+  - Line 7: `function adminApp()` - Entry point for all state/methods
+  - Line 142: `tipoPreview` state - Controls which document type is active
+  - Line 2663: `renderizarModelo()` - Document rendering dispatcher
 - **UI structure:** `admin.html` (3740 lines):
   - Lines 1720-2800: Modal Preview (critical for document rendering)
   - Lines 2995-3300: Modal Nova Empresa
   - Lines 1501-1720: Fluxo de Geração wizard
+  - Line 2563: Declaração preview template (working example)
 - **Data models:** `data/*.json` (on GitHub, use `github-api.js` to read/write)
+  - `empresas.json`: Company data with logos/stamps/colors
+  - `trabalhadores.json`: Worker/client data with salaries
+  - `users.json`: Authentication and permissions
 - **Document templates:** `js/modelos/` (only `declaracao-executivo.js` exists, create others)
 
 ### When to Edit What
@@ -214,28 +245,45 @@ localStorage.clear()          // Reset everything
 ### Empresa (Company)
 ```json
 {
-  "id": "string",
-  "nome": "string",
-  "nif": "string",
-  "logo": "url",
-  "carimbo": "url",
-  "endereco": { "rua": "", "municipio": "", "provincia": "" },
-  "corPrimaria": "#hex",
-  "corSecundaria": "#hex"
+  "id": "empresa_1763340238250",
+  "nome": "EMFC Consulting, S.A.",
+  "nif": "5480023446",
+  "endereco": {
+    "rua": "Avenida 4 de Fevereiro",
+    "edificio": "Edifício Summit Tower",
+    "andar": "5.º andar",
+    "sala": "Sala 502",
+    "bairro": "Bairro Kinaxixe",
+    "municipio": "Luanda",
+    "provincia": "Luanda",
+    "pais": "Angola"
+  },
+  "logo": "https://raw.githubusercontent.com/owner/repo/master/assets/empresas/123/logo.png",
+  "carimbo": "https://raw.githubusercontent.com/owner/repo/master/assets/empresas/123/carimbo.png",
+  "corPrimaria": "#1e40af",
+  "corSecundaria": "#64748b",
+  "contador": 0
 }
 ```
 
 ### Trabalhador (Worker/Client)
 ```json
 {
-  "id": "string",
-  "nome": "string",
-  "bi": "string",
-  "nif": "string",
-  "cargo": "string",
-  "salario": number,
-  "dataAdmissao": "ISO date",
-  "empresaId": "string"
+  "id": "TRAB-1763344070626-456",
+  "nome": "Gaspar Francisco",
+  "documento": "123456789BA",
+  "tipo_documento": "BI",
+  "nif": "123456789",
+  "data_nascimento": "2000-06-18",
+  "nacionalidade": "Angolana",
+  "funcao": "Contabilista",
+  "departamento": "Financeiro",
+  "data_admissao": "2023-09-09",
+  "tipo_contrato": "Contrato a termo incerto",
+  "salario_base": "200000",
+  "salario_liquido": "180000",
+  "moeda": "AKZ",
+  "ativo": true
 }
 ```
 

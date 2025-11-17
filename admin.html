@@ -3020,6 +3020,14 @@
                         <i class="bi bi-arrow-left text-xl"></i>
                     </button>
                     
+                    <!-- Botão Personalizar (Desktop only) -->
+                    <button @click="mostrarPersonalizacao = !mostrarPersonalizacao"
+                            :class="mostrarPersonalizacao ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
+                            class="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg transition-colors"
+                            title="Personalizar">
+                        <i class="bi bi-sliders text-xl"></i>
+                    </button>
+                    
                     <!-- Botão Zoom (Desktop e Mobile) -->
                     <button @click="mostrarControlesZoom = !mostrarControlesZoom"
                             :class="mostrarControlesZoom ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
@@ -4033,112 +4041,164 @@
                         </div>
                     </template>
                     
-                    <!-- PREVIEW: BI (Editor de Fotos) - 100% RESPONSIVO -->
+                    <!-- PREVIEW: BI (Editor de Fotos) - 1000% MOBILE OPTIMIZED -->
                     <template x-if="tipoPreview === 'bi'">
-                        <div class="w-full h-full p-3 sm:p-6 lg:p-8 overflow-y-auto" 
+                        <div class="w-full h-full p-4 sm:p-6 lg:p-8 overflow-y-auto" 
                              x-init="if (biFoto1Editada) { biFoto1Preview = biFoto1Editada; } if (biFoto2Editada) { biFoto2Preview = biFoto2Editada; }">
-                            <div class="max-w-4xl mx-auto">
-                                <h3 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
-                                    <i class="bi bi-person-badge text-pink-600 mr-2"></i>
-                                    <span class="hidden sm:inline">Editor de Bilhete de Identidade</span>
-                                    <span class="sm:hidden">Editor de BI</span>
-                                </h3>
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                                    <!-- FOTO 1 (Superior) -->
-                                    <div class="space-y-2 sm:space-y-3">
-                                        <label class="block text-sm font-bold" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">
-                                            <i class="bi bi-image mr-1"></i>Foto 1 (Superior)
+                            <div class="max-w-5xl mx-auto">
+                                <!-- Título Profissional -->
+                                <div class="text-center mb-6 sm:mb-8">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl mb-3 sm:mb-4">
+                                        <i class="bi bi-person-badge text-white text-3xl sm:text-4xl"></i>
+                                    </div>
+                                    <h3 class="text-2xl sm:text-3xl font-bold mb-2" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                                        Editor de BI
+                                    </h3>
+                                    <p class="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                                        <i class="bi bi-info-circle mr-1"></i>Adicione 2 fotos para gerar o bilhete
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                                    <!-- FOTO 1 (Superior) - MOBILE OPTIMIZADO -->
+                                    <div class="space-y-3">
+                                        <label class="block text-base sm:text-lg font-bold flex items-center gap-2" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">
+                                            <div class="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-sm font-bold">1</div>
+                                            <span>Foto Superior</span>
                                         </label>
                                         <div @click="$refs.inputFoto1.click()" 
-                                             class="relative w-full h-40 sm:h-64 md:h-80 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/10 group"
-                                             :class="biFoto1Preview ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20' : 'border-gray-300 dark:border-gray-600'">
-                                            <div x-show="biFoto1Preview" class="absolute inset-0 overflow-hidden rounded-xl">
+                                             class="relative w-full min-h-[280px] sm:min-h-[320px] lg:min-h-[380px] border-3 border-dashed rounded-2xl cursor-pointer transition-all group touch-manipulation"
+                                             :class="biFoto1Preview ? 'border-pink-500 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 shadow-lg' : 'border-gray-300 dark:border-gray-600 hover:border-pink-400 hover:bg-pink-50/50 dark:hover:bg-pink-900/10'">
+                                            
+                                            <!-- Preview da Foto -->
+                                            <div x-show="biFoto1Preview" class="absolute inset-0 overflow-hidden rounded-2xl p-2">
                                                 <img :src="biFoto1Preview" 
                                                      id="preview-foto1"
-                                                     class="w-full h-full object-contain bg-gray-100 dark:bg-gray-800">
+                                                     class="w-full h-full object-contain bg-gray-50 dark:bg-gray-900 rounded-xl">
                                             </div>
-                                            <div x-show="!biFoto1Preview" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-pink-500 transition-colors px-4">
-                                                <i class="bi bi-cloud-upload text-4xl sm:text-5xl md:text-6xl mb-2"></i>
-                                                <p class="font-medium text-sm sm:text-base text-center">Clique para adicionar foto</p>
-                                                <p class="text-xs mt-1">JPG, PNG - Máx 5MB</p>
+                                            
+                                            <!-- Estado Vazio - Instruções Claras -->
+                                            <div x-show="!biFoto1Preview" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-pink-500 transition-colors px-6 py-8">
+                                                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
+                                                    <i class="bi bi-cloud-upload text-4xl sm:text-5xl text-pink-500"></i>
+                                                </div>
+                                                <p class="font-bold text-base sm:text-lg text-center mb-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Toque para adicionar</p>
+                                                <p class="text-xs sm:text-sm text-center text-gray-500">JPG, PNG • Máx 5MB</p>
                                             </div>
+                                            
+                                            <!-- Overlay ao Hover (Desktop) ou Badge (Mobile) -->
                                             <div x-show="biFoto1Preview" 
-                                                 class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl px-4">
+                                                 class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center rounded-2xl p-4 sm:p-6">
                                                 <div class="text-white text-center">
-                                                    <i class="bi bi-pencil-square text-xl sm:text-2xl md:text-4xl mb-1"></i>
-                                                    <p class="font-medium text-sm sm:text-base">Clique para trocar/editar</p>
+                                                    <i class="bi bi-pencil-square text-2xl sm:text-3xl mb-2"></i>
+                                                    <p class="font-semibold text-sm sm:text-base">Toque para trocar foto</p>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Badge "Foto Adicionada" (Visível em Mobile) -->
+                                            <div x-show="biFoto1Preview" class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                <span>OK</span>
+                                            </div>
                                         </div>
+                                        
                                         <input type="file" 
                                                x-ref="inputFoto1"
                                                @change="carregarFotoBI(1, $event)"
                                                accept="image/*"
                                                class="hidden">
-                                        <div x-show="biFoto1Preview" class="flex gap-2 mt-2">
+                                        
+                                        <!-- Botões de Ação - MOBILE FRIENDLY -->
+                                        <div x-show="biFoto1Preview" x-transition class="flex gap-3">
                                             <button @click.stop="abrirCropperBI(1)" 
-                                                    class="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm sm:text-base font-medium touch-manipulation">
-                                                <i class="bi bi-crop mr-1"></i>Cortar
+                                                    class="flex-1 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white rounded-xl transition-all font-bold shadow-lg hover:shadow-xl touch-manipulation flex items-center justify-center gap-2 text-base">
+                                                <i class="bi bi-crop text-xl"></i>
+                                                <span>Editar</span>
                                             </button>
                                             <button @click.stop="removerFotoBI(1)" 
-                                                    class="px-3 sm:px-4 py-2 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm sm:text-base font-medium touch-manipulation">
-                                                <i class="bi bi-trash"></i>
+                                                    class="h-14 w-14 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-xl transition-all shadow-lg hover:shadow-xl touch-manipulation flex items-center justify-center">
+                                                <i class="bi bi-trash text-xl"></i>
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- FOTO 2 (Inferior) -->
-                                    <div class="space-y-2 sm:space-y-3">
-                                        <label class="block text-sm font-bold" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">
-                                            <i class="bi bi-image mr-1"></i>Foto 2 (Inferior)
+                                    <!-- FOTO 2 (Inferior) - MOBILE OPTIMIZADO -->
+                                    <div class="space-y-3">
+                                        <label class="block text-base sm:text-lg font-bold flex items-center gap-2" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">
+                                            <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-bold">2</div>
+                                            <span>Foto Inferior</span>
                                         </label>
                                         <div @click="$refs.inputFoto2.click()" 
-                                             class="relative w-full h-40 sm:h-64 md:h-80 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/10 group"
-                                             :class="biFoto2Preview ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20' : 'border-gray-300 dark:border-gray-600'">
-                                            <div x-show="biFoto2Preview" class="absolute inset-0 overflow-hidden rounded-xl">
+                                             class="relative w-full min-h-[280px] sm:min-h-[320px] lg:min-h-[380px] border-3 border-dashed rounded-2xl cursor-pointer transition-all group touch-manipulation"
+                                             :class="biFoto2Preview ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 shadow-lg' : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/10'">
+                                            
+                                            <!-- Preview da Foto -->
+                                            <div x-show="biFoto2Preview" class="absolute inset-0 overflow-hidden rounded-2xl p-2">
                                                 <img :src="biFoto2Preview" 
                                                      id="preview-foto2"
-                                                     class="w-full h-full object-contain bg-gray-100 dark:bg-gray-800">
+                                                     class="w-full h-full object-contain bg-gray-50 dark:bg-gray-900 rounded-xl">
                                             </div>
-                                            <div x-show="!biFoto2Preview" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-pink-500 transition-colors px-4">
-                                                <i class="bi bi-cloud-upload text-4xl sm:text-5xl md:text-6xl mb-2"></i>
-                                                <p class="font-medium text-sm sm:text-base text-center">Clique para adicionar foto</p>
-                                                <p class="text-xs mt-1">JPG, PNG - Máx 5MB</p>
+                                            
+                                            <!-- Estado Vazio - Instruções Claras -->
+                                            <div x-show="!biFoto2Preview" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-purple-500 transition-colors px-6 py-8">
+                                                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 flex items-center justify-center mb-4">
+                                                    <i class="bi bi-cloud-upload text-4xl sm:text-5xl text-purple-500"></i>
+                                                </div>
+                                                <p class="font-bold text-base sm:text-lg text-center mb-2" :class="darkMode ? 'text-gray-300' : 'text-gray-700'">Toque para adicionar</p>
+                                                <p class="text-xs sm:text-sm text-center text-gray-500">JPG, PNG • Máx 5MB</p>
                                             </div>
+                                            
+                                            <!-- Overlay ao Hover (Desktop) -->
                                             <div x-show="biFoto2Preview" 
-                                                 class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl px-4">
+                                                 class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center rounded-2xl p-4 sm:p-6">
                                                 <div class="text-white text-center">
-                                                    <i class="bi bi-pencil-square text-xl sm:text-2xl md:text-4xl mb-1"></i>
-                                                    <p class="font-medium text-sm sm:text-base">Clique para trocar/editar</p>
+                                                    <i class="bi bi-pencil-square text-2xl sm:text-3xl mb-2"></i>
+                                                    <p class="font-semibold text-sm sm:text-base">Toque para trocar foto</p>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Badge "Foto Adicionada" -->
+                                            <div x-show="biFoto2Preview" class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                <span>OK</span>
+                                            </div>
                                         </div>
+                                        
                                         <input type="file" 
                                                x-ref="inputFoto2"
                                                @change="carregarFotoBI(2, $event)"
                                                accept="image/*"
                                                class="hidden">
-                                        <div x-show="biFoto2Preview" class="flex gap-2 mt-2">
+                                        
+                                        <!-- Botões de Ação - MOBILE FRIENDLY -->
+                                        <div x-show="biFoto2Preview" x-transition class="flex gap-3">
                                             <button @click.stop="abrirCropperBI(2)" 
-                                                    class="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm sm:text-base font-medium touch-manipulation">
-                                                <i class="bi bi-crop mr-1"></i>Cortar
+                                                    class="flex-1 h-14 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 active:from-purple-700 active:to-purple-800 text-white rounded-xl transition-all font-bold shadow-lg hover:shadow-xl touch-manipulation flex items-center justify-center gap-2 text-base">
+                                                <i class="bi bi-crop text-xl"></i>
+                                                <span>Editar</span>
                                             </button>
                                             <button @click.stop="removerFotoBI(2)" 
-                                                    class="px-3 sm:px-4 py-2 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm sm:text-base font-medium touch-manipulation">
-                                                <i class="bi bi-trash"></i>
+                                                    class="h-14 w-14 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-xl transition-all shadow-lg hover:shadow-xl touch-manipulation flex items-center justify-center">
+                                                <i class="bi bi-trash text-xl"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Toggle Modo Manual -->
-                                <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
-                                    <label class="flex items-center cursor-pointer">
-                                        <input type="checkbox" 
-                                               x-model="biModoManual"
-                                               class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                                        <span class="ml-3 font-medium" :class="darkMode ? 'text-gray-200' : 'text-gray-800'">
-                                            <i class="bi bi-pencil-square mr-1"></i>Modo Manual
-                                        </span>
-                                        <span class="ml-2 text-xs text-gray-500">(Preencher dados manualmente)</span>
+                                <!-- Toggle Modo Manual - MELHORADO -->
+                                <div class="mt-8 p-5 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-600 rounded-2xl">
+                                    <label class="flex items-center cursor-pointer touch-manipulation">
+                                        <div class="relative">
+                                            <input type="checkbox" 
+                                                   x-model="biModoManual"
+                                                   class="sr-only peer">
+                                            <div class="w-14 h-8 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-6 rtl:peer-checked:after:-translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:start-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </div>
+                                        <div class="ml-4 flex-1">
+                                            <div class="font-bold text-base sm:text-lg flex items-center gap-2" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
+                                                <i class="bi bi-pencil-square text-blue-600"></i>
+                                                <span>Modo Manual</span>
+                                            </div>
+                                            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">Preencher dados manualmente do titular</p>
+                                        </div>
                                     </label>
                                 </div>
                                 <!-- Campos Manuais (aparecem quando modo manual ativado) -->
@@ -4189,18 +4249,60 @@
                                         Sem modo manual, os dados vêm da empresa e cliente selecionados no fluxo
                                     </p>
                                 </div>
-                                <!-- Botão Gerar BI -->
-                                <div class="mt-8 text-center">
+                                <!-- Botão Gerar BI - DESTACADO MOBILE -->
+                                <div class="mt-10 sm:mt-12">
+                                    <!-- Indicador de Progresso -->
+                                    <div class="mb-6 bg-white dark:bg-gray-800 rounded-2xl p-5 sm:p-6 shadow-lg">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-sm font-bold" :class="darkMode ? 'text-gray-200' : 'text-gray-700'">Progresso</span>
+                                            <span class="text-sm font-bold" :class="(biFoto1Preview && biFoto2Preview) ? 'text-green-600' : 'text-gray-500'">
+                                                <span x-text="(biFoto1Preview ? 1 : 0) + (biFoto2Preview ? 1 : 0)"></span>/2 fotos
+                                            </span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                            <div class="bg-gradient-to-r from-pink-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                                                 :style="'width: ' + ((biFoto1Preview ? 50 : 0) + (biFoto2Preview ? 50 : 0)) + '%'"></div>
+                                        </div>
+                                        <div class="flex items-center gap-4 mt-4">
+                                            <div class="flex items-center gap-2">
+                                                <i :class="biFoto1Preview ? 'bi bi-check-circle-fill text-green-500' : 'bi bi-circle text-gray-400'"></i>
+                                                <span class="text-xs sm:text-sm" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Foto 1</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i :class="biFoto2Preview ? 'bi bi-check-circle-fill text-green-500' : 'bi bi-circle text-gray-400'"></i>
+                                                <span class="text-xs sm:text-sm" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Foto 2</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botão Principal -->
                                     <button @click="gerarBIPDF()" 
                                             :disabled="!biFoto1Preview || !biFoto2Preview"
-                                            :class="(biFoto1Preview && biFoto2Preview) ? 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'"
-                                            class="px-8 py-4 text-white rounded-xl transition-all font-bold shadow-lg hover:shadow-2xl text-lg touch-manipulation">
-                                        <i class="bi bi-file-earmark-pdf-fill mr-2"></i>
-                                        Gerar BI em PDF
+                                            :class="(biFoto1Preview && biFoto2Preview) ? 'bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:via-purple-700 hover:to-indigo-700 active:scale-95 shadow-2xl' : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-60'"
+                                            class="w-full h-16 sm:h-20 text-white rounded-2xl transition-all font-black text-lg sm:text-xl touch-manipulation flex items-center justify-center gap-3">
+                                        <i class="bi bi-file-earmark-pdf-fill text-2xl sm:text-3xl"></i>
+                                        <span>Gerar BI em PDF</span>
                                     </button>
-                                    <p class="text-xs text-gray-500 mt-3" x-show="!biFoto1Preview || !biFoto2Preview">
-                                        <i class="bi bi-info-circle mr-1"></i>Adicione as 2 fotos para gerar o BI
-                                    </p>
+                                    
+                                    <!-- Mensagem de Aviso -->
+                                    <div x-show="!biFoto1Preview || !biFoto2Preview" 
+                                         x-transition
+                                         class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-xl">
+                                        <p class="text-sm text-center font-medium text-yellow-800 dark:text-yellow-300 flex items-center justify-center gap-2">
+                                            <i class="bi bi-exclamation-triangle-fill text-xl"></i>
+                                            <span>Adicione as 2 fotos para gerar o BI</span>
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Mensagem de Sucesso -->
+                                    <div x-show="biFoto1Preview && biFoto2Preview" 
+                                         x-transition
+                                         class="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl">
+                                        <p class="text-sm text-center font-medium text-green-800 dark:text-green-300 flex items-center justify-center gap-2">
+                                            <i class="bi bi-check-circle-fill text-xl"></i>
+                                            <span>Pronto! Clique acima para gerar o PDF</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4348,72 +4450,94 @@
     </template>
 
     <!-- ===================================================================== -->
-    <!-- MODAL: CROPPER BI (Editor de Corte de Fotos) - 100% MOBILE OPTIMIZED -->
+    <!-- MODAL: CROPPER BI (Editor de Corte de Fotos) - 1000% MOBILE PERFECTION -->
     <!-- ===================================================================== -->
     <div x-show="modalCropperBI" 
-         x-transition
-         class="fixed inset-0 bg-black/95 flex items-center justify-center z-[60] p-0">
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black flex items-center justify-center z-[60] p-0">
         
-        <div :class="darkMode ? 'bg-gray-900' : 'bg-gray-100'" 
-             class="w-full h-full flex flex-col overflow-hidden">
+        <div class="w-full h-full flex flex-col overflow-hidden bg-black">
             
-            <!-- HEADER COMPACTO MOBILE -->
-            <div class="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-3 py-2.5 flex items-center justify-between shrink-0">
-                <h3 class="text-sm font-bold flex items-center gap-1.5">
-                    <i class="bi bi-crop text-base"></i>
-                    <span>Editar Foto <span x-text="cropperFotoAtual" class="font-normal"></span></span>
-                </h3>
+            <!-- HEADER MELHORADO COM STATUS -->
+            <div class="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white px-4 py-4 flex items-center justify-between shrink-0 shadow-2xl">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur">
+                        <i class="bi bi-crop text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold">Editor de Foto</h3>
+                        <p class="text-xs text-white/80">Foto <span x-text="cropperFotoAtual"></span></p>
+                    </div>
+                </div>
                 <button @click="fecharCropperBI()" 
-                        class="text-white hover:text-gray-200 text-3xl leading-none touch-manipulation w-10 h-10 flex items-center justify-center">
-                    ×
+                        class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center touch-manipulation transition-colors">
+                    <i class="bi bi-x-lg text-2xl"></i>
                 </button>
             </div>
 
-            <!-- ÁREA DO CROPPER - MOBILE FULL -->
-            <div class="flex-1 overflow-hidden bg-gray-900 flex items-center justify-center relative min-h-0">
-                <!-- Dica Touch Mobile -->
-                <div class="absolute top-3 left-3 right-3 bg-black/80 text-white text-xs px-3 py-2 rounded-lg z-10 backdrop-blur-sm">
-                    <i class="bi bi-hand-index-thumb mr-1.5"></i>
-                    <span class="font-medium">Use 2 dedos para ajustar</span>
+            <!-- ÁREA DO CROPPER - OTIMIZADA -->
+            <div class="flex-1 overflow-hidden bg-gray-950 flex items-center justify-center relative min-h-0">
+                <!-- Dica Touch - Mais Destacada -->
+                <div class="absolute top-4 left-4 right-4 bg-gradient-to-r from-pink-600/90 to-purple-600/90 text-white px-4 py-3 rounded-xl z-10 backdrop-blur-md shadow-2xl border border-white/20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-hand-index-thumb text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Gestos Disponíveis</p>
+                            <p class="text-xs opacity-90">Pinça: zoom • Arraste: mover • 2 dedos: girar</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div id="cropper-container" class="w-full h-full flex items-center justify-center touch-manipulation p-2">
-                    <img id="cropper-image" style="max-width: 100%; max-height: 100%; display: block; touch-action: none;">
+                <!-- Container do Cropper -->
+                <div id="cropper-container" class="w-full h-full flex items-center justify-center touch-manipulation p-4">
+                    <img id="cropper-image" 
+                         style="max-width: 100%; max-height: 100%; display: block; touch-action: none;"
+                         class="rounded-lg">
                 </div>
             </div>
 
-            <!-- FOOTER: CONTROLES MOBILE COMPACTOS -->
-            <div :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'" 
-                 class="px-3 py-2.5 flex flex-col gap-2 border-t shrink-0">
+            <!-- FOOTER: CONTROLES OTIMIZADOS -->
+            <div class="bg-gradient-to-b from-gray-900 to-black border-t border-gray-800 px-4 py-4 sm:py-5 flex flex-col gap-4 shrink-0">
                 
-                <!-- Controles de Rotação - Compacto -->
-                <div class="flex items-center justify-center gap-2">
+                <!-- Controles de Rotação - MAIORES E MAIS CLAROS -->
+                <div class="grid grid-cols-3 gap-3">
                     <button @click="rotacionarCropper(-90)" 
-                            class="flex-1 max-w-[100px] h-11 bg-blue-500 active:bg-blue-600 text-white rounded-lg touch-manipulation flex items-center justify-center">
-                        <i class="bi bi-arrow-counterclockwise text-xl"></i>
+                            class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                        <i class="bi bi-arrow-counterclockwise text-2xl"></i>
+                        <span class="text-xs font-medium">-90°</span>
                     </button>
                     
                     <button @click="resetarCropper()" 
-                            class="flex-1 max-w-[100px] h-11 bg-gray-500 active:bg-gray-600 text-white rounded-lg touch-manipulation flex items-center justify-center">
-                        <i class="bi bi-arrow-repeat text-xl"></i>
+                            class="h-14 sm:h-16 bg-gradient-to-br from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                        <i class="bi bi-arrow-repeat text-2xl"></i>
+                        <span class="text-xs font-medium">Reset</span>
                     </button>
                     
                     <button @click="rotacionarCropper(90)" 
-                            class="flex-1 max-w-[100px] h-11 bg-blue-500 active:bg-blue-600 text-white rounded-lg touch-manipulation flex items-center justify-center">
-                        <i class="bi bi-arrow-clockwise text-xl"></i>
+                            class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                        <i class="bi bi-arrow-clockwise text-2xl"></i>
+                        <span class="text-xs font-medium">+90°</span>
                     </button>
                 </div>
                 
-                <!-- Botões de Ação Principal -->
-                <div class="flex gap-2">
+                <!-- Botões de Ação Principal - DESTACADOS -->
+                <div class="flex gap-3">
                     <button @click="fecharCropperBI()" 
-                            :class="darkMode ? 'bg-gray-700 active:bg-gray-600 text-gray-200' : 'bg-gray-200 active:bg-gray-300 text-gray-700'"
-                            class="flex-1 h-12 rounded-lg font-medium touch-manipulation text-sm">
-                        Cancelar
+                            class="flex-1 h-14 sm:h-16 bg-gray-700 hover:bg-gray-600 active:bg-gray-500 active:scale-95 text-white rounded-xl font-bold shadow-lg touch-manipulation text-base transition-all flex items-center justify-center gap-2">
+                        <i class="bi bi-x-circle text-xl"></i>
+                        <span>Cancelar</span>
                     </button>
                     <button @click="aplicarCorte()" 
-                            class="flex-1 h-12 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg active:from-pink-700 active:to-purple-700 font-bold shadow-lg touch-manipulation text-sm">
-                        <i class="bi bi-check-lg mr-1.5"></i>Aplicar
+                            class="flex-1 h-14 sm:h-16 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:via-purple-700 hover:to-indigo-700 active:scale-95 text-white rounded-xl font-black shadow-2xl touch-manipulation text-base transition-all flex items-center justify-center gap-2">
+                        <i class="bi bi-check-circle-fill text-xl"></i>
+                        <span>Aplicar Corte</span>
                     </button>
                 </div>
             </div>
