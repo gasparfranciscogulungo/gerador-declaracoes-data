@@ -1,29 +1,6 @@
 {
   "trabalhadores": [
     {
-      "id": "TRAB-1763342687265-469",
-      "nome": "testst",
-      "documento": "23131231",
-      "tipo_documento": "BI",
-      "nif": "010167478",
-      "data_nascimento": "123123132",
-      "nacionalidade": "Angolana",
-      "morada": "ladshlasd8asd8asdasd",
-      "cidade": "",
-      "telefone": "1312312312",
-      "email": "Gaspa@gmail.com",
-      "funcao": "test",
-      "departamento": "reqweqwe",
-      "data_admissao": "asdasdasdas",
-      "tipo_contrato": "Contrato a termo incerto",
-      "salario_bruto": "00912093012391",
-      "salario_liquido": "1009321",
-      "moeda": "AKZ",
-      "iban": "1231231231",
-      "ativo": true,
-      "observacoes": ""
-    },
-    {
       "id": "TRAB-1763344070626-456",
       "nome": "Gaspar Francisco",
       "documento": "",
