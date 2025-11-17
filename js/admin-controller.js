@@ -144,6 +144,7 @@ function adminApp() {
         menuPreviewOpen: false, // Menu hamburger para tipos de documento
         mostrarControlesZoom: false, // Controles de zoom (toggle)
         mostrarAcoesPDF: false, // Ações PDF: Nova Aba, Imprimir, Baixar (toggle)
+        menuFlutuanteMobile: false, // Menu flutuante profissional (mobile)
         
         // Customização do Preview
         previewConfig: {
