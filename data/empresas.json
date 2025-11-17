@@ -27,32 +27,6 @@
       "contador": 0
     },
     {
-      "id": "empresa_1763341942032",
-      "nome": "Empresa de exemplo",
-      "nif": "5480023446",
-      "endereco": {
-        "completo": "Sede: Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
-        "rua": "Sede: Avenida 4 de Fevereiro",
-        "edificio": "",
-        "andar": "",
-        "sala": "",
-        "bairro": "",
-        "municipio": "",
-        "provincia": "",
-        "pais": "Angola"
-      },
-      "enderecoCompleto": "Sede: Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-17T01:23:25.568Z"
-    },
-    {
       "id": "empresa_1763342578417",
       "nome": "Empresa Gaspar Francisco",
       "nif": "578395934",
