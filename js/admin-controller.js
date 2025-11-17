@@ -1412,6 +1412,35 @@ function adminApp() {
                     return;
                 }
 
+                // Processar endereço baseado no modo selecionado
+                if (!this.modoEnderecoDetalhado && this.empresaForm.enderecoCompleto) {
+                    // Modo completo: usar endereço completo e criar um objeto básico
+                    this.empresaForm.endereco = {
+                        completo: this.empresaForm.enderecoCompleto,
+                        rua: this.empresaForm.enderecoCompleto.split(',')[0] || this.empresaForm.enderecoCompleto,
+                        edificio: '',
+                        andar: '',
+                        sala: '',
+                        bairro: '',
+                        municipio: '',
+                        provincia: '',
+                        pais: 'Angola'
+                    };
+                } else if (this.modoEnderecoDetalhado) {
+                    // Modo detalhado: garantir que o campo completo também seja preenchido
+                    const partes = [];
+                    if (this.empresaForm.endereco.rua) partes.push(this.empresaForm.endereco.rua);
+                    if (this.empresaForm.endereco.edificio) partes.push(this.empresaForm.endereco.edificio);
+                    if (this.empresaForm.endereco.andar) partes.push(this.empresaForm.endereco.andar);
+                    if (this.empresaForm.endereco.sala) partes.push(this.empresaForm.endereco.sala);
+                    if (this.empresaForm.endereco.bairro) partes.push('Bairro ' + this.empresaForm.endereco.bairro);
+                    if (this.empresaForm.endereco.municipio) partes.push(this.empresaForm.endereco.municipio);
+                    if (this.empresaForm.endereco.provincia) partes.push(this.empresaForm.endereco.provincia);
+                    if (this.empresaForm.endereco.pais) partes.push(this.empresaForm.endereco.pais);
+                    
+                    this.empresaForm.endereco.completo = partes.join(', ');
+                }
+                
                 // Limpar URLs de cache antes de salvar
                 const logoLimpo = this.limparUrlCache(this.empresaForm.logo);
                 const carimboLimpo = this.limparUrlCache(this.empresaForm.carimbo);
@@ -1492,6 +1521,7 @@ function adminApp() {
                 nome: empresa.nome,
                 nif: empresa.nif,
                 endereco: { ...empresa.endereco },
+                enderecoCompleto: empresa.endereco?.completo || '',
                 telefone: empresa.telefone || '',
                 email: empresa.email || '',
                 website: empresa.website || '',
@@ -1503,6 +1533,17 @@ function adminApp() {
                 corSecundaria: empresa.corSecundaria || '#64748b',
                 marcaDagua: empresa.marcaDagua || ''
             };
+            
+            // Detectar modo de endereço ao editar
+            // Se tem endereço completo e campos detalhados vazios, usar modo completo
+            const camposDetalhadosVazios = !empresa.endereco?.edificio && !empresa.endereco?.andar && 
+                                          !empresa.endereco?.sala && !empresa.endereco?.bairro;
+            
+            if (empresa.endereco?.completo && camposDetalhadosVazios) {
+                this.modoEnderecoDetalhado = false;
+            } else {
+                this.modoEnderecoDetalhado = true;
+            }
             
             // Se não tiver preview, carregar do cache
             if (empresa.logo && !this.empresaForm.logoPreview) {
@@ -1545,6 +1586,7 @@ function adminApp() {
                         provincia: '',
                         pais: 'Angola'
                     },
+                    enderecoCompleto: '',
                     telefone: '',
                     email: '',
                     website: '',
@@ -1554,6 +1596,9 @@ function adminApp() {
                     corSecundaria: '#64748b',
                     marcaDagua: ''
                 };
+                
+                // Resetar modo para detalhado por padrão
+                this.modoEnderecoDetalhado = true;
             }, 300);
         },
 

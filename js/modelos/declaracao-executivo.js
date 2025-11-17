@@ -143,9 +143,13 @@ const ModeloDeclaracaoExecutivo = {
                             line-height: 1.3;
                         ">
                             <p style="margin: 2px 0;"><strong>NIF/CC:</strong> ${empresa.nif}</p>
-                            <p style="margin: 2px 0;"><strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}</p>
+                            ${empresa.endereco.completo ? 
+                                `<p style="margin: 2px 0;"><strong>Sede:</strong> ${empresa.endereco.completo}</p>` 
+                                : 
+                                `<p style="margin: 2px 0;"><strong>Sede:</strong> ${empresa.endereco.rua}${empresa.endereco.edificio ? ', ' + empresa.endereco.edificio : ''}${empresa.endereco.andar ? ', ' + empresa.endereco.andar : ''}${empresa.endereco.sala ? ', ' + empresa.endereco.sala : ''}</p>
                             <p style="margin: 2px 0;">Bairro ${empresa.endereco.bairro} — Município de ${empresa.endereco.municipio}</p>
-                            <p style="margin: 2px 0;">${empresa.endereco.provincia} — ${empresa.endereco.pais}</p>
+                            <p style="margin: 2px 0;">${empresa.endereco.provincia} — ${empresa.endereco.pais}</p>`
+                            }
                         </div>
                     </div>
                 </div>
@@ -175,7 +179,7 @@ const ModeloDeclaracaoExecutivo = {
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
                         na <strong>${empresa.nome}</strong>, NIF <strong>${empresa.nif}</strong>, 
-                        sediada em ${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}.
+                        sediada em ${empresa.endereco.completo || `${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}`}.
                     </p>
                     
                     <p style="margin-bottom: 8px;">
@@ -198,7 +202,7 @@ const ModeloDeclaracaoExecutivo = {
                 <!-- RODAPÉ -->
                 <div style="margin-top: 15px;">
                     <p style="font-size: 9pt; margin-bottom: 20px;">
-                        ${empresa.endereco.municipio}, aos ${dataAtual}.
+                        ${empresa.endereco.municipio || (empresa.endereco.completo ? empresa.endereco.completo.split(',').slice(-2)[0].trim() : 'Luanda')}, aos ${dataAtual}.
                     </p>
                     
                     <!-- Assinatura e Carimbo Centralizados -->
