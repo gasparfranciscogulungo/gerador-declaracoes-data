@@ -75,11 +75,7 @@ class ClienteManager {
     // ===============================================
     
     validarNIF(nif) {
-        if (!nif) return { valido: false, erro: 'NIF é obrigatório' };
-        const nifLimpo = nif.replace(/\D/g, '');
-        if (nifLimpo.length !== 9) {
-            return { valido: false, erro: 'NIF deve ter 9 dígitos' };
-        }
+        // NIF TOTALMENTE LIVRE - SEM VALIDAÇÃO
         return { valido: true };
     }
 
@@ -132,10 +128,7 @@ class ClienteManager {
             erros.push('Nome é obrigatório');
         }
 
-        const resultadoNIF = this.validarNIF(dados.nif);
-        if (!resultadoNIF.valido) {
-            erros.push(resultadoNIF.erro);
-        }
+        // NIF - SEM VALIDAÇÃO (aceita qualquer valor)
 
         const resultadoEmail = this.validarEmail(dados.email);
         if (!resultadoEmail.valido) {
