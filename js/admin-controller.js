@@ -293,6 +293,13 @@ function adminApp() {
         // Controle de modo de endereço
         modoEnderecoDetalhado: true, // true = campos separados, false = textarea completo
         
+        // Controle de modo de morada do trabalhador
+        modoMoradaDetalhado: true,
+        
+        // Formatação de salário
+        salarioBaseFormatado: '',
+        salarioExtenso: '',
+        
         // Managers
         userManager: null,
 
@@ -783,9 +790,106 @@ function adminApp() {
         editarTrabalhadorObj: {},
         visualizarTrabalhador: null,
 
+        /**
+         * Formata valor monetário para padrão angolano (250.000,00)
+         */
+        formatarSalarioBase(valor) {
+            // Remove tudo que não é número
+            let numeros = valor.replace(/\D/g, '');
+            
+            // Converte para número
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            // Armazena valor real
+            this.novoTrabalhador.salario_base = valorNumerico.toFixed(2);
+            
+            // Formata para exibição
+            this.salarioBaseFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+            
+            // Converte para extenso
+            this.salarioExtenso = this.numeroParaExtenso(valorNumerico);
+        },
+        
+        /**
+         * Converte número para extenso em português
+         */
+        numeroParaExtenso(valor) {
+            if (!valor || valor === 0) return '';
+            
+            const unidades = ['', 'Um', 'Dois', 'Três', 'Quatro', 'Cinco', 'Seis', 'Sete', 'Oito', 'Nove'];
+            const dezenas = ['', '', 'Vinte', 'Trinta', 'Quarenta', 'Cinquenta', 'Sessenta', 'Setenta', 'Oitenta', 'Noventa'];
+            const especiais = ['Dez', 'Onze', 'Doze', 'Treze', 'Catorze', 'Quinze', 'Dezesseis', 'Dezessete', 'Dezoito', 'Dezenove'];
+            const centenas = ['', 'Cento', 'Duzentos', 'Trezentos', 'Quatrocentos', 'Quinhentos', 'Seiscentos', 'Setecentos', 'Oitocentos', 'Novecentos'];
+            
+            const converterGrupo = (num) => {
+                if (num === 0) return '';
+                if (num === 100) return 'Cem';
+                
+                let resultado = '';
+                const c = Math.floor(num / 100);
+                const d = Math.floor((num % 100) / 10);
+                const u = num % 10;
+                
+                if (c > 0) resultado += centenas[c];
+                
+                if (d === 1) {
+                    if (resultado) resultado += ' e ';
+                    resultado += especiais[u];
+                } else {
+                    if (d > 0) {
+                        if (resultado) resultado += ' e ';
+                        resultado += dezenas[d];
+                    }
+                    if (u > 0) {
+                        if (resultado) resultado += ' e ';
+                        resultado += unidades[u];
+                    }
+                }
+                
+                return resultado;
+            };
+            
+            const parteInteira = Math.floor(valor);
+            const centavos = Math.round((valor - parteInteira) * 100);
+            
+            let extenso = '';
+            
+            if (parteInteira >= 1000000) {
+                const milhoes = Math.floor(parteInteira / 1000000);
+                extenso += milhoes === 1 ? 'Um Milhão' : converterGrupo(milhoes) + ' Milhões';
+                parteInteira %= 1000000;
+                if (parteInteira > 0) extenso += ' e ';
+            }
+            
+            if (parteInteira >= 1000) {
+                const milhares = Math.floor(parteInteira / 1000);
+                extenso += milhares === 1 ? 'Mil' : converterGrupo(milhares) + ' Mil';
+                parteInteira %= 1000;
+                if (parteInteira > 0) extenso += ' e ';
+            }
+            
+            if (parteInteira > 0) {
+                extenso += converterGrupo(parteInteira);
+            }
+            
+            extenso += ' Kwanzas';
+            
+            if (centavos > 0) {
+                extenso += ' e ' + converterGrupo(centavos) + ' Cêntimos';
+            }
+            
+            return extenso;
+        },
+        
         abrirModalNovoTrabalhador() {
             this.modalNovoTrabalhador = true;
             this.novoTrabalhador = Object.assign({}, ClienteManager.MODELO_TRABALHADOR);
+            this.salarioBaseFormatado = '';
+            this.salarioExtenso = '';
+            this.modoMoradaDetalhado = true;
         },
 
         async salvarNovoTrabalhador() {
@@ -793,15 +897,35 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Salvando trabalhador...';
                 
+                // Processar morada baseada no modo selecionado
+                if (!this.modoMoradaDetalhado && this.novoTrabalhador.morada_completa) {
+                    // Modo completo: usar morada completa e preencher campo legado
+                    this.novoTrabalhador.morada = this.novoTrabalhador.morada_completa;
+                } else if (this.modoMoradaDetalhado) {
+                    // Modo detalhado: montar morada completa a partir dos campos
+                    const partes = [];
+                    if (this.novoTrabalhador.morada_edificio) partes.push(this.novoTrabalhador.morada_edificio);
+                    if (this.novoTrabalhador.morada_apartamento) partes.push(this.novoTrabalhador.morada_apartamento);
+                    if (this.novoTrabalhador.morada_bairro) partes.push(this.novoTrabalhador.morada_bairro);
+                    if (this.novoTrabalhador.morada_municipio) partes.push('Município ' + this.novoTrabalhador.morada_municipio);
+                    if (this.novoTrabalhador.morada_provincia) partes.push(this.novoTrabalhador.morada_provincia);
+                    
+                    this.novoTrabalhador.morada_completa = partes.join(', ');
+                    this.novoTrabalhador.morada = this.novoTrabalhador.morada_completa;
+                }
+                
+                // Salvar valor por extenso
+                this.novoTrabalhador.salario_extenso = this.salarioExtenso;
+                
                 await this.clienteManager.criar(this.novoTrabalhador);
                 await this.carregarTrabalhadores();
                 this.filtrarTrabalhadores();
                 
                 this.modalNovoTrabalhador = false;
-                this.showAlert('success', 'Trabalhador criado com sucesso!');
+                alert('✅ Trabalhador criado com sucesso!');
                 
             } catch (e) {
-                this.showAlert('error', e.message || 'Erro ao criar trabalhador');
+                alert('❌ Erro ao criar trabalhador: ' + (e.message || 'Erro desconhecido'));
             } finally {
                 this.loading = false;
             }

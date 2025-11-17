@@ -36,19 +36,33 @@ class ClienteManager {
             nome: '',
             documento: '',              // BI/CC number
             tipo_documento: 'BI',       // BI ou CC
-            nif: '',
-            data_nascimento: '',        // DD/MM/YYYY
+            nif: '',                    // Aceita alfanumérico (008408047LA047)
+            data_nascimento: '',        // YYYY-MM-DD (formato date input)
             nacionalidade: 'Angolana',
-            morada: '',
+            // Morada detalhada
+            morada_edificio: '',
+            morada_apartamento: '',
+            morada_bairro: '',
+            morada_municipio: '',
+            morada_provincia: '',
+            morada_completa: '',        // Formato livre alternativo
+            morada: '',                 // Campo legado
             cidade: '',
             telefone: '',
             email: '',
             funcao: '',                 // Cargo/função
             departamento: '',
-            data_admissao: '',          // DD/MM/YYYY
-            tipo_contrato: 'Contrato sem termo',
-            salario_bruto: '0.00',
-            salario_liquido: '0.00',
+            data_admissao: '',          // YYYY-MM-DD (formato date input)
+            tipo_contrato: '',
+            // Salário para declaração
+            salario_base: '0.00',       // Salário base (obrigatório para declaração)
+            salario_extenso: '',        // Valor por extenso gerado automaticamente
+            // Campos opcionais para recibo de salário
+            subsidio_alimentacao: '0.00',
+            subsidio_transporte: '0.00',
+            irt: '0.00',
+            salario_bruto: '0.00',      // Calculado automaticamente se necessário
+            salario_liquido: '0.00',    // Calculado automaticamente se necessário
             moeda: 'AKZ',
             iban: '',
             ativo: true,

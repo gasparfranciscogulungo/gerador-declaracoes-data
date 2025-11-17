@@ -945,7 +945,7 @@
             <div x-show="modalNovoTrabalhador" 
                  x-cloak
                  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div :class="darkMode ? 'bg-gray-800' : 'bg-white'" class="rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 flex items-center justify-between sticky top-0">
                         <h3 class="text-2xl font-bold">
                             <i class="bi bi-person-plus mr-2"></i>Novo Trabalhador
@@ -959,92 +959,182 @@
                         <form @submit.prevent="salvarNovoTrabalhador()">
                             <!-- Dados Pessoais -->
                             <div class="mb-6">
-                                <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                                <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" class="text-lg font-bold mb-4 border-b pb-2">
                                     <i class="bi bi-person mr-2 text-blue-600"></i>Dados Pessoais
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
+                                    <div class="md:col-span-2">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Nome Completo <span class="text-red-500">*</span>
+                                        </label>
                                         <input type="text" x-model="novoTrabalhador.nome" required 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="João Pedro Silva">
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: João Pedro Silva Santos">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">NIF *</label>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Data de Nascimento <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="date" x-model="novoTrabalhador.data_nascimento" required
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            BI/NIF <span class="text-red-500">*</span>
+                                        </label>
                                         <input type="text" x-model="novoTrabalhador.nif" required 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="123456789" maxlength="9">
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: 008408047LA047 ou 123456789">
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <i class="bi bi-info-circle mr-1"></i>Aceita números e letras (BI ou NIF)
+                                        </p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">BI/CC</label>
-                                        <input type="text" x-model="novoTrabalhador.documento" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="BA001234567">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Data Nascimento</label>
-                                        <input type="text" x-model="novoTrabalhador.data_nascimento" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="DD/MM/AAAA">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Contacto <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <input type="tel" x-model="novoTrabalhador.telefone" 
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: +244 923 456 789">
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Contato -->
+                            
+                            <!-- Morada Completa -->
                             <div class="mb-6">
-                                <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
-                                    <i class="bi bi-telephone mr-2 text-green-600"></i>Contato
-                                </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                                        <input type="tel" x-model="novoTrabalhador.telefone" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="+244 923 456 789">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" class="text-lg font-bold pb-2 border-b-2 border-orange-600">
+                                        <i class="bi bi-house-door mr-2 text-orange-600"></i>Morada do Trabalhador
+                                    </h4>
+                                    
+                                    <!-- Toggle Modo de Morada -->
+                                    <div class="flex items-center gap-3">
+                                        <span :class="modoMoradaDetalhado ? 'text-blue-600' : (darkMode ? 'text-gray-500' : 'text-gray-500')" class="text-sm font-medium">
+                                            Detalhado
+                                        </span>
+                                        <button type="button" 
+                                                @click="modoMoradaDetalhado = !modoMoradaDetalhado"
+                                                :class="modoMoradaDetalhado ? 'bg-blue-600' : 'bg-gray-300'"
+                                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors">
+                                            <span :class="modoMoradaDetalhado ? 'translate-x-6' : 'translate-x-1'"
+                                                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                        </button>
+                                        <span :class="!modoMoradaDetalhado ? 'text-green-600' : (darkMode ? 'text-gray-500' : 'text-gray-500')" class="text-sm font-medium">
+                                            Completo
+                                        </span>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input type="email" x-model="novoTrabalhador.email" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="joao@email.com">
+                                </div>
+                                
+                                <!-- Modo Detalhado -->
+                                <div x-show="modoMoradaDetalhado" x-transition class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="md:col-span-2">
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                                Edifício/Condomínio <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" x-model="novoTrabalhador.morada_edificio" 
+                                                   :required="modoMoradaDetalhado"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                                   placeholder="Ex: Edifício B12">
+                                        </div>
+                                        <div>
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                                Apartamento/Casa
+                                            </label>
+                                            <input type="text" x-model="novoTrabalhador.morada_apartamento"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                                   placeholder="Ex: Apartamento n.º 42">
+                                        </div>
+                                        <div>
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                                Bairro/Zona <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" x-model="novoTrabalhador.morada_bairro"
+                                                   :required="modoMoradaDetalhado"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                                   placeholder="Ex: Centralidade do Kilamba">
+                                        </div>
+                                        <div>
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                                Município <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" x-model="novoTrabalhador.morada_municipio"
+                                                   :required="modoMoradaDetalhado"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                                   placeholder="Ex: Kilamba Kiaxi">
+                                        </div>
+                                        <div>
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                                Província <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" x-model="novoTrabalhador.morada_provincia"
+                                                   :required="modoMoradaDetalhado"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                                   placeholder="Ex: Luanda">
+                                        </div>
                                     </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Morada</label>
-                                        <input type="text" x-model="novoTrabalhador.morada" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Rua da Independência, Luanda">
+                                </div>
+                                
+                                <!-- Modo Completo -->
+                                <div x-show="!modoMoradaDetalhado" x-transition>
+                                    <div :class="darkMode ? 'bg-green-900/20 border-green-700' : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'" 
+                                         class="p-4 rounded-xl border-2">
+                                        <label :class="darkMode ? 'text-green-200' : 'text-green-800'" class="block text-sm font-bold mb-3">
+                                            <i class="bi bi-lightning-fill mr-2"></i>Morada Completa (Modo Rápido) <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea x-model="novoTrabalhador.morada_completa"
+                                                  :required="!modoMoradaDetalhado"
+                                                  rows="4"
+                                                  placeholder="Digite a morada completa. Exemplo:&#10;&#10;Edifício B12, Apartamento n.º 42, Centralidade do Kilamba, Município do Kilamba Kiaxi, Luanda"
+                                                  :class="darkMode ? 'bg-gray-700 border-green-600 text-white' : 'bg-white border-green-300 text-gray-900'"
+                                                  class="w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all resize-none font-medium"></textarea>
+                                        <p :class="darkMode ? 'text-green-300' : 'text-green-700'" class="text-xs mt-2">
+                                            <i class="bi bi-check-circle-fill mr-1"></i>Digite a morada em formato livre para economizar tempo
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Dados Profissionais -->
                             <div class="mb-6">
-                                <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                                <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" class="text-lg font-bold mb-4 border-b pb-2">
                                     <i class="bi bi-briefcase mr-2 text-purple-600"></i>Dados Profissionais
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Função/Cargo</label>
-                                        <input type="text" x-model="novoTrabalhador.funcao" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Desenvolvedor Full Stack">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Função/Cargo <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" x-model="novoTrabalhador.funcao" required
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: Desenvolvedor Full Stack">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                                        <input type="text" x-model="novoTrabalhador.departamento" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Tecnologia da Informação">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Data de Admissão <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="date" x-model="novoTrabalhador.data_admissao" required
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Data Admissão</label>
-                                        <input type="text" x-model="novoTrabalhador.data_admissao" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="DD/MM/AAAA">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Contrato</label>
-                                        <select x-model="novoTrabalhador.tipo_contrato" 
-                                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                    <div class="md:col-span-2">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Tipo de Contrato <span class="text-red-500">*</span>
+                                        </label>
+                                        <select x-model="novoTrabalhador.tipo_contrato" required
+                                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Selecione o tipo de contrato</option>
                                             <option value="Contrato sem termo">Contrato sem termo</option>
                                             <option value="Contrato a termo certo">Contrato a termo certo</option>
                                             <option value="Contrato a termo incerto">Contrato a termo incerto</option>
@@ -1056,35 +1146,97 @@
 
                             <!-- Dados Salariais -->
                             <div class="mb-6">
-                                <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                                <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" class="text-lg font-bold mb-4 border-b pb-2">
                                     <i class="bi bi-cash mr-2 text-green-600"></i>Dados Salariais
+                                    <span class="text-sm font-normal text-gray-500">(Para Declaração)</span>
                                 </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Salário Bruto (AKZ)</label>
-                                        <input type="number" x-model="novoTrabalhador.salario_bruto" step="0.01"
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="250000.00">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Salário Base (AKZ) <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" x-model="salarioBaseFormatado" required
+                                               @input="formatarSalarioBase($event.target.value)"
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-lg"
+                                               placeholder="Ex: 250.000,00">
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <i class="bi bi-info-circle mr-1"></i>Digite o valor e será formatado automaticamente
+                                        </p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Salário Líquido (AKZ)</label>
-                                        <input type="number" x-model="novoTrabalhador.salario_liquido" step="0.01"
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="200000.00">
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Valor por Extenso <span class="text-gray-500 text-xs">(Gerado automaticamente)</span>
+                                        </label>
+                                        <input type="text" x-model="salarioExtenso" readonly
+                                               :class="darkMode ? 'bg-gray-800 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-300 text-gray-700'"
+                                               class="w-full border rounded-lg px-4 py-2 cursor-not-allowed italic"
+                                               placeholder="Será gerado automaticamente">
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <i class="bi bi-magic mr-1"></i>Conversão automática do valor numérico
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Dados Salariais Completos (Opcional - Para Recibos) -->
+                            <div class="mb-6">
+                                <h4 :class="darkMode ? 'text-gray-100' : 'text-gray-800'" class="text-lg font-bold mb-4 border-b pb-2">
+                                    <i class="bi bi-receipt mr-2 text-orange-600"></i>Dados para Recibo de Salário
+                                    <span class="text-sm font-normal text-gray-500">(Opcional - Apenas para gerar Recibos)</span>
+                                </h4>
+                                <div :class="darkMode ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200'" 
+                                     class="p-4 rounded-lg border mb-4">
+                                    <p :class="darkMode ? 'text-blue-300' : 'text-blue-700'" class="text-sm">
+                                        <i class="bi bi-info-circle-fill mr-2"></i>
+                                        <strong>Atenção:</strong> Estes campos são opcionais e necessários apenas se você pretende gerar Recibos de Salário ou documentos Combo que incluam recibos.
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Subsídio de Alimentação <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <input type="number" x-model="novoTrabalhador.subsidio_alimentacao" step="0.01"
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: 20000.00">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Subsídio de Transporte <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <input type="number" x-model="novoTrabalhador.subsidio_transporte" step="0.01"
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: 15000.00">
+                                    </div>
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            IRT (Imposto) <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <input type="number" x-model="novoTrabalhador.irt" step="0.01"
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: 35000.00">
+                                    </div>
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            IBAN <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
                                         <input type="text" x-model="novoTrabalhador.iban" 
-                                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="AO06...">
+                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: AO06000000123456789">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Botões -->
-                            <div class="flex justify-end gap-3 pt-4 border-t">
+                            <div class="flex justify-end gap-3 pt-4 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
                                 <button type="button" @click="modalNovoTrabalhador = false" 
-                                        class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        :class="darkMode ? 'border-gray-600 hover:bg-gray-700 text-gray-300' : 'border-gray-300 hover:bg-gray-50 text-gray-700'"
+                                        class="px-6 py-2 border rounded-lg transition-colors">
                                     Cancelar
                                 </button>
                                 <button type="submit" 
