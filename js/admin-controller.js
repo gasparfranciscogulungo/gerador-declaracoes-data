@@ -297,10 +297,18 @@ function adminApp() {
         modoMoradaDetalhado: true,
         modoMoradaDetalhadoEdit: true, // Para modal de edição
         
-        // Formatação de salário
+        // Formatação de salário (modal novo trabalhador)
         salarioBaseFormatado: '',
         salarioExtenso: '',
         modoExtensoManual: false, // Toggle entre automático e manual
+        
+        // Formatação de salário (modal editar trabalhador)
+        editSalarioBaseFormatado: '',
+        editSubAlimentacaoFormatado: '',
+        editSubTransporteFormatado: '',
+        editIRTFormatado: '',
+        editSalarioBrutoFormatado: '',
+        editSalarioLiquidoFormatado: '',
         
         // Managers
         userManager: null,
@@ -962,6 +970,22 @@ function adminApp() {
             } else {
                 this.modoMoradaDetalhadoEdit = false; // Padrão: modo completo
             }
+            
+            // Formatar valores monetários para exibição visual
+            const formatarKz = (valor) => {
+                if (!valor || valor === 0) return '';
+                return new Intl.NumberFormat('pt-AO', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(parseFloat(valor));
+            };
+            
+            this.editSalarioBaseFormatado = formatarKz(trabalhador.salario_base);
+            this.editSubAlimentacaoFormatado = formatarKz(trabalhador.subsidio_alimentacao);
+            this.editSubTransporteFormatado = formatarKz(trabalhador.subsidio_transporte);
+            this.editIRTFormatado = formatarKz(trabalhador.irt);
+            this.editSalarioBrutoFormatado = formatarKz(trabalhador.salario_bruto);
+            this.editSalarioLiquidoFormatado = formatarKz(trabalhador.salario_liquido);
         },
 
         async salvarEdicaoTrabalhador() {
@@ -982,6 +1006,74 @@ function adminApp() {
             } finally {
                 this.loading = false;
             }
+        },
+        
+        // ========== FORMATAÇÃO DE VALORES MONETÁRIOS (MODAL EDIÇÃO) ==========
+        
+        formatarEditSalarioBase(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.salario_base = valorNumerico.toFixed(2);
+            this.editSalarioBaseFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+        },
+        
+        formatarEditSubAlimentacao(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.subsidio_alimentacao = valorNumerico.toFixed(2);
+            this.editSubAlimentacaoFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+        },
+        
+        formatarEditSubTransporte(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.subsidio_transporte = valorNumerico.toFixed(2);
+            this.editSubTransporteFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+        },
+        
+        formatarEditIRT(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.irt = valorNumerico.toFixed(2);
+            this.editIRTFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+        },
+        
+        formatarEditSalarioBruto(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.salario_bruto = valorNumerico.toFixed(2);
+            this.editSalarioBrutoFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
+        },
+        
+        formatarEditSalarioLiquido(valor) {
+            let numeros = valor.replace(/\D/g, '');
+            let valorNumerico = parseInt(numeros) / 100;
+            
+            this.editarTrabalhadorObj.salario_liquido = valorNumerico.toFixed(2);
+            this.editSalarioLiquidoFormatado = new Intl.NumberFormat('pt-AO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valorNumerico);
         },
 
         async excluirTrabalhador(id) {

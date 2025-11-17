@@ -1554,10 +1554,19 @@
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
                                             Salário Base (AKZ) <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="number" x-model="editarTrabalhadorObj.salario_base" step="0.01" required
-                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-lg"
-                                               placeholder="Ex: 250000.00">
+                                        <div class="relative">
+                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editSalarioBaseFormatado"
+                                                   @input="formatarEditSalarioBase(editSalarioBaseFormatado)"
+                                                   required
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-12 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-lg"
+                                                   placeholder="250.000,00">
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <i class="bi bi-info-circle mr-1"></i>Digite apenas números - formatação automática
+                                        </p>
                                     </div>
                                     <div>
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
@@ -1589,28 +1598,43 @@
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
                                             Subsídio de Alimentação <span class="text-gray-500 text-xs">(Opcional)</span>
                                         </label>
-                                        <input type="number" x-model="editarTrabalhadorObj.subsidio_alimentacao" step="0.01"
-                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Ex: 20000.00">
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editSubAlimentacaoFormatado"
+                                                   @input="formatarEditSubAlimentacao(editSubAlimentacaoFormatado)"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono"
+                                                   placeholder="20.000,00">
+                                        </div>
                                     </div>
                                     <div>
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
                                             Subsídio de Transporte <span class="text-gray-500 text-xs">(Opcional)</span>
                                         </label>
-                                        <input type="number" x-model="editarTrabalhadorObj.subsidio_transporte" step="0.01"
-                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Ex: 15000.00">
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editSubTransporteFormatado"
+                                                   @input="formatarEditSubTransporte(editSubTransporteFormatado)"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono"
+                                                   placeholder="15.000,00">
+                                        </div>
                                     </div>
                                     <div>
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
                                             IRT (Imposto) <span class="text-gray-500 text-xs">(Opcional)</span>
                                         </label>
-                                        <input type="number" x-model="editarTrabalhadorObj.irt" step="0.01"
-                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Ex: 35000.00">
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editIRTFormatado"
+                                                   @input="formatarEditIRT(editIRTFormatado)"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono"
+                                                   placeholder="35.000,00">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
