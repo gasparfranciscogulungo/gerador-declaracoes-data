@@ -1535,61 +1535,68 @@
 
         <!-- TAB: Colaboradores e Testes -->
         <div x-show="activeTab === 'colaboradores'" :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white'" class="rounded-lg shadow-md p-4 sm:p-6">
-            <div class="flex justify-between items-center mb-6">
+            <!-- Header Responsivo -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
                 <h2 class="text-xl sm:text-2xl font-bold" :class="darkMode ? 'text-gray-100' : 'text-gray-800'">
-                    <i class="bi bi-person-plus mr-2 text-blue-600"></i>Gerenciamento de Colaboradores
+                    <i class="bi bi-person-plus mr-2 text-blue-600"></i>Colaboradores
                 </h2>
                 <button @click="modalGuiaTokens = true" 
-                        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm">
+                        class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm touch-manipulation">
                     <i class="bi bi-question-circle mr-1"></i>Guia de Tokens
                 </button>
             </div>
 
-            <!-- Seção: Adicionar Colaborador -->
-            <div :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'" class="rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <!-- Seção: Adicionar Colaborador - MOBILE OTIMIZADO -->
+            <div :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'" class="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
                     <i class="bi bi-person-plus-fill text-blue-600"></i>
                     Adicionar Novo Colaborador
                 </h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Inputs Empilhados em Mobile -->
+                <div class="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium mb-2">Username do GitHub:</label>
                         <input type="text" 
                                x-model="novoColaborador.username"
                                placeholder="exemplo: Maicky42"
-                               :class="darkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-300'"
-                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                               :class="darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'"
+                               class="w-full border rounded-lg px-4 py-3 sm:py-2 focus:ring-2 focus:ring-blue-500 text-base">
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium mb-2">Nível de Permissão:</label>
                         <select x-model="novoColaborador.permission"
-                                :class="darkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-300'"
-                                class="w-full border rounded-lg px-4 py-2">
-                            <option value="push">push - Usuário Normal (Recomendado)</option>
-                            <option value="pull">pull - Apenas Leitura</option>
-                            <option value="admin">admin - Administrador Total</option>
+                                :class="darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'"
+                                class="w-full border rounded-lg px-4 py-3 sm:py-2 text-base">
+                            <option value="push">Usuário Normal (Recomendado)</option>
+                            <option value="pull">Apenas Leitura</option>
+                            <option value="admin">Administrador Total</option>
                         </select>
                     </div>
                 </div>
 
-                <div :class="darkMode ? 'bg-blue-900/30' : 'bg-blue-50'" class="p-3 rounded-lg mb-4 text-sm">
-                    <p class="font-semibold mb-2">📋 Permissões:</p>
+                <!-- Info Box Compacto -->
+                <div :class="darkMode ? 'bg-blue-900/30 border-blue-700' : 'bg-blue-50 border-blue-200'" 
+                     class="p-3 rounded-lg mb-4 text-xs sm:text-sm border">
+                    <p class="font-semibold mb-1 flex items-center gap-1">
+                        <i class="bi bi-info-circle"></i> Permissões:
+                    </p>
                     <template x-if="novoColaborador.permission === 'push'">
-                        <p>✅ Pode ler empresas + Criar/editar SEUS trabalhadores</p>
+                        <p>✅ Ler empresas + Criar/editar trabalhadores</p>
                     </template>
                     <template x-if="novoColaborador.permission === 'pull'">
-                        <p>⚠️ Pode apenas ler empresas (sem editar)</p>
+                        <p>⚠️ Apenas leitura (sem editar)</p>
                     </template>
                     <template x-if="novoColaborador.permission === 'admin'">
                         <p class="text-red-600 dark:text-red-400">⚠️ Controle total (cuidado!)</p>
                     </template>
                 </div>
 
+                <!-- Botão Mobile Otimizado -->
                 <button @click="adicionarColaborador()" 
                         :disabled="!novoColaborador.username || loadingColab"
-                        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition-colors">
+                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-3 sm:py-2 rounded-lg transition-colors touch-manipulation font-medium">
                     <span x-show="!loadingColab">
                         <i class="bi bi-person-plus mr-2"></i>Adicionar Colaborador
                     </span>
@@ -1600,36 +1607,40 @@
             </div>
 
             <!-- Seção: Testar Colaboradores em Tempo Real -->
-            <div :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'" class="rounded-lg p-6 mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold flex items-center gap-2">
+            <div :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'" class="rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+                <!-- Header Mobile Empilhado -->
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
+                    <h3 class="text-base sm:text-lg font-semibold flex items-center gap-2">
                         <i class="bi bi-check2-circle text-purple-600"></i>
-                        Testar Colaboradores em Tempo Real
+                        Testar Colaboradores
                     </h3>
+                    <!-- Botões Horizontais em Mobile -->
                     <div class="flex gap-2">
                         <button @click="carregarColaboradores()" 
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
-                            <i class="bi bi-arrow-clockwise mr-1"></i>Atualizar
+                                class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm touch-manipulation">
+                            <i class="bi bi-arrow-clockwise sm:mr-1"></i>
+                            <span class="hidden sm:inline">Atualizar</span>
                         </button>
                         <button @click="limparLogTestes()" 
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">
-                            <i class="bi bi-trash mr-1"></i>Limpar Log
+                                class="flex-1 sm:flex-initial bg-gray-600 hover:bg-gray-700 text-white px-4 py-2.5 sm:py-2 rounded-lg text-sm touch-manipulation">
+                            <i class="bi bi-trash sm:mr-1"></i>
+                            <span class="hidden sm:inline">Limpar Log</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Input de Pesquisa -->
+                <!-- Input de Pesquisa Mobile Otimizado -->
                 <div class="mb-4">
                     <div class="relative">
                         <input type="text" 
                                x-model="pesquisaColaborador"
-                               placeholder="🔍 Pesquisar colaborador por nome ou username..."
+                               placeholder="🔍 Pesquisar colaborador..."
                                :class="darkMode ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'"
-                               class="w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                               class="w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base">
                         <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                        <span x-text="colaboradoresFiltrados.length"></span> colaborador(es) encontrado(s)
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+                        <span x-text="colaboradoresFiltrados.length"></span> encontrado(s)
                     </p>
                 </div>
 
@@ -1679,14 +1690,14 @@
                                 </div>
                             </div>
 
-                            <!-- Botões de Ação -->
+                            <!-- Botões de Ação Mobile Otimizados -->
                             <div class="flex gap-2">
                                 <button @click="testarUsuario(colab.login)" 
-                                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-3 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation">
                                     <i class="bi bi-play-circle-fill mr-1"></i>Testar
                                 </button>
                                 <button @click="abrirPainelColaborador(colab.login)" 
-                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 sm:py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation">
                                     <i class="bi bi-box-arrow-up-right mr-1"></i>Abrir
                                 </button>
                             </div>
