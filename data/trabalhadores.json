@@ -17,7 +17,7 @@
       "data_admissao": "2023-09-09",
       "tipo_contrato": "Contrato a termo incerto",
       "salario_base": "200000",
-      "subsidio_alimentacao": "0.00",
+      "subsidio_alimentacao": "",
       "subsidio_transporte": "0.00",
       "irt": "0.00",
       "salario_bruto": "0.00",
@@ -25,7 +25,8 @@
       "moeda": "AKZ",
       "iban": "",
       "ativo": true,
-      "observacoes": ""
+      "observacoes": "",
+      "morada_completa": "uslçajçf ajfajçfs jaçs fjçasjfç jsfça js"
     },
     {
       "id": "TRAB-1763348786580-431",
