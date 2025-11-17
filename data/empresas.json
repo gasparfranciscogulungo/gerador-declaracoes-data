@@ -1,28 +1,3 @@
 {
-  "empresas": [
-    {
-      "id": "empresa_1762610857091",
-      "nome": "Empresa Manuela João e filhos ",
-      "nif": "50009099",
-      "endereco": {
-        "rua": "TALATONA",
-        "edificio": "test",
-        "andar": "test",
-        "sala": "test",
-        "bairro": "test",
-        "municipio": "test",
-        "provincia": "test",
-        "pais": "Angola"
-      },
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/1000/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/1000/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "updatedAt": "2025-11-08T14:13:56.096Z"
-    }
-  ]
+  "empresas": []
 }
