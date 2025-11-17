@@ -1,27 +1,3 @@
 {
-  "trabalhadores": [
-    {
-      "id": "TRAB-1763337879222-448",
-      "nome": "tes",
-      "documento": "sadada",
-      "tipo_documento": "BI",
-      "nif": "093102931",
-      "data_nascimento": "adadada",
-      "nacionalidade": "Angolana",
-      "morada": "dasdas",
-      "cidade": "",
-      "telefone": "945955570",
-      "email": "Gaspakkl@gmal.com",
-      "funcao": "dadada",
-      "departamento": "dasda",
-      "data_admissao": "adasdas",
-      "tipo_contrato": "Contrato sem termo",
-      "salario_bruto": "0.00",
-      "salario_liquido": "0.00",
-      "moeda": "AKZ",
-      "iban": "adasdasda",
-      "ativo": true,
-      "observacoes": ""
-    }
-  ]
+  "trabalhadores": []
 }
