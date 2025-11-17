@@ -726,9 +726,10 @@
                                         class="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2.5 sm:py-2 px-3 sm:px-4 rounded-lg transition-colors flex items-center justify-center font-medium text-sm sm:text-base touch-manipulation">
                                     <i class="bi bi-pencil-square mr-1.5 sm:mr-2"></i>Editar
                                 </button>
-                                <button @click="resetarContador(empresa.id)" 
+                                <button x-show="getContador(empresa.id) > 0"
+                                        @click="resetarContador(empresa.id)" 
                                         class="bg-orange-100 hover:bg-orange-200 active:bg-orange-300 text-orange-700 p-2.5 sm:p-2 rounded-lg transition-colors touch-manipulation"
-                                        title="Resetar contador">
+                                        title="Resetar contador (zerar declarações)">
                                     <i class="bi bi-arrow-clockwise text-base sm:text-lg"></i>
                                 </button>
                                 <button @click="deletarEmpresa(empresa.id)" 
@@ -3936,20 +3937,46 @@
                                 </label>
                                 <input type="text" 
                                        x-model="empresaForm.nif"
+                                       @input="empresaForm.nif = empresaForm.nif.replace(/\D/g, '')"
                                        required
-                                       placeholder="Ex: 5480023446"
+                                       pattern="[0-9]*"
+                                       inputmode="numeric"
+                                       placeholder="Ex: 5480023446 (apenas números)"
                                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <i class="bi bi-info-circle mr-1"></i>Digite apenas números, sem espaços ou caracteres especiais
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     <!-- SEÇÃO 2: Endereço Completo -->
                     <div class="mb-8">
-                        <h4 class="text-lg font-bold mb-4 pb-2 border-b-2 border-green-600">
-                            <i class="bi bi-geo-alt mr-2"></i>Endereço da Sede
-                        </h4>
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-bold pb-2 border-b-2 border-green-600">
+                                <i class="bi bi-geo-alt mr-2"></i>Endereço da Sede
+                            </h4>
+                            
+                            <!-- Toggle Modo de Endereço -->
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-medium" :class="modoEnderecoDetalhado ? 'text-blue-600' : 'text-gray-500'">
+                                    Detalhado
+                                </span>
+                                <button type="button" 
+                                        @click="modoEnderecoDetalhado = !modoEnderecoDetalhado"
+                                        :class="modoEnderecoDetalhado ? 'bg-blue-600' : 'bg-gray-300'"
+                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors">
+                                    <span :class="modoEnderecoDetalhado ? 'translate-x-6' : 'translate-x-1'"
+                                          class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                </button>
+                                <span class="text-sm font-medium" :class="!modoEnderecoDetalhado ? 'text-green-600' : 'text-gray-500'">
+                                    Completo
+                                </span>
+                            </div>
+                        </div>
                         
-                        <div class="space-y-4">
+                        <!-- MODO DETALHADO (campos separados) -->
+                        <div x-show="modoEnderecoDetalhado" x-transition class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="col-span-2">
                                     <label class="block text-sm font-medium mb-2">
@@ -3957,7 +3984,7 @@
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.rua"
-                                           required
+                                           :required="modoEnderecoDetalhado"
                                            placeholder="Ex: Avenida 4 de Fevereiro"
                                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
@@ -3992,7 +4019,7 @@
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.bairro"
-                                           required
+                                           :required="modoEnderecoDetalhado"
                                            placeholder="Ex: Kinaxixe"
                                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
@@ -4003,7 +4030,7 @@
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.municipio"
-                                           required
+                                           :required="modoEnderecoDetalhado"
                                            placeholder="Ex: Luanda"
                                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
@@ -4014,7 +4041,7 @@
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.provincia"
-                                           required
+                                           :required="modoEnderecoDetalhado"
                                            placeholder="Ex: Luanda"
                                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
@@ -4025,10 +4052,27 @@
                                     </label>
                                     <input type="text" 
                                            x-model="empresaForm.endereco.pais"
-                                           required
+                                           :required="modoEnderecoDetalhado"
                                            placeholder="Ex: Angola"
                                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MODO COMPLETO (textarea) -->
+                        <div x-show="!modoEnderecoDetalhado" x-transition class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">
+                                    Endereço Completo <span class="text-red-500">*</span>
+                                </label>
+                                <textarea x-model="empresaForm.enderecoCompleto"
+                                          :required="!modoEnderecoDetalhado"
+                                          rows="5"
+                                          placeholder="Ex: Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502, Bairro Kinaxixe, Luanda, Angola"
+                                          class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    <i class="bi bi-info-circle mr-1"></i>Digite o endereço completo da empresa em formato livre
+                                </p>
                             </div>
                         </div>
                     </div>

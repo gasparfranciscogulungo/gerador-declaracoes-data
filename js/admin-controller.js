@@ -279,6 +279,7 @@ function adminApp() {
                 provincia: '',
                 pais: 'Angola'
             },
+            enderecoCompleto: '', // Modo textarea
             telefone: '',
             email: '',
             website: '',
@@ -288,6 +289,9 @@ function adminApp() {
             corSecundaria: '#64748b',
             marcaDagua: ''
         },
+        
+        // Controle de modo de endereço
+        modoEnderecoDetalhado: true, // true = campos separados, false = textarea completo
         
         // Managers
         userManager: null,
@@ -1334,9 +1338,32 @@ function adminApp() {
 
                 // Validações básicas
                 if (!this.empresaForm.nome || !this.empresaForm.nif) {
-                    this.showAlert('error', 'Preencha todos os campos obrigatórios');
+                    alert('❌ Preencha todos os campos obrigatórios (Nome e NIF)');
                     this.loading = false;
                     return;
+                }
+                
+                // Validar NIF (apenas números)
+                if (!/^\d+$/.test(this.empresaForm.nif)) {
+                    alert('❌ O campo NIF deve conter apenas números');
+                    this.loading = false;
+                    return;
+                }
+                
+                // Validar endereço (usar modo detalhado OU completo)
+                if (this.modoEnderecoDetalhado) {
+                    if (!this.empresaForm.endereco.rua || !this.empresaForm.endereco.bairro || 
+                        !this.empresaForm.endereco.municipio || !this.empresaForm.endereco.provincia) {
+                        alert('❌ Preencha todos os campos obrigatórios do endereço (Rua, Bairro, Município, Província)');
+                        this.loading = false;
+                        return;
+                    }
+                } else {
+                    if (!this.empresaForm.enderecoCompleto || this.empresaForm.enderecoCompleto.trim() === '') {
+                        alert('❌ Preencha o endereço completo da empresa');
+                        this.loading = false;
+                        return;
+                    }
                 }
 
                 // Validar se tem logo e carimbo (preview OU url)
