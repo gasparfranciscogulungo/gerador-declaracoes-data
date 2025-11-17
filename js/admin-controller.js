@@ -295,6 +295,7 @@ function adminApp() {
         
         // Controle de modo de morada do trabalhador
         modoMoradaDetalhado: true,
+        modoMoradaDetalhadoEdit: true, // Para modal de edição
         
         // Formatação de salário
         salarioBaseFormatado: '',
@@ -952,6 +953,15 @@ function adminApp() {
         async editarTrabalhador(trabalhador) {
             this.modalEditarTrabalhador = true;
             this.editarTrabalhadorObj = Object.assign({}, trabalhador);
+            
+            // Detectar modo de morada: se tem morada_completa, usa modo completo, senão detalhado
+            if (trabalhador.morada_completa) {
+                this.modoMoradaDetalhadoEdit = false;
+            } else if (trabalhador.morada_edificio || trabalhador.morada_bairro) {
+                this.modoMoradaDetalhadoEdit = true;
+            } else {
+                this.modoMoradaDetalhadoEdit = false; // Padrão: modo completo
+            }
         },
 
         async salvarEdicaoTrabalhador() {
