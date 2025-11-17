@@ -28,10 +28,10 @@
     },
     {
       "id": "empresa_1763342578417",
-      "nome": "Empresa Gaspar Francisco",
+      "nome": "Empresa Angola prestação de Serviço ",
       "nif": "578395934",
       "endereco": {
-        "completo": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
+        "completo": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe —Luanda\n\nLuanda — Angola",
         "rua": "Avenida 4 de Fevereiro",
         "edificio": "",
         "andar": "",
@@ -41,7 +41,7 @@
         "provincia": "",
         "pais": "Angola"
       },
-      "enderecoCompleto": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
+      "enderecoCompleto": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe —Luanda\n\nLuanda — Angola",
       "telefone": "",
       "email": "",
       "website": "",
@@ -50,9 +50,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-17T01:22:58.417Z",
-      "updatedAt": "2025-11-17T01:22:58.417Z",
-      "contador": 0
+      "updatedAt": "2025-11-17T10:57:23.713Z"
     }
   ]
 }
