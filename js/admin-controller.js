@@ -299,6 +299,7 @@ function adminApp() {
         // Formatação de salário
         salarioBaseFormatado: '',
         salarioExtenso: '',
+        modoExtensoManual: false, // Toggle entre automático e manual
         
         // Managers
         userManager: null,
@@ -809,8 +810,10 @@ function adminApp() {
                 maximumFractionDigits: 2
             }).format(valorNumerico);
             
-            // Converte para extenso
-            this.salarioExtenso = this.numeroParaExtenso(valorNumerico);
+            // Converte para extenso APENAS se não estiver em modo manual
+            if (!this.modoExtensoManual) {
+                this.salarioExtenso = this.numeroParaExtenso(valorNumerico);
+            }
         },
         
         /**
@@ -866,9 +869,23 @@ function adminApp() {
             
             if (parteInteira >= 1000) {
                 const milhares = Math.floor(parteInteira / 1000);
-                extenso += milhares === 1 ? 'Mil' : converterGrupo(milhares) + ' Mil';
-                parteInteira %= 1000;
-                if (parteInteira > 0) extenso += ' e ';
+                const restoMilhares = parteInteira % 1000;
+                
+                if (milhares === 1) {
+                    extenso += 'Mil';
+                } else {
+                    extenso += converterGrupo(milhares) + ' Mil';
+                }
+                
+                // Adiciona 'e' apenas se o resto for menor que 100
+                if (restoMilhares > 0) {
+                    if (restoMilhares < 100) {
+                        extenso += ' e ';
+                    } else {
+                        extenso += ' ';
+                    }
+                }
+                parteInteira = restoMilhares;
             }
             
             if (parteInteira > 0) {
@@ -889,6 +906,7 @@ function adminApp() {
             this.novoTrabalhador = Object.assign({}, ClienteManager.MODELO_TRABALHADOR);
             this.salarioBaseFormatado = '';
             this.salarioExtenso = '';
+            this.modoExtensoManual = false; // Reset para modo automático
             this.modoMoradaDetalhado = true;
         },
 

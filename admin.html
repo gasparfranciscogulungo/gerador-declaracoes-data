@@ -1165,15 +1165,28 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
-                                            Valor por Extenso <span class="text-gray-500 text-xs">(Gerado automaticamente)</span>
-                                        </label>
-                                        <input type="text" x-model="salarioExtenso" readonly
-                                               :class="darkMode ? 'bg-gray-800 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-300 text-gray-700'"
-                                               class="w-full border rounded-lg px-4 py-2 cursor-not-allowed italic"
-                                               placeholder="Será gerado automaticamente">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium">
+                                                Valor por Extenso
+                                            </label>
+                                            <button type="button" 
+                                                    @click="modoExtensoManual = !modoExtensoManual"
+                                                    class="text-xs px-2 py-1 rounded transition-colors"
+                                                    :class="modoExtensoManual ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'">
+                                                <i :class="modoExtensoManual ? 'bi-pencil-fill' : 'bi-magic'" class="mr-1"></i>
+                                                <span x-text="modoExtensoManual ? 'Manual' : 'Auto'"></span>
+                                            </button>
+                                        </div>
+                                        <input type="text" x-model="salarioExtenso" 
+                                               :readonly="!modoExtensoManual"
+                                               :class="modoExtensoManual ? 
+                                                   (darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900') :
+                                                   (darkMode ? 'bg-gray-800 border-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-50 border-gray-300 text-gray-600 cursor-not-allowed')"
+                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                               placeholder="Ex: Duzentos e cinquenta mil Kwanzas">
                                         <p class="text-xs text-gray-500 mt-1">
-                                            <i class="bi bi-magic mr-1"></i>Conversão automática do valor numérico
+                                            <i :class="modoExtensoManual ? 'bi-pencil' : 'bi-magic'" class="mr-1"></i>
+                                            <span x-text="modoExtensoManual ? 'Digite manualmente o valor por extenso' : 'Conversão automática do valor numérico'"></span>
                                         </p>
                                     </div>
                                 </div>
@@ -1192,7 +1205,7 @@
                                         <strong>Atenção:</strong> Estes campos são opcionais e necessários apenas se você pretende gerar Recibos de Salário ou documentos Combo que incluam recibos.
                                     </p>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
                                             Subsídio de Alimentação <span class="text-gray-500 text-xs">(Opcional)</span>
@@ -1219,15 +1232,6 @@
                                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
                                                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
                                                placeholder="Ex: 35000.00">
-                                    </div>
-                                    <div>
-                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
-                                            IBAN <span class="text-gray-500 text-xs">(Opcional)</span>
-                                        </label>
-                                        <input type="text" x-model="novoTrabalhador.iban" 
-                                               :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                               class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Ex: AO06000000123456789">
                                     </div>
                                 </div>
                             </div>
