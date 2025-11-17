@@ -792,16 +792,16 @@ function adminApp() {
         visualizarTrabalhador: null,
 
         /**
-         * Formata NIF/BI angolano (007010193UE048)
-         * Formato: 9 números + 2 letras + 3 números
+         * Formata NIF/BI - Campo livre alfanumérico
+         * Aceita qualquer combinação de números e letras (máx 20 caracteres)
          */
         formatarNIF(valor) {
-            // Remove espaços e caracteres inválidos
+            // Remove apenas espaços, mantém alfanuméricos
             let nif = valor.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
             
-            // Limita a 14 caracteres (9 números + 2 letras + 3 números)
-            if (nif.length > 14) {
-                nif = nif.substring(0, 14);
+            // Limita a 20 caracteres
+            if (nif.length > 20) {
+                nif = nif.substring(0, 20);
             }
             
             // Atualiza o campo
