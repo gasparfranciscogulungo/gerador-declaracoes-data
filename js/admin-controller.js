@@ -148,35 +148,36 @@ function adminApp() {
         // Customização do Preview
         previewConfig: {
             fontFamily: 'Arial',
-            fontSize: 12,
+            fontSize: 14,
             tamanhoTitulo: 24,
             tamanhoSubtitulo: 16,
-            tamanhoEmpresa: 9,
+            tamanhoEmpresa: 10,
             corTexto: '#000000',
-            corDestaque: '#091f67',
-            marcaDaguaOpacidade: 8,
-            marcaDaguaRotacao: -45,
-            marcaDaguaWidth: 350,
-            marcaDaguaHeight: 350,
-            espacamentoLinhas: 1.8,
-            zoom: 55,
+            corDestaque: '#091F67',
+            espacamentoLinhas: 1.5,
+            zoom: 125,
             // Edição de Conteúdo
             tituloDocumento: 'Declaração de Serviço',
             textoIntro: 'Declara-se, para os devidos efeitos, que',
             alinhamentoTexto: 'justify',
             alinhamentoCabecalho: 'left',
             // Controles Avançados do Cabeçalho
-            cabecalhoMaxWidth: 450,           // Largura máxima do texto (px)
-            cabecalhoMarginEntreLogoTexto: 340, // Espaço entre logo e texto (px) - Era 20, agora 340
-            cabecalhoJustify: 'space-between', // Distribuição: space-between, flex-start, flex-end, center
-            cabecalhoPaddingBottom: 5,        // Padding inferior (px) - Era 15, agora 5
-            cabecalhoBordaLargura: 2,          // Largura da borda inferior (px) - Era 4, agora 2
-            cabecalhoLogoSize: 90,             // Tamanho do logo (px) - Era 80, agora 90
-            cabecalhoPaddingHorizontal: 5,     // Padding lateral do container (px) - Era 0, agora 5
-            cabecalhoLineHeight: 1.2,          // Espaçamento entre linhas do texto (multiplicador) - Era 1.4, agora 1.2
+            cabecalhoMaxWidth: 450,
+            cabecalhoMarginEntreLogoTexto: 280,
+            cabecalhoJustify: 'space-between',
+            cabecalhoPaddingBottom: 15,
+            cabecalhoBordaLargura: 2,
+            cabecalhoLogoSize: 130,
+            cabecalhoPaddingHorizontal: 0,
+            cabecalhoLineHeight: 1.2,
             // Controles do Carimbo
-            carimboWidth: 200,                 // Largura do carimbo (px) - Era 110, agora 200
-            carimboHeight: 190                 // Altura do carimbo (px) - Era 110, agora 190
+            carimboWidth: 300,
+            carimboHeight: 230,
+            // Data e Local
+            textoDataLocal: '',
+            tamanhoTextoDataLocal: 13,
+            estiloTextoDataLocal: 'normal',
+            decoracaoTextoDataLocal: 'none'
         },
         
         // Presets de Estilos Profissionais
@@ -187,25 +188,25 @@ function adminApp() {
                 cor: 'blue',
                 config: {
                     fontFamily: 'Arial',
-                    fontSize: 12,
+                    fontSize: 14,
                     tamanhoTitulo: 24,
                     tamanhoSubtitulo: 16,
-                    tamanhoEmpresa: 9,
-                    corDestaque: '#091f67',
-                    marcaDaguaOpacidade: 8,
-                    marcaDaguaRotacao: -45,
-                    marcaDaguaWidth: 350,
-                    marcaDaguaHeight: 350,
-                    espacamentoLinhas: 1.8,
-                    cabecalhoLogoSize: 90,
-                    cabecalhoMarginEntreLogoTexto: 340,
-                    cabecalhoPaddingBottom: 5,
+                    tamanhoEmpresa: 10,
+                    corDestaque: '#091F67',
+                    espacamentoLinhas: 1.5,
+                    cabecalhoLogoSize: 130,
+                    cabecalhoMarginEntreLogoTexto: 280,
+                    cabecalhoPaddingBottom: 15,
                     cabecalhoBordaLargura: 2,
-                    cabecalhoPaddingHorizontal: 5,
+                    cabecalhoPaddingHorizontal: 0,
                     cabecalhoLineHeight: 1.2,
-                    carimboWidth: 200,
-                    carimboHeight: 190,
-                    zoom: 55
+                    carimboWidth: 300,
+                    carimboHeight: 230,
+                    zoom: 125,
+                    textoDataLocal: '',
+                    tamanhoTextoDataLocal: 13,
+                    estiloTextoDataLocal: 'normal',
+                    decoracaoTextoDataLocal: 'none'
                 }
             },
             moderno: {
@@ -214,16 +215,16 @@ function adminApp() {
                 cor: 'purple',
                 config: {
                     fontFamily: 'Arial, sans-serif',
-                    fontSize: 11,
+                    fontSize: 14,
                     tamanhoTitulo: 32,
                     tamanhoSubtitulo: 20,
-                    tamanhoEmpresa: 9,
+                    tamanhoEmpresa: 10,
                     corDestaque: '#7c3aed',
-                    marcaDaguaOpacidade: 15,
-                    marcaDaguaRotacao: -30,
-                    marcaDaguaWidth: 450,
-                    marcaDaguaHeight: 450,
-                    espacamentoLinhas: 1.5
+                    espacamentoLinhas: 1.5,
+                    textoDataLocal: '',
+                    tamanhoTextoDataLocal: 13,
+                    estiloTextoDataLocal: 'normal',
+                    decoracaoTextoDataLocal: 'none'
                 }
             },
             minimalista: {
@@ -232,16 +233,16 @@ function adminApp() {
                 cor: 'gray',
                 config: {
                     fontFamily: 'Calibri, sans-serif',
-                    fontSize: 11,
+                    fontSize: 14,
                     tamanhoTitulo: 26,
                     tamanhoSubtitulo: 17,
-                    tamanhoEmpresa: 8.5,
+                    tamanhoEmpresa: 10,
                     corDestaque: '#374151',
-                    marcaDaguaOpacidade: 5,
-                    marcaDaguaRotacao: 0,
-                    marcaDaguaWidth: 300,
-                    marcaDaguaHeight: 300,
-                    espacamentoLinhas: 1.6
+                    espacamentoLinhas: 1.6,
+                    textoDataLocal: '',
+                    tamanhoTextoDataLocal: 13,
+                    estiloTextoDataLocal: 'normal',
+                    decoracaoTextoDataLocal: 'none'
                 }
             },
             executivo: {
@@ -250,16 +251,16 @@ function adminApp() {
                 cor: 'green',
                 config: {
                     fontFamily: 'Georgia, serif',
-                    fontSize: 12,
+                    fontSize: 14,
                     tamanhoTitulo: 30,
                     tamanhoSubtitulo: 19,
-                    tamanhoEmpresa: 9.5,
+                    tamanhoEmpresa: 10,
                     corDestaque: '#059669',
-                    marcaDaguaOpacidade: 12,
-                    marcaDaguaRotacao: -45,
-                    marcaDaguaWidth: 420,
-                    marcaDaguaHeight: 420,
-                    espacamentoLinhas: 1.7
+                    espacamentoLinhas: 1.7,
+                    textoDataLocal: '',
+                    tamanhoTextoDataLocal: 13,
+                    estiloTextoDataLocal: 'normal',
+                    decoracaoTextoDataLocal: 'none'
                 }
             }
         },
@@ -2453,13 +2454,7 @@ function adminApp() {
             this.showAlert('success', '🎨 Cores resetadas!');
         },
         
-        resetMarcaDagua() {
-            this.previewConfig.marcaDaguaOpacidade = 10;
-            this.previewConfig.marcaDaguaRotacao = -45;
-            this.previewConfig.marcaDaguaWidth = 400;
-            this.previewConfig.marcaDaguaHeight = 400;
-            this.showAlert('success', '💧 Marca d\'água resetada!');
-        },
+        // resetMarcaDagua() removido - marca d'água não é mais usada
         
         getEmpresaExemplo() {
             // 1. Tentar pegar empresa do fluxo de geração (dados reais)

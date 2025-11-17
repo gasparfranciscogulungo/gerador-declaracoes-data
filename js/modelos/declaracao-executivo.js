@@ -20,20 +20,16 @@ const ModeloDeclaracaoExecutivo = {
      */
     renderizar(empresa, cliente, config = {}) {
         
-        // Configurações padrão
+        // Configurações padrão profissionais
         const cfg = {
             fontFamily: config.fontFamily || 'Arial',
-            fontSize: config.fontSize || 12,
+            fontSize: config.fontSize || 14,
             tamanhoTitulo: config.tamanhoTitulo || 24,
             tamanhoSubtitulo: config.tamanhoSubtitulo || 16,
-            tamanhoEmpresa: config.tamanhoEmpresa || 9,
+            tamanhoEmpresa: config.tamanhoEmpresa || 10,
             corTexto: config.corTexto || '#000000',
-            corDestaque: config.corDestaque || empresa.corPrimaria || '#091f67',
-            marcaDaguaOpacidade: config.marcaDaguaOpacidade || 8,
-            marcaDaguaRotacao: config.marcaDaguaRotacao !== undefined ? config.marcaDaguaRotacao : -45,
-            marcaDaguaWidth: config.marcaDaguaWidth || 350,
-            marcaDaguaHeight: config.marcaDaguaHeight || 350,
-            espacamentoLinhas: config.espacamentoLinhas || 1.8,
+            corDestaque: config.corDestaque || empresa.corPrimaria || '#091F67',
+            espacamentoLinhas: config.espacamentoLinhas || 1.5,
             // Edição de Conteúdo
             tituloDocumento: config.tituloDocumento || 'Declaração de Serviço',
             textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
@@ -41,16 +37,21 @@ const ModeloDeclaracaoExecutivo = {
             alinhamentoCabecalho: config.alinhamentoCabecalho || 'left',
             // Controles Avançados do Cabeçalho
             cabecalhoMaxWidth: config.cabecalhoMaxWidth || 450,
-            cabecalhoMarginEntreLogoTexto: config.cabecalhoMarginEntreLogoTexto || 340,
+            cabecalhoMarginEntreLogoTexto: config.cabecalhoMarginEntreLogoTexto || 280,
             cabecalhoJustify: config.cabecalhoJustify || 'space-between',
-            cabecalhoPaddingBottom: config.cabecalhoPaddingBottom || 5,
+            cabecalhoPaddingBottom: config.cabecalhoPaddingBottom || 15,
             cabecalhoBordaLargura: config.cabecalhoBordaLargura || 2,
-            cabecalhoLogoSize: config.cabecalhoLogoSize || 90,
-            cabecalhoPaddingHorizontal: config.cabecalhoPaddingHorizontal || 5,
+            cabecalhoLogoSize: config.cabecalhoLogoSize || 130,
+            cabecalhoPaddingHorizontal: config.cabecalhoPaddingHorizontal || 0,
             cabecalhoLineHeight: config.cabecalhoLineHeight || 1.2,
             // Controles do Carimbo
-            carimboWidth: config.carimboWidth || 200,
-            carimboHeight: config.carimboHeight || 190
+            carimboWidth: config.carimboWidth || 300,
+            carimboHeight: config.carimboHeight || 230,
+            // Data e Local editáveis
+            textoDataLocal: config.textoDataLocal || '',
+            tamanhoTextoDataLocal: config.tamanhoTextoDataLocal || 13,
+            estiloTextoDataLocal: config.estiloTextoDataLocal || 'normal', // 'normal', 'bold', 'italic', 'bold-italic'
+            decoracaoTextoDataLocal: config.decoracaoTextoDataLocal || 'none' // 'none', 'underline'
         };
 
         // Data atual formatada
@@ -105,12 +106,12 @@ const ModeloDeclaracaoExecutivo = {
                     border-bottom: ${cfg.cabecalhoBordaLargura}px solid ${cfg.corDestaque};
                 ">
                     <!-- Logo -->
-                    <div style="flex-shrink: 0; margin-right: ${cfg.cabecalhoMarginEntreLogoTexto}px;">
+                    <div style="flex-shrink: 0; margin-right: ${cfg.cabecalhoMarginEntreLogoTexto}px; width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px;">
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
                                  crossorigin="anonymous"
-                                 style="width: ${cfg.cabecalhoLogoSize}px; height: ${cfg.cabecalhoLogoSize}px; object-fit: contain;">
+                                 style="max-width: ${cfg.cabecalhoLogoSize}px; max-height: ${cfg.cabecalhoLogoSize}px; width: auto; height: auto; object-fit: contain; display: block;">
                         ` : `
                             <div style="
                                 width: ${cfg.cabecalhoLogoSize}px; 
@@ -156,7 +157,7 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- TÍTULO -->
-                <div style="text-align: center; margin: 12px 0 10px 0;">
+                <div style="text-align: center; margin: 30px 0 10px 0;">
                     <h2 style="
                         font-size: ${cfg.tamanhoTitulo}pt;
                         font-weight: bold;
@@ -203,8 +204,15 @@ const ModeloDeclaracaoExecutivo = {
 
                 <!-- RODAPÉ -->
                 <div style="margin-top: 15px;">
-                    <p style="font-size: 9pt; margin-bottom: 20px;">
-                        ${empresa.endereco.municipio || (empresa.endereco.completo ? empresa.endereco.completo.split(',').slice(-2)[0].trim() : 'Luanda')}, aos ${dataAtual}.
+                    <!-- Data e Local Editáveis -->
+                    <p style="
+                        font-size: ${cfg.tamanhoTextoDataLocal}pt; 
+                        margin-bottom: 20px;
+                        font-weight: ${cfg.estiloTextoDataLocal === 'bold' || cfg.estiloTextoDataLocal === 'bold-italic' ? 'bold' : 'normal'};
+                        font-style: ${cfg.estiloTextoDataLocal === 'italic' || cfg.estiloTextoDataLocal === 'bold-italic' ? 'italic' : 'normal'};
+                        text-decoration: ${cfg.decoracaoTextoDataLocal};
+                    ">
+                        ${cfg.textoDataLocal || `Luanda, aos ${dataAtual}`}.
                     </p>
                     
                     <!-- Assinatura e Carimbo Centralizados -->
@@ -214,7 +222,7 @@ const ModeloDeclaracaoExecutivo = {
                         align-items: center;
                         justify-content: center;
                     ">
-                        <p style="font-size: 9pt; font-weight: 600; margin-bottom: 12px;">
+                        <p style="font-size: 13pt; font-weight: 600; margin-bottom: 12px;">
                             A Direcção da Empresa
                         </p>
                         
@@ -228,17 +236,19 @@ const ModeloDeclaracaoExecutivo = {
                                     object-fit: contain; 
                                     opacity: 0.9;
                                     display: block;
+                                    max-width: 100%;
                                  ">
                         ` : `
                             <div style="
                                 width: ${cfg.carimboWidth}px;
                                 height: ${cfg.carimboHeight}px;
+                                max-width: 100%;
                                 border: 3px solid #999;
                                 border-radius: 50%;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                font-size: ${cfg.carimboWidth * 0.4}px;
+                                font-size: ${Math.min(cfg.carimboWidth, cfg.carimboHeight) * 0.4}px;
                                 color: #999;
                             ">📌</div>
                         `}

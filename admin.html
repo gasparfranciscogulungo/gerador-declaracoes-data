@@ -3658,51 +3658,85 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: MARCA D'ÁGUA -->
-                    <div class="mb-6 pb-6 border-b border-gray-300">
+                    <!-- SEÇÃO: DATA E LOCAL -->
+                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
                         <div class="flex items-center justify-between mb-3">
-                            <label class="block text-sm font-medium text-gray-700">
-                                <i class="bi bi-droplet mr-1"></i>Marca d'água
+                            <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium">
+                                <i class="bi bi-calendar-event mr-1"></i>Data e Local
                             </label>
-                            <button @click="resetMarcaDagua()" class="text-xs text-blue-600 hover:text-blue-700">
+                            <button @click="previewConfig.textoDataLocal = ''; previewConfig.tamanhoTextoDataLocal = 13; previewConfig.estiloTextoDataLocal = 'normal'; previewConfig.decoracaoTextoDataLocal = 'none'" 
+                                    class="text-xs text-blue-600 hover:text-blue-700">
                                 <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
                             </button>
                         </div>
                         
-                        <!-- Opacidade -->
+                        <!-- Campo de Texto -->
                         <div class="mb-3">
-                            <label class="block text-xs text-gray-600 mb-1">
-                                Opacidade: <span class="font-bold" x-text="previewConfig.marcaDaguaOpacidade + '%'"></span>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Texto (deixe vazio para automático):
                             </label>
-                            <input type="range" x-model="previewConfig.marcaDaguaOpacidade" min="5" max="30" step="5"
+                            <textarea x-model="previewConfig.textoDataLocal" 
+                                      rows="2"
+                                      :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                      class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
+                                      placeholder="Ex: Luanda, aos 17 de novembro de 2025"></textarea>
+                        </div>
+
+                        <!-- Tamanho do Texto -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Tamanho: <span class="font-bold" x-text="previewConfig.tamanhoTextoDataLocal + 'pt'"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.tamanhoTextoDataLocal" min="10" max="16" step="1"
                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
                         </div>
 
-                        <!-- Rotação -->
+                        <!-- Estilo do Texto -->
                         <div class="mb-3">
-                            <label class="block text-xs text-gray-600 mb-1">
-                                Rotação: <span class="font-bold" x-text="previewConfig.marcaDaguaRotacao + '°'"></span>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Estilo:
                             </label>
-                            <input type="range" x-model="previewConfig.marcaDaguaRotacao" min="-45" max="45" step="5"
-                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex gap-2">
+                                <button @click="previewConfig.estiloTextoDataLocal = 'normal'" 
+                                        :class="previewConfig.estiloTextoDataLocal === 'normal' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs font-medium transition-colors">
+                                    Normal
+                                </button>
+                                <button @click="previewConfig.estiloTextoDataLocal = 'bold'" 
+                                        :class="previewConfig.estiloTextoDataLocal === 'bold' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs font-bold transition-colors">
+                                    <strong>Negrito</strong>
+                                </button>
+                                <button @click="previewConfig.estiloTextoDataLocal = 'italic'" 
+                                        :class="previewConfig.estiloTextoDataLocal === 'italic' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs italic transition-colors">
+                                    <em>Itálico</em>
+                                </button>
+                                <button @click="previewConfig.estiloTextoDataLocal = 'bold-italic'" 
+                                        :class="previewConfig.estiloTextoDataLocal === 'bold-italic' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs font-bold italic transition-colors">
+                                    <strong><em>Ambos</em></strong>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Width -->
-                        <div class="mb-3">
-                            <label class="block text-xs text-gray-600 mb-1">
-                                Largura: <span class="font-bold" x-text="previewConfig.marcaDaguaWidth + 'px'"></span>
-                            </label>
-                            <input type="range" x-model="previewConfig.marcaDaguaWidth" min="200" max="600" step="25"
-                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                        </div>
-
-                        <!-- Height -->
+                        <!-- Sublinhado -->
                         <div>
-                            <label class="block text-xs text-gray-600 mb-1">
-                                Altura: <span class="font-bold" x-text="previewConfig.marcaDaguaHeight + 'px'"></span>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Decoração:
                             </label>
-                            <input type="range" x-model="previewConfig.marcaDaguaHeight" min="200" max="600" step="25"
-                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex gap-2">
+                                <button @click="previewConfig.decoracaoTextoDataLocal = 'none'" 
+                                        :class="previewConfig.decoracaoTextoDataLocal === 'none' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs font-medium transition-colors">
+                                    Sem
+                                </button>
+                                <button @click="previewConfig.decoracaoTextoDataLocal = 'underline'" 
+                                        :class="previewConfig.decoracaoTextoDataLocal === 'underline' ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                        class="flex-1 px-3 py-2 rounded text-xs font-medium underline transition-colors">
+                                    Sublinhado
+                                </button>
+                            </div>
                         </div>
                     </div>
 
