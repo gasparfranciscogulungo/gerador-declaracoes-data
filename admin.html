@@ -3740,13 +3740,78 @@
                         </div>
                     </div>
 
+                    <!-- SEÇÃO: MARGENS DO RODAPÉ -->
+                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
+                        <div class="flex items-center justify-between mb-3">
+                            <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium">
+                                <i class="bi bi-arrows-vertical mr-1"></i>Margens do Rodapé
+                            </label>
+                            <button @click="previewConfig.margemTopDataLocal = 40; previewConfig.margemBottomDataLocal = 20; previewConfig.margemTopAssinatura = 30; previewConfig.margemBottomTextoAssinatura = 12" 
+                                    class="text-xs text-blue-600 hover:text-blue-700">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Margem Topo da Data -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Espaço antes da Data: <span class="font-bold" x-text="previewConfig.margemTopDataLocal + 'px'"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.margemTopDataLocal" min="10" max="100" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>10px</span>
+                                <span>100px</span>
+                            </div>
+                        </div>
+
+                        <!-- Margem Inferior da Data -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Espaço após a Data: <span class="font-bold" x-text="previewConfig.margemBottomDataLocal + 'px'"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.margemBottomDataLocal" min="10" max="60" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>10px</span>
+                                <span>60px</span>
+                            </div>
+                        </div>
+
+                        <!-- Margem Topo da Assinatura -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Espaço antes de "A Direcção": <span class="font-bold" x-text="previewConfig.margemTopAssinatura + 'px'"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.margemTopAssinatura" min="10" max="100" step="5"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>10px</span>
+                                <span>100px</span>
+                            </div>
+                        </div>
+
+                        <!-- Margem entre Texto e Carimbo -->
+                        <div>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
+                                Espaço entre Texto e Carimbo: <span class="font-bold" x-text="previewConfig.margemBottomTextoAssinatura + 'px'"></span>
+                            </label>
+                            <input type="range" x-model.number="previewConfig.margemBottomTextoAssinatura" min="5" max="40" step="2"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>5px</span>
+                                <span>40px</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- SEÇÃO: ESPAÇAMENTO -->
-                    <div class="mb-6 pb-6 border-b border-gray-300">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
+                        <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium mb-3">
                             <i class="bi bi-text-indent-left mr-1"></i>Espaçamento
                         </label>
                         <div>
-                            <label class="block text-xs text-gray-600 mb-1">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" class="block text-xs mb-1">
                                 Entre linhas: <span class="font-bold" x-text="previewConfig.espacamentoLinhas.toFixed(1)"></span>
                             </label>
                             <input type="range" x-model.number="previewConfig.espacamentoLinhas" min="1.0" max="2.0" step="0.1"

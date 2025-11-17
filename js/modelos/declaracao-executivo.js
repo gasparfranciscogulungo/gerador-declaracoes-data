@@ -51,7 +51,12 @@ const ModeloDeclaracaoExecutivo = {
             textoDataLocal: config.textoDataLocal || '',
             tamanhoTextoDataLocal: config.tamanhoTextoDataLocal || 13,
             estiloTextoDataLocal: config.estiloTextoDataLocal || 'normal', // 'normal', 'bold', 'italic', 'bold-italic'
-            decoracaoTextoDataLocal: config.decoracaoTextoDataLocal || 'none' // 'none', 'underline'
+            decoracaoTextoDataLocal: config.decoracaoTextoDataLocal || 'none', // 'none', 'underline'
+            // Margens do Rodapé
+            margemTopDataLocal: config.margemTopDataLocal || 40,
+            margemBottomDataLocal: config.margemBottomDataLocal || 20,
+            margemTopAssinatura: config.margemTopAssinatura || 30,
+            margemBottomTextoAssinatura: config.margemBottomTextoAssinatura || 12
         };
 
         // Data atual formatada
@@ -203,11 +208,11 @@ const ModeloDeclaracaoExecutivo = {
                 </div>
 
                 <!-- RODAPÉ -->
-                <div style="margin-top: 15px;">
+                <div style="margin-top: ${cfg.margemTopDataLocal || 40}px;">
                     <!-- Data e Local Editáveis -->
                     <p style="
                         font-size: ${cfg.tamanhoTextoDataLocal}pt; 
-                        margin-bottom: 20px;
+                        margin-bottom: ${cfg.margemBottomDataLocal || 20}px;
                         font-weight: ${cfg.estiloTextoDataLocal === 'bold' || cfg.estiloTextoDataLocal === 'bold-italic' ? 'bold' : 'normal'};
                         font-style: ${cfg.estiloTextoDataLocal === 'italic' || cfg.estiloTextoDataLocal === 'bold-italic' ? 'italic' : 'normal'};
                         text-decoration: ${cfg.decoracaoTextoDataLocal};
@@ -221,8 +226,13 @@ const ModeloDeclaracaoExecutivo = {
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        margin-top: ${cfg.margemTopAssinatura || 30}px;
                     ">
-                        <p style="font-size: 13pt; font-weight: 600; margin-bottom: 12px;">
+                        <p style="
+                            font-size: 13pt; 
+                            font-weight: 600; 
+                            margin-bottom: ${cfg.margemBottomTextoAssinatura || 12}px;
+                        ">
                             A Direcção da Empresa
                         </p>
                         

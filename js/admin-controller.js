@@ -177,7 +177,12 @@ function adminApp() {
             textoDataLocal: '',
             tamanhoTextoDataLocal: 13,
             estiloTextoDataLocal: 'normal',
-            decoracaoTextoDataLocal: 'none'
+            decoracaoTextoDataLocal: 'none',
+            // Margens do Rodapé
+            margemTopDataLocal: 40,
+            margemBottomDataLocal: 20,
+            margemTopAssinatura: 30,
+            margemBottomTextoAssinatura: 12
         },
         
         // Presets de Estilos Profissionais
@@ -206,7 +211,11 @@ function adminApp() {
                     textoDataLocal: '',
                     tamanhoTextoDataLocal: 13,
                     estiloTextoDataLocal: 'normal',
-                    decoracaoTextoDataLocal: 'none'
+                    decoracaoTextoDataLocal: 'none',
+                    margemTopDataLocal: 40,
+                    margemBottomDataLocal: 20,
+                    margemTopAssinatura: 30,
+                    margemBottomTextoAssinatura: 12
                 }
             },
             moderno: {
@@ -224,7 +233,11 @@ function adminApp() {
                     textoDataLocal: '',
                     tamanhoTextoDataLocal: 13,
                     estiloTextoDataLocal: 'normal',
-                    decoracaoTextoDataLocal: 'none'
+                    decoracaoTextoDataLocal: 'none',
+                    margemTopDataLocal: 40,
+                    margemBottomDataLocal: 20,
+                    margemTopAssinatura: 30,
+                    margemBottomTextoAssinatura: 12
                 }
             },
             minimalista: {
@@ -242,7 +255,11 @@ function adminApp() {
                     textoDataLocal: '',
                     tamanhoTextoDataLocal: 13,
                     estiloTextoDataLocal: 'normal',
-                    decoracaoTextoDataLocal: 'none'
+                    decoracaoTextoDataLocal: 'none',
+                    margemTopDataLocal: 40,
+                    margemBottomDataLocal: 20,
+                    margemTopAssinatura: 30,
+                    margemBottomTextoAssinatura: 12
                 }
             },
             executivo: {
@@ -260,7 +277,11 @@ function adminApp() {
                     textoDataLocal: '',
                     tamanhoTextoDataLocal: 13,
                     estiloTextoDataLocal: 'normal',
-                    decoracaoTextoDataLocal: 'none'
+                    decoracaoTextoDataLocal: 'none',
+                    margemTopDataLocal: 40,
+                    margemBottomDataLocal: 20,
+                    margemTopAssinatura: 30,
+                    margemBottomTextoAssinatura: 12
                 }
             }
         },
