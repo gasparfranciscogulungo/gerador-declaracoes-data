@@ -145,6 +145,7 @@ function adminApp() {
         mostrarControlesZoom: false, // Controles de zoom (toggle)
         mostrarAcoesPDF: false, // Ações PDF: Nova Aba, Imprimir, Baixar (toggle)
         menuFlutuanteMobile: false, // Menu flutuante profissional (mobile)
+        tamanhoModalFerramentas: 60, // Tamanho do modal de ferramentas mobile (20, 40, 60, 80%)
         
         // Customização do Preview
         previewConfig: {

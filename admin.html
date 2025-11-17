@@ -3012,38 +3012,27 @@
                 
                 <!-- Botões de Ação -->
                 <div class="flex items-center gap-2">
-                    <!-- Botão Personalizar (Desktop) -->
-                    <button @click="mostrarPersonalizacao = !mostrarPersonalizacao"
-                            :class="mostrarPersonalizacao ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
-                            class="hidden lg:flex items-center px-4 py-2 rounded-lg font-medium transition-colors">
-                        <i class="bi bi-palette mr-2"></i>Personalizar
+                    <!-- Botão Voltar (Desktop e Mobile) -->
+                    <button @click="fluxoEtapa === 4 ? voltarParaEscolhaModelo() : fecharModalPreview()"
+                            :class="darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700'"
+                            class="flex items-center justify-center w-10 h-10 rounded-lg transition-colors touch-manipulation"
+                            title="Voltar">
+                        <i class="bi bi-arrow-left text-xl"></i>
                     </button>
                     
-                    <!-- Botão Ferramentas de Zoom (Desktop) -->
+                    <!-- Botão Zoom (Desktop e Mobile) -->
                     <button @click="mostrarControlesZoom = !mostrarControlesZoom"
                             :class="mostrarControlesZoom ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
-                            class="hidden lg:flex items-center px-4 py-2 rounded-lg font-medium transition-colors">
-                        <i class="bi bi-search mr-2"></i>Zoom
-                    </button>
-                    
-                    <!-- Botão Personalizar (Mobile - só ícone) -->
-                    <button @click="mostrarPersonalizacao = !mostrarPersonalizacao"
-                            :class="mostrarPersonalizacao ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
-                            class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-colors touch-manipulation">
-                        <i class="bi bi-palette text-xl"></i>
-                    </button>
-                    
-                    <!-- Botão Zoom (Mobile - só ícone) -->
-                    <button @click="mostrarControlesZoom = !mostrarControlesZoom"
-                            :class="mostrarControlesZoom ? 'bg-blue-600 text-white' : (darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700')"
-                            class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-colors touch-manipulation">
+                            class="flex items-center justify-center w-10 h-10 rounded-lg transition-colors touch-manipulation"
+                            title="Zoom">
                         <i class="bi bi-search text-xl"></i>
                     </button>
                     
-                    <!-- Botão Fechar -->
+                    <!-- Botão Fechar (Desktop only) -->
                     <button @click="fecharModalPreview()" 
                             :class="darkMode ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700'"
-                            class="flex items-center justify-center w-10 h-10 rounded-lg transition-colors touch-manipulation">
+                            class="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg transition-colors"
+                            title="Fechar">
                         <i class="bi bi-x-lg text-xl"></i>
                     </button>
                 </div>
@@ -3161,12 +3150,13 @@
                      x-transition
                      :class="darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'"
                      class="w-full lg:w-96 xl:w-[420px] border-t lg:border-t-0 lg:border-l overflow-y-auto p-3 sm:p-4 lg:p-6 
-                            max-h-[60vh] sm:max-h-[55vh] lg:max-h-none 
+                            lg:max-h-none 
                             fixed lg:relative bottom-0 left-0 right-0 lg:bottom-auto lg:left-auto lg:right-auto
                             z-30 lg:z-auto
                             rounded-t-3xl lg:rounded-none
                             shadow-2xl lg:shadow-none
-                            overscroll-contain">
+                            overscroll-contain"
+                     :style="`max-height: ${tamanhoModalFerramentas}vh`">
                     
                     <!-- Handle para arrastar (mobile) -->
                     <div class="lg:hidden flex justify-center mb-3 -mt-1">
@@ -3182,10 +3172,39 @@
                             <span class="hidden xs:inline">Personalização</span>
                             <span class="xs:hidden">Editar</span>
                         </h4>
-                        <button @click="mostrarPersonalizacao = false" 
-                                class="lg:hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 touch-manipulation active:scale-95 transition-transform">
-                            <i class="bi bi-x-lg text-xl"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <!-- Botões de Tamanho (Mobile Only) -->
+                            <div class="lg:hidden flex items-center gap-1">
+                                <button @click="tamanhoModalFerramentas = 20"
+                                        :class="tamanhoModalFerramentas === 20 ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600')"
+                                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold touch-manipulation transition-colors"
+                                        title="20%">
+                                    20
+                                </button>
+                                <button @click="tamanhoModalFerramentas = 40"
+                                        :class="tamanhoModalFerramentas === 40 ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600')"
+                                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold touch-manipulation transition-colors"
+                                        title="40%">
+                                    40
+                                </button>
+                                <button @click="tamanhoModalFerramentas = 60"
+                                        :class="tamanhoModalFerramentas === 60 ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600')"
+                                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold touch-manipulation transition-colors"
+                                        title="60%">
+                                    60
+                                </button>
+                                <button @click="tamanhoModalFerramentas = 80"
+                                        :class="tamanhoModalFerramentas === 80 ? 'bg-purple-600 text-white' : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-600')"
+                                        class="w-7 h-7 rounded flex items-center justify-center text-xs font-bold touch-manipulation transition-colors"
+                                        title="80%">
+                                    80
+                                </button>
+                            </div>
+                            <button @click="mostrarPersonalizacao = false" 
+                                    class="lg:hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 touch-manipulation active:scale-95 transition-transform">
+                                <i class="bi bi-x-lg text-xl"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- SEÇÃO: PRESETS DE ESTILOS -->
@@ -4193,13 +4212,13 @@
             
             </div><!-- Fecha layout principal -->
 
-            <!-- FOOTER: Ações de PDF - 100% RESPONSIVO COM TOGGLE MOBILE -->
+            <!-- FOOTER: Badge de Status - MOBILE E DESKTOP -->
             <div :class="darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'" 
-                 class="px-3 sm:px-6 py-3 sm:py-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 border-t">
+                 class="px-3 sm:px-6 py-3 flex items-center justify-between gap-3 border-t">
                 
-                <!-- Badge de Status - Mobile: Full width, Desktop: Auto -->
+                <!-- Badge de Status -->
                 <div :class="(fluxoEmpresaSelecionada && fluxoClienteSelecionado) ? (darkMode ? 'bg-green-900/30 text-green-300 border-green-700' : 'bg-green-50 text-green-700 border-green-300') : (darkMode ? 'bg-yellow-900/30 text-yellow-300 border-yellow-700' : 'bg-yellow-50 text-yellow-700 border-yellow-300')" 
-                     class="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border flex items-center justify-center lg:justify-start order-2 lg:order-1">
+                     class="text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-lg border flex items-center justify-center flex-1">
                     <i :class="(fluxoEmpresaSelecionada && fluxoClienteSelecionado) ? 'bi bi-check-circle-fill text-green-500' : 'bi bi-lightbulb text-yellow-500'" class="mr-2 flex-shrink-0"></i>
                     <span x-show="fluxoEmpresaSelecionada && fluxoClienteSelecionado" class="truncate">
                         <strong class="hidden sm:inline">Dados Reais: </strong>
@@ -4214,54 +4233,26 @@
                     </span>
                 </div>
                 
-                <!-- Botões de Ação - Responsivos -->
-                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 order-1 lg:order-2">
-                    
-                    <!-- Botão Voltar/Fechar -->
-                    <button @click="fluxoEtapa === 4 ? voltarParaEscolhaModelo() : fecharModalPreview()" 
-                            :class="darkMode ? 'bg-gray-600 text-gray-200 hover:bg-gray-500 active:bg-gray-400' : 'bg-gray-300 text-gray-700 hover:bg-gray-400 active:bg-gray-500'"
-                            class="px-4 py-2.5 sm:py-2 rounded-lg transition-colors font-medium touch-manipulation text-sm sm:text-base">
-                        <i :class="fluxoEtapa === 4 ? 'bi bi-arrow-left' : 'bi bi-x-circle'" class="mr-2"></i>
-                        <span x-text="fluxoEtapa === 4 ? 'Voltar' : 'Fechar'"></span>
-                    </button>
-                    
-                    <!-- Botões de ação (ocultos para tipos em desenvolvimento) -->
-                    <template x-if="!['nif', 'atestado', 'recibo', 'combo'].includes(tipoPreview)">
-                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-                            
-                            <!-- MOBILE ONLY: Sem botões aqui - Usa menu flutuante fixo -->
-                                    
-                                    <!-- Botão: Baixar PDF (Full Width) -->
-                                    <button @click="(fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()); mostrarAcoesPDF = false" 
-                                            class="col-span-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg touch-manipulation text-sm">
-                                        <i class="bi bi-download mr-2"></i>
-                                        <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- DESKTOP: Botões inline -->
-                            <div class="hidden sm:flex items-center gap-3">
-                                <button @click="visualizarPDFNovaAba()" 
-                                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg touch-manipulation">
-                                    <i class="bi bi-window mr-2"></i>Nova Aba
-                                </button>
-                                
-                                <button @click="imprimirPDF()" 
-                                        class="px-4 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg touch-manipulation">
-                                    <i class="bi bi-printer mr-2"></i>Imprimir
-                                </button>
-                                
-                                <!-- Botão Principal: Gerar/Baixar PDF -->
-                                <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
-                                        class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg hover:shadow-xl touch-manipulation">
-                                    <i class="bi bi-download mr-2"></i>
-                                    <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
+                <!-- Botões Desktop Only -->
+                <template x-if="!['nif', 'atestado', 'recibo', 'combo'].includes(tipoPreview)">
+                    <div class="hidden lg:flex items-center gap-3">
+                        <button @click="visualizarPDFNovaAba()" 
+                                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                            <i class="bi bi-window mr-2"></i>Nova Aba
+                        </button>
+                        
+                        <button @click="imprimirPDF()" 
+                                class="px-4 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md hover:shadow-lg">
+                            <i class="bi bi-printer mr-2"></i>Imprimir
+                        </button>
+                        
+                        <button @click="fluxoEtapa === 4 ? gerarPDFFluxo() : gerarPDF()" 
+                                class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg hover:shadow-xl">
+                            <i class="bi bi-download mr-2"></i>
+                            <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
+                        </button>
+                    </div>
+                </template>
             </div>
 
         </div>
