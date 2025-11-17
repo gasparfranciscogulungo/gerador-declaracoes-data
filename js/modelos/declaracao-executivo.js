@@ -56,7 +56,9 @@ const ModeloDeclaracaoExecutivo = {
             margemTopDataLocal: config.margemTopDataLocal || 40,
             margemBottomDataLocal: config.margemBottomDataLocal || 20,
             margemTopAssinatura: config.margemTopAssinatura || 30,
-            margemBottomTextoAssinatura: config.margemBottomTextoAssinatura || 12
+            margemBottomTextoAssinatura: config.margemBottomTextoAssinatura || 12,
+            // Espaçamento entre parágrafos
+            espacoParagrafos: config.espacoParagrafos || 12
         };
 
         // Data atual formatada
@@ -181,7 +183,7 @@ const ModeloDeclaracaoExecutivo = {
 
                 <!-- CORPO DO TEXTO -->
                 <div style="text-align: ${cfg.alinhamentoTexto}; margin-bottom: 12px;">
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: ${cfg.espacoParagrafos}px;">
                         ${cfg.textoIntro} <strong style="color: ${cfg.corDestaque};">${cliente.nome}</strong>, 
                         portador(a) do Bilhete de Identidade n.º <strong>${cliente.bi}</strong>, 
                         exerce as funções de <strong style="color: ${cfg.corDestaque};">${cliente.cargo}</strong> 
@@ -189,19 +191,19 @@ const ModeloDeclaracaoExecutivo = {
                         sediada em ${empresa.endereco.completo || `${empresa.endereco.rua}, ${empresa.endereco.municipio}, ${empresa.endereco.pais}`}.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: ${cfg.espacoParagrafos}px;">
                         O(A) colaborador(a) foi admitido(a) em <strong>${dataAdmissao}</strong>, 
                         desempenhando as suas funções com competência e profissionalismo.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: ${cfg.espacoParagrafos}px;">
                         Aufere mensalmente o vencimento bruto de 
                         <strong style="color: ${cfg.corDestaque};">${salarioFormatado} Kz</strong>
                         ${cliente.salarioExtenso ? `(<em>${cliente.salarioExtenso}</em>)` : ''}, 
                         acrescido dos subsídios legalmente estabelecidos.
                     </p>
                     
-                    <p style="margin-bottom: 8px;">
+                    <p style="margin-bottom: ${cfg.espacoParagrafos}px;">
                         A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
                         nomeadamente comprovação de vínculo laboral e auferimento de rendimentos.
                     </p>
