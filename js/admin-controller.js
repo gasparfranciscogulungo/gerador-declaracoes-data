@@ -792,6 +792,23 @@ function adminApp() {
         visualizarTrabalhador: null,
 
         /**
+         * Formata NIF/BI angolano (007010193UE048)
+         * Formato: 9 números + 2 letras + 3 números
+         */
+        formatarNIF(valor) {
+            // Remove espaços e caracteres inválidos
+            let nif = valor.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+            
+            // Limita a 14 caracteres (9 números + 2 letras + 3 números)
+            if (nif.length > 14) {
+                nif = nif.substring(0, 14);
+            }
+            
+            // Atualiza o campo
+            this.novoTrabalhador.nif = nif;
+        },
+
+        /**
          * Formata valor monetário para padrão angolano (250.000,00)
          */
         formatarSalarioBase(valor) {
