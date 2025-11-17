@@ -67,11 +67,12 @@ const ModeloDeclaracaoExecutivo = {
             year: 'numeric'
         });
 
-        // Formatar salário
-        const salarioFormatado = cliente.salario.toLocaleString('pt-AO', {
+        // Formatar salário com separadores de milhar
+        const salarioNum = parseFloat(cliente.salario) || 0;
+        const salarioFormatado = new Intl.NumberFormat('pt-PT', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        });
+        }).format(salarioNum);
 
         return `
         <div class="modelo-declaracao-executivo" style="
@@ -189,7 +190,7 @@ const ModeloDeclaracaoExecutivo = {
                     
                     <p style="margin-bottom: 8px;">
                         Aufere mensalmente o vencimento bruto de 
-                        <strong style="color: ${cfg.corDestaque};">${salarioFormatado} AKZ</strong>
+                        <strong style="color: ${cfg.corDestaque};">${salarioFormatado} Kz</strong>
                         ${cliente.salarioExtenso ? `(<em>${cliente.salarioExtenso}</em>)` : ''}, 
                         acrescido dos subsídios legalmente estabelecidos.
                     </p>
