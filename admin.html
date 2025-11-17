@@ -1740,42 +1740,98 @@
         <!-- TAB: Histórico e Analytics -->
         <div x-show="activeTab === 'historico'" class="space-y-6">
             
-            <!-- Estatísticas Resumidas -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-blue-100 text-sm">Total Documentos</p>
-                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.totalDocumentos"></p>
+            <!-- Estatísticas Resumidas - RESPONSIVO COM CARROSSEL -->
+            <div class="mb-6 lg:mb-8">
+                <!-- Desktop: Grid normal (lg+) -->
+                <div class="hidden lg:grid grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Documentos</p>
+                                <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.totalDocumentos"></p>
+                            </div>
+                            <i class="bi bi-file-earmark-pdf text-5xl text-blue-300"></i>
                         </div>
-                        <i class="bi bi-file-earmark-pdf text-5xl text-blue-300"></i>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm">Declarações</p>
+                                <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.declaracao || 0"></p>
+                            </div>
+                            <i class="bi bi-file-text text-5xl text-green-300"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm">Recibos</p>
+                                <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.recibo || 0"></p>
+                            </div>
+                            <i class="bi bi-receipt text-5xl text-purple-300"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">Usuários Ativos</p>
+                                <p class="text-4xl font-bold" x-text="Object.keys(statsHistoricoAdmin.porUsuario || {}).length"></p>
+                            </div>
+                            <i class="bi bi-people text-5xl text-orange-300"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-green-100 text-sm">Declarações</p>
-                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.declaracao || 0"></p>
+
+                <!-- Mobile/Tablet: Carrossel Swiper (até lg) -->
+                <div class="lg:hidden">
+                    <div class="swiper historicoSwiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-6 text-white">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-blue-100 text-sm">Total Documentos</p>
+                                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.totalDocumentos"></p>
+                                        </div>
+                                        <i class="bi bi-file-earmark-pdf text-5xl text-blue-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-green-100 text-sm">Declarações</p>
+                                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.declaracao || 0"></p>
+                                        </div>
+                                        <i class="bi bi-file-text text-5xl text-green-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-purple-100 text-sm">Recibos</p>
+                                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.recibo || 0"></p>
+                                        </div>
+                                        <i class="bi bi-receipt text-5xl text-purple-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-6 text-white">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-orange-100 text-sm">Usuários Ativos</p>
+                                            <p class="text-4xl font-bold" x-text="Object.keys(statsHistoricoAdmin.porUsuario || {}).length"></p>
+                                        </div>
+                                        <i class="bi bi-people text-5xl text-orange-300"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <i class="bi bi-file-text text-5xl text-green-300"></i>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-purple-100 text-sm">Recibos</p>
-                            <p class="text-4xl font-bold" x-text="statsHistoricoAdmin.porTipo.recibo || 0"></p>
-                        </div>
-                        <i class="bi bi-receipt text-5xl text-purple-300"></i>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-6 text-white">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-orange-100 text-sm">Usuários Ativos</p>
-                            <p class="text-4xl font-bold" x-text="Object.keys(statsHistoricoAdmin.porUsuario || {}).length"></p>
-                        </div>
-                        <i class="bi bi-people text-5xl text-orange-300"></i>
+                        <div class="swiper-pagination mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -4851,6 +4907,53 @@
                         if ('vibrate' in navigator) {
                             navigator.vibrate(10);
                         }
+                    }
+                }
+            });
+
+            // Carrossel de Histórico - Mesma configuração
+            const historicoSwiper = new Swiper('.historicoSwiper', {
+                slidesPerView: 1,
+                spaceBetween: 16,
+                loop: false,
+                grabCursor: true,
+                centeredSlides: false,
+                
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: true,
+                    pauseOnMouseEnter: true
+                },
+                
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                    dynamicBullets: false
+                },
+                
+                effect: 'slide',
+                speed: 600,
+                
+                touchEventsTarget: 'container',
+                simulateTouch: true,
+                touchRatio: 1,
+                
+                resistance: true,
+                resistanceRatio: 0.85,
+                
+                breakpoints: {
+                    320: { slidesPerView: 1, spaceBetween: 12 },
+                    375: { slidesPerView: 1, spaceBetween: 14 },
+                    480: { slidesPerView: 1.3, spaceBetween: 16 },
+                    540: { slidesPerView: 1.5, spaceBetween: 16 },
+                    640: { slidesPerView: 2, spaceBetween: 18 },
+                    768: { slidesPerView: 2.5, spaceBetween: 20 },
+                    900: { slidesPerView: 3, spaceBetween: 20 }
+                },
+                
+                on: {
+                    init: function () {
+                        console.log('✅ Carrossel de histórico inicializado');
                     }
                 }
             });
