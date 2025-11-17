@@ -985,7 +985,7 @@
                                             BI/NIF <span class="text-gray-500 text-xs">(Opcional)</span>
                                         </label>
                                         <input type="text" x-model="novoTrabalhador.nif"
-                                               @input="formatarNIF($event.target.value)"
+                                               @input="formatarNIF(novoTrabalhador.nif)"
                                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
                                                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono uppercase"
                                                placeholder="Ex: 007010193UE048 ou qualquer formato"
@@ -1158,7 +1158,7 @@
                                             Salário Base (AKZ) <span class="text-red-500">*</span>
                                         </label>
                                         <input type="text" x-model="salarioBaseFormatado" required
-                                               @input="formatarSalarioBase($event.target.value)"
+                                               @input="formatarSalarioBase(salarioBaseFormatado)"
                                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
                                                class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono text-lg"
                                                placeholder="Ex: 250.000,00">
