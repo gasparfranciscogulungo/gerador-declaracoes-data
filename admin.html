@@ -1593,6 +1593,40 @@
                                         <strong>Atenção:</strong> Estes campos são opcionais e necessários apenas se você pretende gerar Recibos de Salário ou documentos Combo que incluam recibos.
                                     </p>
                                 </div>
+                                
+                                <!-- Salário Bruto e Líquido -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Salário Bruto (AKZ) <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editSalarioBrutoFormatado"
+                                                   @input="formatarEditSalarioBruto(editSalarioBrutoFormatado)"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono"
+                                                   placeholder="300.000,00">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
+                                            Salário Líquido (AKZ) <span class="text-gray-500 text-xs">(Opcional)</span>
+                                        </label>
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">Kz</span>
+                                            <input type="text" 
+                                                   x-model="editSalarioLiquidoFormatado"
+                                                   @input="formatarEditSalarioLiquido(editSalarioLiquidoFormatado)"
+                                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                                   class="w-full border rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 font-mono"
+                                                   placeholder="250.000,00">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subsídios e IRT -->
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="block text-sm font-medium mb-1">
