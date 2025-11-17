@@ -792,23 +792,6 @@ function adminApp() {
         visualizarTrabalhador: null,
 
         /**
-         * Formata NIF/BI - Campo livre alfanumérico
-         * Aceita qualquer combinação de números e letras (máx 20 caracteres)
-         */
-        formatarNIF(valor) {
-            // Remove apenas espaços, mantém alfanuméricos
-            let nif = valor.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
-            
-            // Limita a 20 caracteres
-            if (nif.length > 20) {
-                nif = nif.substring(0, 20);
-            }
-            
-            // Atualiza o campo
-            this.novoTrabalhador.nif = nif;
-        },
-
-        /**
          * Formata valor monetário para padrão angolano (250.000,00)
          */
         formatarSalarioBase(valor) {
