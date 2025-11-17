@@ -2537,7 +2537,8 @@ function adminApp() {
                     nome: this.fluxoClienteSelecionado.nome,
                     bi: this.fluxoClienteSelecionado.nif || this.fluxoClienteSelecionado.bi || '',
                     cargo: this.fluxoClienteSelecionado.funcao || this.fluxoClienteSelecionado.cargo || '',
-                    salario: this.fluxoClienteSelecionado.salario_bruto || 0,
+                    salario: this.fluxoClienteSelecionado.salario_base || this.fluxoClienteSelecionado.salario_bruto || 0,
+                    salarioExtenso: this.fluxoClienteSelecionado.salario_extenso || '',
                     dataAdmissao: this.fluxoClienteSelecionado.data_admissao || '',
                     moeda: this.fluxoClienteSelecionado.moeda || 'Kz',
                     // Gerar meses de trabalho baseado nos dados reais
@@ -2558,7 +2559,8 @@ function adminApp() {
                                 nome: cliente.nome,
                                 bi: cliente.nif || cliente.bi || '',
                                 cargo: cliente.funcao || cliente.cargo || '',
-                                salario: cliente.salario_bruto || 0,
+                                salario: cliente.salario_base || cliente.salario_bruto || 0,
+                                salarioExtenso: cliente.salario_extenso || '',
                                 dataAdmissao: cliente.data_admissao || '',
                                 moeda: cliente.moeda || 'Kz',
                                 mesesTrabalho: this.gerarMesesTrabalho(cliente)
@@ -2578,7 +2580,8 @@ function adminApp() {
                     nome: cliente.nome,
                     bi: cliente.nif || cliente.bi || '',
                     cargo: cliente.funcao || cliente.cargo || '',
-                    salario: cliente.salario_bruto || 0,
+                    salario: cliente.salario_base || cliente.salario_bruto || 0,
+                    salarioExtenso: cliente.salario_extenso || '',
                     dataAdmissao: cliente.data_admissao || '',
                     moeda: cliente.moeda || 'Kz',
                     mesesTrabalho: this.gerarMesesTrabalho(cliente)

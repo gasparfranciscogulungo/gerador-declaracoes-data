@@ -189,7 +189,8 @@ const ModeloDeclaracaoExecutivo = {
                     
                     <p style="margin-bottom: 8px;">
                         Aufere mensalmente o vencimento bruto de 
-                        <strong style="color: ${cfg.corDestaque};">${salarioFormatado} AKZ</strong>, 
+                        <strong style="color: ${cfg.corDestaque};">${salarioFormatado} AKZ</strong>
+                        ${cliente.salarioExtenso ? `(<em>${cliente.salarioExtenso}</em>)` : ''}, 
                         acrescido dos subsídios legalmente estabelecidos.
                     </p>
                     
