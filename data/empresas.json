@@ -1,3 +1,30 @@
 {
-  "empresas": []
+  "empresas": [
+    {
+      "id": "empresa_1763340238250",
+      "nome": "EMFC Consulting, S.A.",
+      "nif": "5480023446",
+      "endereco": {
+        "rua": "Avenida 4 de Fevereiro",
+        "edificio": " Edifício Summit Tower",
+        "andar": "5.º andar",
+        "sala": "Sala 502",
+        "bairro": "Bairro Kinaxixe ",
+        "municipio": "Luanda ",
+        "provincia": "Luanda ",
+        "pais": "Angola"
+      },
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5480023446/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-17T00:43:58.250Z",
+      "updatedAt": "2025-11-17T00:43:58.250Z",
+      "contador": 0
+    }
+  ]
 }
