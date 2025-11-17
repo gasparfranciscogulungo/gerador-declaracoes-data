@@ -31,7 +31,8 @@
       "nome": "Empresa de exemplo",
       "nif": "5480023446",
       "endereco": {
-        "rua": "",
+        "completo": "Sede: Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
+        "rua": "Sede: Avenida 4 de Fevereiro",
         "edificio": "",
         "andar": "",
         "sala": "",
@@ -40,7 +41,7 @@
         "provincia": "",
         "pais": "Angola"
       },
-      "enderecoCompleto": "Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
+      "enderecoCompleto": "Sede: Avenida 4 de Fevereiro, Edifício Summit Tower, 5.º andar, Sala 502\nBairro Kinaxixe — Município de Luanda\nLuanda — Angola",
       "telefone": "",
       "email": "",
       "website": "",
@@ -49,9 +50,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-11-17T01:12:22.032Z",
-      "updatedAt": "2025-11-17T01:12:22.032Z",
-      "contador": 0
+      "updatedAt": "2025-11-17T01:23:25.568Z"
     },
     {
       "id": "empresa_1763342578417",
