@@ -4624,7 +4624,7 @@
                 </button>
             </div>
 
-            <!-- ÁREA DO CROPPER - OTIMIZADA -->
+            <!-- ÁREA DO CROPPER - OTIMIZADA PARA MOBILE 90% VIEWPORT -->
             <div class="flex-1 overflow-hidden bg-gray-950 flex items-center justify-center relative min-h-0">
                 <!-- Dica Touch - Mais Destacada -->
                 <div class="absolute top-4 left-4 right-4 bg-gradient-to-r from-pink-600/90 to-purple-600/90 text-white px-4 py-3 rounded-xl z-10 backdrop-blur-md shadow-2xl border border-white/20">
@@ -4639,13 +4639,74 @@
                     </div>
                 </div>
                 
-                <!-- Container do Cropper -->
-                <div id="cropper-container" class="w-full h-full flex items-center justify-center touch-manipulation p-4">
+                <!-- Container do Cropper - OTIMIZADO PARA ALTA QUALIDADE -->
+                <div id="cropper-container" class="w-full h-full flex items-center justify-center touch-manipulation">
                     <img id="cropper-image" 
                          style="max-width: 100%; max-height: 100%; display: block; touch-action: none;"
                          class="rounded-lg">
                 </div>
             </div>
+            
+            <style>
+                /* Cropper.js - Otimização para ALTA QUALIDADE no mobile */
+                #cropper-container {
+                    padding: 0 !important; /* Sem padding - máximo espaço */
+                }
+                
+                @media (max-width: 768px) {
+                    /* Mobile: Container ocupa 90% do viewport */
+                    .cropper-container {
+                        max-width: 90vw !important;
+                        max-height: 75vh !important;
+                        margin: auto !important;
+                    }
+                    
+                    /* Canvas sem limitações - usa dimensões reais da imagem */
+                    .cropper-canvas {
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                    }
+                    
+                    /* Crop box também sem restrições */
+                    .cropper-crop-box {
+                        min-width: 200px !important;
+                        min-height: 200px !important;
+                    }
+                    
+                    /* Garantir que controles sejam visíveis */
+                    .cropper-point,
+                    .cropper-line {
+                        background-color: rgba(236, 72, 153, 0.7) !important;
+                    }
+                    
+                    .cropper-view-box {
+                        outline: 2px solid rgba(236, 72, 153, 0.8) !important;
+                        outline-offset: -1px !important;
+                    }
+                }
+                
+                /* Desktop mantém qualidade alta */
+                @media (min-width: 769px) {
+                    .cropper-container {
+                        max-width: 80vw !important;
+                        max-height: 80vh !important;
+                    }
+                }
+                
+                /* Touch feedback melhorado */
+                .cropper-point {
+                    width: 12px !important;
+                    height: 12px !important;
+                    opacity: 1 !important;
+                }
+                
+                @media (max-width: 768px) {
+                    .cropper-point {
+                        width: 16px !important;
+                        height: 16px !important;
+                    }
+                }
+            </style>
 
             <!-- FOOTER: CONTROLES OTIMIZADOS -->
             <div class="bg-gradient-to-b from-gray-900 to-black border-t border-gray-800 px-4 py-4 sm:py-5 flex flex-col gap-4 shrink-0">

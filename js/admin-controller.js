@@ -3469,12 +3469,19 @@ function adminApp() {
          * Clientes filtrados pela busca
          */
         get clientesFiltrados() {
-            if (!this.fluxoBuscaCliente) return this.trabalhadores;
+            // Garantir que trabalhadores é um array válido
+            const trabalhadores = Array.isArray(this.trabalhadores) ? this.trabalhadores : [];
             
-            const busca = this.fluxoBuscaCliente.toLowerCase();
-            return this.trabalhadores.filter(cli => 
-                cli.nome.toLowerCase().includes(busca) ||
-                cli.nif.includes(busca) ||
+            // Se não há busca, retornar todos os trabalhadores
+            if (!this.fluxoBuscaCliente || this.fluxoBuscaCliente.trim() === '') {
+                return trabalhadores;
+            }
+            
+            // Filtrar por busca
+            const busca = this.fluxoBuscaCliente.toLowerCase().trim();
+            return trabalhadores.filter(cli => 
+                (cli.nome && cli.nome.toLowerCase().includes(busca)) ||
+                (cli.nif && cli.nif.toLowerCase().includes(busca)) ||
                 (cli.funcao && cli.funcao.toLowerCase().includes(busca)) ||
                 (cli.departamento && cli.departamento.toLowerCase().includes(busca))
             );
@@ -3483,8 +3490,14 @@ function adminApp() {
         /**
          * Abre o fluxo de geração (carrega cache se disponível)
          */
-        abrirFluxoGeracao() {
+        async abrirFluxoGeracao() {
             this.modalFluxoGeracao = true;
+            
+            // 🔥 GARANTIR que trabalhadores estão carregados
+            if (!this.trabalhadores || this.trabalhadores.length === 0) {
+                console.log('📥 Carregando trabalhadores para o fluxo...');
+                await this.carregarTrabalhadores();
+            }
             
             // Tentar carregar cache do localStorage
             const cache = localStorage.getItem('fluxoGeracaoCache');
@@ -3518,6 +3531,8 @@ function adminApp() {
             
             this.fluxoBuscaEmpresa = '';
             this.fluxoBuscaCliente = '';
+            
+            console.log(`✅ Fluxo aberto - ${this.trabalhadores.length} trabalhadores disponíveis`);
         },
         
         /**
@@ -3719,12 +3734,16 @@ function adminApp() {
                         this.cropperInstance.destroy();
                     }
                     
-                    // Inicializar Cropper.js com aspecto LIVRE (sem restrição)
+                    // Inicializar Cropper.js OTIMIZADO PARA MOBILE - ALTA QUALIDADE
+                    const isMobile = window.innerWidth < 768;
+                    const vw = window.innerWidth;
+                    const vh = window.innerHeight;
+                    
                     this.cropperInstance = new Cropper(image, {
                         aspectRatio: NaN, // SEM manter proporção (crop livre)
-                        viewMode: 1,
+                        viewMode: 0, // Sem restrições - máxima liberdade
                         dragMode: 'move',
-                        autoCropArea: 0.8,
+                        autoCropArea: 0.9, // 90% da área disponível
                         restore: false,
                         guides: true,
                         center: true,
@@ -3736,6 +3755,30 @@ function adminApp() {
                         checkOrientation: true,
                         background: true,
                         modal: true,
+                        // MOBILE: Container ocupa 90% do viewport para melhor resolução
+                        minContainerWidth: isMobile ? vw * 0.9 : 600,
+                        minContainerHeight: isMobile ? vh * 0.6 : 400,
+                        // MOBILE: Canvas sem limitações - usa todo o espaço disponível
+                        minCanvasWidth: 0, // Sem limite mínimo - deixa o Cropper decidir
+                        minCanvasHeight: 0,
+                        // MOBILE: Container máximo também ampliado
+                        maxContainerWidth: isMobile ? vw * 0.95 : undefined,
+                        maxContainerHeight: isMobile ? vh * 0.75 : undefined,
+                        // Touch gestures otimizados
+                        zoomable: true,
+                        zoomOnTouch: true,
+                        zoomOnWheel: true,
+                        wheelZoomRatio: 0.1,
+                        movable: true,
+                        rotatable: true,
+                        scalable: true,
+                        // Callbacks para debug (remover depois se quiser)
+                        ready: function() {
+                            const containerData = this.cropper.getContainerData();
+                            console.log('📐 Cropper pronto - Container:', containerData.width + 'x' + containerData.height);
+                            const canvasData = this.cropper.getCanvasData();
+                            console.log('📐 Canvas:', canvasData.width + 'x' + canvasData.height);
+                        }
                     });
                     
                     console.log(`✂️ Cropper aberto para foto ${numeroFoto} (modo livre)`);
@@ -3778,7 +3821,24 @@ function adminApp() {
         aplicarCorte() {
             if (!this.cropperInstance) return;
             
-            this.cropperInstance.getCroppedCanvas().toBlob((blob) => {
+            // ALTA QUALIDADE: Canvas em resolução máxima para mobile
+            const isMobile = window.innerWidth < 768;
+            const canvasOptions = {
+                // Mobile: width mínimo de 1200px para garantir qualidade
+                // Desktop: width mínimo de 1600px
+                minWidth: isMobile ? 1200 : 1600,
+                minHeight: isMobile ? 1500 : 2000,
+                // Máximo também aumentado para não limitar imagens grandes
+                maxWidth: isMobile ? 2400 : 4000,
+                maxHeight: isMobile ? 3000 : 5000,
+                // Cor de preenchimento caso tenha rotação
+                fillColor: '#fff',
+                // Suavização de imagem (melhor qualidade)
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            };
+            
+            this.cropperInstance.getCroppedCanvas(canvasOptions).toBlob((blob) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const dataUrl = reader.result;
@@ -3796,12 +3856,13 @@ function adminApp() {
                     // Salvar no cache do navegador
                     this.salvarCacheBI();
                     
-                    console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual}`);
+                    const canvas = this.cropperInstance.getCroppedCanvas(canvasOptions);
+                    console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual} - Resolução: ${canvas.width}x${canvas.height}px`);
                     this.fecharCropperBI();
-                    this.showAlert('success', 'Corte aplicado com sucesso!');
+                    this.showAlert('success', `Corte aplicado com sucesso! (${canvas.width}x${canvas.height}px)`);
                 };
                 reader.readAsDataURL(blob);
-            });
+            }, 'image/jpeg', 0.95); // JPEG com qualidade 95% (alta)
         },
         
         /**
