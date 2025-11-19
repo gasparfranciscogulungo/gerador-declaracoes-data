@@ -1,137 +1,255 @@
 // ============================================
-// SERVICE WORKER - PWA
-// Cache e funcionalidade offline
+// SERVICE WORKER - PWA PROFISSIONAL
+// Cache strategies, offline support, background sync
+// Version: 2.0.0
 // ============================================
 
-const CACHE_NAME = 'gerador-declaracoes-v1.0.0';
-const urlsToCache = [
+const VERSION = '2.0.0';
+const CACHE_NAME = `gerador-pdf-v${VERSION}`;
+const CACHE_STATIC = `static-v${VERSION}`;
+const CACHE_DYNAMIC = `dynamic-v${VERSION}`;
+const CACHE_IMAGES = `images-v${VERSION}`;
+
+// Recursos críticos (cache primeiro)
+const STATIC_ASSETS = [
     '/',
     '/index.html',
+    '/admin.html',
     '/manifest.json',
     '/assets/css/styles.css',
-    '/js/main.js',
-    '/js/data-handler.js',
-    '/js/storage-handler.js',
-    '/js/model-builder.js',
-    '/js/pdf-generator.js',
+    '/assets/icons/icon-192x192.png',
+    '/assets/icons/icon-512x512.png'
+];
+
+// Recursos dinâmicos (network primeiro, fallback para cache)
+const DYNAMIC_ASSETS = [
     '/data/empresas.json',
     '/data/trabalhadores.json',
     '/data/modelos.json',
-    '/models/modelo-master.html',
-    '/models/types/type1.json',
-    '/models/types/type2.json',
-    '/models/types/type3.json',
-    '/assets/logos/empresa1.png',
-    '/assets/logos/empresa2.png',
-    '/assets/logos/empresa3.png',
-    '/assets/carimbos/carimbo1.png',
-    '/assets/carimbos/carimbo2.png',
-    '/assets/carimbos/carimbo3.png'
+    '/data/personalizacoes.json'
 ];
 
-// Instalação - cachear recursos
+// Tamanho máximo do cache dinâmico
+const CACHE_SIZE_LIMIT = 50;
+
+// ========== INSTALAÇÃO ==========
 self.addEventListener('install', (event) => {
-    console.log('[SW] Instalando Service Worker...');
+    console.log(`[SW v${VERSION}] 🔧 Instalando Service Worker...`);
     
     event.waitUntil(
-        caches.open(CACHE_NAME)
+        caches.open(CACHE_STATIC)
             .then((cache) => {
-                console.log('[SW] Cache aberto');
-                return cache.addAll(urlsToCache);
+                console.log('[SW] 📦 Cacheando recursos estáticos...');
+                return cache.addAll(STATIC_ASSETS);
             })
             .then(() => {
-                console.log('[SW] ✅ Recursos cacheados');
+                console.log('[SW] ✅ Recursos estáticos cacheados com sucesso');
                 return self.skipWaiting();
             })
             .catch((error) => {
-                console.error('[SW] ❌ Erro ao cachear:', error);
+                console.error('[SW] ❌ Erro ao cachear recursos:', error);
             })
     );
 });
 
-// Ativação - limpar caches antigos
+// ========== ATIVAÇÃO ==========
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Ativando Service Worker...');
+    console.log(`[SW v${VERSION}] 🔄 Ativando Service Worker...`);
     
     event.waitUntil(
         caches.keys()
             .then((cacheNames) => {
                 return Promise.all(
-                    cacheNames.map((cacheName) => {
-                        if (cacheName !== CACHE_NAME) {
+                    cacheNames
+                        .filter(cacheName => {
+                            // Deletar caches de versões antigas
+                            return cacheName.startsWith('gerador-pdf-') && 
+                                   cacheName !== CACHE_STATIC && 
+                                   cacheName !== CACHE_DYNAMIC &&
+                                   cacheName !== CACHE_IMAGES;
+                        })
+                        .map(cacheName => {
                             console.log('[SW] 🗑️ Removendo cache antigo:', cacheName);
                             return caches.delete(cacheName);
-                        }
-                    })
+                        })
                 );
             })
             .then(() => {
-                console.log('[SW] ✅ Service Worker ativado');
+                console.log('[SW] ✅ Service Worker ativado e assumindo controle');
                 return self.clients.claim();
             })
     );
 });
 
-// Fetch - estratégia Cache First com Network Fallback
+// ========== FETCH - ESTRATÉGIAS DE CACHE ==========
 self.addEventListener('fetch', (event) => {
-    // Ignorar requisições não GET
-    if (event.request.method !== 'GET') return;
+    const { request } = event;
+    const { url, method } = request;
 
-    // Ignorar CDNs externas
-    if (event.request.url.includes('cdn.')) {
+    // Ignorar requisições não-GET
+    if (method !== 'GET') return;
+
+    // Ignorar CDNs externos e GitHub API
+    if (url.includes('cdn.') || url.includes('api.github.com')) {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request)
-            .then((cachedResponse) => {
-                // Se encontrou no cache, retorna
-                if (cachedResponse) {
-                    console.log('[SW] 📦 Servindo do cache:', event.request.url);
-                    return cachedResponse;
-                }
+    // Estratégia: Cache First para recursos estáticos
+    if (STATIC_ASSETS.some(asset => url.includes(asset))) {
+        event.respondWith(cacheFirst(request, CACHE_STATIC));
+        return;
+    }
 
-                // Senão, busca na rede
-                return fetch(event.request)
-                    .then((response) => {
-                        // Verificar se a resposta é válida
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
+    // Estratégia: Network First para dados dinâmicos (JSON)
+    if (url.endsWith('.json') || url.includes('/data/')) {
+        event.respondWith(networkFirst(request, CACHE_DYNAMIC));
+        return;
+    }
 
-                        // Clonar a resposta
-                        const responseToCache = response.clone();
+    // Estratégia: Cache First para imagens
+    if (url.match(/\.(png|jpg|jpeg|svg|gif|webp)$/)) {
+        event.respondWith(cacheFirst(request, CACHE_IMAGES));
+        return;
+    }
 
-                        // Adicionar ao cache
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
+    // Estratégia: Stale While Revalidate para HTML
+    if (url.endsWith('.html') || url.endsWith('/')) {
+        event.respondWith(staleWhileRevalidate(request, CACHE_STATIC));
+        return;
+    }
 
-                        return response;
-                    })
-                    .catch((error) => {
-                        console.error('[SW] ❌ Erro no fetch:', error);
-                        
-                        // Retornar página offline se disponível
-                        return caches.match('/index.html');
-                    });
-            })
-    );
+    // Fallback: Network First
+    event.respondWith(networkFirst(request, CACHE_DYNAMIC));
 });
 
-// Mensagens do app
+// ========== ESTRATÉGIAS DE CACHE ==========
+
+// Cache First (ideal para assets estáticos)
+async function cacheFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cached = await cache.match(request);
+    
+    if (cached) {
+        console.log('[SW] 📦 Cache First:', request.url);
+        return cached;
+    }
+    
+    try {
+        const response = await fetch(request);
+        if (response.ok) {
+            cache.put(request, response.clone());
+        }
+        return response;
+    } catch (error) {
+        console.error('[SW] ❌ Cache First falhou:', error);
+        return new Response('Offline', { status: 503 });
+    }
+}
+
+// Network First (ideal para dados dinâmicos)
+async function networkFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    
+    try {
+        const response = await fetch(request);
+        if (response.ok) {
+            console.log('[SW] 🌐 Network First (atualizando cache):', request.url);
+            cache.put(request, response.clone());
+            limitCacheSize(cacheName, CACHE_SIZE_LIMIT);
+        }
+        return response;
+    } catch (error) {
+        console.log('[SW] 📦 Network falhou, usando cache:', request.url);
+        const cached = await cache.match(request);
+        return cached || new Response('Offline', { status: 503 });
+    }
+}
+
+// Stale While Revalidate (retorna cache imediatamente, atualiza em background)
+async function staleWhileRevalidate(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cached = await cache.match(request);
+    
+    const fetchPromise = fetch(request).then(response => {
+        if (response.ok) {
+            cache.put(request, response.clone());
+        }
+        return response;
+    });
+    
+    return cached || fetchPromise;
+}
+
+// Limitar tamanho do cache
+async function limitCacheSize(cacheName, maxSize) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    
+    if (keys.length > maxSize) {
+        console.log(`[SW] 🗑️ Limpando cache ${cacheName} (${keys.length}/${maxSize})`);
+        await cache.delete(keys[0]);
+        limitCacheSize(cacheName, maxSize);
+    }
+}
+
+// ========== MENSAGENS DO APP ==========
 self.addEventListener('message', (event) => {
+    console.log('[SW] 📨 Mensagem recebida:', event.data);
+    
     if (event.data && event.data.type === 'SKIP_WAITING') {
+        console.log('[SW] ⏭️ Pulando espera e ativando...');
         self.skipWaiting();
     }
 
     if (event.data && event.data.type === 'CLEAR_CACHE') {
-        caches.delete(CACHE_NAME)
-            .then(() => {
-                console.log('[SW] 🗑️ Cache limpo');
-            });
+        console.log('[SW] 🗑️ Limpando todos os caches...');
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => caches.delete(cacheName))
+            );
+        }).then(() => {
+            console.log('[SW] ✅ Todos os caches foram limpos');
+            event.ports[0].postMessage({ success: true });
+        });
+    }
+
+    if (event.data && event.data.type === 'GET_VERSION') {
+        event.ports[0].postMessage({ version: VERSION });
     }
 });
 
-console.log('[SW] 🚀 Service Worker carregado');
+// ========== BACKGROUND SYNC (para quando voltar online) ==========
+self.addEventListener('sync', (event) => {
+    console.log('[SW] 🔄 Background Sync:', event.tag);
+    
+    if (event.tag === 'sync-data') {
+        event.waitUntil(syncData());
+    }
+});
+
+async function syncData() {
+    console.log('[SW] 📤 Sincronizando dados...');
+    // Implementar lógica de sincronização aqui
+}
+
+// ========== PUSH NOTIFICATIONS (futuro) ==========
+self.addEventListener('push', (event) => {
+    console.log('[SW] 📬 Push notification recebida');
+    
+    const options = {
+        body: event.data ? event.data.text() : 'Nova notificação',
+        icon: '/assets/icons/icon-192x192.png',
+        badge: '/assets/icons/icon-72x72.png',
+        vibrate: [200, 100, 200],
+        data: {
+            dateOfArrival: Date.now(),
+            primaryKey: 1
+        }
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification('Gerador PDF', options)
+    );
+});
+
+console.log(`[SW v${VERSION}] 🚀 Service Worker carregado e pronto!`);

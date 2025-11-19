@@ -1,0 +1,390 @@
+<!-- ============================================ -->
+<!-- BANNER DE INSTALAÇÃO PWA -->
+<!-- Cole antes do </body> em admin.html e index.html -->
+<!-- ============================================ -->
+
+<div id="install-banner">
+    <div class="content">
+        <div class="icon">📱</div>
+        <div class="text">
+            <h3>Instalar como App</h3>
+            <p>Acesso rápido e funciona offline!</p>
+        </div>
+    </div>
+    <button id="install-button" onclick="installPWA()">Instalar</button>
+    <div class="close" onclick="dismissInstallBanner()">✕</div>
+</div>
+
+<script>
+// ============================================
+// SISTEMA DE INSTALAÇÃO PWA
+// ============================================
+
+let deferredPrompt = null;
+const DISMISS_KEY = 'pwa-install-dismissed';
+const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 dias
+
+// Verificar se já foi dispensado recentemente
+function wasRecentlyDismissed() {
+    const dismissedTime = localStorage.getItem(DISMISS_KEY);
+    if (!dismissedTime) return false;
+    
+    const timePassed = Date.now() - parseInt(dismissedTime);
+    return timePassed < DISMISS_DURATION;
+}
+
+// Verificar se está rodando como PWA
+function isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true ||
+           document.referrer.includes('android-app://');
+}
+
+// Mostrar banner de instalação
+function showInstallBanner() {
+    if (isPWA() || wasRecentlyDismissed()) return;
+    
+    const banner = document.getElementById('install-banner');
+    if (banner) {
+        banner.style.display = 'flex';
+    }
+}
+
+// Dispensar banner
+function dismissInstallBanner() {
+    const banner = document.getElementById('install-banner');
+    if (banner) {
+        banner.style.animation = 'slideDown 0.3s ease-out';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 300);
+    }
+    
+    // Salvar que foi dispensado
+    localStorage.setItem(DISMISS_KEY, Date.now().toString());
+    
+    // Analytics (se disponível)
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'pwa_install_dismissed');
+    }
+}
+
+// Instalar PWA
+async function installPWA() {
+    if (!deferredPrompt) {
+        alert('Instalação não disponível. Por favor, use o menu do navegador.');
+        return;
+    }
+    
+    // Mostrar prompt do navegador
+    deferredPrompt.prompt();
+    
+    // Aguardar escolha do usuário
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    console.log(`📱 Instalação ${outcome === 'accepted' ? 'aceita' : 'recusada'}`);
+    
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'pwa_install_prompt', {
+            outcome: outcome
+        });
+    }
+    
+    // Esconder banner
+    if (outcome === 'accepted') {
+        dismissInstallBanner();
+    }
+    
+    // Limpar prompt
+    deferredPrompt = null;
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+// Capturar evento de instalação disponível
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('📱 PWA pode ser instalado');
+    
+    // Prevenir banner padrão do navegador
+    e.preventDefault();
+    
+    // Guardar evento para usar depois
+    deferredPrompt = e;
+    
+    // Mostrar banner customizado após 3 segundos
+    setTimeout(() => {
+        showInstallBanner();
+    }, 3000);
+});
+
+// Após instalação bem-sucedida
+window.addEventListener('appinstalled', () => {
+    console.log('✅ PWA instalado com sucesso!');
+    
+    // Esconder banner
+    dismissInstallBanner();
+    
+    // Limpar dismissal para não mostrar novamente
+    localStorage.removeItem(DISMISS_KEY);
+    
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'pwa_installed', {
+            method: 'browser_prompt'
+        });
+    }
+    
+    // Mostrar mensagem de sucesso (opcional)
+    if (typeof showNotification === 'function') {
+        showNotification('✅ App instalado! Acesse pelo ícone na tela inicial.', 'success');
+    }
+});
+
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('✅ Service Worker registrado:', registration.scope);
+            
+            // Verificar atualizações periodicamente
+            setInterval(() => {
+                registration.update();
+            }, 60 * 60 * 1000); // A cada 1 hora
+            
+            // Listener para atualizações
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Nova versão disponível
+                        console.log('🔄 Nova versão disponível!');
+                        
+                        // Mostrar notificação de atualização
+                        if (confirm('🔄 Nova versão disponível! Atualizar agora?')) {
+                            newWorker.postMessage({ type: 'SKIP_WAITING' });
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+            
+            // Recarregar quando novo SW ativar
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+            
+        } catch (error) {
+            console.error('❌ Erro ao registrar Service Worker:', error);
+        }
+    });
+}
+
+// Log do modo de execução
+if (isPWA()) {
+    console.log('🚀 Rodando como PWA instalado');
+    document.body.classList.add('pwa-installed');
+} else {
+    console.log('🌐 Rodando no navegador');
+}
+
+// ============================================
+// ANIMAÇÃO DE SAÍDA
+// ============================================
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from { transform: translateY(0); }
+        to { transform: translateY(100%); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+<style>
+/* ============================================ */
+/* ESTILOS DO BANNER DE INSTALAÇÃO */
+/* ============================================ */
+
+#install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 16px 20px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 9999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+#install-banner .content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+#install-banner .icon {
+    font-size: 40px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+#install-banner .text {
+    flex: 1;
+}
+
+#install-banner .text h3 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+#install-banner .text p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+#install-banner button {
+    background: white;
+    color: #1e40af;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    letter-spacing: -0.01em;
+}
+
+#install-banner button:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+#install-banner button:active {
+    transform: scale(0.98);
+}
+
+#install-banner .close {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    font-weight: 700;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+#install-banner .close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+    #install-banner {
+        padding: 14px 16px;
+    }
+    
+    #install-banner .icon {
+        font-size: 32px;
+    }
+    
+    #install-banner .text h3 {
+        font-size: 15px;
+    }
+    
+    #install-banner .text p {
+        font-size: 12px;
+    }
+    
+    #install-banner button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    #install-banner .close {
+        width: 32px;
+        height: 32px;
+        margin-left: 8px;
+    }
+}
+
+/* Muito pequeno */
+@media (max-width: 380px) {
+    #install-banner .content {
+        gap: 8px;
+    }
+    
+    #install-banner .icon {
+        font-size: 28px;
+    }
+    
+    #install-banner button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Esconder se já está instalado */
+.pwa-installed #install-banner {
+    display: none !important;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    #install-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-top-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 -4px 20px rgba(59, 130, 246, 0.2);
+    }
+    
+    #install-banner button {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    #install-banner button:hover {
+        background: #2563eb;
+    }
+}
+</style>

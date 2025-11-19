@@ -1,0 +1,276 @@
+<!-- ============================================ -->
+<!-- PWA META TAGS - Cole no <head> de todas as páginas -->
+<!-- ============================================ -->
+
+<!-- Meta Tags Básicas -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Informações do App -->
+<meta name="application-name" content="Gerador PDF">
+<meta name="description" content="Sistema profissional para geração de declarações, recibos, NIF, atestados e documentos empresariais angolanos. Rápido, seguro e 100% offline.">
+<meta name="keywords" content="gerador pdf, declarações angola, recibos angola, documentos empresariais, NIF angola, atestados, declaração de serviço, recibo de salário, PWA">
+<meta name="author" content="Gaspar Gulungo">
+<meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gerador PDF">
+
+<!-- Icons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/icon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/icon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180x180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-touch-icon-120x120.png">
+<link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg" color="#1e40af">
+
+<!-- Apple Splash Screens (iPhone/iPad) -->
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="/assets/splash/iphone-14-pro-max.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="/assets/splash/iphone-14-pro.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="/assets/splash/iphone-13-mini.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="/assets/splash/iphone-11.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="/assets/splash/iphone-11-pro-max.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/assets/splash/iphone-8.png">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://geradorpdf.ao/">
+<meta property="og:title" content="Gerador PDF - Declarações e Recibos Profissionais">
+<meta property="og:description" content="Sistema profissional para geração de declarações, recibos, NIF e documentos empresariais angolanos. Rápido, seguro e 100% offline. ✨">
+<meta property="og:image" content="https://geradorpdf.ao/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Gerador PDF - Interface profissional do sistema">
+<meta property="og:site_name" content="Gerador PDF">
+<meta property="og:locale" content="pt_AO">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://geradorpdf.ao/">
+<meta name="twitter:title" content="Gerador PDF - Declarações e Recibos Profissionais">
+<meta name="twitter:description" content="Sistema profissional para geração de declarações, recibos, NIF e documentos empresariais angolanos. Rápido, seguro e 100% offline. ✨">
+<meta name="twitter:image" content="https://geradorpdf.ao/assets/twitter-card.png">
+<meta name="twitter:image:alt" content="Gerador PDF - Interface profissional do sistema">
+<meta name="twitter:creator" content="@GasparGulungo">
+
+<!-- Windows Tiles -->
+<meta name="msapplication-TileColor" content="#1e40af">
+<meta name="msapplication-TileImage" content="/assets/icons/ms-tile-144x144.png">
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-navbutton-color" content="#1e40af">
+
+<!-- Outros -->
+<meta name="format-detection" content="telephone=no">
+<meta name="format-detection" content="date=no">
+<meta name="format-detection" content="address=no">
+<meta name="format-detection" content="email=no">
+<link rel="canonical" href="https://geradorpdf.ao/">
+
+<!-- Preconnect para CDNs (otimização de performance) -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://unpkg.com">
+
+<!-- Robots -->
+<meta name="robots" content="index, follow">
+<meta name="googlebot" content="index, follow">
+
+<!-- Service Worker Registration -->
+<script>
+// ============================================
+// THEME COLOR DINÂMICO (Dark Mode Support)
+// ============================================
+function updateThemeColor() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const themeColor = isDarkMode ? '#0f172a' : '#1e40af';
+    
+    // Atualizar meta tag theme-color
+    let metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (!metaTheme) {
+        metaTheme = document.createElement('meta');
+        metaTheme.name = 'theme-color';
+        document.head.appendChild(metaTheme);
+    }
+    metaTheme.content = themeColor;
+    
+    // Android Chrome: Status bar
+    const metaStatusBar = document.querySelector('meta[name="mobile-web-app-status-bar-style"]');
+    if (metaStatusBar) {
+        metaStatusBar.content = isDarkMode ? 'black-translucent' : 'default';
+    }
+    
+    // iOS Safari: Status bar
+    const metaAppleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (metaAppleStatusBar) {
+        metaAppleStatusBar.content = isDarkMode ? 'black-translucent' : 'default';
+    }
+    
+    console.log(`🎨 Theme color atualizado: ${themeColor} (${isDarkMode ? 'dark' : 'light'} mode)`);
+}
+
+// Atualizar ao carregar
+updateThemeColor();
+
+// Escutar mudanças no tema do sistema
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
+
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('✅ SW registrado:', registration.scope);
+                
+                // Verificar atualizações
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Nova versão disponível
+                            if (confirm('Nova versão disponível! Atualizar agora?')) {
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                window.location.reload();
+                            }
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('❌ Erro ao registrar SW:', error);
+            });
+    });
+}
+
+// Detectar se está instalado como PWA
+function isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+}
+
+// Mostrar banner de instalação
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Mostrar botão de instalação customizado
+    const installButton = document.getElementById('install-button');
+    if (installButton) {
+        installButton.style.display = 'block';
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Usuário ${outcome === 'accepted' ? 'aceitou' : 'recusou'} instalar`);
+                deferredPrompt = null;
+            }
+        });
+    }
+});
+
+// Evento após instalação
+window.addEventListener('appinstalled', () => {
+    console.log('✅ PWA instalado com sucesso!');
+    deferredPrompt = null;
+    
+    // Analytics ou notificação
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'pwa_install', { method: 'browser_prompt' });
+    }
+});
+
+// Log se está rodando como PWA
+if (isPWA()) {
+    console.log('🚀 Rodando como PWA instalado');
+    document.body.classList.add('pwa-installed');
+}
+</script>
+
+<!-- Estilo para banner de instalação -->
+<style>
+    #install-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #EC4899, #A855F7);
+        color: white;
+        padding: 16px 20px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+    
+    #install-banner .content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+    
+    #install-banner .icon {
+        font-size: 32px;
+    }
+    
+    #install-banner .text h3 {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        font-weight: 700;
+    }
+    
+    #install-banner .text p {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.95;
+    }
+    
+    #install-banner button {
+        background: white;
+        color: #EC4899;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 14px;
+        transition: transform 0.2s;
+    }
+    
+    #install-banner button:hover {
+        transform: scale(1.05);
+    }
+    
+    #install-banner .close {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 12px;
+        cursor: pointer;
+    }
+    
+    /* Hide on PWA installed */
+    .pwa-installed #install-banner {
+        display: none !important;
+    }
+</style>
