@@ -1,10 +1,67 @@
                                                                                                                                                                                                                                                                                                                                                     <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-AO">
 <head>
+    <!-- ============================================ -->
+    <!-- PWA META TAGS -->
+    <!-- ============================================ -->
+    
+    <!-- Meta Tags Básicas -->
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Painel - Gerador de Declarações</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Meu Painel - Gerador PDF</title>
+    
+    <!-- Informações do App -->
+    <meta name="application-name" content="Gerador PDF">
+    <meta name="description" content="Painel do usuário - Geração de declarações, recibos e documentos empresariais angolanos.">
+    <meta name="keywords" content="painel usuário, declarações, recibos, documentos, angola">
+    <meta name="author" content="Gaspar Gulungo">
+    <meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gerador PDF">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-touch-icon-120x120.png">
+    <link rel="mask-icon" href="/assets/icons/safari-pinned-tab.png" color="#1e40af">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://geradorpdf.ao/user-panel.html">
+    <meta property="og:title" content="Gerador PDF - Painel do Usuário">
+    <meta property="og:description" content="Geração de declarações e recibos profissionais">
+    <meta property="og:image" content="https://geradorpdf.ao/assets/og-image.png">
+    <meta property="og:locale" content="pt_AO">
+    
+    <!-- Windows Tiles -->
+    <meta name="msapplication-TileColor" content="#1e40af">
+    <meta name="msapplication-TileImage" content="/assets/icons/ms-tile-144x144.png">
+    <meta name="msapplication-navbutton-color" content="#1e40af">
+    
+    <!-- Outros -->
+    <meta name="format-detection" content="telephone=no">
+    <link rel="canonical" href="https://geradorpdf.ao/user-panel.html">
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Robots -->
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- ============================================ -->
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,6 +93,35 @@
             
             console.log('✅ Autenticado:', username);
         })();
+    </script>
+    
+    <!-- PWA: Service Worker e Theme Color -->
+    <script>
+        function updateThemeColor() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeColor = isDarkMode ? '#0f172a' : '#1e40af';
+            let metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (!metaTheme) {
+                metaTheme = document.createElement('meta');
+                metaTheme.name = 'theme-color';
+                document.head.appendChild(metaTheme);
+            }
+            metaTheme.content = themeColor;
+        }
+        updateThemeColor();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('✅ SW:', reg.scope))
+                    .catch(err => console.error('❌ SW:', err));
+            });
+        }
+        
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            document.body.classList.add('pwa-installed');
+        }
     </script>
 </head>
 <body class="transition-colors duration-300" x-data="userPanelApp()" x-init="init()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
@@ -1296,5 +1382,25 @@
     <!-- Cropper.js (para Modal BI) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    
+    <!-- PWA: Banner de Instalação (código inline compacto) -->
+    <div id="install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1e40af,#3b82f6);color:white;padding:16px 20px;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 -4px 20px rgba(0,0,0,0.3);backdrop-filter:blur(10px);border-top:2px solid rgba(255,255,255,0.2)">
+        <div style="display:flex;align-items:center;gap:12px;flex:1">
+            <div style="font-size:40px">📱</div>
+            <div style="flex:1"><h3 style="margin:0 0 2px 0;font-size:16px;font-weight:700">Instalar como App</h3><p style="margin:0;font-size:13px;opacity:0.95">Acesso rápido e funciona offline!</p></div>
+        </div>
+        <button id="install-button" onclick="installPWA()" style="background:white;color:#1e40af;border:none;padding:12px 28px;border-radius:12px;font-weight:700;cursor:pointer;font-size:15px">Instalar</button>
+        <div onclick="dismissInstallBanner()" style="background:rgba(255,255,255,0.2);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:12px;cursor:pointer;font-size:18px;font-weight:700;border:2px solid rgba(255,255,255,0.3)">✕</div>
+    </div>
+    <script>
+        let deferredPrompt=null;const DISMISS_KEY='pwa-install-dismissed';
+        function wasRecentlyDismissed(){const t=localStorage.getItem(DISMISS_KEY);return t&&Date.now()-parseInt(t)<6048e5}
+        function isPWA(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===!0}
+        function showInstallBanner(){if(isPWA()||wasRecentlyDismissed())return;const t=document.getElementById('install-banner');t&&(t.style.display='flex')}
+        function dismissInstallBanner(){const t=document.getElementById('install-banner');t&&(t.style.transition='transform 0.3s',t.style.transform='translateY(100%)',setTimeout(()=>t.style.display='none',300));localStorage.setItem(DISMISS_KEY,Date.now().toString())}
+        async function installPWA(){if(!deferredPrompt){alert('Instalação não disponível. Use o menu do navegador.');return}deferredPrompt.prompt();const{outcome:t}=await deferredPrompt.userChoice;t==='accepted'&&dismissInstallBanner();deferredPrompt=null}
+        window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;setTimeout(showInstallBanner,3e3)});
+        window.addEventListener('appinstalled',()=>{dismissInstallBanner();localStorage.removeItem(DISMISS_KEY);document.body.classList.add('pwa-installed')});
+    </script>
 </body>
 </html>

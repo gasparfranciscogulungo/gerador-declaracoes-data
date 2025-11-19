@@ -1,10 +1,90 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-AO">
 <head>
+    <!-- ============================================ -->
+    <!-- PWA META TAGS -->
+    <!-- ============================================ -->
+    
+    <!-- Meta Tags Básicas -->
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - Gerador de Declarações</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Painel Administrativo - Gerador PDF</title>
+    
+    <!-- Informações do App -->
+    <meta name="application-name" content="Gerador PDF">
+    <meta name="description" content="Sistema profissional para geração de declarações, recibos, NIF, atestados e documentos empresariais angolanos. Rápido, seguro e 100% offline.">
+    <meta name="keywords" content="gerador pdf, declarações angola, recibos angola, documentos empresariais, NIF angola, atestados, declaração de serviço, recibo de salário, PWA">
+    <meta name="author" content="Gaspar Gulungo">
+    <meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gerador PDF">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-touch-icon-120x120.png">
+    <link rel="mask-icon" href="/assets/icons/safari-pinned-tab.png" color="#1e40af">
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://geradorpdf.ao/admin.html">
+    <meta property="og:title" content="Gerador PDF - Painel Administrativo">
+    <meta property="og:description" content="Sistema profissional para geração de declarações, recibos, NIF e documentos empresariais angolanos. Rápido, seguro e 100% offline. ✨">
+    <meta property="og:image" content="https://geradorpdf.ao/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Gerador PDF - Interface profissional do sistema">
+    <meta property="og:site_name" content="Gerador PDF">
+    <meta property="og:locale" content="pt_AO">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://geradorpdf.ao/admin.html">
+    <meta name="twitter:title" content="Gerador PDF - Painel Administrativo">
+    <meta name="twitter:description" content="Sistema profissional para geração de declarações, recibos, NIF e documentos empresariais angolanos. Rápido, seguro e 100% offline. ✨">
+    <meta name="twitter:image" content="https://geradorpdf.ao/assets/twitter-card.png">
+    <meta name="twitter:image:alt" content="Gerador PDF - Interface profissional do sistema">
+    <meta name="twitter:creator" content="@GasparGulungo">
+    
+    <!-- Windows Tiles -->
+    <meta name="msapplication-TileColor" content="#1e40af">
+    <meta name="msapplication-TileImage" content="/assets/icons/ms-tile-144x144.png">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="msapplication-navbutton-color" content="#1e40af">
+    
+    <!-- Outros -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="date=no">
+    <meta name="format-detection" content="address=no">
+    <meta name="format-detection" content="email=no">
+    <link rel="canonical" href="https://geradorpdf.ao/admin.html">
+    
+    <!-- Preconnect para CDNs (otimização de performance) -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Robots -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    
+    <!-- ============================================ -->
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -104,6 +184,69 @@
             // Token existe, prosseguir
             console.log('✅ Token encontrado - Carregando painel admin...');
         })();
+    </script>
+    
+    <!-- PWA: Service Worker e Theme Color Dinâmico -->
+    <script>
+        // ============================================
+        // THEME COLOR DINÂMICO (Dark Mode Support)
+        // ============================================
+        function updateThemeColor() {
+            const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeColor = isDarkMode ? '#0f172a' : '#1e40af';
+            
+            // Atualizar meta tag theme-color
+            let metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (!metaTheme) {
+                metaTheme = document.createElement('meta');
+                metaTheme.name = 'theme-color';
+                document.head.appendChild(metaTheme);
+            }
+            metaTheme.content = themeColor;
+            
+            console.log(`🎨 Theme color: ${themeColor} (${isDarkMode ? 'dark' : 'light'} mode)`);
+        }
+        
+        // Atualizar ao carregar
+        updateThemeColor();
+        
+        // Escutar mudanças no tema do sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeColor);
+        
+        // ============================================
+        // SERVICE WORKER REGISTRATION
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                        
+                        // Verificar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nova versão disponível
+                                    if (confirm('🔄 Nova versão disponível! Atualizar agora?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro ao registrar Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Detectar se está rodando como PWA instalado
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('🚀 Rodando como PWA instalado');
+            document.body.classList.add('pwa-installed');
+        }
     </script>
 </head>
 <body class="transition-colors duration-300" x-data="adminApp()" :class="darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'">
@@ -5449,6 +5592,314 @@
     <!-- MODAIS DE TRABALHADORES -->
     <!-- ===================================================================== -->
 
+    <!-- ============================================ -->
+    <!-- PWA: BANNER DE INSTALAÇÃO -->
+    <!-- ============================================ -->
+    <div id="install-banner" style="display: none;">
+        <div class="content">
+            <div class="icon">📱</div>
+            <div class="text">
+                <h3>Instalar como App</h3>
+                <p>Acesso rápido e funciona offline!</p>
+            </div>
+        </div>
+        <button id="install-button" onclick="installPWA()">Instalar</button>
+        <div class="close" onclick="dismissInstallBanner()">✕</div>
+    </div>
+
+    <style>
+        /* ============================================ */
+        /* ESTILOS DO BANNER DE INSTALAÇÃO PWA */
+        /* ============================================ */
+        
+        #install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 16px 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 9999;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes slideUp {
+            from { 
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+        }
+        
+        #install-banner .content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        #install-banner .icon {
+            font-size: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        #install-banner .text {
+            flex: 1;
+        }
+        
+        #install-banner .text h3 {
+            margin: 0 0 2px 0;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        #install-banner .text p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        #install-banner button {
+            background: white;
+            color: #1e40af;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            letter-spacing: -0.01em;
+        }
+        
+        #install-banner button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        #install-banner button:active {
+            transform: scale(0.98);
+        }
+        
+        #install-banner .close {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+            font-weight: 700;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        #install-banner .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Responsivo */
+        @media (max-width: 640px) {
+            #install-banner {
+                padding: 14px 16px;
+            }
+            
+            #install-banner .icon {
+                font-size: 32px;
+            }
+            
+            #install-banner .text h3 {
+                font-size: 15px;
+            }
+            
+            #install-banner .text p {
+                font-size: 12px;
+            }
+            
+            #install-banner button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            #install-banner .close {
+                width: 32px;
+                height: 32px;
+                margin-left: 8px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            #install-banner .content {
+                gap: 8px;
+            }
+            
+            #install-banner .icon {
+                font-size: 28px;
+            }
+            
+            #install-banner button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+        
+        /* Esconder se já está instalado */
+        .pwa-installed #install-banner {
+            display: none !important;
+        }
+        
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            #install-banner {
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                border-top-color: rgba(59, 130, 246, 0.3);
+                box-shadow: 0 -4px 20px rgba(59, 130, 246, 0.2);
+            }
+            
+            #install-banner button {
+                background: #3b82f6;
+                color: white;
+            }
+            
+            #install-banner button:hover {
+                background: #2563eb;
+            }
+        }
+    </style>
+
+    <script>
+        // ============================================
+        // SISTEMA DE INSTALAÇÃO PWA
+        // ============================================
+        
+        let deferredPrompt = null;
+        const DISMISS_KEY = 'pwa-install-dismissed';
+        const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 dias
+        
+        // Verificar se já foi dispensado recentemente
+        function wasRecentlyDismissed() {
+            const dismissedTime = localStorage.getItem(DISMISS_KEY);
+            if (!dismissedTime) return false;
+            
+            const timePassed = Date.now() - parseInt(dismissedTime);
+            return timePassed < DISMISS_DURATION;
+        }
+        
+        // Verificar se está rodando como PWA
+        function isPWA() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
+                   document.referrer.includes('android-app://');
+        }
+        
+        // Mostrar banner de instalação
+        function showInstallBanner() {
+            if (isPWA() || wasRecentlyDismissed()) return;
+            
+            const banner = document.getElementById('install-banner');
+            if (banner) {
+                banner.style.display = 'flex';
+            }
+        }
+        
+        // Dispensar banner
+        function dismissInstallBanner() {
+            const banner = document.getElementById('install-banner');
+            if (banner) {
+                banner.style.animation = 'slideDown 0.3s ease-out';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 300);
+            }
+            
+            // Salvar que foi dispensado
+            localStorage.setItem(DISMISS_KEY, Date.now().toString());
+            
+            console.log('📱 Banner de instalação dispensado');
+        }
+        
+        // Instalar PWA
+        async function installPWA() {
+            if (!deferredPrompt) {
+                alert('Instalação não disponível neste momento. Por favor, use o menu do navegador.');
+                return;
+            }
+            
+            // Mostrar prompt do navegador
+            deferredPrompt.prompt();
+            
+            // Aguardar escolha do usuário
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            console.log(`📱 Instalação ${outcome === 'accepted' ? 'aceita' : 'recusada'}`);
+            
+            // Esconder banner
+            if (outcome === 'accepted') {
+                dismissInstallBanner();
+            }
+            
+            // Limpar prompt
+            deferredPrompt = null;
+        }
+        
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        // Capturar evento de instalação disponível
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('📱 PWA pode ser instalado');
+            
+            // Prevenir banner padrão do navegador
+            e.preventDefault();
+            
+            // Guardar evento para usar depois
+            deferredPrompt = e;
+            
+            // Mostrar banner customizado após 3 segundos
+            setTimeout(() => {
+                showInstallBanner();
+            }, 3000);
+        });
+        
+        // Após instalação bem-sucedida
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalado com sucesso!');
+            
+            // Esconder banner
+            dismissInstallBanner();
+            
+            // Limpar dismissal
+            localStorage.removeItem(DISMISS_KEY);
+            
+            // Adicionar classe ao body
+            document.body.classList.add('pwa-installed');
+        });
+    </script>
 
 </body>
 </html>
