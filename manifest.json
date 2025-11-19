@@ -2,99 +2,76 @@
   "name": "Gerador PDF - Declarações e Recibos",
   "short_name": "Gerador PDF",
   "description": "Sistema profissional para geração de declarações, recibos, NIF, atestados e documentos empresariais angolanos. Rápido, seguro e 100% offline.",
-  "start_url": "/admin.html",
+  "start_url": "./admin.html",
   "display": "standalone",
   "background_color": "#1e40af",
   "theme_color": "#1e40af",
-  "orientation": "portrait-primary",
-  "scope": "/",
+  "orientation": "any",
+  "scope": "./",
   "lang": "pt-AO",
   "dir": "ltr",
   "categories": ["business", "productivity", "finance", "utilities"],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "icons": [
     {
-      "src": "assets/icons/icon-72x72.png",
+      "src": "./assets/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-96x96.png",
+      "src": "./assets/icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-128x128.png",
+      "src": "./assets/icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-144x144.png",
+      "src": "./assets/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-152x152.png",
+      "src": "./assets/icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-192x192.png",
+      "src": "./assets/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-384x384.png",
+      "src": "./assets/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-512x512.png",
+      "src": "./assets/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/icons/icon-192x192-maskable.png",
+      "src": "./assets/icons/icon-192x192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "assets/icons/icon-512x512-maskable.png",
+      "src": "./assets/icons/icon-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "assets/screenshots/desktop-1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Dashboard principal com gestão de empresas e trabalhadores"
-    },
-    {
-      "src": "assets/screenshots/mobile-1.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Interface mobile responsiva e touch-optimized"
-    },
-    {
-      "src": "assets/screenshots/mobile-2.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Preview de documentos em tempo real"
     }
   ],
   "shortcuts": [
@@ -102,11 +79,11 @@
       "name": "Nova Declaração",
       "short_name": "Declaração",
       "description": "Criar nova declaração de serviço",
-      "url": "/admin.html?action=nova-declaracao",
+      "url": "./admin.html?action=nova-declaracao",
       "icons": [
         {
-          "src": "assets/icons/shortcut-declaracao.png",
-          "sizes": "192x192",
+          "src": "./assets/icons/shortcut-declaracao.png",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -115,11 +92,11 @@
       "name": "Novo Recibo",
       "short_name": "Recibo",
       "description": "Criar novo recibo de salário",
-      "url": "/admin.html?action=novo-recibo",
+      "url": "./admin.html?action=novo-recibo",
       "icons": [
         {
-          "src": "assets/icons/shortcut-recibo.png",
-          "sizes": "192x192",
+          "src": "./assets/icons/shortcut-recibo.png",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -128,18 +105,18 @@
       "name": "Gestão",
       "short_name": "Gestão",
       "description": "Gerir empresas e trabalhadores",
-      "url": "/admin.html?tab=empresas",
+      "url": "./admin.html?tab=empresas",
       "icons": [
         {
-          "src": "assets/icons/shortcut-gestao.png",
-          "sizes": "192x192",
+          "src": "./assets/icons/shortcut-gestao.png",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
     }
   ],
   "share_target": {
-    "action": "/admin.html",
+    "action": "./admin.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
