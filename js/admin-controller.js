@@ -3734,16 +3734,14 @@ function adminApp() {
                         this.cropperInstance.destroy();
                     }
                     
-                    // Inicializar Cropper.js OTIMIZADO PARA MOBILE - ALTA QUALIDADE
+                    // 🔥 Cropper.js - 100% TELA COM MARGENS 10PX (CONFORTÁVEL)
                     const isMobile = window.innerWidth < 768;
-                    const vw = window.innerWidth;
-                    const vh = window.innerHeight;
                     
                     this.cropperInstance = new Cropper(image, {
-                        aspectRatio: NaN, // SEM manter proporção (crop livre)
-                        viewMode: 0, // Sem restrições - máxima liberdade
+                        aspectRatio: NaN, // Crop livre (sem proporção fixa)
+                        viewMode: 0, // SEM restrições de boundary - máxima liberdade
                         dragMode: 'move',
-                        autoCropArea: 0.9, // 90% da área disponível
+                        autoCropArea: 1, // 100% da área inicial (crop box grande)
                         restore: false,
                         guides: true,
                         center: true,
@@ -3753,17 +3751,16 @@ function adminApp() {
                         toggleDragModeOnDblclick: false,
                         responsive: true,
                         checkOrientation: true,
+                        checkCrossOrigin: false,
                         background: true,
                         modal: true,
-                        // MOBILE: Container ocupa 90% do viewport para melhor resolução
-                        minContainerWidth: isMobile ? vw * 0.9 : 600,
-                        minContainerHeight: isMobile ? vh * 0.6 : 400,
-                        // MOBILE: Canvas sem limitações - usa todo o espaço disponível
-                        minCanvasWidth: 0, // Sem limite mínimo - deixa o Cropper decidir
+                        // 🔥 MOBILE: SEM limites - usa TUDO que tiver disponível
+                        minContainerWidth: 100,
+                        minContainerHeight: 100,
+                        minCanvasWidth: 0,
                         minCanvasHeight: 0,
-                        // MOBILE: Container máximo também ampliado
-                        maxContainerWidth: isMobile ? vw * 0.95 : undefined,
-                        maxContainerHeight: isMobile ? vh * 0.75 : undefined,
+                        minCropBoxWidth: isMobile ? 150 : 100,
+                        minCropBoxHeight: isMobile ? 150 : 100,
                         // Touch gestures otimizados
                         zoomable: true,
                         zoomOnTouch: true,
@@ -3772,12 +3769,26 @@ function adminApp() {
                         movable: true,
                         rotatable: true,
                         scalable: true,
-                        // Callbacks para debug (remover depois se quiser)
+                        // Callback: Maximizar canvas após inicialização
                         ready: function() {
                             const containerData = this.cropper.getContainerData();
-                            console.log('📐 Cropper pronto - Container:', containerData.width + 'x' + containerData.height);
-                            const canvasData = this.cropper.getCanvasData();
-                            console.log('📐 Canvas:', canvasData.width + 'x' + canvasData.height);
+                            const imageData = this.cropper.getImageData();
+                            
+                            console.log('📐 Cropper pronto:');
+                            console.log('   Container:', containerData.width + 'x' + containerData.height + 'px');
+                            console.log('   Imagem original:', imageData.naturalWidth + 'x' + imageData.naturalHeight + 'px');
+                            
+                            // Mobile: Zoom para preencher área
+                            if (isMobile) {
+                                const scaleX = containerData.width / imageData.width;
+                                const scaleY = containerData.height / imageData.height;
+                                const scale = Math.max(scaleX, scaleY, 1); // Pelo menos 1x
+                                
+                                if (scale > 1) {
+                                    this.cropper.zoomTo(scale);
+                                    console.log('   � Zoom aplicado:', scale.toFixed(2) + 'x');
+                                }
+                            }
                         }
                     });
                     
