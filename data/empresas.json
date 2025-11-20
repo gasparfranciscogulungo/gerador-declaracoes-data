@@ -1,3 +1,32 @@
 {
-  "empresas": []
+  "empresas": [
+    {
+      "id": "empresa_1763655246589",
+      "nome": "Media Nova, S.A.",
+      "nif": "5417006629",
+      "endereco": {
+        "completo": "Edifício Talatona Business Square\nVia AL10, Talatona, Belas – Luanda",
+        "rua": "Edifício Talatona Business Square\nVia AL10",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Edifício Talatona Business Square\nVia AL10, Talatona, Belas – Luanda",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417006629/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417006629/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-20T16:14:06.589Z",
+      "updatedAt": "2025-11-20T16:14:06.589Z",
+      "contador": 0
+    }
+  ]
 }
