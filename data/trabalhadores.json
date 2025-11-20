@@ -1,3 +1,38 @@
 {
-  "trabalhadores": []
+  "trabalhadores": [
+    {
+      "id": "TRAB-1763655835690-571",
+      "nome": "Ana Miguel Mestre",
+      "documento": "",
+      "tipo_documento": "BI",
+      "nif": "009269181KS041",
+      "data_nascimento": "1999-12-31",
+      "nacionalidade": "Angolana",
+      "morada_edificio": "",
+      "morada_apartamento": "",
+      "morada_bairro": "",
+      "morada_municipio": "",
+      "morada_provincia": "",
+      "morada_completa": "CASA Nº3 ZONA 3\nBAIRRO CHINGUAR-BENFICA\nSAMBA",
+      "morada": "CASA Nº3 ZONA 3\nBAIRRO CHINGUAR-BENFICA\nSAMBA",
+      "cidade": "",
+      "telefone": "",
+      "email": "",
+      "funcao": "Gerente Financeiro",
+      "departamento": "",
+      "data_admissao": "2024-09-09",
+      "tipo_contrato": "Contrato a termo incerto",
+      "salario_base": "400000.00",
+      "salario_extenso": "Quatrocentos Mil Kwanzas",
+      "subsidio_alimentacao": "0.00",
+      "subsidio_transporte": "0.00",
+      "irt": "0.00",
+      "salario_bruto": "0.00",
+      "salario_liquido": "0.00",
+      "moeda": "AKZ",
+      "iban": "",
+      "ativo": true,
+      "observacoes": ""
+    }
+  ]
 }
