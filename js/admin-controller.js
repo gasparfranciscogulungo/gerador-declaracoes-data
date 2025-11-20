@@ -3472,19 +3472,30 @@ function adminApp() {
             // Garantir que trabalhadores é um array válido
             const trabalhadores = Array.isArray(this.trabalhadores) ? this.trabalhadores : [];
             
+            // DEBUG: Log para verificar o que está acontecendo
+            console.log('🔍 clientesFiltrados chamado:', {
+                totalTrabalhadores: trabalhadores.length,
+                busca: this.fluxoBuscaCliente,
+                trabalhadores: trabalhadores.map(t => t.nome).join(', ')
+            });
+            
             // Se não há busca, retornar todos os trabalhadores
             if (!this.fluxoBuscaCliente || this.fluxoBuscaCliente.trim() === '') {
+                console.log('✅ Retornando todos os trabalhadores:', trabalhadores.length);
                 return trabalhadores;
             }
             
             // Filtrar por busca
             const busca = this.fluxoBuscaCliente.toLowerCase().trim();
-            return trabalhadores.filter(cli => 
+            const filtrados = trabalhadores.filter(cli => 
                 (cli.nome && cli.nome.toLowerCase().includes(busca)) ||
                 (cli.nif && cli.nif.toLowerCase().includes(busca)) ||
                 (cli.funcao && cli.funcao.toLowerCase().includes(busca)) ||
                 (cli.departamento && cli.departamento.toLowerCase().includes(busca))
             );
+            
+            console.log('🔎 Filtrados:', filtrados.length, 'de', trabalhadores.length);
+            return filtrados;
         },
         
         /**
