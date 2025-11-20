@@ -11,6 +11,7 @@ function adminApp() {
         usuarioData: null, // Dados completos do users.json (role, status, etc)
         empresas: [],
         modelos: [],
+        trabalhadores: [], // Lista de trabalhadores/clientes
         contador: {},
         usersData: null,
         darkMode: localStorage.getItem('darkMode') === 'true',
