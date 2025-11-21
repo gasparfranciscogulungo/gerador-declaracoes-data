@@ -27,6 +27,34 @@
       "createdAt": "2025-11-20T16:14:06.589Z",
       "updatedAt": "2025-11-20T16:14:06.589Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1763730506230",
+      "nome": "XUGU",
+      "nif": "789208930123",
+      "endereco": {
+        "completo": "luanda da hsdjaçsd jçasdj kçajs djaçls djjjj g",
+        "rua": "luanda da hsdjaçsd jçasdj kçajs djaçls djjjj g",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "luanda da hsdjaçsd jçasdj kçajs djaçls djjjj g",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/789208930123/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/789208930123/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-11-21T13:08:26.230Z",
+      "updatedAt": "2025-11-21T13:08:26.231Z",
+      "contador": 0
     }
   ]
 }
