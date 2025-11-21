@@ -163,6 +163,7 @@ function adminApp() {
             // Edição de Conteúdo
             tituloDocumento: 'Declaração de Serviço',
             textoIntro: 'Declara-se, para os devidos efeitos, que',
+            textoFinalidade: 'A presente declaração é emitida a pedido da interessada, para efeitos de instrução de processo de abertura de conta bancária.',
             alinhamentoTexto: 'justify',
             alinhamentoCabecalho: 'left',
             // Controles Avançados do Cabeçalho

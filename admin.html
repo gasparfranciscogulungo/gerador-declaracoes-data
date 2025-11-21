@@ -3514,7 +3514,7 @@
                         
                         <!-- Título do Documento -->
                         <div class="mb-3">
-                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                            <label :class="darkMode ? 'text-gray-400' : 't3ext-gray-600'" 
                                    class="block text-xs mb-1">Título do Documento</label>
                             <input type="text" 
                                    x-model="previewConfig.tituloDocumento"
@@ -3533,6 +3533,21 @@
                                 :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'"
                                 class="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm touch-manipulation resize-y"
                                 placeholder="Declara-se, para os devidos efeitos..."></textarea>
+                        </div>
+
+                        <!-- Texto de Finalidade (Último Parágrafo) -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-1">Finalidade da Declaração</label>
+                            <textarea 
+                                x-model="previewConfig.textoFinalidade"
+                                rows="3"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'"
+                                class="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm touch-manipulation resize-y"
+                                placeholder="A presente declaração é emitida a pedido da interessada, para efeitos de instrução de processo de abertura de conta bancária."></textarea>
+                            <p class="text-xs mt-1" :class="darkMode ? 'text-gray-500' : 'text-gray-500'">
+                                <i class="bi bi-info-circle mr-1"></i>Este texto aparecerá no último parágrafo antes do rodapé
+                            </p>
                         </div>
 
                         <!-- Alinhamento do Texto -->

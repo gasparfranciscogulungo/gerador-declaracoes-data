@@ -33,6 +33,7 @@ const ModeloDeclaracaoExecutivo = {
             // Edição de Conteúdo
             tituloDocumento: config.tituloDocumento || 'Declaração de Serviço',
             textoIntro: config.textoIntro || 'Declara-se, para os devidos efeitos, que',
+            textoFinalidade: config.textoFinalidade || 'A presente declaração é emitida a pedido da interessada, para efeitos de instrução de processo de abertura de conta bancária.',
             alinhamentoTexto: config.alinhamentoTexto || 'justify',
             alinhamentoCabecalho: config.alinhamentoCabecalho || 'left',
             // Controles Avançados do Cabeçalho
@@ -204,8 +205,7 @@ const ModeloDeclaracaoExecutivo = {
                     </p>
                     
                     <p style="margin-bottom: ${cfg.espacoParagrafos}px;">
-                        A presente declaração é emitida a pedido do(a) interessado(a), para os devidos efeitos, 
-                        nomeadamente comprovação de vínculo laboral e auferimento de rendimentos.
+                        ${cfg.textoFinalidade || 'A presente declaração é emitida a pedido da interessada, para efeitos de instrução de processo de abertura de conta bancária.'}
                     </p>
                 </div>
 
