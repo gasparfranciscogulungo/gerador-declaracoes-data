@@ -4518,38 +4518,133 @@ function adminApp() {
          */
         async gerarPDFFluxo() {
             try {
+                // Validações
                 if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
-                    this.showAlert('error', 'Dados incompletos');
+                    this.showAlert('error', '❌ Dados incompletos para gerar PDF');
                     return;
                 }
-                
+
+                if (!this.tipoPreview) {
+                    this.showAlert('error', '❌ Tipo de documento não selecionado');
+                    return;
+                }
+
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada. Recarregue a página.');
+                    console.error('html2pdf não está definido!');
+                    return;
+                }
+
                 console.log('📄 Gerando PDF do fluxo...', {
                     empresa: this.fluxoEmpresaSelecionada.nome,
                     cliente: this.fluxoClienteSelecionado.nome,
-                    tipo: this.fluxoTipoDocumento,
-                    modelo: this.fluxoModeloSelecionado?.nome
+                    tipo: this.tipoPreview
                 });
-                
-                // Simular geração por enquanto
+
+                // Mostrar loading
                 this.loading = true;
-                this.loadingMessage = 'Gerando PDF...';
+                this.loadingMessage = 'Gerando PDF profissional...';
+
+                // Obter o HTML renderizado do preview
+                const previewElement = document.getElementById('preview-render');
+                if (!previewElement) {
+                    throw new Error('Elemento de preview não encontrado');
+                }
+
+                // Pegar o conteúdo interno (o modelo renderizado)
+                const modeloHtml = previewElement.innerHTML;
                 
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // Criar um container temporário limpo e centralizado
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = modeloHtml;
+                tempContainer.style.cssText = `
+                    width: 210mm;
+                    min-height: 297mm;
+                    max-height: 297mm;
+                    margin: 0 auto;
+                    padding: 0;
+                    box-sizing: border-box;
+                    position: relative;
+                    overflow: hidden;
+                    background: white;
+                `;
                 
-                // Nome do arquivo: {empresa}_{cliente}_{tipo}.pdf
-                const nomeArquivo = `${this.fluxoEmpresaSelecionada.nome}_${this.fluxoClienteSelecionado.nome}_${this.fluxoTipoDocumento}.pdf`;
+                // Adicionar temporariamente ao DOM para renderização
+                document.body.appendChild(tempContainer);
+
+                // Obter dados para nome do arquivo
+                const empresa = this.fluxoEmpresaSelecionada;
+                const cliente = this.fluxoClienteSelecionado;
+                const dataAtual = new Date().toISOString().split('T')[0];
                 
+                // Nome do arquivo sanitizado
+                const nomeArquivo = this.gerarNomeArquivo({
+                    modeloNome: this.tipoPreview,
+                    empresaNome: empresa.nome,
+                    clienteNome: cliente.nome,
+                    data: dataAtual
+                });
+
+                // Configurações otimizadas para PDF profissional - UMA ÚNICA PÁGINA
+                const opcoesPDF = {
+                    margin: 0,
+                    filename: nomeArquivo,
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.98
+                    },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123,
+                        x: 0,
+                        y: 0
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { 
+                        mode: 'avoid-all'
+                    }
+                };
+
+                console.log('📄 Gerando PDF com configurações:', opcoesPDF);
+                console.log('📝 Nome do arquivo:', nomeArquivo);
+
+                // Gerar e baixar PDF
+                await html2pdf()
+                    .set(opcoesPDF)
+                    .from(tempContainer)
+                    .save();
+
+                // Remover container temporário
+                document.body.removeChild(tempContainer);
+
+                // Sucesso
                 this.loading = false;
-                this.showAlert('success', `✅ PDF gerado: ${nomeArquivo}`);
+                this.showAlert('success', `✅ PDF gerado com sucesso!\n📄 ${nomeArquivo}`);
                 console.log('✅ PDF gerado com sucesso:', nomeArquivo);
-                
+
+                // Registrar no histórico (opcional)
+                this.registrarDownloadPDF(nomeArquivo);
+
                 // Perguntar se deseja gerar mais documentos
                 this.perguntarGerarOutroDocumento();
-                
+
             } catch (error) {
                 this.loading = false;
                 console.error('❌ Erro ao gerar PDF:', error);
-                this.showAlert('error', 'Erro ao gerar PDF');
+                this.showAlert('error', `❌ Erro ao gerar PDF: ${error.message}`);
             }
         },
         

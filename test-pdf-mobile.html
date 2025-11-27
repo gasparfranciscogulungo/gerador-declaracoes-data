@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste PDF Mobile - Gerador de PDF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div x-data="testPdfApp()" class="container mx-auto p-4">
+        <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+                <i class="bi bi-file-pdf text-red-500 mr-2"></i>
+                Teste de Geração de PDF Mobile
+            </h1>
+            
+            <!-- Status -->
+            <div class="mb-6">
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                        <strong>Dispositivo:</strong> <span x-text="deviceInfo"></span>
+                    </p>
+                    <p class="text-sm text-blue-800 dark:text-blue-200 mt-1">
+                        <strong>html2pdf.js:</strong> 
+                        <span x-text="html2pdfLoaded ? '✅ Carregado' : '❌ Não carregado'" 
+                              :class="html2pdfLoaded ? 'text-green-600' : 'text-red-600'"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botão de Teste -->
+            <button @click="gerarPDFTeste()" 
+                    :disabled="loading"
+                    class="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-bold shadow-lg transition-all">
+                <template x-if="!loading">
+                    <span><i class="bi bi-download mr-2"></i>Gerar PDF de Teste</span>
+                </template>
+                <template x-if="loading">
+                    <span><i class="bi bi-hourglass-split animate-spin mr-2"></i>Gerando PDF...</span>
+                </template>
+            </button>
+
+            <!-- Mensagem de Loading -->
+            <div x-show="loading" class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                <p class="text-yellow-800 dark:text-yellow-200 text-center" x-text="loadingMessage"></p>
+            </div>
+
+            <!-- Alertas -->
+            <div x-show="alert.show" 
+                 x-transition
+                 class="mt-4 p-4 rounded-lg border"
+                 :class="{
+                     'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700': alert.type === 'success',
+                     'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700': alert.type === 'error'
+                 }">
+                <p :class="{
+                    'text-green-800 dark:text-green-200': alert.type === 'success',
+                    'text-red-800 dark:text-red-200': alert.type === 'error'
+                }" x-text="alert.message"></p>
+            </div>
+
+            <!-- Preview do Documento (invisível para usuário) -->
+            <div id="preview-render" class="hidden">
+                <div style="width: 210mm; min-height: 297mm; padding: 15mm; background: white; font-family: Arial, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="font-size: 24px; color: #1e40af; margin-bottom: 10px;">DECLARAÇÃO DE TESTE</h1>
+                        <p style="font-size: 14px; color: #64748b;">Documento de Teste para Validação de PDF</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <p style="font-size: 16px; line-height: 1.6; text-align: justify;">
+                            Declara-se, para os devidos efeitos, que <strong>GASPAR FRANCISCO GULUNGO</strong>, 
+                            portador do Bilhete de Identidade nº <strong>123456789BA</strong>, 
+                            trabalha nesta empresa desde <strong>01 de Janeiro de 2023</strong>, 
+                            no cargo de <strong>Desenvolvedor Full Stack</strong>.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 40px;">
+                        <p style="font-size: 14px;">
+                            A presente declaração é emitida a pedido do interessado para efeitos de 
+                            <strong>abertura de conta bancária</strong>.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 60px; text-align: center;">
+                        <p style="font-size: 12px; color: #64748b;">
+                            Luanda, <span x-text="new Date().toLocaleDateString('pt-AO')"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log de Debug -->
+            <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="bi bi-terminal mr-1"></i>Log de Debug:
+                </h3>
+                <div class="text-xs font-mono text-gray-600 dark:text-gray-400 max-h-40 overflow-y-auto">
+                    <template x-for="log in logs" :key="log.id">
+                        <p x-text="log.message" class="mb-1"></p>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testPdfApp() {
+            return {
+                loading: false,
+                loadingMessage: '',
+                html2pdfLoaded: typeof html2pdf !== 'undefined',
+                deviceInfo: navigator.userAgent.includes('Mobile') ? '📱 Mobile' : '💻 Desktop',
+                alert: {
+                    show: false,
+                    type: 'success',
+                    message: ''
+                },
+                logs: [],
+
+                init() {
+                    this.addLog('✅ App inicializado');
+                    this.addLog(`📱 Dispositivo: ${this.deviceInfo}`);
+                    this.addLog(`📚 html2pdf: ${this.html2pdfLoaded ? 'Carregado' : 'Não carregado'}`);
+                },
+
+                addLog(message) {
+                    this.logs.push({
+                        id: Date.now(),
+                        message: `[${new Date().toLocaleTimeString()}] ${message}`
+                    });
+                    console.log(message);
+                },
+
+                showAlert(type, message) {
+                    this.alert = { show: true, type, message };
+                    this.addLog(`${type === 'success' ? '✅' : '❌'} ${message}`);
+                    setTimeout(() => {
+                        this.alert.show = false;
+                    }, 5000);
+                },
+
+                async gerarPDFTeste() {
+                    try {
+                        this.addLog('🚀 Iniciando geração de PDF...');
+
+                        // Validar html2pdf
+                        if (typeof html2pdf === 'undefined') {
+                            throw new Error('html2pdf.js não está carregado');
+                        }
+
+                        this.loading = true;
+                        this.loadingMessage = 'Preparando documento...';
+
+                        // Obter elemento de preview
+                        const previewElement = document.getElementById('preview-render');
+                        if (!previewElement) {
+                            throw new Error('Elemento preview-render não encontrado');
+                        }
+                        this.addLog('✅ Elemento de preview encontrado');
+
+                        // Criar container temporário
+                        const tempContainer = document.createElement('div');
+                        tempContainer.innerHTML = previewElement.innerHTML;
+                        tempContainer.style.cssText = `
+                            width: 210mm;
+                            min-height: 297mm;
+                            margin: 0 auto;
+                            padding: 0;
+                            background: white;
+                        `;
+                        document.body.appendChild(tempContainer);
+                        this.addLog('✅ Container temporário criado');
+
+                        // Nome do arquivo
+                        const nomeArquivo = `teste_pdf_${Date.now()}.pdf`;
+                        this.addLog(`📄 Nome do arquivo: ${nomeArquivo}`);
+
+                        this.loadingMessage = 'Gerando PDF...';
+
+                        // Configurações do PDF
+                        const opcoesPDF = {
+                            margin: 0,
+                            filename: nomeArquivo,
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { 
+                                scale: 1.5,
+                                useCORS: true,
+                                letterRendering: true,
+                                logging: false,
+                                windowWidth: 794,
+                                windowHeight: 1123
+                            },
+                            jsPDF: { 
+                                unit: 'mm', 
+                                format: 'a4', 
+                                orientation: 'portrait',
+                                compress: true
+                            }
+                        };
+
+                        this.addLog('📋 Configurações aplicadas');
+                        this.addLog('⏳ Chamando html2pdf().save()...');
+
+                        // Gerar PDF
+                        await html2pdf()
+                            .set(opcoesPDF)
+                            .from(tempContainer)
+                            .save();
+
+                        // Limpar
+                        document.body.removeChild(tempContainer);
+                        this.addLog('🧹 Container temporário removido');
+
+                        this.loading = false;
+                        this.showAlert('success', `✅ PDF gerado com sucesso!\n📄 ${nomeArquivo}`);
+
+                    } catch (error) {
+                        this.loading = false;
+                        this.addLog(`❌ ERRO: ${error.message}`);
+                        this.showAlert('error', `❌ Erro: ${error.message}`);
+                        console.error('Erro completo:', error);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
