@@ -17,7 +17,7 @@ function adminApp() {
         darkMode: localStorage.getItem('darkMode') === 'true',
         mobileMenuOpen: false, // Menu hamburger mobile
         
-        activeTab: 'empresas',
+        activeTab: 'clientes', // Aba padrão (não protegida)
         loading: false,
         loadingMessage: 'Carregando...',
         uploadProgress: null, // Progresso do upload (0-100)
@@ -67,9 +67,12 @@ function adminApp() {
         // Proteção de Senha (seções sensíveis)
         modalSenha: false,
         senhaInput: '',
-        senhaSecaoAtual: '', // empresa | colaboradores | gerarPDF
+        senhaSecaoAtual: '', // empresas | colaboradores | gerarPDF | users | historico | configuracoes
+        senhaSecaoNome: '', // Nome amigável da seção (para mostrar no modal)
         senhaTentativaErro: false,
+        senhaCallbackPendente: null, // Callback a executar após validação bem-sucedida
         SENHA_ADMIN: '2005Admin',
+        SECOES_PROTEGIDAS: ['empresas', 'colaboradores', 'gerarPDF', 'users', 'historico', 'configuracoes'],
         
         // Colaboradores
         colaboradores: [],
@@ -447,6 +450,23 @@ function adminApp() {
             
             this.loading = false;
             console.log('✅ Painel admin iniciado com SUCESSO!');
+            
+            // Verificar se a aba atual precisa de senha
+            this.verificarAbaAtual();
+        },
+        
+        /**
+         * Verifica se a aba atual precisa de senha ao carregar a página
+         */
+        verificarAbaAtual() {
+            // Se a aba atual é protegida e não tem senha validada
+            if (this.SECOES_PROTEGIDAS.includes(this.activeTab)) {
+                if (!this.validarAcessoSecao(this.activeTab)) {
+                    // Redireciona para "clientes" (aba sem senha)
+                    console.log('🔒 Aba protegida detectada ao carregar. Redirecionando para clientes...');
+                    this.activeTab = 'clientes';
+                }
+            }
         },
 
         // ========== MODAL DE CONFIRMAÇÃO ==========
@@ -555,27 +575,59 @@ function adminApp() {
         
         /**
          * Solicita senha para acessar seção protegida
-         * @param {string} secao - empresa | colaboradores | gerarPDF
+         * @param {string} secao - empresas | colaboradores | gerarPDF | users | historico | configuracoes
          * @param {Function} callback - Função a executar após validação
          */
         solicitarSenha(secao, callback) {
+            console.log('🔐 solicitarSenha() CHAMADA!');
+            console.log('   Seção:', secao);
+            console.log('   Callback:', typeof callback);
+            console.log('   modalSenha atual:', this.modalSenha);
+            
+            // Verificar se já validou nesta sessão
+            const chave = `senha_${secao}_validada`;
+            const jaValidado = sessionStorage.getItem(chave) === 'true';
+            console.log(`   Verificando ${chave}:`, jaValidado);
+            
             // Se já validou, executa callback direto
-            if (this.validarAcessoSecao(secao)) {
-                callback();
+            if (jaValidado) {
+                console.log(`✅ Seção "${secao}" já validada. Executando callback...`);
+                if (callback) callback();
                 return;
             }
             
+            console.log(`🔒 Solicitando senha para seção: ${secao}`);
+            
+            // Define nome amigável da seção
+            const nomes = {
+                'empresas': 'Empresas',
+                'colaboradores': 'Colaboradores',
+                'gerarPDF': 'Gerar PDF',
+                'users': 'Gerenciador de Usuários',
+                'historico': 'Histórico',
+                'configuracoes': 'Configurações'
+            };
+            
+            // Armazena callback para executar após validação
+            this.senhaCallbackPendente = callback;
+            console.log('   Callback armazenado:', typeof this.senhaCallbackPendente);
+            
             // Mostra modal de senha
             this.senhaSecaoAtual = secao;
+            this.senhaSecaoNome = nomes[secao] || secao;
             this.senhaInput = '';
             this.senhaTentativaErro = false;
             this.modalSenha = true;
             
-            // Focar no input após o modal abrir
-            setTimeout(() => {
+            console.log('   modalSenha após definir true:', this.modalSenha);
+            console.log('   senhaSecaoNome:', this.senhaSecaoNome);
+            
+            // Forçar re-render do Alpine.js
+            this.$nextTick(() => {
                 const input = document.getElementById('senha-admin-input');
+                console.log('   Input encontrado no nextTick?', !!input);
                 if (input) input.focus();
-            }, 100);
+            });
         },
         
         /**
@@ -583,20 +635,31 @@ function adminApp() {
          */
         validarSenha() {
             if (this.senhaInput === this.SENHA_ADMIN) {
+                console.log(`✅ Senha correta para seção: ${this.senhaSecaoAtual}`);
+                
                 // Senha correta! Salva validação no sessionStorage
                 const chave = `senha_${this.senhaSecaoAtual}_validada`;
                 sessionStorage.setItem(chave, 'true');
+                console.log(`💾 Validação salva no sessionStorage: ${chave}`);
                 
                 // Fecha modal
                 this.modalSenha = false;
                 this.senhaInput = '';
                 this.senhaTentativaErro = false;
                 
-                // Executa ação (mudar tab)
-                this.mudarAbaProtegida(this.senhaSecaoAtual);
+                // Executa callback pendente (mudança de tab)
+                if (this.senhaCallbackPendente) {
+                    console.log('🚀 Executando callback pendente...');
+                    this.senhaCallbackPendente();
+                    this.senhaCallbackPendente = null;
+                } else {
+                    // Fallback: usar função antiga
+                    this.mudarAbaProtegida(this.senhaSecaoAtual);
+                }
                 
             } else {
                 // Senha incorreta
+                console.log('❌ Senha incorreta');
                 this.senhaTentativaErro = true;
                 this.senhaInput = '';
                 
@@ -614,6 +677,23 @@ function adminApp() {
             this.modalSenha = false;
             this.senhaInput = '';
             this.senhaTentativaErro = false;
+            this.senhaCallbackPendente = null; // Limpa callback pendente
+        },
+        
+        /**
+         * Redireciona para "Criar Trabalhador" quando não sabe a senha
+         */
+        irParaCriarTrabalhador() {
+            this.modalSenha = false;
+            this.senhaInput = '';
+            this.senhaTentativaErro = false;
+            this.senhaCallbackPendente = null; // Limpa callback pendente
+            
+            // Muda para aba de clientes
+            this.activeTab = 'clientes';
+            
+            // Mostra mensagem informativa
+            this.showAlert('info', '💡 Você pode criar trabalhadores/clientes aqui. Entre em contato com o administrador para obter a senha e gerar PDFs.');
         },
         
         /**
@@ -629,6 +709,15 @@ function adminApp() {
                     break;
                 case 'gerarPDF':
                     this.abrirModalFluxoGeracao();
+                    break;
+                case 'users':
+                    this.activeTab = 'users';
+                    break;
+                case 'historico':
+                    this.activeTab = 'historico';
+                    break;
+                case 'configuracoes':
+                    this.activeTab = 'configuracoes';
                     break;
             }
         },
