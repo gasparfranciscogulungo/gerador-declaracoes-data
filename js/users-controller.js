@@ -163,8 +163,8 @@ function usersApp() {
                 // 4. Contar documentos por usuário no histórico
                 console.log('🔍 Processando histórico...');
                 listaHistorico.forEach(h => {
-                    const username = h.usuario || h.criado_por;
-                    console.log('   Documento:', h.trabalhador_nome, '→ Usuario:', username);
+                    const username = h.gerado_por || h.usuario || h.criado_por;
+                    console.log('   Documento:', h.dados_documento?.trabalhador_nome, '→ Usuario:', username);
                     if (username) {
                         if (!usuariosMap.has(username)) {
                             usuariosMap.set(username, {
@@ -177,10 +177,10 @@ function usersApp() {
                         usuariosMap.get(username).documentos++;
                         
                         // Atualizar último acesso
-                        const dataDoc = new Date(h.data || h.created_at);
+                        const dataDoc = new Date(h.gerado_em || h.data || h.created_at);
                         const dataAtual = usuariosMap.get(username).ultimoAcesso;
                         if (!dataAtual || dataDoc > new Date(dataAtual)) {
-                            usuariosMap.get(username).ultimoAcesso = h.data || h.created_at;
+                            usuariosMap.get(username).ultimoAcesso = h.gerado_em || h.data || h.created_at;
                         }
                     }
                 });
@@ -472,7 +472,7 @@ function usersApp() {
                 }
                 
                 // Por usuário
-                const usuario = doc.usuario || doc.criado_por || 'desconhecido';
+                const usuario = doc.gerado_por || doc.usuario || doc.criado_por || 'desconhecido';
                 this.statsHistorico.porUsuario[usuario] = (this.statsHistorico.porUsuario[usuario] || 0) + 1;
                 
                 // Por empresa
@@ -486,7 +486,7 @@ function usersApp() {
                 }
                 
                 // Por dia
-                const data = (doc.data || doc.created_at || '').split('T')[0];
+                const data = (doc.gerado_em || doc.data || doc.created_at || '').split('T')[0];
                 if (data) {
                     this.statsHistorico.porDia[data] = (this.statsHistorico.porDia[data] || 0) + 1;
                 }
@@ -519,7 +519,7 @@ function usersApp() {
             // Filtro por usuário
             if (this.filtrosHistorico.usuario) {
                 filtrado = filtrado.filter(doc => 
-                    (doc.usuario || doc.criado_por) === this.filtrosHistorico.usuario
+                    (doc.gerado_por || doc.usuario || doc.criado_por) === this.filtrosHistorico.usuario
                 );
             }
             
@@ -534,7 +534,7 @@ function usersApp() {
             if (this.filtrosHistorico.data_inicio) {
                 const dataInicio = new Date(this.filtrosHistorico.data_inicio);
                 filtrado = filtrado.filter(doc => {
-                    const dataDoc = new Date(doc.data || doc.created_at);
+                    const dataDoc = new Date(doc.gerado_em || doc.data || doc.created_at);
                     return dataDoc >= dataInicio;
                 });
             }
@@ -544,7 +544,7 @@ function usersApp() {
                 const dataFim = new Date(this.filtrosHistorico.data_fim);
                 dataFim.setHours(23, 59, 59, 999); // Fim do dia
                 filtrado = filtrado.filter(doc => {
-                    const dataDoc = new Date(doc.data || doc.created_at);
+                    const dataDoc = new Date(doc.gerado_em || doc.data || doc.created_at);
                     return dataDoc <= dataFim;
                 });
             }

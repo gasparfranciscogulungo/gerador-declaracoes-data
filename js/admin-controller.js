@@ -3254,8 +3254,10 @@ function adminApp() {
                         salario_base: cliente?.salario_base || '0',
                         moeda: cliente?.moeda || 'AKZ'
                     },
-                    usuario: this.usuario?.login || 'unknown',
-                    data: new Date().toISOString(),
+                    gerado_por: this.usuario?.login || 'unknown',
+                    gerado_em: new Date().toISOString(),
+                    contador: empresa?.contador ? `${String(empresa.contador).padStart(3, '0')}/${new Date().getFullYear()}` : `001/${new Date().getFullYear()}`,
+                    modelo_usado: this.previewConfig?.modelo || tipo,
                     arquivo: nomeArquivo,
                     status: 'ativo'
                 };
