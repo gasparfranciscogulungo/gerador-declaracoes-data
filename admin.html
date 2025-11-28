@@ -107,6 +107,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
+    <!-- Chart.js - Gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <!-- jsPDF - Geração de PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
@@ -2234,10 +2237,17 @@
             <div :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'" 
                  class="rounded-lg shadow-md border">
                 <div class="p-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="bi bi-clock-history text-blue-600"></i>
-                        Documentos Recentes
-                    </h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <i class="bi bi-clock-history text-blue-600"></i>
+                            Documentos Recentes
+                        </h3>
+                        <button @click="carregarHistoricoAdmin(); atualizarStatsReais()" 
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm flex items-center gap-2">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Atualizar</span>
+                        </button>
+                    </div>
                     
                     <!-- Loading -->
                     <div x-show="loadingHistoricoAdmin" class="text-center py-8">
@@ -2258,23 +2268,25 @@
                                 </tr>
                             </thead>
                             <tbody :class="darkMode ? 'divide-gray-700' : 'divide-gray-200'" class="divide-y">
-                                <template x-for="doc in historicoAdminRecente.slice(0, 10)" :key="doc.id">
+                                <template x-for="doc in historicoAdminRecente.slice(0, 20)" :key="doc.id">
                                     <tr :class="darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'" class="transition-colors">
-                                        <td class="px-4 py-3 text-sm whitespace-nowrap" x-text="formatarDataSimples(doc.data || doc.created_at)"></td>
+                                        <td class="px-4 py-3 text-sm whitespace-nowrap" x-text="formatarDataSimples(doc.data || doc.gerado_em || doc.created_at)"></td>
                                         <td class="px-4 py-3 text-sm">
                                             <span class="px-2 py-1 rounded-full text-xs font-semibold"
                                                   :class="{
-                                                      'bg-green-100 text-green-800': (doc.tipo_documento || doc.tipo) === 'declaracao',
-                                                      'bg-blue-100 text-blue-800': (doc.tipo_documento || doc.tipo) === 'recibo',
-                                                      'bg-purple-100 text-purple-800': (doc.tipo_documento || doc.tipo) === 'combo'
+                                                      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': (doc.tipo_documento || doc.tipo) === 'declaracao',
+                                                      'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': (doc.tipo_documento || doc.tipo) === 'recibo',
+                                                      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200': (doc.tipo_documento || doc.tipo) === 'combo',
+                                                      'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200': (doc.tipo_documento || doc.tipo) === 'nif',
+                                                      'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200': (doc.tipo_documento || doc.tipo) === 'atestado'
                                                   }"
-                                                  x-text="doc.tipo_documento || doc.tipo || 'N/A'">
+                                                  x-text="(doc.tipo_documento || doc.tipo || 'N/A').toUpperCase()">
                                             </span>
                                         </td>
                                         <td class="px-4 py-3 text-sm" x-text="doc.dados_documento?.empresa_nome || doc.empresa_nome || 'N/A'"></td>
                                         <td class="px-4 py-3 text-sm" x-text="doc.dados_documento?.trabalhador_nome || doc.trabalhador_nome || 'N/A'"></td>
                                         <td class="px-4 py-3 text-sm">
-                                            <span class="font-semibold" x-text="'@' + (doc.usuario || doc.criado_por || 'N/A')"></span>
+                                            <span class="font-semibold text-blue-600 dark:text-blue-400" x-text="'@' + (doc.usuario || doc.gerado_por || doc.criado_por || 'N/A')"></span>
                                         </td>
                                     </tr>
                                 </template>

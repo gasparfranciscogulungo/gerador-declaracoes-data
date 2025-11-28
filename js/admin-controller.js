@@ -424,6 +424,13 @@ function adminApp() {
             // Carregar colaboradores
             await this.carregarColaboradores();
             
+            // Pré-carregar histórico para stats (não bloqueia UI)
+            setTimeout(() => {
+                this.carregarHistoricoAdmin().catch(err => {
+                    console.warn('⚠️ Erro ao pré-carregar histórico:', err);
+                });
+            }, 1000);
+            
             // Configurar autosave (a cada 10 segundos)
             setInterval(() => {
                 if (this.autosaveEnabled && this.modalPreviewModelo) {
@@ -702,9 +709,11 @@ function adminApp() {
             console.log('✅ Contador inicializado');
         },
 
-        // ========== ESTATÍSTICAS REAIS (OTIMIZADO - SEM LOOP) ==========
+        // ========== ESTATÍSTICAS REAIS (OTIMIZADO) ==========
         async atualizarStatsReais() {
             try {
+                console.log('📊 Atualizando estatísticas...');
+                
                 // Stats básicas
                 this.stats.empresas = this.empresas.length;
                 this.stats.modelos = this.modelos.length;
@@ -713,38 +722,38 @@ function adminApp() {
                 const usersAtivos = this.usersData?.users.filter(u => u.status === 'active') || [];
                 this.stats.users = usersAtivos.length;
                 
-                // Total de Clientes e Declarações (USA OS STATS JÁ SALVOS EM users.json)
-                // Isso é MUITO mais rápido que ler arquivo de cada usuário!
-                let totalClientes = 0;
-                let totalDeclaracoes = 0;
+                // Total de Clientes
+                this.stats.totalClientes = this.trabalhadores?.length || 0;
                 
-                for (const user of usersAtivos) {
-                    totalClientes += user.stats?.clientes || 0;
-                    totalDeclaracoes += user.stats?.declaracoes || 0;
-                }
-                
-                this.stats.totalClientes = totalClientes;
-                this.stats.totalDeclaracoes = totalDeclaracoes;
-                
-                // 🆕 PDFs HOJE e TOTAL: Buscar do HistoricoManager
-                if (typeof historicoManager !== 'undefined' && historicoManager.initialized) {
-                    try {
-                        const historicoStats = historicoManager.estatisticas();
-                        this.stats.totalDeclaracoes = historicoStats.total || totalDeclaracoes;
-                        this.stats.declaracoesHoje = historicoManager.estatisticasHoje();
-                        console.log('📊 Stats do histórico carregadas:', {
-                            totalDocs: historicoStats.total,
+                // 📊 Total de PDFs do HISTÓRICO (fonte confiável)
+                try {
+                    const result = await githubAPI.lerJSON('data/historico.json');
+                    if (result?.data?.historico) {
+                        const historico = result.data.historico;
+                        this.stats.totalDeclaracoes = historico.length;
+                        
+                        // PDFs gerados hoje
+                        const hoje = new Date().toISOString().split('T')[0];
+                        this.stats.declaracoesHoje = historico.filter(doc => {
+                            const dataDoc = (doc.data || doc.gerado_em || doc.created_at || '').split('T')[0];
+                            return dataDoc === hoje;
+                        }).length;
+                        
+                        console.log('✅ Stats do histórico:', {
+                            total: this.stats.totalDeclaracoes,
                             hoje: this.stats.declaracoesHoje
                         });
-                    } catch (error) {
-                        console.warn('⚠️ Erro ao carregar stats do histórico:', error);
+                    } else {
+                        this.stats.totalDeclaracoes = 0;
                         this.stats.declaracoesHoje = 0;
                     }
-                } else {
+                } catch (error) {
+                    console.warn('⚠️ Erro ao carregar histórico para stats:', error);
+                    this.stats.totalDeclaracoes = 0;
                     this.stats.declaracoesHoje = 0;
                 }
                 
-                console.log('📊 Stats atualizadas:', {
+                console.log('✅ Stats atualizadas:', {
                     empresas: this.stats.empresas,
                     modelos: this.stats.modelos,
                     usersAtivos: this.stats.users,
@@ -3219,32 +3228,80 @@ function adminApp() {
         },
 
         /**
-         * Registra download no histórico (opcional - para implementar)
+         * Registra download de PDF no histórico (GitHub)
          */
-        registrarDownloadPDF(nomeArquivo) {
+        async registrarDownloadPDF(nomeArquivo) {
             try {
-                // Salvar em localStorage
-                const historico = JSON.parse(localStorage.getItem('historico_pdfs') || '[]');
+                console.log('📊 Registrando download no histórico...');
                 
-                historico.unshift({
+                // Determinar dados corretos (do fluxo ou do preview)
+                const empresa = this.fluxoEmpresaSelecionada || this.getEmpresaExemplo();
+                const cliente = this.fluxoClienteSelecionado || this.getClienteExemplo();
+                const tipo = this.tipoPreview || this.fluxoTipoDocumento || 'declaracao';
+                
+                // Criar registro completo
+                const registro = {
+                    id: `DOC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    tipo_documento: tipo,
+                    empresa_id: empresa?.id || 'unknown',
+                    trabalhador_id: cliente?.id || 'unknown',
+                    dados_documento: {
+                        empresa_nome: empresa?.nome || 'N/A',
+                        empresa_nif: empresa?.nif || 'N/A',
+                        trabalhador_nome: cliente?.nome || 'N/A',
+                        trabalhador_nif: cliente?.nif || 'N/A',
+                        trabalhador_funcao: cliente?.funcao || 'N/A',
+                        salario_base: cliente?.salario_base || '0',
+                        moeda: cliente?.moeda || 'AKZ'
+                    },
+                    usuario: this.usuario?.login || 'unknown',
+                    data: new Date().toISOString(),
                     arquivo: nomeArquivo,
-                    modelo: this.modeloSelecionado?.nome,
-                    empresa: this.getEmpresaExemplo().nome,
-                    cliente: this.getClienteExemplo().nome,
-                    usuario: this.usuario?.login,
-                    timestamp: new Date().toISOString()
-                });
-
-                // Manter apenas últimos 50
-                if (historico.length > 50) {
-                    historico.splice(50);
+                    status: 'ativo'
+                };
+                
+                // Carregar histórico atual do GitHub
+                let historicoData = { historico: [] };
+                try {
+                    const result = await githubAPI.lerJSON('data/historico.json');
+                    if (result?.data) {
+                        historicoData = result.data;
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Histórico não existe, criando novo');
                 }
-
-                localStorage.setItem('historico_pdfs', JSON.stringify(historico));
-                console.log('📊 Download registrado no histórico');
-
+                
+                // Adicionar novo registro no início (mais recente primeiro)
+                historicoData.historico = historicoData.historico || [];
+                historicoData.historico.unshift(registro);
+                
+                // Limitar a 1000 registros mais recentes
+                if (historicoData.historico.length > 1000) {
+                    historicoData.historico = historicoData.historico.slice(0, 1000);
+                }
+                
+                // Atualizar metadata
+                historicoData._metadata = {
+                    versao: "1.0.0",
+                    atualizado_em: new Date().toISOString(),
+                    total_documentos: historicoData.historico.length
+                };
+                
+                // Salvar no GitHub (async, não bloqueia UI)
+                githubAPI.salvarJSON(
+                    'data/historico.json',
+                    historicoData,
+                    `📊 Novo documento: ${tipo} - ${cliente?.nome || 'N/A'}`
+                ).then(() => {
+                    console.log('✅ Histórico salvo no GitHub');
+                }).catch(error => {
+                    console.error('❌ Erro ao salvar histórico:', error);
+                });
+                
+                console.log('✅ Download registrado:', registro);
             } catch (error) {
-                console.error('⚠️ Erro ao registrar histórico:', error);
+                console.error('⚠️ Erro ao registrar download:', error);
+                // Não bloqueia a geração do PDF
             }
         },
 
@@ -5198,26 +5255,43 @@ function adminApp() {
             this.loadingHistoricoAdmin = true;
             
             try {
+                // Carregar do GitHub
                 const result = await githubAPI.lerJSON('data/historico.json');
-                this.historicoAdmin = result?.data?.historico || [];
-                console.log(`✅ ${this.historicoAdmin.length} documentos carregados`);
+                
+                if (result && result.data) {
+                    this.historicoAdmin = result.data.historico || [];
+                    console.log(`✅ ${this.historicoAdmin.length} documentos carregados do histórico`);
+                } else {
+                    console.warn('⚠️ Nenhum histórico encontrado');
+                    this.historicoAdmin = [];
+                }
                 
                 // Ordenar por data (mais recente primeiro)
                 this.historicoAdminRecente = [...this.historicoAdmin].sort((a, b) => {
-                    const dataA = new Date(a.data || a.created_at);
-                    const dataB = new Date(b.data || b.created_at);
+                    const dataA = new Date(a.data || a.gerado_em || a.created_at || 0);
+                    const dataB = new Date(b.data || b.gerado_em || b.created_at || 0);
                     return dataB - dataA;
                 });
+                
+                console.log('📊 Documentos ordenados:', this.historicoAdminRecente.length);
                 
                 // Calcular estatísticas
                 this.calcularStatsHistoricoAdmin();
                 
-                // Criar gráficos
-                setTimeout(() => this.criarGraficosAdmin(), 100);
+                // Criar gráficos (com delay para garantir que DOM está pronto)
+                setTimeout(() => {
+                    try {
+                        this.criarGraficosAdmin();
+                    } catch (error) {
+                        console.error('❌ Erro ao criar gráficos:', error);
+                    }
+                }, 300);
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar histórico:', error);
-                this.showAlert('error', 'Erro ao carregar histórico: ' + error.message);
+                this.historicoAdmin = [];
+                this.historicoAdminRecente = [];
+                this.showAlert('error', 'Erro ao carregar histórico. Arquivo pode não existir ainda.');
             } finally {
                 this.loadingHistoricoAdmin = false;
             }
@@ -5227,6 +5301,8 @@ function adminApp() {
          * Calcula estatísticas do histórico
          */
         calcularStatsHistoricoAdmin() {
+            console.log('📊 Calculando estatísticas de', this.historicoAdmin.length, 'documentos...');
+            
             this.statsHistoricoAdmin = {
                 totalDocumentos: this.historicoAdmin.length,
                 porTipo: {
@@ -5242,32 +5318,48 @@ function adminApp() {
             };
             
             this.historicoAdmin.forEach(doc => {
-                // Por tipo
-                const tipo = doc.tipo_documento || doc.tipo || 'declaracao';
-                if (this.statsHistoricoAdmin.porTipo.hasOwnProperty(tipo)) {
-                    this.statsHistoricoAdmin.porTipo[tipo]++;
-                }
-                
-                // Por usuário
-                const usuario = doc.usuario || doc.criado_por || 'desconhecido';
-                this.statsHistoricoAdmin.porUsuario[usuario] = (this.statsHistoricoAdmin.porUsuario[usuario] || 0) + 1;
-                
-                // Por empresa
-                const empresaNome = doc.dados_documento?.empresa_nome || doc.empresa_nome || 'Desconhecida';
-                const empresaId = doc.dados_documento?.empresa_id || doc.empresa_id || empresaNome;
-                if (!this.statsHistoricoAdmin.porEmpresa[empresaId]) {
-                    this.statsHistoricoAdmin.porEmpresa[empresaId] = { nome: empresaNome, total: 0 };
-                }
-                this.statsHistoricoAdmin.porEmpresa[empresaId].total++;
-                
-                // Por dia
-                const data = (doc.data || doc.created_at || '').split('T')[0];
-                if (data) {
-                    this.statsHistoricoAdmin.porDia[data] = (this.statsHistoricoAdmin.porDia[data] || 0) + 1;
+                try {
+                    // Por tipo
+                    const tipo = doc.tipo_documento || doc.tipo || 'declaracao';
+                    if (this.statsHistoricoAdmin.porTipo.hasOwnProperty(tipo)) {
+                        this.statsHistoricoAdmin.porTipo[tipo]++;
+                    } else {
+                        this.statsHistoricoAdmin.porTipo[tipo] = 1;
+                    }
+                    
+                    // Por usuário
+                    const usuario = doc.usuario || doc.gerado_por || doc.criado_por || 'desconhecido';
+                    this.statsHistoricoAdmin.porUsuario[usuario] = (this.statsHistoricoAdmin.porUsuario[usuario] || 0) + 1;
+                    
+                    // Por empresa
+                    const empresaNome = doc.dados_documento?.empresa_nome || doc.empresa_nome || 'Desconhecida';
+                    const empresaId = doc.empresa_id || doc.dados_documento?.empresa_id || empresaNome;
+                    if (!this.statsHistoricoAdmin.porEmpresa[empresaId]) {
+                        this.statsHistoricoAdmin.porEmpresa[empresaId] = { 
+                            nome: empresaNome, 
+                            total: 0 
+                        };
+                    }
+                    this.statsHistoricoAdmin.porEmpresa[empresaId].total++;
+                    
+                    // Por dia (últimos 30 dias)
+                    const dataDoc = doc.data || doc.gerado_em || doc.created_at;
+                    if (dataDoc) {
+                        const data = dataDoc.split('T')[0];
+                        this.statsHistoricoAdmin.porDia[data] = (this.statsHistoricoAdmin.porDia[data] || 0) + 1;
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao processar documento:', doc, error);
                 }
             });
             
-            console.log('📊 Stats calculadas:', this.statsHistoricoAdmin);
+            console.log('✅ Stats calculadas:', {
+                total: this.statsHistoricoAdmin.totalDocumentos,
+                porTipo: this.statsHistoricoAdmin.porTipo,
+                usuarios: Object.keys(this.statsHistoricoAdmin.porUsuario).length,
+                empresas: Object.keys(this.statsHistoricoAdmin.porEmpresa).length,
+                dias: Object.keys(this.statsHistoricoAdmin.porDia).length
+            });
         },
         
         /**
