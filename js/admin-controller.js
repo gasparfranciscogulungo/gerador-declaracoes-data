@@ -64,6 +64,13 @@ function adminApp() {
             resolve: null
         },
         
+        // Proteção de Senha (seções sensíveis)
+        modalSenha: false,
+        senhaInput: '',
+        senhaSecaoAtual: '', // empresa | colaboradores | gerarPDF
+        senhaTentativaErro: false,
+        SENHA_ADMIN: '2005Admin',
+        
         // Colaboradores
         colaboradores: [],
         loadingColab: false,
@@ -532,6 +539,98 @@ function adminApp() {
         async carregarUsuariosPendentes() {
             this.stats.usersPendentes = 0;
             console.log('⏭️  Sistema de aprovação desativado (modo simplificado)');
+        },
+        
+        // ========== PROTEÇÃO POR SENHA ==========
+        /**
+         * Verifica se a seção precisa de senha e se já foi validada
+         * @param {string} secao - empresa | colaboradores | gerarPDF
+         * @returns {boolean}
+         */
+        validarAcessoSecao(secao) {
+            // Verifica se já foi validado nesta sessão
+            const chave = `senha_${secao}_validada`;
+            return sessionStorage.getItem(chave) === 'true';
+        },
+        
+        /**
+         * Solicita senha para acessar seção protegida
+         * @param {string} secao - empresa | colaboradores | gerarPDF
+         * @param {Function} callback - Função a executar após validação
+         */
+        solicitarSenha(secao, callback) {
+            // Se já validou, executa callback direto
+            if (this.validarAcessoSecao(secao)) {
+                callback();
+                return;
+            }
+            
+            // Mostra modal de senha
+            this.senhaSecaoAtual = secao;
+            this.senhaInput = '';
+            this.senhaTentativaErro = false;
+            this.modalSenha = true;
+            
+            // Focar no input após o modal abrir
+            setTimeout(() => {
+                const input = document.getElementById('senha-admin-input');
+                if (input) input.focus();
+            }, 100);
+        },
+        
+        /**
+         * Valida senha digitada
+         */
+        validarSenha() {
+            if (this.senhaInput === this.SENHA_ADMIN) {
+                // Senha correta! Salva validação no sessionStorage
+                const chave = `senha_${this.senhaSecaoAtual}_validada`;
+                sessionStorage.setItem(chave, 'true');
+                
+                // Fecha modal
+                this.modalSenha = false;
+                this.senhaInput = '';
+                this.senhaTentativaErro = false;
+                
+                // Executa ação (mudar tab)
+                this.mudarAbaProtegida(this.senhaSecaoAtual);
+                
+            } else {
+                // Senha incorreta
+                this.senhaTentativaErro = true;
+                this.senhaInput = '';
+                
+                // Remove erro após 2s
+                setTimeout(() => {
+                    this.senhaTentativaErro = false;
+                }, 2000);
+            }
+        },
+        
+        /**
+         * Cancela modal de senha
+         */
+        cancelarSenha() {
+            this.modalSenha = false;
+            this.senhaInput = '';
+            this.senhaTentativaErro = false;
+        },
+        
+        /**
+         * Muda para aba protegida após validação
+         */
+        mudarAbaProtegida(secao) {
+            switch(secao) {
+                case 'empresas':
+                    this.activeTab = 'empresas';
+                    break;
+                case 'colaboradores':
+                    this.activeTab = 'colaboradores';
+                    break;
+                case 'gerarPDF':
+                    this.abrirModalFluxoGeracao();
+                    break;
+            }
         },
         
         // ========== ATUALIZAR BADGES DE NOTIFICAÇÃO ==========
