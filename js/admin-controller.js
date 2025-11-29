@@ -588,11 +588,29 @@ function adminApp() {
             const chave = `senha_${secao}_validada`;
             const jaValidado = sessionStorage.getItem(chave) === 'true';
             console.log(`   Verificando ${chave}:`, jaValidado);
+
+            const executarCallbackSeguro = (fn) => {
+                if (typeof fn !== 'function') {
+                    console.warn('⚠️ Nenhum callback válido informado para seção protegida:', secao);
+                    return;
+                }
+                try {
+                    fn.call(this);
+                } catch (error) {
+                    console.error('❌ Erro ao executar callback da seção protegida:', error);
+                    this.showAlert('error', 'Erro ao abrir esta seção. Atualize a página e tente novamente.');
+                }
+            };
             
             // Se já validou, executa callback direto
             if (jaValidado) {
                 console.log(`✅ Seção "${secao}" já validada. Executando callback...`);
-                if (callback) callback();
+                if (callback) {
+                    executarCallbackSeguro(callback);
+                } else {
+                    console.log('ℹ️ Nenhum callback fornecido. Usando fallback padrão.');
+                    this.mudarAbaProtegida(secao);
+                }
                 return;
             }
             
@@ -609,7 +627,9 @@ function adminApp() {
             };
             
             // Armazena callback para executar após validação
-            this.senhaCallbackPendente = callback;
+            this.senhaCallbackPendente = typeof callback === 'function'
+                ? callback.bind(this)
+                : null;
             console.log('   Callback armazenado:', typeof this.senhaCallbackPendente);
             
             // Mostra modal de senha
@@ -650,8 +670,14 @@ function adminApp() {
                 // Executa callback pendente (mudança de tab)
                 if (this.senhaCallbackPendente) {
                     console.log('🚀 Executando callback pendente...');
-                    this.senhaCallbackPendente();
-                    this.senhaCallbackPendente = null;
+                    try {
+                        this.senhaCallbackPendente();
+                    } catch (error) {
+                        console.error('❌ Erro ao executar callback pendente:', error);
+                        this.showAlert('error', 'Erro ao concluir a abertura da seção protegida.');
+                    } finally {
+                        this.senhaCallbackPendente = null;
+                    }
                 } else {
                     // Fallback: usar função antiga
                     this.mudarAbaProtegida(this.senhaSecaoAtual);
