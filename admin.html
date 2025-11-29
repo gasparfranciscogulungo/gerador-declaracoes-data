@@ -4744,8 +4744,8 @@
                     </button>
                 </div>
                 
-                <!-- Container do Cropper - 100% LARGURA COM MARGENS 10PX -->
-                <div id="cropper-container" class="touch-manipulation" style="width: calc(100% - 20px); height: calc(100% - 20px); margin: 10px; display: flex; align-items: center; justify-content: center;">
+                <!-- Container do Cropper - espaçamento confortável -->
+                <div id="cropper-container" class="touch-manipulation">
                     <img id="cropper-image" 
                          style="max-width: 100%; max-height: 100%; display: block; touch-action: none; object-fit: contain;"
                          class="rounded-lg">
@@ -4753,212 +4753,240 @@
             </div>
             
             <style>
-                /* 🔥 CROPPER.JS - 100% TELA COM MARGENS 10PX (MOBILE CONFORTÁVEL) */
-                
-                /* Mobile: Imagem ocupa toda a tela disponível */
+                /* 🔥 CROPPER.JS - Área centralizada com margens confortáveis */
+
+                #cropper-container {
+                    width: min(90vw, 1100px);
+                    height: min(78vh, 640px);
+                    margin: 18px auto 32px;
+                    padding: 14px;
+                    border-radius: 26px;
+                    background: radial-gradient(circle at top, rgba(15,23,42,0.8), rgba(2,6,23,0.95));
+                    border: 1px solid rgba(148, 163, 184, 0.25);
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                /* Estilo unificado das linhas e guias */
+                .cropper-line {
+                    background-color: rgba(255, 255, 255, 0.65) !important;
+                    opacity: 1 !important;
+                }
+
+                .cropper-line.line-e,
+                .cropper-line.line-w {
+                    width: 3px !important;
+                    height: 100% !important;
+                    cursor: ew-resize !important;
+                }
+
+                .cropper-line.line-n,
+                .cropper-line.line-s {
+                    width: 100% !important;
+                    height: 3px !important;
+                    cursor: ns-resize !important;
+                }
+
+                .cropper-view-box {
+                    outline: 2px solid rgba(255,255,255,0.85) !important;
+                    outline-offset: -1px !important;
+                    box-shadow: 0 0 0 1px rgba(15,23,42,0.65), 0 0 20px rgba(2,6,23,0.55) !important;
+                    border-radius: 14px;
+                }
+
+                .cropper-face {
+                    background-color: transparent !important;
+                }
+
+                .cropper-point {
+                    width: 16px !important;
+                    height: 16px !important;
+                    border-radius: 9999px !important;
+                    background: linear-gradient(135deg, #ec4899, #8b5cf6) !important;
+                    border: 2px solid #fff !important;
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.45) !important;
+                }
+
+                .cropper-point.point-nw,
+                .cropper-point.point-ne,
+                .cropper-point.point-sw,
+                .cropper-point.point-se {
+                    width: 18px !important;
+                    height: 18px !important;
+                }
+
+                .cropper-center {
+                    width: 6px !important;
+                    height: 6px !important;
+                    opacity: 1 !important;
+                    background-color: #ec4899 !important;
+                    border-radius: 50% !important;
+                    box-shadow: 0 0 0 2px #fff !important;
+                }
+
+                .cropper-center::before,
+                .cropper-center::after {
+                    background-color: #ec4899 !important;
+                    width: 20px !important;
+                    height: 3px !important;
+                    box-shadow: 0 0 0 1px rgba(255,255,255,0.5) !important;
+                }
+
+                .cropper-dashed {
+                    opacity: 0.8 !important;
+                    border: 0 dashed rgba(255, 255, 255, 0.4) !important;
+                }
+
+                .cropper-dashed.dashed-h {
+                    border-top-width: 1px !important;
+                    border-bottom-width: 1px !important;
+                }
+
+                .cropper-dashed.dashed-v {
+                    border-left-width: 1px !important;
+                    border-right-width: 1px !important;
+                }
+
+                /* Mobile: experiência equivalente ao desktop */
                 @media (max-width: 768px) {
                     #cropper-container {
                         width: calc(100vw - 20px) !important;
-                        height: calc(75vh - 20px) !important;
-                        padding: 0 !important;
-                        margin: 10px !important;
+                        height: calc(72vh - 16px) !important;
+                        margin: 12px auto 20px !important;
+                        padding: 12px !important;
+                        border-radius: 22px !important;
+                        background: rgba(15, 23, 42, 0.92);
                     }
-                    
-                    /* Cropper container principal - 100% do espaço */
-                    .cropper-container {
+
+                    .cropper-container,
+                    .cropper-wrap-box,
+                    .cropper-canvas,
+                    .cropper-drag-box {
                         width: 100% !important;
                         height: 100% !important;
                         max-width: 100% !important;
                         max-height: 100% !important;
                         margin: 0 !important;
                     }
-                    
-                    /* Wrapper - 100% */
-                    .cropper-wrap-box {
-                        width: 100% !important;
-                        height: 100% !important;
-                    }
-                    
-                    /* Canvas - máximo espaço possível */
-                    .cropper-canvas {
-                        max-width: 100% !important;
-                        max-height: 100% !important;
-                    }
-                    
-                    /* Drag box - área total */
-                    .cropper-drag-box {
-                        width: 100% !important;
-                        height: 100% !important;
-                    }
-                    
-                    /* Crop box - flexível e grande */
+
                     .cropper-crop-box {
-                        min-width: calc(100vw - 80px) !important;
-                        min-height: 200px !important;
+                        min-width: 140px !important;
+                        min-height: 140px !important;
                     }
-                    
-                    /* Modal (overlay escuro) - cobrir tudo */
-                    .cropper-modal {
-                        opacity: 0.5 !important;
-                    }
-                    
-                    /* Controles touch-friendly - TODOS OS PONTOS */
+
                     .cropper-point {
-                        width: 24px !important;
-                        height: 24px !important;
-                        opacity: 1 !important;
-                        background-color: rgba(236, 72, 153, 1) !important;
-                        border-radius: 50% !important;
-                        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0,0,0,0.6) !important;
-                        border: 2px solid white !important;
+                        width: 22px !important;
+                        height: 22px !important;
+                        box-shadow: 0 0 0 3px rgba(0,0,0,0.25), 0 6px 18px rgba(0,0,0,0.55) !important;
                     }
-                    
-                    /* Pontos dos cantos - maiores para melhor toque */
+
                     .cropper-point.point-nw,
                     .cropper-point.point-ne,
                     .cropper-point.point-sw,
                     .cropper-point.point-se {
-                        width: 30px !important;
-                        height: 30px !important;
+                        width: 26px !important;
+                        height: 26px !important;
                     }
-                    
-                    /* Bordas TODAS visíveis e touch-friendly */
-                    .cropper-line {
-                        background-color: rgba(236, 72, 153, 0.9) !important;
-                        opacity: 1 !important;
-                    }
-                    
-                    /* Bordas laterais (esquerda/direita) */
+
                     .cropper-line.line-e,
                     .cropper-line.line-w {
-                        width: 5px !important;
-                        height: 100% !important;
-                        cursor: ew-resize !important;
+                        width: 4px !important;
                     }
-                    
-                    /* Bordas horizontais (topo/baixo) - IMPORTANTES! */
+
                     .cropper-line.line-n,
                     .cropper-line.line-s {
-                        width: 100% !important;
-                        height: 5px !important;
-                        cursor: ns-resize !important;
+                        height: 4px !important;
                     }
-                    
-                    .cropper-view-box {
-                        outline: 3px solid rgba(236, 72, 153, 1) !important;
-                        outline-offset: -2px !important;
-                        box-shadow: 0 0 0 2px rgba(255,255,255,0.5), 0 0 20px rgba(236, 72, 153, 0.6) !important;
-                    }
-                    
-                    /* Face da crop box - fundo semi-transparente para contraste */
-                    .cropper-face {
-                        background-color: transparent !important;
-                    }
-                    
-                    /* Center indicator - maior e mais visível */
+
                     .cropper-center {
-                        width: 6px !important;
-                        height: 6px !important;
-                        opacity: 1 !important;
-                        background-color: rgba(236, 72, 153, 1) !important;
-                        border-radius: 50% !important;
-                        box-shadow: 0 0 0 2px white !important;
-                    }
-                    
-                    .cropper-center::before,
-                    .cropper-center::after {
-                        background-color: rgba(236, 72, 153, 1) !important;
-                        width: 24px !important;
-                        height: 3px !important;
-                        box-shadow: 0 0 0 1px rgba(255,255,255,0.5) !important;
-                    }
-                    
-                    /* Grid de terços - mais visível */
-                    .cropper-dashed {
-                        opacity: 1 !important;
-                        border: 0 dashed rgba(255, 255, 255, 0.4) !important;
-                    }
-                    
-                    .cropper-dashed.dashed-h {
-                        border-top-width: 1px !important;
-                        border-bottom-width: 1px !important;
-                    }
-                    
-                    .cropper-dashed.dashed-v {
-                        border-left-width: 1px !important;
-                        border-right-width: 1px !important;
+                        width: 8px !important;
+                        height: 8px !important;
                     }
                 }
-                
+
                 /* Desktop - mantém qualidade e UX */
                 @media (min-width: 769px) {
                     #cropper-container {
-                        width: calc(80vw - 20px) !important;
-                        height: calc(75vh - 20px) !important;
+                        width: min(80vw, 960px) !important;
+                        height: min(75vh, 620px) !important;
                     }
-                    
+
                     .cropper-container {
-                        max-width: 80vw !important;
-                        max-height: 75vh !important;
-                    }
-                    
-                    .cropper-point {
-                        width: 12px !important;
-                        height: 12px !important;
-                        opacity: 0.8 !important;
-                    }
-                    
-                    .cropper-line {
-                        background-color: rgba(236, 72, 153, 0.6) !important;
+                        max-width: min(80vw, 960px) !important;
+                        max-height: min(75vh, 620px) !important;
                     }
                 }
-                
+
                 /* Garantir que imagem original seja visível */
                 #cropper-image {
                     visibility: hidden; /* Esconder só até Cropper inicializar */
                 }
-                
+
                 .cropper-container img {
                     visibility: visible !important;
                 }
             </style>
 
-            <!-- FOOTER: CONTROLES OTIMIZADOS -->
-            <div class="bg-gradient-to-b from-gray-900 to-black border-t border-gray-800 px-4 py-4 sm:py-5 flex flex-col gap-4 shrink-0">
-                
-                <!-- Controles de Rotação - MAIORES E MAIS CLAROS -->
-                <div class="grid grid-cols-3 gap-3">
-                    <button @click="rotacionarCropper(-90)" 
-                            class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
-                        <i class="bi bi-arrow-counterclockwise text-2xl"></i>
-                        <span class="text-xs font-medium">-90°</span>
-                    </button>
+            <!-- BOTÃO FLUTUANTE DOS CONTROLES -->
+            <button @click="toggleCropperControles()"
+                    class="fixed bottom-6 right-5 sm:right-8 z-[70] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-600 shadow-[0_20px_45px_rgba(0,0,0,0.45)] flex items-center justify-center text-white text-3xl font-bold transition-all active:scale-95">
+                <i :class="cropperControlesVisiveis ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+            </button>
+
+            <!-- PAINEL FLUTUANTE DE CONTROLES -->
+          <div x-show="cropperControlesVisiveis"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="translate-y-6 opacity-0"
+                 x-transition:enter-end="translate-y-0 opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="translate-y-0 opacity-100"
+              x-transition:leave-end="translate-y-4 opacity-0"
+              class="fixed left-1/2 -translate-x-1/2 bottom-0 w-full max-w-4xl px-4 pb-8 z-[65]"
+              style="padding-bottom: max(env(safe-area-inset-bottom, 24px), 32px);">
+                <div class="bg-gradient-to-b from-slate-900/95 to-black/95 border border-white/5 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl px-5 py-5 space-y-4">
+                    <div class="flex items-center justify-between text-white/80">
+                        <div>
+                            <p class="text-sm font-semibold tracking-wide uppercase text-white/60">Ferramentas de edição</p>
+                            <p class="text-xs text-white/50">Ajuste, gire ou aplique o corte quando precisar</p>
+                        </div>
+                        <button @click="cropperControlesVisiveis = false"
+                                class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
+                            <i class="bi bi-chevron-down text-lg"></i>
+                        </button>
+                    </div>
                     
-                    <button @click="resetarCropper()" 
-                            class="h-14 sm:h-16 bg-gradient-to-br from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
-                        <i class="bi bi-arrow-repeat text-2xl"></i>
-                        <span class="text-xs font-medium">Reset</span>
-                    </button>
-                    
-                    <button @click="rotacionarCropper(90)" 
-                            class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 text-white rounded-xl touch-manipulation flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
-                        <i class="bi bi-arrow-clockwise text-2xl"></i>
-                        <span class="text-xs font-medium">+90°</span>
-                    </button>
-                </div>
-                
-                <!-- Botões de Ação Principal - DESTACADOS -->
-                <div class="flex gap-3">
-                    <button @click="fecharCropperBI()" 
-                            class="flex-1 h-14 sm:h-16 bg-gray-700 hover:bg-gray-600 active:bg-gray-500 active:scale-95 text-white rounded-xl font-bold shadow-lg touch-manipulation text-base transition-all flex items-center justify-center gap-2">
-                        <i class="bi bi-x-circle text-xl"></i>
-                        <span>Cancelar</span>
-                    </button>
-                    <button @click="aplicarCorte()" 
-                            class="flex-1 h-14 sm:h-16 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:via-purple-700 hover:to-indigo-700 active:scale-95 text-white rounded-xl font-black shadow-2xl touch-manipulation text-base transition-all flex items-center justify-center gap-2">
-                        <i class="bi bi-check-circle-fill text-xl"></i>
-                        <span>Aplicar Corte</span>
-                    </button>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button @click="rotacionarCropper(-90)"
+                                class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:brightness-110 active:scale-95 text-white rounded-2xl flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                            <i class="bi bi-arrow-counterclockwise text-2xl"></i>
+                            <span class="text-xs font-medium">-90°</span>
+                        </button>
+                        <button @click="resetarCropper()"
+                                class="h-14 sm:h-16 bg-gradient-to-br from-slate-600 to-slate-700 hover:brightness-110 active:scale-95 text-white rounded-2xl flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                            <i class="bi bi-arrow-repeat text-2xl"></i>
+                            <span class="text-xs font-medium">Reset</span>
+                        </button>
+                        <button @click="rotacionarCropper(90)"
+                                class="h-14 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 hover:brightness-110 active:scale-95 text-white rounded-2xl flex flex-col items-center justify-center gap-1 shadow-lg transition-all">
+                            <i class="bi bi-arrow-clockwise text-2xl"></i>
+                            <span class="text-xs font-medium">+90°</span>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button @click="fecharCropperBI()" 
+                                class="flex-1 h-14 sm:h-16 bg-slate-700/80 hover:bg-slate-600 active:scale-95 text-white rounded-2xl font-semibold shadow-lg flex items-center justify-center gap-2">
+                            <i class="bi bi-x-circle text-xl"></i>
+                            <span>Cancelar</span>
+                        </button>
+                        <button @click="aplicarCorte()" 
+                                class="flex-1 h-14 sm:h-16 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:via-purple-700 hover:to-indigo-700 active:scale-95 text-white rounded-2xl font-black shadow-2xl flex items-center justify-center gap-2">
+                            <i class="bi bi-check-circle-fill text-xl"></i>
+                            <span>Aplicar Corte</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

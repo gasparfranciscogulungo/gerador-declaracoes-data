@@ -137,10 +137,13 @@ function adminApp() {
         modalCropperBI: false,
         cropperInstance: null,
         cropperFotoAtual: 1,
-        biFoto1Preview: null,
-        biFoto2Preview: null,
-        biFoto1Blob: null,
-        biFoto2Blob: null,
+    biFoto1Preview: null,
+    biFoto2Preview: null,
+    biFoto1Blob: null,
+    biFoto2Blob: null,
+    biFoto1Editada: null,
+    biFoto2Editada: null,
+    cropperControlesVisiveis: false,
         biModoManual: false, // Se true, permite editar dados manualmente
         biDadosManuais: {
             nome: '',
@@ -3893,6 +3896,8 @@ function adminApp() {
                     const dados = JSON.parse(cache);
                     this.biFoto1Editada = dados.foto1 || null;
                     this.biFoto2Editada = dados.foto2 || null;
+                    this.biFoto1Preview = this.biFoto1Editada;
+                    this.biFoto2Preview = this.biFoto2Editada;
                     console.log('📦 Cache BI carregado:', dados.timestamp);
                     return true;
                 }
@@ -3909,6 +3914,8 @@ function adminApp() {
             localStorage.removeItem('editorBICache');
             this.biFoto1Editada = null;
             this.biFoto2Editada = null;
+            this.biFoto1Preview = null;
+            this.biFoto2Preview = null;
             console.log('🗑️ Cache BI limpo');
         },
         
@@ -3993,10 +4000,13 @@ function adminApp() {
             if (numeroFoto === 1) {
                 this.biFoto1Preview = null;
                 this.biFoto1Blob = null;
+                this.biFoto1Editada = null;
             } else {
                 this.biFoto2Preview = null;
                 this.biFoto2Blob = null;
+                this.biFoto2Editada = null;
             }
+            this.salvarCacheBI();
             console.log(`🗑️ Foto ${numeroFoto} removida`);
         },
         
@@ -4009,6 +4019,7 @@ function adminApp() {
             
             this.cropperFotoAtual = numeroFoto;
             this.modalCropperBI = true;
+            this.cropperControlesVisiveis = false;
             
             this.$nextTick(() => {
                 const image = document.getElementById('cropper-image');
@@ -4025,9 +4036,9 @@ function adminApp() {
                     
                     this.cropperInstance = new Cropper(image, {
                         aspectRatio: NaN, // Crop livre (sem proporção fixa)
-                        viewMode: 0, // SEM restrições de boundary - máxima liberdade
+                        viewMode: 1, // mantém crop dentro da área da imagem
                         dragMode: 'move',
-                        autoCropArea: 1, // 100% da área inicial (crop box grande)
+                        autoCropArea: 0.92,
                         restore: false,
                         guides: true,
                         center: true,
@@ -4040,13 +4051,12 @@ function adminApp() {
                         checkCrossOrigin: false,
                         background: true,
                         modal: true,
-                        // 🔥 MOBILE: SEM limites - usa TUDO que tiver disponível
-                        minContainerWidth: 100,
-                        minContainerHeight: 100,
+                        minContainerWidth: 160,
+                        minContainerHeight: 160,
                         minCanvasWidth: 0,
                         minCanvasHeight: 0,
-                        minCropBoxWidth: isMobile ? 150 : 100,
-                        minCropBoxHeight: isMobile ? 150 : 100,
+                        minCropBoxWidth: isMobile ? 90 : 160,
+                        minCropBoxHeight: isMobile ? 90 : 160,
                         // Touch gestures otimizados
                         zoomable: true,
                         zoomOnTouch: true,
@@ -4064,15 +4074,15 @@ function adminApp() {
                             console.log('   Container:', containerData.width + 'x' + containerData.height + 'px');
                             console.log('   Imagem original:', imageData.naturalWidth + 'x' + imageData.naturalHeight + 'px');
                             
-                            // Mobile: Zoom para preencher área
+                            // Mobile: garantir que a imagem apareça inteira (sem ampliar)
                             if (isMobile) {
                                 const scaleX = containerData.width / imageData.width;
                                 const scaleY = containerData.height / imageData.height;
-                                const scale = Math.max(scaleX, scaleY, 1); // Pelo menos 1x
+                                const scale = Math.min(scaleX, scaleY, 1); // nunca aumenta além do tamanho real
                                 
-                                if (scale > 1) {
+                                if (scale < 1) {
                                     this.cropper.zoomTo(scale);
-                                    console.log('   � Zoom aplicado:', scale.toFixed(2) + 'x');
+                                    console.log('   📱 Zoom ajustado para caber:', scale.toFixed(2) + 'x');
                                 }
                             }
                         }
@@ -4081,6 +4091,10 @@ function adminApp() {
                     console.log(`✂️ Cropper aberto para foto ${numeroFoto} (modo livre)`);
                 }
             });
+        },
+
+        toggleCropperControles() {
+            this.cropperControlesVisiveis = !this.cropperControlesVisiveis;
         },
         
         /**
@@ -4092,6 +4106,7 @@ function adminApp() {
                 this.cropperInstance = null;
             }
             this.modalCropperBI = false;
+            this.cropperControlesVisiveis = false;
         },
         
         /**
@@ -4135,7 +4150,13 @@ function adminApp() {
                 imageSmoothingQuality: 'high'
             };
             
-            this.cropperInstance.getCroppedCanvas(canvasOptions).toBlob((blob) => {
+            const canvas = this.cropperInstance.getCroppedCanvas(canvasOptions);
+            if (!canvas) {
+                this.showAlert('error', 'Não foi possível gerar a imagem cortada. Tente novamente.');
+                return;
+            }
+
+            canvas.toBlob((blob) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const dataUrl = reader.result;
@@ -4153,7 +4174,6 @@ function adminApp() {
                     // Salvar no cache do navegador
                     this.salvarCacheBI();
                     
-                    const canvas = this.cropperInstance.getCroppedCanvas(canvasOptions);
                     console.log(`✅ Corte aplicado na foto ${this.cropperFotoAtual} - Resolução: ${canvas.width}x${canvas.height}px`);
                     this.fecharCropperBI();
                     this.showAlert('success', `Corte aplicado com sucesso! (${canvas.width}x${canvas.height}px)`);
