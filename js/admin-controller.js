@@ -71,7 +71,7 @@ function adminApp() {
         senhaSecaoNome: '', // Nome amigável da seção (para mostrar no modal)
         senhaTentativaErro: false,
         senhaCallbackPendente: null, // Callback a executar após validação bem-sucedida
-        SENHA_ADMIN: '2005Admin',
+        SENHA_ADMIN: '20050905Gerador',
         SECOES_PROTEGIDAS: ['empresas', 'colaboradores', 'gerarPDF', 'users', 'historico', 'configuracoes'],
         
         // Colaboradores
