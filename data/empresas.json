@@ -1,3 +1,32 @@
 {
-  "empresas": []
+  "empresas": [
+    {
+      "id": "empresa_1765839467626",
+      "nome": "BENERGY, S.A",
+      "nif": "5417356549",
+      "endereco": {
+        "completo": "Zona de Talatona, Município de Belas, Luanda – Angola",
+        "rua": "Zona de Talatona",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Zona de Talatona, Município de Belas, Luanda – Angola",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417356549/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417356549/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-12-15T22:57:47.626Z",
+      "updatedAt": "2025-12-15T22:57:47.626Z",
+      "contador": 0
+    }
+  ]
 }
