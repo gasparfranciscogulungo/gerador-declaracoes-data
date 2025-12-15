@@ -55,6 +55,34 @@
       "createdAt": "2025-12-15T23:15:14.909Z",
       "updatedAt": "2025-12-15T23:15:14.909Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1765840683933",
+      "nome": "WANAYNO COMERCIAL - COMERCIO GERAL, TRANSPORTES E PRESTAÇAO DE SERVIÇOS, LDA",
+      "nif": "5417586501",
+      "endereco": {
+        "completo": "Av. 4 de Fevereiro, nº 210, Edifício Marginal Plaza, 10º Andar, Sala 1002, Luanda – Angola",
+        "rua": "Av. 4 de Fevereiro",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Av. 4 de Fevereiro, nº 210, Edifício Marginal Plaza, 10º Andar, Sala 1002, Luanda – Angola",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417586501/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417586501/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-12-15T23:18:03.933Z",
+      "updatedAt": "2025-12-15T23:18:03.933Z",
+      "contador": 0
     }
   ]
 }
