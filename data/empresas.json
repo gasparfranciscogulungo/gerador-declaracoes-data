@@ -1,32 +1,3 @@
 {
-  "empresas": [
-    {
-      "id": "empresa_1765097664179",
-      "nome": "Mike test Empresa ",
-      "nif": "08484848484",
-      "endereco": {
-        "completo": "Test test test test test test",
-        "rua": "Test test test test test test",
-        "edificio": "",
-        "andar": "",
-        "sala": "",
-        "bairro": "",
-        "municipio": "",
-        "provincia": "",
-        "pais": "Angola"
-      },
-      "enderecoCompleto": "Test test test test test test",
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/08484848484/logo.jpeg",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/08484848484/carimbo.jpeg",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "createdAt": "2025-12-07T08:54:24.179Z",
-      "updatedAt": "2025-12-07T08:54:24.179Z",
-      "contador": 0
-    }
-  ]
+  "empresas": []
 }
