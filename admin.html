@@ -3629,8 +3629,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: GERENCIAR PERSONALIZAÇÕES -->
-                    <div class="mb-6 pb-6 border-b border-gray-300">
+                    <!-- SEÇÃO: GERENCIAR PERSONALIZAÇÕES (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-6 pb-6 border-b border-gray-300">
                         <div class="flex items-center justify-between mb-3">
                             <label class="block text-sm font-medium text-gray-700">
                                 <i class="bi bi-save mr-1"></i>Gerenciar Personalizações
@@ -4301,8 +4301,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: MARGENS DO RODAPÉ -->
-                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
+                    <!-- SEÇÃO: MARGENS DO RODAPÉ (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
                         <div class="flex items-center justify-between mb-3">
                             <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium">
                                 <i class="bi bi-arrows-vertical mr-1"></i>Margens do Rodapé
@@ -4366,8 +4366,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: ESPAÇAMENTO -->
-                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
+                    <!-- SEÇÃO: ESPAÇAMENTO (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
                         <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium mb-3">
                             <i class="bi bi-text-indent-left mr-1"></i>Espaçamento
                         </label>
