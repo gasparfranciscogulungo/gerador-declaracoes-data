@@ -58,7 +58,7 @@
     },
     {
       "id": "empresa_1765840683933",
-      "nome": "WANAYNO COMERCIAL - COMERCIO GERAL, TRANSPORTES E PRESTAÇAO DE SERVIÇOS, LDA",
+      "nome": "WANAYNO COMERCIAL - COMERCIO GERAL, LDA",
       "nif": "5417586501",
       "endereco": {
         "completo": "Av. 4 de Fevereiro, nº 210, Edifício Marginal Plaza, 10º Andar, Sala 1002, Luanda – Angola",
@@ -80,9 +80,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2025-12-15T23:18:03.933Z",
-      "updatedAt": "2025-12-15T23:18:03.933Z",
-      "contador": 0
+      "updatedAt": "2025-12-18T19:01:02.957Z"
     }
   ]
 }
