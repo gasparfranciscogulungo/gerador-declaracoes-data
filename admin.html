@@ -3616,6 +3616,31 @@
                                    class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation">
                         </div>
 
+                        <!-- Dia de Pagamento -->
+                        <div class="mb-4" x-show="tipoPreview === 'recibo'" x-transition>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">Dia de Pagamento (1-15)</label>
+                            <input type="number" 
+                                   min="1" max="15"
+                                   x-model.number="previewConfig.diaPagamento"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation"
+                                   placeholder="8">
+                            <p class="text-xs text-gray-500 mt-1">As empresas normalmente pagam entre os dias 1 e 15 do mês seguinte</p>
+                        </div>
+
+                        <!-- Texto da Data de Processamento -->
+                        <div class="mb-4" x-show="tipoPreview === 'recibo'" x-transition>
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">Data de Processamento (texto)</label>
+                            <input type="text" 
+                                   x-model="previewConfig.textoDataProcessamento"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation"
+                                   :placeholder="'Luanda, aos ' + new Date().toLocaleDateString('pt-PT', {day: 'numeric', month: 'long', year: 'numeric'})">
+                            <p class="text-xs text-gray-500 mt-1">Deixe vazio para usar a data atual</p>
+                        </div>
+
                         <!-- Observações -->
                         <div>
                             <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 

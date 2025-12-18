@@ -15,6 +15,10 @@
  * - INSS = 3% do Bruto
  * - IRT = Configurável (padrão 18%)
  * - Líquido = Bruto - (INSS + IRT + Outros)
+ * 
+ * DATA DE PAGAMENTO:
+ * - Empresas pagam entre dia 1 e 15 do mês seguinte
+ * - Lógica automática: se mês referência = Dezembro, pagamento = Janeiro do ano seguinte
  */
 
 const ModelosRecibo = {
@@ -24,7 +28,7 @@ const ModelosRecibo = {
     // ==========================================
     
     /**
-     * Formata data para português de Portugal
+     * Formata data para português de Portugal (extenso)
      */
     _formatarData(data) {
         if (!data) return 'N/D';
@@ -36,14 +40,56 @@ const ModelosRecibo = {
     },
     
     /**
-     * Formata data curta (YYYY/MM)
+     * Formata período no formato YYYY/MM
      */
     _formatarPeriodo(data) {
         if (!data) return 'N/D';
         const d = new Date(data);
         return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`;
     },
-    
+
+    /**
+     * Calcula e formata a Data de Pagamento
+     * Lógica: Empresas pagam entre dia 1 e 15 do mês seguinte ao mês de referência
+     */
+    _calcularDataPagamento(mesReferencia, diaPagamento = null) {
+        const refDate = mesReferencia ? new Date(mesReferencia + '-01') : new Date();
+        
+        // Mês seguinte ao mês de referência
+        const mesPagamento = new Date(refDate);
+        mesPagamento.setMonth(mesPagamento.getMonth() + 1);
+        
+        // Dia de pagamento (padrão: dia 8, mas pode ser 1-15)
+        const dia = diaPagamento || 8;
+        mesPagamento.setDate(Math.min(dia, 15)); // Máximo dia 15
+        
+        return {
+            ano: mesPagamento.getFullYear(),
+            mes: String(mesPagamento.getMonth() + 1).padStart(2, '0'),
+            dia: String(mesPagamento.getDate()).padStart(2, '0'),
+            formatado: `${mesPagamento.getFullYear()}/${String(mesPagamento.getMonth() + 1).padStart(2, '0')}/${String(mesPagamento.getDate()).padStart(2, '0')}`,
+            extenso: this._formatarData(mesPagamento)
+        };
+    },
+
+    /**
+     * Gera texto da data de processamento (editável)
+     * Formato: "Luanda aos XX de XXXX de XXXX"
+     */
+    _gerarTextoDataProcessamento(config, empresa) {
+        // Se há texto personalizado, usar
+        if (config.textoDataProcessamento) {
+            return config.textoDataProcessamento;
+        }
+        
+        // Gerar automático
+        const cidade = empresa.endereco?.municipio || 'Luanda';
+        const dataAtual = new Date();
+        const dataFormatada = this._formatarData(dataAtual);
+        
+        return `${cidade} aos ${dataFormatada}`;
+    },
+
     /**
      * Retorna nome do mês
      */
@@ -204,10 +250,21 @@ const ModelosRecibo = {
             const utils = ModelosRecibo;
             const calc = utils._calcularRecibo(cliente, config);
             const corDestaque = utils._corProfissional(empresa, config);
-            const periodo = config.periodoRecibo || new Date();
-            const periodoFormatado = utils._formatarPeriodo(periodo);
-            const dataEmissao = utils._formatarData(new Date());
+            
+            // Mês de referência (do config ou mês anterior)
+            const mesRef = config.mesReferencia || new Date().toISOString().slice(0, 7);
+            const mesRefDate = new Date(mesRef + '-01');
+            const periodoFormatado = utils._formatarPeriodo(mesRefDate);
+            
+            // Data de pagamento (dia 1-15 do mês seguinte)
+            const diaPagamento = config.diaPagamento || 8;
+            const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
+            
+            // Data de admissão
             const dataAdmissao = utils._formatarData(cliente.data_admissao || cliente.dataAdmissao);
+            
+            // Texto da data de processamento (editável)
+            const textoDataProcessamento = utils._gerarTextoDataProcessamento(config, empresa);
             
             const cfg = {
                 fontFamily: config.fontFamily || 'Arial, Helvetica, sans-serif',
@@ -252,11 +309,11 @@ const ModelosRecibo = {
                     <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                         <div style="flex: 1; border: 1px solid #ddd; padding: 12px; border-radius: 4px;">
                             <p style="margin: 4px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
-                            <p style="margin: 4px 0;"><strong>B.I nº:</strong> ${cliente.nif || cliente.bi || cliente.documento || 'N/D'}</p>
+                            <p style="margin: 4px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
                             <p style="margin: 4px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
                             <p style="margin: 4px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
-                            <p style="margin: 4px 0;"><strong>Data de Pagamento:</strong> ${periodoFormatado}</p>
-                            <p style="margin: 4px 0;"><strong>Local de Trabalho:</strong> Sede</p>
+                            <p style="margin: 4px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
+                            <p style="margin: 4px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
                         </div>
                     </div>
                     
@@ -364,25 +421,30 @@ const ModelosRecibo = {
                         </tbody>
                     </table>
                     
-                    <!-- RODAPÉ COM DATA E ASSINATURA -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
+                    <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 25px;">
+                        <!-- LADO ESQUERDO: Data + Direcção + Carimbo -->
                         <div>
-                            <p style="margin: 0; font-size: 10pt;">${empresa.endereco?.municipio || 'Luanda'} aos ${utils._formatarData(new Date())}</p>
+                            <p style="margin: 0 0 15px 0; font-size: 10pt;">${textoDataProcessamento}</p>
                             
-                            <!-- CARIMBO -->
-                            <div style="margin-top: 15px;">
+                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            
+                            <!-- CARIMBO DA EMPRESA (com assinatura) -->
+                            <div style="margin-top: 5px;">
                                 ${empresa.carimbo ? `
                                     <img src="${empresa.carimbo}" 
                                          alt="Carimbo" 
                                          crossorigin="anonymous"
                                          style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
                                 ` : `
-                                    <div style="width: 120px; height: 40px; border-bottom: 1px solid #666;"></div>
-                                    <p style="font-size: 8pt; color: #666; margin: 5px 0 0 0;">Assinatura e Carimbo</p>
+                                    <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 8pt; color: #999;">Carimbo</span>
+                                    </div>
                                 `}
                             </div>
                         </div>
                         
+                        <!-- LADO DIREITO: Totais -->
                         <div style="text-align: right;">
                             <p style="margin: 5px 0; font-size: 11pt;"><strong>Total</strong></p>
                             <p style="margin: 5px 0; font-size: 13pt; color: ${corDestaque};"><strong>Líquido: ${utils._formatarValor(calc.liquido)}</strong></p>
@@ -405,10 +467,21 @@ const ModelosRecibo = {
             const utils = ModelosRecibo;
             const calc = utils._calcularRecibo(cliente, config);
             const corDestaque = utils._corProfissional(empresa, config);
-            const periodo = config.periodoRecibo || new Date();
-            const periodoFormatado = utils._formatarPeriodo(periodo);
-            const dataEmissao = utils._formatarData(new Date());
+            
+            // Mês de referência (do config ou mês anterior)
+            const mesRef = config.mesReferencia || new Date().toISOString().slice(0, 7);
+            const mesRefDate = new Date(mesRef + '-01');
+            const periodoFormatado = utils._formatarPeriodo(mesRefDate);
+            
+            // Data de pagamento (dia 1-15 do mês seguinte)
+            const diaPagamento = config.diaPagamento || 8;
+            const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
+            
+            // Data de admissão
             const dataAdmissao = utils._formatarData(cliente.data_admissao || cliente.dataAdmissao);
+            
+            // Texto da data de processamento (editável)
+            const textoDataProcessamento = utils._gerarTextoDataProcessamento(config, empresa);
             
             const cfg = {
                 fontFamily: config.fontFamily || 'Arial, Helvetica, sans-serif',
@@ -454,16 +527,18 @@ const ModelosRecibo = {
                         <!-- TÍTULO -->
                         <div style="text-align: center; margin: 25px 0;">
                             <h2 style="font-size: 16pt; font-weight: bold; color: ${corDestaque}; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Recibo de Vencimento</h2>
-                            <p style="font-size: 10pt; color: #666; margin-top: 5px;">Período: ${utils._nomeMes(periodo)}</p>
+                            <p style="font-size: 10pt; color: #666; margin-top: 5px;">Período: ${utils._nomeMes(mesRefDate)}</p>
                         </div>
                         
                         <!-- DADOS DO COLABORADOR -->
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <p style="margin: 4px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
-                                <p style="margin: 4px 0;"><strong>BI:</strong> ${cliente.nif || cliente.bi || 'N/D'}</p>
+                                <p style="margin: 4px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
                                 <p style="margin: 4px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
-                                <p style="margin: 4px 0;"><strong>Admissão:</strong> ${dataAdmissao}</p>
+                                <p style="margin: 4px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
+                                <p style="margin: 4px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
+                                <p style="margin: 4px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
                             </div>
                         </div>
                         
@@ -529,28 +604,24 @@ const ModelosRecibo = {
                             </tbody>
                         </table>
                         
-                        <!-- RODAPÉ -->
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
-                            <div>
-                                <p style="margin: 0 0 20px 0; font-size: 10pt;">${empresa.endereco?.municipio || 'Luanda'}, ${dataEmissao}</p>
-                                <div style="display: flex; justify-content: center;">
-                                    ${empresa.carimbo ? `
-                                        <img src="${empresa.carimbo}" 
-                                             alt="Carimbo" 
-                                             crossorigin="anonymous"
-                                             style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
-                                    ` : `
-                                        <div style="text-align: center;">
-                                            <div style="width: 140px; height: 50px; border-bottom: 1px solid #666;"></div>
-                                            <p style="font-size: 8pt; color: #666; margin: 5px 0 0 0;">A Direcção</p>
-                                        </div>
-                                    `}
-                                </div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="width: 140px; height: 50px; border-bottom: 1px solid #666;"></div>
-                                <p style="font-size: 8pt; color: #666; margin: 5px 0 0 0;">Recebi o valor acima</p>
-                                <p style="font-size: 8pt; color: #666; margin: 2px 0 0 0;">${cliente.nome}</p>
+                        <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
+                        <div style="margin-top: 30px;">
+                            <p style="margin: 0 0 15px 0; font-size: 10pt;">${textoDataProcessamento}</p>
+                            
+                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            
+                            <!-- CARIMBO DA EMPRESA -->
+                            <div style="margin-top: 5px;">
+                                ${empresa.carimbo ? `
+                                    <img src="${empresa.carimbo}" 
+                                         alt="Carimbo" 
+                                         crossorigin="anonymous"
+                                         style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
+                                ` : `
+                                    <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 8pt; color: #999;">Carimbo</span>
+                                    </div>
+                                `}
                             </div>
                         </div>
                     </div>
@@ -571,10 +642,21 @@ const ModelosRecibo = {
             const utils = ModelosRecibo;
             const calc = utils._calcularRecibo(cliente, config);
             const corDestaque = utils._corProfissional(empresa, config);
-            const periodo = config.periodoRecibo || new Date();
-            const periodoFormatado = utils._formatarPeriodo(periodo);
-            const dataEmissao = utils._formatarData(new Date());
+            
+            // Mês de referência (do config ou mês anterior)
+            const mesRef = config.mesReferencia || new Date().toISOString().slice(0, 7);
+            const mesRefDate = new Date(mesRef + '-01');
+            const periodoFormatado = utils._formatarPeriodo(mesRefDate);
+            
+            // Data de pagamento (dia 1-15 do mês seguinte)
+            const diaPagamento = config.diaPagamento || 8;
+            const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
+            
+            // Data de admissão
             const dataAdmissao = utils._formatarData(cliente.data_admissao || cliente.dataAdmissao);
+            
+            // Texto da data de processamento (editável)
+            const textoDataProcessamento = utils._gerarTextoDataProcessamento(config, empresa);
             
             const cfg = {
                 fontFamily: config.fontFamily || 'Arial, Helvetica, sans-serif',
@@ -638,14 +720,16 @@ const ModelosRecibo = {
                             </div>
                             <div style="background: #f8f9fa; border-left: 3px solid ${corDestaque}; padding: 12px;">
                                 <p style="font-size: 8pt; color: #888; margin: 0 0 3px 0; text-transform: uppercase;">Período</p>
-                                <p style="font-size: 11pt; font-weight: 600; margin: 0;">${utils._nomeMes(periodo)}</p>
+                                <p style="font-size: 11pt; font-weight: 600; margin: 0;">${utils._nomeMes(mesRefDate)}</p>
                             </div>
                         </div>
                         
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; font-size: 9pt;">
-                            <div><strong>BI:</strong> ${cliente.nif || cliente.bi || 'N/D'}</div>
+                            <div><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</div>
                             <div><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</div>
-                            <div><strong>Admissão:</strong> ${dataAdmissao}</div>
+                            <div><strong>Data de Admissão:</strong> ${dataAdmissao}</div>
+                            <div><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</div>
+                            <div><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</div>
                         </div>
                         
                         <!-- TABELA COMPACTA -->
@@ -709,24 +793,22 @@ const ModelosRecibo = {
                             <span style="font-size: 18pt; font-weight: bold;">${utils._formatarValor(calc.liquido)} Kz</span>
                         </div>
                         
-                        <!-- RODAPÉ -->
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <div>
-                                <p style="font-size: 9pt; color: #666; margin: 0 0 15px 0;">${empresa.endereco?.municipio || 'Luanda'}, ${dataEmissao}</p>
-                                ${empresa.carimbo ? `
-                                    <img src="${empresa.carimbo}" 
-                                         alt="Carimbo" 
-                                         crossorigin="anonymous"
-                                         style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
-                                ` : `
-                                    <div style="width: 120px; height: 40px; border-bottom: 1px solid #999;"></div>
-                                    <p style="font-size: 8pt; color: #888; margin: 5px 0 0 0;">A Direcção</p>
-                                `}
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="width: 130px; height: 40px; border-bottom: 1px solid #999;"></div>
-                                <p style="font-size: 8pt; color: #888; margin: 5px 0 0 0;">Assinatura do Colaborador</p>
-                            </div>
+                        <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
+                        <div style="margin-top: 20px;">
+                            <p style="font-size: 9pt; color: #666; margin: 0 0 15px 0;">${textoDataProcessamento}</p>
+                            
+                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            
+                            ${empresa.carimbo ? `
+                                <img src="${empresa.carimbo}" 
+                                     alt="Carimbo" 
+                                     crossorigin="anonymous"
+                                     style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
+                            ` : `
+                                <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 8pt; color: #999;">Carimbo</span>
+                                </div>
+                            `}
                         </div>
                     </div>
                 </div>
@@ -746,9 +828,20 @@ const ModelosRecibo = {
             const utils = ModelosRecibo;
             const calc = utils._calcularRecibo(cliente, config);
             const corDestaque = utils._corProfissional(empresa, config);
-            const periodo = config.periodoRecibo || new Date();
-            const dataEmissao = utils._formatarData(new Date());
+            
+            // Mês de referência (do config ou mês anterior)
+            const mesRef = config.mesReferencia || new Date().toISOString().slice(0, 7);
+            const mesRefDate = new Date(mesRef + '-01');
+            
+            // Data de pagamento (dia 1-15 do mês seguinte)
+            const diaPagamento = config.diaPagamento || 8;
+            const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
+            
+            // Data de admissão
             const dataAdmissao = utils._formatarData(cliente.data_admissao || cliente.dataAdmissao);
+            
+            // Texto da data de processamento (editável)
+            const textoDataProcessamento = utils._gerarTextoDataProcessamento(config, empresa);
             
             const cfg = {
                 fontFamily: config.fontFamily || 'Arial, Helvetica, sans-serif',
@@ -800,7 +893,7 @@ const ModelosRecibo = {
                         <div style="margin-bottom: 25px;">
                             <h2 style="font-size: 18pt; font-weight: 300; color: ${corDestaque}; margin: 0 0 5px 0; letter-spacing: 1px;">Recibo de Vencimento</h2>
                             <div style="width: 35px; height: 2px; background: ${corDestaque};"></div>
-                            <p style="font-size: 9pt; color: #888; margin-top: 8px;">${utils._nomeMes(periodo)}</p>
+                            <p style="font-size: 9pt; color: #888; margin-top: 8px;">${utils._nomeMes(mesRefDate)}</p>
                         </div>
                         
                         <!-- DADOS EM GRID -->
@@ -810,16 +903,24 @@ const ModelosRecibo = {
                                 <p style="font-size: 10pt; font-weight: 600; color: ${corDestaque}; margin: 0;">${cliente.nome}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Documento</p>
-                                <p style="font-size: 10pt; margin: 0;">${cliente.nif || cliente.bi || 'N/D'}</p>
+                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">B.I nº</p>
+                                <p style="font-size: 10pt; margin: 0;">${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
                             </div>
                             <div>
                                 <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Função</p>
                                 <p style="font-size: 10pt; margin: 0;">${cliente.funcao || cliente.cargo || 'N/D'}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Admissão</p>
+                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Admissão</p>
                                 <p style="font-size: 10pt; margin: 0;">${dataAdmissao}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Pagamento</p>
+                                <p style="font-size: 10pt; margin: 0;">${dataPagamento.formatado}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Local de Trabalho</p>
+                                <p style="font-size: 10pt; margin: 0;">${cliente.local_trabalho || 'Sede'}</p>
                             </div>
                         </div>
                         
@@ -869,21 +970,18 @@ const ModelosRecibo = {
                         </div>
                         
                         <!-- RODAPÉ -->
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <div>
-                                <p style="font-size: 9pt; color: #888; margin: 0 0 12px 0;">${empresa.endereco?.municipio || 'Luanda'}, ${dataEmissao}</p>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <p style="font-size: 9pt; color: #888; margin: 0 0 25px 0;">${textoDataProcessamento}</p>
+                            <p style="font-size: 10pt; color: #555; margin: 0 0 15px 0; font-weight: 500;">A Direcção</p>
+                            <div style="display: flex; justify-content: center;">
                                 ${empresa.carimbo ? `
                                     <img src="${empresa.carimbo}" 
                                          alt="Carimbo" 
                                          crossorigin="anonymous"
                                          style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
                                 ` : `
-                                    <div style="width: 100px; height: 35px; border-bottom: 1px solid #ccc;"></div>
+                                    <div style="width: 150px; height: 50px; border: 1px dashed #ccc; border-radius: 4px;"></div>
                                 `}
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="width: 110px; height: 35px; border-bottom: 1px solid #ccc;"></div>
-                                <p style="font-size: 7pt; color: #888; margin: 4px 0 0 0;">Colaborador</p>
                             </div>
                         </div>
                     </div>
