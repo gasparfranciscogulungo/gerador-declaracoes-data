@@ -137,15 +137,15 @@ const ModelosDeclaracao = {
             
             const cfg = {
                 fontFamily: config.fontFamily || 'Arial, Helvetica, sans-serif',
-                fontSize: config.fontSize || 12,
-                tamanhoTitulo: config.tamanhoTitulo || 20,
-                tamanhoEmpresa: config.tamanhoEmpresa || 10,
+                fontSize: config.fontSize || 11,
+                tamanhoTitulo: config.tamanhoTitulo || 24,
+                tamanhoEmpresa: config.tamanhoEmpresa || 9,
                 corTexto: config.corTexto || '#1a1a1a',
-                espacamentoLinhas: config.espacamentoLinhas || 1.7,
+                espacamentoLinhas: config.espacamentoLinhas || 1.6,
                 alinhamentoTexto: config.alinhamentoTexto || 'justify',
-                carimboWidth: config.carimboWidth || 200,
-                carimboHeight: config.carimboHeight || 150,
-                cabecalhoLogoSize: config.cabecalhoLogoSize || 80
+                carimboWidth: config.carimboWidth || 180,
+                carimboHeight: config.carimboHeight || 140,
+                cabecalhoLogoSize: config.cabecalhoLogoSize || 70
             };
             
             return `
@@ -163,20 +163,20 @@ const ModelosDeclaracao = {
                 overflow: hidden;
             ">
                 <!-- BORDA SUPERIOR DECORATIVA -->
-                <div style="height: 6px; background: linear-gradient(90deg, ${corDestaque} 0%, ${corDestaque}cc 100%);"></div>
+                <div style="height: 5px; background: linear-gradient(90deg, ${corDestaque} 0%, ${corDestaque}cc 100%);"></div>
                 
                 <div style="padding: 18mm 20mm 15mm 20mm;">
                     <!-- CABEÇALHO -->
-                    <div style="display: flex; align-items: flex-start; margin-bottom: 25px; padding-bottom: 18px; border-bottom: 1px solid #e0e0e0;">
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0;">
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
                                  alt="Logo" 
                                  crossorigin="anonymous"
-                                 style="max-width: ${cfg.cabecalhoLogoSize}px; max-height: ${cfg.cabecalhoLogoSize}px; object-fit: contain; margin-right: 22px;">
+                                 style="max-width: ${cfg.cabecalhoLogoSize}px; max-height: ${cfg.cabecalhoLogoSize}px; object-fit: contain; margin-right: 20px;">
                         ` : ''}
                         <div style="flex: 1;">
                             <h1 style="
-                                font-size: 15pt;
+                                font-size: 14pt;
                                 font-weight: 700;
                                 color: ${corDestaque};
                                 margin: 0 0 8px 0;
