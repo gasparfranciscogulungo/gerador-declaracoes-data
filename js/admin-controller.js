@@ -4792,12 +4792,13 @@ function adminApp() {
         },
         
         /**
-         * Volta do modal de preview para a escolha de modelo (ETAPA 3.5)
+         * Volta do modal de preview para a escolha de tipo (ETAPA 3)
          */
         voltarParaEscolhaModelo() {
             this.modalPreviewModelo = false;
-            this.fluxoEtapa = 3.5;
-            console.log('⬅️ Voltando para escolha de modelo');
+            this.modalFluxoGeracao = true;
+            this.fluxoEtapa = 3;
+            console.log('⬅️ Voltando para escolha de tipo de documento');
         },
         
         /**
