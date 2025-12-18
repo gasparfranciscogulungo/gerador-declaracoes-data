@@ -164,6 +164,7 @@ function adminApp() {
         
         // Customização do Preview
         previewConfig: {
+            genero: 'masculino', // 'masculino' ou 'feminino' - determina os artigos e termos
             fontFamily: 'Arial',
             fontSize: 14,
             tamanhoTitulo: 24,
