@@ -154,6 +154,7 @@ function adminApp() {
         // Preview de Modelo
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo', 'bi'
+        layoutAtivo: 'executivo', // Layout de declaração: 'formal', 'moderno', 'minimalista', 'executivo'
         mostrarPersonalizacao: false,
         menuPreviewOpen: false, // Menu hamburger para tipos de documento
         mostrarControlesZoom: false, // Controles de zoom (toggle)
@@ -207,15 +208,17 @@ function adminApp() {
         presetsEstilo: {
             formal: {
                 nome: 'Formal',
+                descricao: 'Layout tradicional para documentos oficiais',
                 icone: 'bi-mortarboard',
                 cor: 'blue',
+                layout: 'formal',
                 config: {
-                    fontFamily: 'Arial',
-                    fontSize: 14,
-                    tamanhoTitulo: 24,
-                    tamanhoSubtitulo: 16,
+                    fontFamily: 'Times New Roman, serif',
+                    fontSize: 12,
+                    tamanhoTitulo: 18,
+                    tamanhoSubtitulo: 14,
                     tamanhoEmpresa: 10,
-                    corDestaque: '#091F67',
+                    corDestaque: '#1a365d',
                     espacamentoLinhas: 1.5,
                     espacoParagrafos: 12,
                     cabecalhoLogoSize: 130,
@@ -239,15 +242,17 @@ function adminApp() {
             },
             moderno: {
                 nome: 'Moderno',
+                descricao: 'Design contemporâneo com faixa lateral',
                 icone: 'bi-lightning',
-                cor: 'purple',
+                cor: 'indigo',
+                layout: 'moderno',
                 config: {
-                    fontFamily: 'Arial, sans-serif',
-                    fontSize: 14,
-                    tamanhoTitulo: 32,
-                    tamanhoSubtitulo: 20,
-                    tamanhoEmpresa: 10,
-                    corDestaque: '#7c3aed',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
+                    fontSize: 11,
+                    tamanhoTitulo: 28,
+                    tamanhoSubtitulo: 16,
+                    tamanhoEmpresa: 9,
+                    corDestaque: '#1e3a5f',
                     espacamentoLinhas: 1.5,
                     espacoParagrafos: 12,
                     textoDataLocal: '',
@@ -262,14 +267,16 @@ function adminApp() {
             },
             minimalista: {
                 nome: 'Minimalista',
+                descricao: 'Design limpo com muito espaço em branco',
                 icone: 'bi-dash-circle',
                 cor: 'gray',
+                layout: 'minimalista',
                 config: {
-                    fontFamily: 'Calibri, sans-serif',
-                    fontSize: 14,
-                    tamanhoTitulo: 26,
-                    tamanhoSubtitulo: 17,
-                    tamanhoEmpresa: 10,
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontSize: 11,
+                    tamanhoTitulo: 14,
+                    tamanhoSubtitulo: 12,
+                    tamanhoEmpresa: 9,
                     corDestaque: '#374151',
                     espacamentoLinhas: 1.6,
                     espacoParagrafos: 12,
@@ -285,15 +292,17 @@ function adminApp() {
             },
             executivo: {
                 nome: 'Executivo',
+                descricao: 'Layout corporativo robusto e completo',
                 icone: 'bi-briefcase',
-                cor: 'green',
+                cor: 'slate',
+                layout: 'executivo',
                 config: {
-                    fontFamily: 'Georgia, serif',
-                    fontSize: 14,
-                    tamanhoTitulo: 30,
-                    tamanhoSubtitulo: 19,
+                    fontFamily: 'Arial, sans-serif',
+                    fontSize: 12,
+                    tamanhoTitulo: 22,
+                    tamanhoSubtitulo: 14,
                     tamanhoEmpresa: 10,
-                    corDestaque: '#059669',
+                    corDestaque: '#1a365d',
                     espacamentoLinhas: 1.7,
                     textoDataLocal: '',
                     tamanhoTextoDataLocal: 13,
@@ -2676,18 +2685,24 @@ function adminApp() {
         },
         
         /**
-         * Aplicar preset de estilo
+         * Aplicar preset de estilo - Muda layout E configurações
          */
         aplicarPreset(presetKey) {
             const preset = this.presetsEstilo[presetKey];
             if (preset) {
+                // Atualizar layout ativo (muda a estrutura do documento)
+                this.layoutAtivo = preset.layout || presetKey;
+                
+                // Aplicar configurações visuais
                 this.previewConfig = {
                     ...this.previewConfig,
                     ...preset.config,
                     corTexto: '#000000', // Manter cor do texto preta
                     zoom: this.previewConfig.zoom // Manter zoom atual
                 };
-                this.showAlert('success', `✨ Estilo "${preset.nome}" aplicado com sucesso!`);
+                
+                console.log(`📐 Layout alterado para: ${this.layoutAtivo}`);
+                this.showAlert('success', `✨ Layout "${preset.nome}" aplicado!`);
             }
         },
         
@@ -2887,6 +2902,7 @@ function adminApp() {
 
         /**
          * Renderiza modelo usando módulo externo
+         * Usa o layoutAtivo para determinar qual layout de declaração usar
          */
         renderizarModelo() {
             const modelo = this.modeloSelecionado;
@@ -2905,12 +2921,22 @@ function adminApp() {
             const empresa = this.getEmpresaExemplo();
             const cliente = this.getClienteExemplo();
             
-            // Verificar qual modelo usar
-            if (modelo.id === 'modelo_executivo' && typeof ModeloDeclaracaoExecutivo !== 'undefined') {
+            // Usar novo sistema de layouts múltiplos
+            if (typeof ModelosDeclaracao !== 'undefined') {
+                const layout = this.layoutAtivo || 'executivo';
+                
+                if (ModelosDeclaracao[layout] && typeof ModelosDeclaracao[layout].renderizar === 'function') {
+                    console.log(`📐 Renderizando layout: ${layout}`);
+                    return ModelosDeclaracao[layout].renderizar(empresa, cliente, this.previewConfig);
+                }
+            }
+            
+            // Fallback: usar modelo antigo se existir
+            if (typeof ModeloDeclaracaoExecutivo !== 'undefined') {
                 return ModeloDeclaracaoExecutivo.renderizar(empresa, cliente, this.previewConfig);
             }
             
-            // Fallback: modelo não implementado ainda
+            // Fallback final: modelo não implementado
             return `
                 <div style="text-align: center; padding: 100px 20px; color: #666;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🚧</div>
