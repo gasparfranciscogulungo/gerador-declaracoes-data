@@ -2872,15 +2872,15 @@
                     <h4 class="text-lg font-bold mb-4">Escolha o Tipo de Documento:</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Declaração (Editável) -->
-                        <div @click="fluxoTipoDocumento = 'declaracao'; fluxoEtapa = 3.5"
+                        <!-- Declaração (Vai directo ao Preview com 4 layouts) -->
+                        <div @click="fluxoTipoDocumento = 'declaracao'; tipoPreview = 'declaracao'; layoutAtivo = 'executivo'; fluxoEtapa = 4; modalFluxoGeracao = false; modalPreviewModelo = true"
                              :class="fluxoTipoDocumento === 'declaracao' ? 'border-green-600 bg-green-50 dark:bg-green-900/20 scale-105' : (darkMode ? 'border-gray-600' : 'border-gray-300')"
                              class="border-2 rounded-xl p-6 cursor-pointer hover:border-green-400 hover:shadow-lg transition-all text-center group">
                             <i class="bi bi-file-text text-5xl text-green-600 mb-3 group-hover:scale-110 transition-transform"></i>
                             <h5 class="font-bold text-lg mb-2">Declaração</h5>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">1 página com dados da empresa e cliente</p>
                             <span class="inline-flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                <i class="bi bi-pencil mr-1"></i>Editável - 3 modelos
+                                <i class="bi bi-check-circle mr-1"></i>4 layouts disponíveis
                             </span>
                         </div>
                         
