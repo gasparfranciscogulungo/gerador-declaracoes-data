@@ -2884,15 +2884,15 @@
                             </span>
                         </div>
                         
-                        <!-- Recibo (Editável) -->
-                        <div @click="fluxoTipoDocumento = 'recibo'; fluxoEtapa = 3.5"
+                        <!-- Recibo (Vai directo ao Preview com 4 layouts) -->
+                        <div @click="fluxoTipoDocumento = 'recibo'; tipoPreview = 'recibo'; layoutReciboAtivo = 'executivo'; fluxoEtapa = 4; modalFluxoGeracao = false; modalPreviewModelo = true; modeloSelecionado = { id: 'recibo', nome: 'Recibo de Vencimento', tipo: 'recibo' }"
                              :class="fluxoTipoDocumento === 'recibo' ? 'border-orange-600 bg-orange-50 dark:bg-orange-900/20 scale-105' : (darkMode ? 'border-gray-600' : 'border-gray-300')"
                              class="border-2 rounded-xl p-6 cursor-pointer hover:border-orange-400 hover:shadow-lg transition-all text-center group">
                             <i class="bi bi-receipt text-5xl text-orange-600 mb-3 group-hover:scale-110 transition-transform"></i>
                             <h5 class="font-bold text-lg mb-2">Recibo</h5>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">1-3 páginas (1 por mês trabalhado)</p>
                             <span class="inline-flex items-center text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                                <i class="bi bi-pencil mr-1"></i>Editável - 2 modelos
+                                <i class="bi bi-check-circle mr-1"></i>4 layouts disponíveis
                             </span>
                         </div>
                         
@@ -3442,10 +3442,10 @@
                     </div>
 
                     <!-- SEÇÃO: LAYOUTS DE DECLARAÇÃO -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <div x-show="tipoPreview === 'declaracao'" class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                class="block text-sm font-medium mb-2 sm:mb-3">
-                            <i class="bi bi-layout-text-window-reverse mr-1"></i>Layout do Documento
+                            <i class="bi bi-layout-text-window-reverse mr-1"></i>Layout da Declaração
                         </label>
                         <div class="grid grid-cols-2 gap-2 sm:gap-3">
                             <!-- FORMAL -->
@@ -3496,6 +3496,111 @@
                                 <span>Executivo</span>
                                 <span class="text-[10px] opacity-70 mt-0.5">Corporativo</span>
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: LAYOUTS DE RECIBO -->
+                    <div x-show="tipoPreview === 'recibo'" class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
+                               class="block text-sm font-medium mb-2 sm:mb-3">
+                            <i class="bi bi-receipt mr-1"></i>Layout do Recibo
+                        </label>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                            <!-- EXECUTIVO -->
+                            <button @click="layoutReciboAtivo = 'executivo'"
+                                    :class="[
+                                        layoutReciboAtivo === 'executivo' 
+                                            ? (darkMode ? 'bg-orange-700 ring-2 ring-orange-400 text-white' : 'bg-orange-600 ring-2 ring-orange-300 text-white')
+                                            : (darkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700')
+                                    ]"
+                                    class="px-3 py-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex flex-col items-center touch-manipulation active:scale-95">
+                                <i class="bi bi-briefcase text-xl sm:text-lg mb-1"></i>
+                                <span>Executivo</span>
+                                <span class="text-[10px] opacity-70 mt-0.5">Tabela completa</span>
+                            </button>
+                            <!-- FORMAL -->
+                            <button @click="layoutReciboAtivo = 'formal'"
+                                    :class="[
+                                        layoutReciboAtivo === 'formal' 
+                                            ? (darkMode ? 'bg-orange-700 ring-2 ring-orange-400 text-white' : 'bg-orange-600 ring-2 ring-orange-300 text-white')
+                                            : (darkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700')
+                                    ]"
+                                    class="px-3 py-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex flex-col items-center touch-manipulation active:scale-95">
+                                <i class="bi bi-mortarboard text-xl sm:text-lg mb-1"></i>
+                                <span>Formal</span>
+                                <span class="text-[10px] opacity-70 mt-0.5">Tradicional</span>
+                            </button>
+                            <!-- MODERNO -->
+                            <button @click="layoutReciboAtivo = 'moderno'"
+                                    :class="[
+                                        layoutReciboAtivo === 'moderno' 
+                                            ? (darkMode ? 'bg-orange-700 ring-2 ring-orange-400 text-white' : 'bg-orange-600 ring-2 ring-orange-300 text-white')
+                                            : (darkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700')
+                                    ]"
+                                    class="px-3 py-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex flex-col items-center touch-manipulation active:scale-95">
+                                <i class="bi bi-lightning text-xl sm:text-lg mb-1"></i>
+                                <span>Moderno</span>
+                                <span class="text-[10px] opacity-70 mt-0.5">Faixa lateral</span>
+                            </button>
+                            <!-- MINIMALISTA -->
+                            <button @click="layoutReciboAtivo = 'minimalista'"
+                                    :class="[
+                                        layoutReciboAtivo === 'minimalista' 
+                                            ? (darkMode ? 'bg-orange-700 ring-2 ring-orange-400 text-white' : 'bg-orange-600 ring-2 ring-orange-300 text-white')
+                                            : (darkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-700')
+                                    ]"
+                                    class="px-3 py-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex flex-col items-center touch-manipulation active:scale-95">
+                                <i class="bi bi-dash-circle text-xl sm:text-lg mb-1"></i>
+                                <span>Minimalista</span>
+                                <span class="text-[10px] opacity-70 mt-0.5">Clean</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: CONFIGURAÇÕES DE RECIBO (IRT) -->
+                    <div x-show="tipoPreview === 'recibo'" class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
+                               class="block text-sm font-medium mb-2 sm:mb-3">
+                            <i class="bi bi-calculator mr-1"></i>Configurações do Recibo
+                        </label>
+                        
+                        <!-- Taxa IRT -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-1">Taxa IRT (%)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" 
+                                       x-model="previewConfig.taxaIRT" 
+                                       min="0" max="25" step="1"
+                                       class="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
+                                       :class="darkMode ? 'bg-gray-700' : 'bg-gray-200'">
+                                <span class="w-12 text-center font-bold" :class="darkMode ? 'text-orange-400' : 'text-orange-600'" 
+                                      x-text="previewConfig.taxaIRT + '%'"></span>
+                            </div>
+                            <p class="text-xs mt-1 text-gray-500">INSS é fixo em 3%</p>
+                        </div>
+                        
+                        <!-- Outros Descontos -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-1">Outros Descontos (Kz)</label>
+                            <input type="number" 
+                                   x-model="previewConfig.outrosDescontos"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                                   placeholder="0.00">
+                        </div>
+                        
+                        <!-- Observações -->
+                        <div class="mb-3">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-1">Observações</label>
+                            <textarea 
+                                x-model="previewConfig.observacoes"
+                                rows="2"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm resize-y"
+                                placeholder="Observações opcionais..."></textarea>
                         </div>
                     </div>
 
@@ -3985,6 +4090,62 @@
                                        :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
                                        class="flex-1 px-3 py-2.5 border rounded-lg text-sm font-mono uppercase touch-manipulation">
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO: CONFIGURAÇÕES DO RECIBO (só visível para recibos) -->
+                    <div x-show="tipoPreview === 'recibo'" 
+                         x-transition
+                         class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" 
+                         :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                        <div class="flex items-center justify-between mb-2 sm:mb-3">
+                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
+                                   class="block text-sm font-medium">
+                                <i class="bi bi-calculator mr-1"></i>Cálculos do Recibo
+                            </label>
+                            <button @click="previewConfig.irtPercentagem = 18" 
+                                    class="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 p-2 touch-manipulation">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
+                        
+                        <!-- IRT Percentagem -->
+                        <div class="mb-4">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">
+                                IRT (Imposto sobre Rendimento): <span class="font-bold text-blue-600" x-text="previewConfig.irtPercentagem + '%'"></span>
+                            </label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" 
+                                       x-model.number="previewConfig.irtPercentagem" 
+                                       min="0" max="25" step="0.5"
+                                       class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                       :class="darkMode ? 'bg-gray-700' : 'bg-gray-200'">
+                                <input type="number" 
+                                       x-model.number="previewConfig.irtPercentagem"
+                                       min="0" max="25" step="0.5"
+                                       :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                       class="w-20 px-2 py-2 border rounded-lg text-sm text-center touch-manipulation">
+                            </div>
+                            <div :class="darkMode ? 'text-gray-500' : 'text-gray-400'" 
+                                 class="flex justify-between text-xs mt-1">
+                                <span>0%</span>
+                                <span>Padrão: 18%</span>
+                                <span>25%</span>
+                            </div>
+                        </div>
+
+                        <!-- INSS (informativo - fixo em 3%) -->
+                        <div class="p-3 rounded-lg" :class="darkMode ? 'bg-gray-700/50' : 'bg-gray-100'">
+                            <div class="flex items-center justify-between">
+                                <span :class="darkMode ? 'text-gray-300' : 'text-gray-700'" class="text-xs">
+                                    <i class="bi bi-info-circle mr-1"></i>INSS (fixo)
+                                </span>
+                                <span class="text-sm font-bold text-green-600">3%</span>
+                            </div>
+                            <p :class="darkMode ? 'text-gray-500' : 'text-gray-400'" class="text-xs mt-1">
+                                Segurança Social (valor fixo conforme legislação)
+                            </p>
                         </div>
                     </div>
 
@@ -5830,6 +5991,7 @@
     
     <!-- Modelos de Documentos (Modulares) -->
     <script src="js/modelos/declaracoes-layouts.js"></script>
+    <script src="js/modelos/recibos-layouts.js"></script>
     <script src="js/modelos/declaracao-executivo.js"></script>
     
     <!-- Controllers -->

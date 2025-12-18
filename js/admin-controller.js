@@ -155,6 +155,7 @@ function adminApp() {
         modeloSelecionado: null,
         tipoPreview: 'declaracao', // 'declaracao', 'recibo', 'combo', 'bi'
         layoutAtivo: 'executivo', // Layout de declaração: 'formal', 'moderno', 'minimalista', 'executivo'
+        layoutReciboAtivo: 'executivo', // Layout de recibo: 'formal', 'moderno', 'minimalista', 'executivo'
         mostrarPersonalizacao: false,
         menuPreviewOpen: false, // Menu hamburger para tipos de documento
         mostrarControlesZoom: false, // Controles de zoom (toggle)
@@ -167,6 +168,12 @@ function adminApp() {
             genero: 'masculino', // 'masculino' ou 'feminino' - determina os artigos e termos
             fontFamily: 'Arial',
             fontSize: 14,
+            // Configurações de Recibo
+            taxaIRT: 18, // Taxa IRT editável (padrão 18%)
+            outrosDescontos: 0,
+            periodoRecibo: null, // Data do período do recibo
+            quantidadeMeses: 1, // Quantidade de meses (1-3)
+            observacoes: '',
             tamanhoTitulo: 24,
             tamanhoSubtitulo: 16,
             tamanhoEmpresa: 10,
@@ -2706,6 +2713,22 @@ function adminApp() {
                 this.showAlert('success', `✨ Layout "${preset.nome}" aplicado!`);
             }
         },
+
+        /**
+         * Aplicar preset de estilo para Recibos
+         */
+        aplicarPresetRecibo(layoutKey) {
+            const nomes = {
+                'executivo': 'Executivo',
+                'formal': 'Formal', 
+                'moderno': 'Moderno',
+                'minimalista': 'Minimalista'
+            };
+            
+            this.layoutReciboAtivo = layoutKey;
+            console.log(`📐 Layout Recibo alterado para: ${layoutKey}`);
+            this.showAlert('success', `✨ Layout "${nomes[layoutKey]}" aplicado ao recibo!`);
+        },
         
         /**
          * Reset por seção
@@ -2903,7 +2926,7 @@ function adminApp() {
 
         /**
          * Renderiza modelo usando módulo externo
-         * Usa o layoutAtivo para determinar qual layout de declaração usar
+         * Usa o layoutAtivo para declarações e layoutReciboAtivo para recibos
          */
         renderizarModelo() {
             const modelo = this.modeloSelecionado;
@@ -2922,7 +2945,17 @@ function adminApp() {
             const empresa = this.getEmpresaExemplo();
             const cliente = this.getClienteExemplo();
             
-            // Usar novo sistema de layouts múltiplos
+            // RECIBOS - Novo sistema de layouts
+            if (this.tipoPreview === 'recibo' && typeof ModelosRecibo !== 'undefined') {
+                const layout = this.layoutReciboAtivo || 'executivo';
+                
+                if (ModelosRecibo[layout] && typeof ModelosRecibo[layout].renderizar === 'function') {
+                    console.log(`📐 Renderizando recibo layout: ${layout}`);
+                    return ModelosRecibo[layout].renderizar(empresa, cliente, this.previewConfig);
+                }
+            }
+            
+            // DECLARAÇÕES - Usar sistema de layouts múltiplos
             if (typeof ModelosDeclaracao !== 'undefined') {
                 const layout = this.layoutAtivo || 'executivo';
                 
@@ -4832,6 +4865,40 @@ function adminApp() {
             this.modalPreviewModelo = true;
             
             console.log('✅ Modal de preview aberto com dados do fluxo');
+        },
+
+        /**
+         * Abre diretamente o preview de Recibo (fluxo simplificado)
+         */
+        abrirPreviewRecibo() {
+            console.log('📄 Abrindo preview de Recibo...', {
+                empresa: this.fluxoEmpresaSelecionada?.nome,
+                cliente: this.fluxoClienteSelecionado?.nome
+            });
+            
+            // Validar se tem empresa e cliente selecionados
+            if (!this.fluxoEmpresaSelecionada || !this.fluxoClienteSelecionado) {
+                this.showAlert('error', '❌ Selecione uma empresa e um trabalhador primeiro');
+                return;
+            }
+            
+            // Configurar tipo de preview
+            this.tipoPreview = 'recibo';
+            this.fluxoTipoDocumento = 'recibo';
+            
+            // Configurar modelo padrão para recibo
+            this.modeloSelecionado = {
+                id: 'recibo',
+                nome: 'Recibo de Vencimento',
+                descricao: 'Recibo salarial com descontos',
+                tiposSuportados: ['recibo']
+            };
+            
+            // Fechar modal do fluxo e abrir preview
+            this.modalFluxoGeracao = false;
+            this.modalPreviewModelo = true;
+            
+            console.log('✅ Preview de Recibo aberto com layout:', this.layoutReciboAtivo);
         },
         
         /**
