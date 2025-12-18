@@ -169,9 +169,11 @@ function adminApp() {
             fontFamily: 'Arial',
             fontSize: 14,
             // Configurações de Recibo
-            taxaIRT: 18, // Taxa IRT editável (padrão 18%)
+            irtPercentagem: 18, // Taxa IRT editável (padrão 18%)
+            subsidioAlimentacao: null, // null = cálculo automático
+            subsidioTransporte: null, // null = cálculo automático
             outrosDescontos: 0,
-            periodoRecibo: null, // Data do período do recibo
+            mesReferencia: new Date().toISOString().slice(0, 7), // YYYY-MM atual
             quantidadeMeses: 1, // Quantidade de meses (1-3)
             observacoes: '',
             tamanhoTitulo: 24,

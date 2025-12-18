@@ -77,27 +77,87 @@ const ModelosRecibo = {
     },
     
     /**
+     * Calcula subsídios automáticos baseado no salário
+     * Lógica: Percentagem varia conforme faixa salarial
+     */
+    _calcularSubsidiosAutomaticos(salarioBase) {
+        let percAlimentacao, percTransporte;
+        
+        if (salarioBase < 100000) {
+            percAlimentacao = 8;
+            percTransporte = 5;
+        } else if (salarioBase <= 300000) {
+            percAlimentacao = 10;
+            percTransporte = 6;
+        } else if (salarioBase <= 500000) {
+            percAlimentacao = 12;
+            percTransporte = 8;
+        } else {
+            percAlimentacao = 15;
+            percTransporte = 10;
+        }
+        
+        // Calcular valores (arredondados para valores "partidos" mais realistas)
+        let alimentacao = Math.round(salarioBase * percAlimentacao / 100);
+        let transporte = Math.round(salarioBase * percTransporte / 100);
+        
+        // Arredondar para centenas para parecer mais realista
+        alimentacao = Math.round(alimentacao / 100) * 100;
+        transporte = Math.round(transporte / 100) * 100;
+        
+        return {
+            alimentacao,
+            transporte,
+            percAlimentacao,
+            percTransporte
+        };
+    },
+
+    /**
      * Calcula os valores do recibo
+     * Usa valores do cliente ou calcula automaticamente
      */
     _calcularRecibo(cliente, config = {}) {
         const salarioBase = parseFloat(cliente.salario_base) || parseFloat(cliente.salario) || 0;
-        const subsidioAlimentacao = parseFloat(cliente.subsidio_alimentacao) || 0;
-        const subsidioTransporte = parseFloat(cliente.subsidio_transporte) || 0;
+        
+        // Subsídios: usar do config (editado), do cliente, ou calcular automaticamente
+        let subsidioAlimentacao, subsidioTransporte;
+        
+        // Verificar se há valores editados no config (preview)
+        if (config.subsidioAlimentacao !== undefined && config.subsidioAlimentacao !== null) {
+            subsidioAlimentacao = parseFloat(config.subsidioAlimentacao);
+        } else if (cliente.subsidio_alimentacao && parseFloat(cliente.subsidio_alimentacao) > 0) {
+            subsidioAlimentacao = parseFloat(cliente.subsidio_alimentacao);
+        } else {
+            // Calcular automaticamente
+            const auto = this._calcularSubsidiosAutomaticos(salarioBase);
+            subsidioAlimentacao = auto.alimentacao;
+        }
+        
+        if (config.subsidioTransporte !== undefined && config.subsidioTransporte !== null) {
+            subsidioTransporte = parseFloat(config.subsidioTransporte);
+        } else if (cliente.subsidio_transporte && parseFloat(cliente.subsidio_transporte) > 0) {
+            subsidioTransporte = parseFloat(cliente.subsidio_transporte);
+        } else {
+            // Calcular automaticamente
+            const auto = this._calcularSubsidiosAutomaticos(salarioBase);
+            subsidioTransporte = auto.transporte;
+        }
         
         // Taxa IRT configurável (padrão 18%)
-        const taxaIRT = parseFloat(config.taxaIRT) || 18;
+        const taxaIRT = parseFloat(config.irtPercentagem) || parseFloat(config.taxaIRT) || 18;
         const taxaINSS = 3; // Fixo 3%
         
-        // Vencimento Bruto
+        // Vencimento Bruto = Base + Subsídios
         const bruto = salarioBase + subsidioAlimentacao + subsidioTransporte;
         
         // Descontos
-        const inss = bruto * (taxaINSS / 100);
-        const irt = bruto * (taxaIRT / 100);
+        const inss = Math.round(bruto * (taxaINSS / 100));
+        const irt = Math.round(bruto * (taxaIRT / 100));
         const outrosDescontos = parseFloat(config.outrosDescontos) || 0;
         const totalDescontos = inss + irt + outrosDescontos;
         
-        // Líquido
+        // Líquido = Bruto - Descontos
         const liquido = bruto - totalDescontos;
         
         return {

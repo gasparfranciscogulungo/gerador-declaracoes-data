@@ -3557,49 +3557,74 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: CONFIGURAÇÕES DE RECIBO (IRT) -->
+                    <!-- SEÇÃO: ESTILO DO RECIBO -->
                     <div x-show="tipoPreview === 'recibo'" class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
-                        <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
-                               class="block text-sm font-medium mb-2 sm:mb-3">
-                            <i class="bi bi-calculator mr-1"></i>Configurações do Recibo
-                        </label>
+                        <div class="flex items-center justify-between mb-2 sm:mb-3">
+                            <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
+                                   class="block text-sm font-medium">
+                                <i class="bi bi-palette mr-1"></i>Estilo do Recibo
+                            </label>
+                            <button @click="previewConfig.corDestaque = fluxoEmpresaSelecionada?.corPrimaria || '#1a365d'" 
+                                    class="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 p-2 touch-manipulation">
+                                <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
+                            </button>
+                        </div>
                         
-                        <!-- Taxa IRT -->
-                        <div class="mb-3">
+                        <!-- Cor de Destaque -->
+                        <div class="mb-4">
                             <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
-                                   class="block text-xs mb-1">Taxa IRT (%)</label>
+                                   class="block text-xs mb-2">Cor Principal</label>
                             <div class="flex items-center gap-2">
-                                <input type="range" 
-                                       x-model="previewConfig.taxaIRT" 
-                                       min="0" max="25" step="1"
-                                       class="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
-                                       :class="darkMode ? 'bg-gray-700' : 'bg-gray-200'">
-                                <span class="w-12 text-center font-bold" :class="darkMode ? 'text-orange-400' : 'text-orange-600'" 
-                                      x-text="previewConfig.taxaIRT + '%'"></span>
+                                <input type="color" x-model="previewConfig.corDestaque"
+                                       class="w-14 h-12 rounded-lg border cursor-pointer touch-manipulation"
+                                       :class="darkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300'">
+                                <input type="text" x-model="previewConfig.corDestaque"
+                                       :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                       class="flex-1 px-3 py-2.5 border rounded-lg text-sm font-mono uppercase touch-manipulation">
                             </div>
-                            <p class="text-xs mt-1 text-gray-500">INSS é fixo em 3%</p>
                         </div>
-                        
-                        <!-- Outros Descontos -->
-                        <div class="mb-3">
+
+                        <!-- Género do Trabalhador -->
+                        <div class="mb-4">
                             <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
-                                   class="block text-xs mb-1">Outros Descontos (Kz)</label>
-                            <input type="number" 
-                                   x-model="previewConfig.outrosDescontos"
+                                   class="block text-xs mb-2">Género do Colaborador</label>
+                            <div class="flex gap-2">
+                                <button @click="previewConfig.genero = 'masculino'"
+                                        :class="previewConfig.genero === 'masculino' 
+                                            ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700 border-blue-500')
+                                            : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700')"
+                                        class="flex-1 px-3 py-2.5 rounded-lg text-sm font-medium transition-all border touch-manipulation">
+                                    <i class="bi bi-gender-male mr-1"></i>Masculino
+                                </button>
+                                <button @click="previewConfig.genero = 'feminino'"
+                                        :class="previewConfig.genero === 'feminino' 
+                                            ? (darkMode ? 'bg-pink-600 text-white' : 'bg-pink-100 text-pink-700 border-pink-500')
+                                            : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700')"
+                                        class="flex-1 px-3 py-2.5 rounded-lg text-sm font-medium transition-all border touch-manipulation">
+                                    <i class="bi bi-gender-female mr-1"></i>Feminino
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mês de Referência -->
+                        <div class="mb-4">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">Mês de Referência</label>
+                            <input type="month" 
+                                   x-model="previewConfig.mesReferencia"
                                    :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
-                                   placeholder="0.00">
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation">
                         </div>
-                        
+
                         <!-- Observações -->
-                        <div class="mb-3">
+                        <div>
                             <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
-                                   class="block text-xs mb-1">Observações</label>
+                                   class="block text-xs mb-2">Observações</label>
                             <textarea 
                                 x-model="previewConfig.observacoes"
                                 rows="2"
-                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm resize-y"
+                                :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900'"
+                                class="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 text-sm resize-y touch-manipulation"
                                 placeholder="Observações opcionais..."></textarea>
                         </div>
                     </div>
@@ -3681,8 +3706,8 @@
                         </template>
                     </div>
 
-                    <!-- SEÇÃO: EDIÇÃO DE CONTEÚDO -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <!-- SEÇÃO: EDIÇÃO DE CONTEÚDO (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                class="block text-sm font-medium mb-2 sm:mb-3">
                             <i class="bi bi-person mr-1"></i>Género do Colaborador
@@ -3792,8 +3817,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: CONTROLES AVANÇADOS DO CABEÇALHO -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <!-- SEÇÃO: CONTROLES AVANÇADOS DO CABEÇALHO (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <div class="flex items-center justify-between mb-2 sm:mb-3">
                             <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                    class="block text-sm font-medium">
@@ -3903,8 +3928,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: CONTROLES DO CARIMBO -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <!-- SEÇÃO: CONTROLES DO CARIMBO (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <div class="flex items-center justify-between mb-2 sm:mb-3">
                             <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                    class="block text-sm font-medium">
@@ -3972,8 +3997,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: FONTES -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <!-- SEÇÃO: FONTES (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <div class="flex items-center justify-between mb-2 sm:mb-3">
                             <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                    class="block text-sm font-medium">
@@ -4065,8 +4090,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: CORES -->
-                    <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
+                    <!-- SEÇÃO: CORES (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-300'">
                         <div class="flex items-center justify-between mb-2 sm:mb-3">
                             <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                    class="block text-sm font-medium">
@@ -4101,38 +4126,83 @@
                         <div class="flex items-center justify-between mb-2 sm:mb-3">
                             <label :class="darkMode ? 'text-gray-300' : 'text-gray-700'" 
                                    class="block text-sm font-medium">
-                                <i class="bi bi-calculator mr-1"></i>Cálculos do Recibo
+                                <i class="bi bi-calculator mr-1"></i>Valores do Recibo
                             </label>
-                            <button @click="previewConfig.irtPercentagem = 18" 
+                            <button @click="previewConfig.irtPercentagem = 18; previewConfig.subsidioAlimentacao = null; previewConfig.subsidioTransporte = null; previewConfig.outrosDescontos = 0" 
                                     class="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 p-2 touch-manipulation">
                                 <i class="bi bi-arrow-counterclockwise mr-1"></i>Reset
                             </button>
                         </div>
                         
+                        <!-- Subsídio de Alimentação -->
+                        <div class="mb-4">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">
+                                <i class="bi bi-egg-fried mr-1 text-yellow-500"></i>Subsídio de Alimentação (Kz)
+                            </label>
+                            <input type="number" 
+                                   x-model.number="previewConfig.subsidioAlimentacao"
+                                   min="0" step="1000"
+                                   :placeholder="'Automático (baseado no salário)'"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'"
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation">
+                            <p :class="darkMode ? 'text-gray-500' : 'text-gray-400'" class="text-xs mt-1">
+                                Deixe vazio para cálculo automático
+                            </p>
+                        </div>
+
+                        <!-- Subsídio de Transporte -->
+                        <div class="mb-4">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">
+                                <i class="bi bi-bus-front mr-1 text-green-500"></i>Subsídio de Transporte (Kz)
+                            </label>
+                            <input type="number" 
+                                   x-model.number="previewConfig.subsidioTransporte"
+                                   min="0" step="1000"
+                                   :placeholder="'Automático (baseado no salário)'"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'"
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation">
+                            <p :class="darkMode ? 'text-gray-500' : 'text-gray-400'" class="text-xs mt-1">
+                                Deixe vazio para cálculo automático
+                            </p>
+                        </div>
+
+                        <!-- Separador -->
+                        <div class="border-t my-4" :class="darkMode ? 'border-gray-600' : 'border-gray-200'"></div>
+                        
                         <!-- IRT Percentagem -->
                         <div class="mb-4">
                             <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
                                    class="block text-xs mb-2">
-                                IRT (Imposto sobre Rendimento): <span class="font-bold text-blue-600" x-text="previewConfig.irtPercentagem + '%'"></span>
+                                <i class="bi bi-percent mr-1 text-red-500"></i>IRT (Imposto): <span class="font-bold text-red-600" x-text="previewConfig.irtPercentagem + '%'"></span>
                             </label>
                             <div class="flex items-center gap-3">
                                 <input type="range" 
                                        x-model.number="previewConfig.irtPercentagem" 
                                        min="0" max="25" step="0.5"
-                                       class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                       class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600"
                                        :class="darkMode ? 'bg-gray-700' : 'bg-gray-200'">
                                 <input type="number" 
                                        x-model.number="previewConfig.irtPercentagem"
                                        min="0" max="25" step="0.5"
                                        :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
-                                       class="w-20 px-2 py-2 border rounded-lg text-sm text-center touch-manipulation">
+                                       class="w-16 px-2 py-2 border rounded-lg text-sm text-center touch-manipulation">
                             </div>
-                            <div :class="darkMode ? 'text-gray-500' : 'text-gray-400'" 
-                                 class="flex justify-between text-xs mt-1">
-                                <span>0%</span>
-                                <span>Padrão: 18%</span>
-                                <span>25%</span>
-                            </div>
+                        </div>
+
+                        <!-- Outros Descontos -->
+                        <div class="mb-4">
+                            <label :class="darkMode ? 'text-gray-400' : 'text-gray-600'" 
+                                   class="block text-xs mb-2">
+                                <i class="bi bi-dash-circle mr-1 text-orange-500"></i>Outros Descontos (Kz)
+                            </label>
+                            <input type="number" 
+                                   x-model.number="previewConfig.outrosDescontos"
+                                   min="0" step="100"
+                                   placeholder="0"
+                                   :class="darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'"
+                                   class="w-full px-3 py-2.5 border rounded-lg text-sm touch-manipulation">
                         </div>
 
                         <!-- INSS (informativo - fixo em 3%) -->
@@ -4149,8 +4219,8 @@
                         </div>
                     </div>
 
-                    <!-- SEÇÃO: DATA E LOCAL -->
-                    <div :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
+                    <!-- SEÇÃO: DATA E LOCAL (só declaração) -->
+                    <div x-show="tipoPreview !== 'recibo'" x-transition :class="darkMode ? 'border-gray-700' : 'border-gray-300'" class="mb-6 pb-6 border-b">
                         <div class="flex items-center justify-between mb-3">
                             <label :class="darkMode ? 'text-gray-200' : 'text-gray-700'" class="block text-sm font-medium">
                                 <i class="bi bi-calendar-event mr-1"></i>Data e Local
