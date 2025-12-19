@@ -5191,7 +5191,7 @@ function adminApp() {
 
         /**
          * Gera PDF único com todos os meses - Alta qualidade
-         * Processa cada página separadamente e combina no final
+         * Usa container visível na viewport para html2canvas funcionar corretamente
          */
         async gerarReciboPDF() {
             try {
@@ -5201,7 +5201,7 @@ function adminApp() {
                 }
 
                 this.loading = true;
-                this.loadingMessage = 'Gerando PDF do recibo...';
+                this.loadingMessage = 'Preparando recibo...';
 
                 const meses = this.gerarMesesRecibo();
                 const empresa = this.fluxoEmpresaSelecionada;
@@ -5212,90 +5212,113 @@ function adminApp() {
                 const mesNome = mesRef.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                 const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${this.formatarNomeFicheiro(empresa?.nome || 'Empresa')}_${mesNome}.pdf`;
 
-                // Configurações html2pdf otimizadas
+                // Criar overlay para cobrir a tela durante processamento
+                const overlay = document.createElement('div');
+                overlay.id = 'pdf-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.95);
+                    z-index: 999998;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    gap: 16px;
+                `;
+                overlay.innerHTML = `
+                    <div style="width: 48px; height: 48px; border: 4px solid rgba(249, 115, 22, 0.3); border-top-color: #f97316; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="color: white; font-size: 16px; font-weight: 500;">Gerando PDF...</p>
+                    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                `;
+                document.body.appendChild(overlay);
+
+                // Criar wrapper VISÍVEL na viewport (html2canvas precisa disso)
+                const wrapper = document.createElement('div');
+                wrapper.id = 'pdf-render-wrapper';
+                wrapper.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 210mm;
+                    background: white;
+                    z-index: 999999;
+                    transform: translateX(-100vw);
+                `;
+                
+                // Criar todas as páginas dentro do wrapper
+                meses.forEach((mesInfo, index) => {
+                    const pagina = document.createElement('div');
+                    pagina.className = 'pdf-page';
+                    pagina.style.cssText = `
+                        width: 210mm;
+                        height: 297mm;
+                        background: white;
+                        overflow: hidden;
+                        box-sizing: border-box;
+                        page-break-after: ${index < meses.length - 1 ? 'always' : 'avoid'};
+                        page-break-inside: avoid;
+                    `;
+                    pagina.innerHTML = this.renderizarReciboMes(mesInfo);
+                    wrapper.appendChild(pagina);
+                });
+                
+                document.body.appendChild(wrapper);
+                
+                // Mover para viewport para html2canvas capturar
+                wrapper.style.transform = 'translateX(0)';
+                
+                // Aguardar renderização de imagens e fontes
+                this.loadingMessage = 'Renderizando conteúdo...';
+                await new Promise(resolve => setTimeout(resolve, 600));
+
+                // Configurações otimizadas para qualidade máxima
                 const opcoesPDF = {
                     margin: 0,
-                    image: { type: 'jpeg', quality: 0.95 },
+                    filename: nomeArquivo,
+                    image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
                         scale: 2,
                         useCORS: true,
                         allowTaint: true,
                         logging: false,
                         backgroundColor: '#ffffff',
-                        scrollY: 0,
-                        scrollX: 0
+                        letterRendering: true
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
-                        orientation: 'portrait'
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { 
+                        mode: ['css', 'legacy'],
+                        before: '.page-break-before',
+                        after: '.page-break-after',
+                        avoid: '.page-break-avoid'
                     }
                 };
 
-                let pdfFinal = null;
+                this.loadingMessage = 'Gerando PDF...';
+                
+                // Gerar PDF
+                await html2pdf().set(opcoesPDF).from(wrapper).save();
 
-                // Processar cada mês separadamente
-                for (let i = 0; i < meses.length; i++) {
-                    this.loadingMessage = `Processando página ${i + 1} de ${meses.length}...`;
-                    
-                    const mesInfo = meses[i];
-                    
-                    // Criar container com dimensões A4 exatas
-                    const container = document.createElement('div');
-                    container.id = `pdf-container-${i}`;
-                    container.style.cssText = `
-                        position: fixed;
-                        left: 0;
-                        top: 0;
-                        width: 210mm;
-                        min-height: 297mm;
-                        max-height: 297mm;
-                        background: white;
-                        z-index: 99999;
-                        overflow: hidden;
-                        box-sizing: border-box;
-                    `;
-                    container.innerHTML = this.renderizarReciboMes(mesInfo);
-                    document.body.appendChild(container);
-
-                    // Aguardar renderização completa (imagens, fontes, etc)
-                    await new Promise(resolve => setTimeout(resolve, 200));
-
-                    if (i === 0) {
-                        // Primeira página: criar o PDF
-                        const worker = html2pdf().set(opcoesPDF).from(container);
-                        pdfFinal = await worker.toPdf().get('pdf');
-                    } else {
-                        // Páginas seguintes: renderizar para canvas e adicionar
-                        // Usar a API interna do html2pdf para consistência
-                        const worker = html2pdf().set(opcoesPDF).from(container);
-                        const pdfTemp = await worker.toPdf().get('pdf');
-                        
-                        // Adicionar página do PDF temporário ao final
-                        if (pdfFinal && pdfTemp) {
-                            pdfFinal.addPage();
-                            
-                            // Obter canvas do html2pdf interno
-                            const canvas = await html2pdf().set(opcoesPDF).from(container).toCanvas().get('canvas');
-                            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                            pdfFinal.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-                        }
-                    }
-
-                    // Remover container após processar
-                    document.body.removeChild(container);
-                }
-
-                // Salvar PDF final
-                if (pdfFinal) {
-                    pdfFinal.save(nomeArquivo);
-                }
+                // Limpar
+                document.body.removeChild(wrapper);
+                document.body.removeChild(overlay);
 
                 this.loading = false;
-                this.showAlert('success', `✅ PDF gerado com ${meses.length} página(s)`);
+                this.showAlert('success', `✅ PDF gerado com ${meses.length} página(s)!`);
 
             } catch (error) {
                 console.error('Erro ao gerar PDF:', error);
+                // Limpar elementos se existirem
+                const wrapper = document.getElementById('pdf-render-wrapper');
+                const overlay = document.getElementById('pdf-overlay');
+                if (wrapper) document.body.removeChild(wrapper);
+                if (overlay) document.body.removeChild(overlay);
+                
                 this.loading = false;
                 this.showAlert('error', '❌ Erro ao gerar PDF: ' + error.message);
             }
@@ -5303,6 +5326,7 @@ function adminApp() {
 
         /**
          * Gera PDFs separados (individuais ou ZIP)
+         * Usa container visível na viewport para html2canvas funcionar
          */
         async gerarRecibosZIP() {
             try {
@@ -5319,30 +5343,10 @@ function adminApp() {
                 }
 
                 this.loading = true;
-                this.loadingMessage = `Gerando ${meses.length} PDFs...`;
+                this.loadingMessage = `Preparando ${meses.length} recibos...`;
 
                 const empresa = this.fluxoEmpresaSelecionada;
                 const cliente = this.fluxoClienteSelecionado;
-                
-                // Configurações html2pdf otimizadas
-                const opcoesPDF = {
-                    margin: 0,
-                    image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: { 
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        logging: false,
-                        backgroundColor: '#ffffff',
-                        scrollY: 0,
-                        scrollX: 0
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait'
-                    }
-                };
                 
                 // Verificar se JSZip está disponível
                 const temJSZip = typeof JSZip !== 'undefined';
@@ -5352,52 +5356,101 @@ function adminApp() {
                     this.showAlert('info', '📥 Gerando PDFs individuais...');
                 }
 
+                // Criar overlay para cobrir a tela durante processamento
+                const overlay = document.createElement('div');
+                overlay.id = 'pdf-zip-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.95);
+                    z-index: 999998;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    gap: 16px;
+                `;
+                overlay.innerHTML = `
+                    <div style="width: 48px; height: 48px; border: 4px solid rgba(249, 115, 22, 0.3); border-top-color: #f97316; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p id="zip-status" style="color: white; font-size: 16px; font-weight: 500;">Preparando...</p>
+                    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                `;
+                document.body.appendChild(overlay);
+                const statusEl = document.getElementById('zip-status');
+
                 for (let i = 0; i < meses.length; i++) {
+                    if (statusEl) statusEl.textContent = `Gerando PDF ${i + 1} de ${meses.length}...`;
                     this.loadingMessage = `Gerando PDF ${i + 1} de ${meses.length}...`;
                     
                     const mesInfo = meses[i];
                     
-                    // Criar container com dimensões A4 exatas - VISÍVEL
-                    const container = document.createElement('div');
-                    container.id = `pdf-zip-container-${i}`;
-                    container.style.cssText = `
+                    // Criar wrapper VISÍVEL na viewport
+                    const wrapper = document.createElement('div');
+                    wrapper.id = `pdf-zip-wrapper-${i}`;
+                    wrapper.style.cssText = `
                         position: fixed;
-                        left: 0;
                         top: 0;
+                        left: 0;
                         width: 210mm;
-                        min-height: 297mm;
-                        max-height: 297mm;
                         background: white;
-                        z-index: 99999;
+                        z-index: 999999;
+                    `;
+                    
+                    // Criar página A4
+                    const pagina = document.createElement('div');
+                    pagina.style.cssText = `
+                        width: 210mm;
+                        height: 297mm;
+                        background: white;
                         overflow: hidden;
                         box-sizing: border-box;
                     `;
-                    container.innerHTML = this.renderizarReciboMes(mesInfo);
-                    document.body.appendChild(container);
+                    pagina.innerHTML = this.renderizarReciboMes(mesInfo);
+                    wrapper.appendChild(pagina);
+                    document.body.appendChild(wrapper);
 
-                    // Aguardar renderização completa
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    // Aguardar renderização de imagens
+                    await new Promise(resolve => setTimeout(resolve, 500));
 
                     const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                     const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
 
+                    // Configurações otimizadas
+                    const opcoesPDF = {
+                        margin: 0,
+                        filename: nomeArquivo,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { 
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            logging: false,
+                            backgroundColor: '#ffffff',
+                            letterRendering: true
+                        },
+                        jsPDF: { 
+                            unit: 'mm', 
+                            format: 'a4', 
+                            orientation: 'portrait',
+                            compress: true
+                        }
+                    };
+
                     if (temJSZip) {
                         // Gerar blob para ZIP
-                        const pdfBlob = await html2pdf().set(opcoesPDF).from(container).outputPdf('blob');
+                        const pdfBlob = await html2pdf().set(opcoesPDF).from(wrapper).outputPdf('blob');
                         zip.file(nomeArquivo, pdfBlob);
                     } else {
                         // Download direto
-                        await html2pdf().set({
-                            ...opcoesPDF,
-                            filename: nomeArquivo
-                        }).from(container).save();
-                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await html2pdf().set(opcoesPDF).from(wrapper).save();
+                        await new Promise(resolve => setTimeout(resolve, 600));
                     }
 
-                    document.body.removeChild(container);
+                    document.body.removeChild(wrapper);
                 }
 
                 if (temJSZip) {
+                    if (statusEl) statusEl.textContent = 'Compactando ZIP...';
                     this.loadingMessage = 'Compactando ZIP...';
                     const zipBlob = await zip.generateAsync({ type: 'blob' });
                     
@@ -5412,10 +5465,16 @@ function adminApp() {
                     this.showAlert('success', `✅ ${meses.length} PDFs gerados!`);
                 }
 
+                // Limpar overlay
+                document.body.removeChild(overlay);
                 this.loading = false;
 
             } catch (error) {
                 console.error('Erro ao gerar ZIP:', error);
+                // Limpar elementos se existirem
+                document.querySelectorAll('[id^="pdf-zip-wrapper-"]').forEach(el => el.remove());
+                const overlay = document.getElementById('pdf-zip-overlay');
+                if (overlay) document.body.removeChild(overlay);
                 this.loading = false;
                 this.showAlert('error', '❌ Erro ao gerar: ' + error.message);
             }
