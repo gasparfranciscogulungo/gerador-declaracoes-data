@@ -290,12 +290,12 @@ const ModelosRecibo = {
                     overflow: hidden;
                 ">
                     <!-- CABEÇALHO DA EMPRESA -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid ${corDestaque};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid ${corDestaque};">
                         <div style="flex: 1;">
-                            <h1 style="font-size: 14pt; font-weight: bold; color: ${corDestaque}; margin: 0 0 5px 0;">${empresa.nome}</h1>
-                            <p style="font-size: 9pt; margin: 2px 0; color: #444;">NIF/CC: ${empresa.nif}</p>
-                            <p style="font-size: 8pt; margin: 2px 0; color: #666;">Sede: ${empresa.endereco?.completo || empresa.endereco?.rua || 'Luanda – Angola'}</p>
-                            <p style="font-size: 8pt; margin: 2px 0; color: #666;">${empresa.endereco?.municipio || 'Luanda'} — Angola</p>
+                            <h1 style="font-size: 12pt; font-weight: bold; color: ${corDestaque}; margin: 0 0 4px 0;">${empresa.nome}</h1>
+                            <p style="font-size: 8pt; margin: 2px 0; color: #444;">NIF/CC: ${empresa.nif}</p>
+                            <p style="font-size: 7pt; margin: 2px 0; color: #666;">Sede: ${empresa.endereco?.completo || empresa.endereco?.rua || 'Luanda – Angola'}</p>
+                            <p style="font-size: 7pt; margin: 2px 0; color: #666;">${empresa.endereco?.municipio || 'Luanda'} — Angola</p>
                         </div>
                         ${empresa.logo ? `
                             <img src="${empresa.logo}" 
@@ -306,139 +306,139 @@ const ModelosRecibo = {
                     </div>
                     
                     <!-- DADOS DO COLABORADOR -->
-                    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
-                        <div style="flex: 1; border: 1px solid #ddd; padding: 12px; border-radius: 4px;">
-                            <p style="margin: 4px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
-                            <p style="margin: 4px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
-                            <p style="margin: 4px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
-                            <p style="margin: 4px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
-                            <p style="margin: 4px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
-                            <p style="margin: 4px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 12px;">
+                        <div style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 4px; font-size: 8pt;">
+                            <p style="margin: 3px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
+                            <p style="margin: 3px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
+                            <p style="margin: 3px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
+                            <p style="margin: 3px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
+                            <p style="margin: 3px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
+                            <p style="margin: 3px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
                         </div>
                     </div>
                     
                     <!-- TÍTULO -->
-                    <h2 style="font-size: 12pt; font-weight: normal; margin: 20px 0 15px 0; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Recibo de Vencimento</h2>
+                    <h2 style="font-size: 10pt; font-weight: normal; margin: 15px 0 10px 0; border-bottom: 1px solid #ccc; padding-bottom: 4px;">Recibo de Vencimento</h2>
                     
                     <!-- TABELA DE RUBRICAS -->
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 9pt;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8pt;">
                         <thead>
                             <tr style="background: ${corDestaque}; color: white;">
-                                <th style="padding: 8px; text-align: left; border: 1px solid ${corDestaque};">Discrição de Rubricas</th>
-                                <th style="padding: 8px; text-align: center; border: 1px solid ${corDestaque};">Período</th>
-                                <th style="padding: 8px; text-align: right; border: 1px solid ${corDestaque};">Valor base</th>
-                                <th style="padding: 8px; text-align: center; border: 1px solid ${corDestaque};">Taxa</th>
-                                <th style="padding: 8px; text-align: right; border: 1px solid ${corDestaque};">Pagamento</th>
-                                <th style="padding: 8px; text-align: right; border: 1px solid ${corDestaque};">Desconto</th>
+                                <th style="padding: 6px; text-align: left; border: 1px solid ${corDestaque};">Discrição de Rubricas</th>
+                                <th style="padding: 6px; text-align: center; border: 1px solid ${corDestaque};">Período</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid ${corDestaque};">Valor base</th>
+                                <th style="padding: 6px; text-align: center; border: 1px solid ${corDestaque};">Taxa</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid ${corDestaque};">Pagamento</th>
+                                <th style="padding: 6px; text-align: right; border: 1px solid ${corDestaque};">Desconto</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- PAGAMENTOS -->
                             <tr style="background: #f8f9fa;">
-                                <td colspan="6" style="padding: 6px 8px; font-weight: bold; border: 1px solid #ddd;">Pagamentos</td>
+                                <td colspan="6" style="padding: 5px 6px; font-weight: bold; border: 1px solid #ddd; font-size: 8pt;">Pagamentos</td>
                             </tr>
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">Vencimento Base</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.salarioBase)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">Vencimento Base</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.salarioBase)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             ${calc.subsidioAlimentacao > 0 ? `
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">Sub. Alimentação</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.subsidioAlimentacao)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">Sub. Alimentação</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.subsidioAlimentacao)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             ` : ''}
                             ${calc.subsidioTransporte > 0 ? `
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">Sub. De Transporte</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.subsidioTransporte)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">Sub. De Transporte</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;">${periodoFormatado}</td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.subsidioTransporte)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             ` : ''}
                             
                             <!-- DESCONTOS -->
                             <tr style="background: #f8f9fa;">
-                                <td colspan="6" style="padding: 6px 8px; font-weight: bold; border: 1px solid #ddd;">Descontos</td>
+                                <td colspan="6" style="padding: 5px 6px; font-weight: bold; border: 1px solid #ddd; font-size: 8pt;">Descontos</td>
                             </tr>
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">Vencimento Bruto</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.bruto)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">Vencimento Bruto</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.bruto)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">INSS</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.inss)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;">${calc.taxaINSS}%</td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd; color: #c00;">${utils._formatarValor(calc.totalDescontos)}</td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">INSS</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.inss)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;">${calc.taxaINSS}%</td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd; color: #c00;">${utils._formatarValor(calc.totalDescontos)}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">IRT</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.irt)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;">${calc.taxaIRT}%</td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">IRT</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.irt)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;">${calc.taxaIRT}%</td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             ${calc.outrosDescontos > 0 ? `
                             <tr>
-                                <td style="padding: 6px 8px; border: 1px solid #ddd;">Outros Descontos</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.outrosDescontos)}</td>
-                                <td style="padding: 6px 8px; text-align: center; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
-                                <td style="padding: 6px 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; border: 1px solid #ddd;">Outros Descontos</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;">${utils._formatarValor(calc.outrosDescontos)}</td>
+                                <td style="padding: 5px 6px; text-align: center; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td style="padding: 5px 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             ` : ''}
                             
                             <!-- OBSERVAÇÕES E TOTAIS -->
                             <tr>
-                                <td style="padding: 8px; border: 1px solid #ddd; vertical-align: top;" rowspan="3">
-                                    <strong>Observações:</strong><br>
-                                    <span style="font-size: 8pt; color: #666;">${config.observacoes || ''}</span>
+                                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" rowspan="3">
+                                    <strong style="font-size: 8pt;">Observações:</strong><br>
+                                    <span style="font-size: 7pt; color: #666;">${config.observacoes || ''}</span>
                                 </td>
-                                <td colspan="4" style="padding: 8px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Total</td>
-                                <td style="padding: 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td colspan="4" style="padding: 6px; text-align: right; border: 1px solid #ddd; font-weight: bold; font-size: 8pt;">Total</td>
+                                <td style="padding: 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                             <tr>
-                                <td colspan="4" style="padding: 8px; text-align: right; border: 1px solid #ddd;">Bruto: <strong>${utils._formatarValor(calc.bruto)}</strong></td>
-                                <td style="padding: 8px; text-align: right; border: 1px solid #ddd;"></td>
+                                <td colspan="4" style="padding: 6px; text-align: right; border: 1px solid #ddd; font-size: 8pt;">Bruto: <strong>${utils._formatarValor(calc.bruto)}</strong></td>
+                                <td style="padding: 6px; text-align: right; border: 1px solid #ddd;"></td>
                             </tr>
                         </tbody>
                     </table>
                     
                     <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 25px;">
-                        <!-- LADO ESQUERDO: Data + Direcção + Carimbo -->
-                        <div>
-                            <p style="margin: 0 0 15px 0; font-size: 10pt;">${textoDataProcessamento}</p>
+                        <!-- LADO ESQUERDO: Data + Direcção + Carimbo (centrado) -->
+                        <div style="text-align: center;">
+                            <p style="margin: 0 0 20px 0; font-size: 9pt; color: #555;">${textoDataProcessamento}</p>
                             
-                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            <p style="margin: 0 0 10px 0; font-size: 9pt; font-weight: 600; color: #333;">A Direcção</p>
                             
                             <!-- CARIMBO DA EMPRESA (com assinatura) -->
-                            <div style="margin-top: 5px;">
+                            <div style="display: inline-block;">
                                 ${empresa.carimbo ? `
                                     <img src="${empresa.carimbo}" 
                                          alt="Carimbo" 
                                          crossorigin="anonymous"
                                          style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
                                 ` : `
-                                    <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
-                                        <span style="font-size: 8pt; color: #999;">Carimbo</span>
+                                    <div style="width: 130px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 7pt; color: #999;">Carimbo</span>
                                     </div>
                                 `}
                             </div>
@@ -446,8 +446,8 @@ const ModelosRecibo = {
                         
                         <!-- LADO DIREITO: Totais -->
                         <div style="text-align: right;">
-                            <p style="margin: 5px 0; font-size: 11pt;"><strong>Total</strong></p>
-                            <p style="margin: 5px 0; font-size: 13pt; color: ${corDestaque};"><strong>Líquido: ${utils._formatarValor(calc.liquido)}</strong></p>
+                            <p style="margin: 5px 0; font-size: 9pt;"><strong>Total</strong></p>
+                            <p style="margin: 5px 0; font-size: 11pt; color: ${corDestaque};"><strong>Líquido: ${utils._formatarValor(calc.liquido)}</strong></p>
                         </div>
                     </div>
                 </div>
@@ -518,108 +518,108 @@ const ModelosRecibo = {
                                      style="max-width: ${cfg.cabecalhoLogoSize}px; max-height: ${cfg.cabecalhoLogoSize}px; object-fit: contain; margin-right: 20px;">
                             ` : ''}
                             <div style="flex: 1;">
-                                <h1 style="font-size: 14pt; font-weight: 700; color: ${corDestaque}; margin: 0 0 6px 0;">${empresa.nome}</h1>
-                                <p style="font-size: 9pt; margin: 2px 0; color: #444;">NIF: ${empresa.nif}</p>
+                                <h1 style="font-size: 12pt; font-weight: 700; color: ${corDestaque}; margin: 0 0 4px 0;">${empresa.nome}</h1>
+                                <p style="font-size: 8pt; margin: 2px 0; color: #444;">NIF: ${empresa.nif}</p>
                                 <p style="font-size: 8pt; margin: 2px 0; color: #666;">${empresa.endereco?.completo || 'Luanda – Angola'}</p>
                             </div>
                         </div>
                         
                         <!-- TÍTULO -->
-                        <div style="text-align: center; margin: 25px 0;">
-                            <h2 style="font-size: 16pt; font-weight: bold; color: ${corDestaque}; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Recibo de Vencimento</h2>
-                            <p style="font-size: 10pt; color: #666; margin-top: 5px;">Período: ${utils._nomeMes(mesRefDate)}</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <h2 style="font-size: 13pt; font-weight: bold; color: ${corDestaque}; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Recibo de Vencimento</h2>
+                            <p style="font-size: 9pt; color: #666; margin-top: 5px;">Período: ${utils._nomeMes(mesRefDate)}</p>
                         </div>
                         
                         <!-- DADOS DO COLABORADOR -->
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <p style="margin: 4px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
-                                <p style="margin: 4px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
-                                <p style="margin: 4px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
-                                <p style="margin: 4px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
-                                <p style="margin: 4px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
-                                <p style="margin: 4px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 9pt;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <p style="margin: 3px 0;"><strong>Nome:</strong> ${cliente.nome}</p>
+                                <p style="margin: 3px 0;"><strong>B.I nº:</strong> ${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
+                                <p style="margin: 3px 0;"><strong>Função:</strong> ${cliente.funcao || cliente.cargo || 'N/D'}</p>
+                                <p style="margin: 3px 0;"><strong>Data de Admissão:</strong> ${dataAdmissao}</p>
+                                <p style="margin: 3px 0;"><strong>Data de Pagamento:</strong> ${dataPagamento.formatado}</p>
+                                <p style="margin: 3px 0;"><strong>Local de Trabalho:</strong> ${cliente.local_trabalho || 'Sede'}</p>
                             </div>
                         </div>
                         
                         <!-- TABELA SIMPLIFICADA -->
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 9pt;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 8pt;">
                             <thead>
                                 <tr style="background: ${corDestaque}; color: white;">
-                                    <th style="padding: 10px; text-align: left;">Descrição</th>
-                                    <th style="padding: 10px; text-align: right;">Valor (Kz)</th>
+                                    <th style="padding: 6px; text-align: left;">Descrição</th>
+                                    <th style="padding: 6px; text-align: right;">Valor (Kz)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr style="background: #f0f0f0;">
-                                    <td colspan="2" style="padding: 8px; font-weight: bold;">RENDIMENTOS</td>
+                                    <td colspan="2" style="padding: 5px 6px; font-weight: bold; font-size: 8pt;">RENDIMENTOS</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">Vencimento Base</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.salarioBase)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">Vencimento Base</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.salarioBase)}</td>
                                 </tr>
                                 ${calc.subsidioAlimentacao > 0 ? `
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">Subsídio de Alimentação</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.subsidioAlimentacao)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">Subsídio de Alimentação</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.subsidioAlimentacao)}</td>
                                 </tr>
                                 ` : ''}
                                 ${calc.subsidioTransporte > 0 ? `
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">Subsídio de Transporte</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.subsidioTransporte)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">Subsídio de Transporte</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee;">${utils._formatarValor(calc.subsidioTransporte)}</td>
                                 </tr>
                                 ` : ''}
                                 <tr style="background: #e8f4e8;">
-                                    <td style="padding: 10px; font-weight: bold;">TOTAL BRUTO</td>
-                                    <td style="padding: 10px; text-align: right; font-weight: bold;">${utils._formatarValor(calc.bruto)}</td>
+                                    <td style="padding: 6px; font-weight: bold;">TOTAL BRUTO</td>
+                                    <td style="padding: 6px; text-align: right; font-weight: bold;">${utils._formatarValor(calc.bruto)}</td>
                                 </tr>
                                 
                                 <tr style="background: #f0f0f0;">
-                                    <td colspan="2" style="padding: 8px; font-weight: bold;">DESCONTOS</td>
+                                    <td colspan="2" style="padding: 5px 6px; font-weight: bold; font-size: 8pt;">DESCONTOS</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">INSS (${calc.taxaINSS}%)</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.inss)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">INSS (${calc.taxaINSS}%)</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.inss)}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">IRT (${calc.taxaIRT}%)</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.irt)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">IRT (${calc.taxaIRT}%)</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.irt)}</td>
                                 </tr>
                                 ${calc.outrosDescontos > 0 ? `
                                 <tr>
-                                    <td style="padding: 8px; border-bottom: 1px solid #eee;">Outros Descontos</td>
-                                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.outrosDescontos)}</td>
+                                    <td style="padding: 5px 6px; border-bottom: 1px solid #eee;">Outros Descontos</td>
+                                    <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #eee; color: #c00;">- ${utils._formatarValor(calc.outrosDescontos)}</td>
                                 </tr>
                                 ` : ''}
                                 <tr style="background: #fee;">
-                                    <td style="padding: 10px; font-weight: bold;">TOTAL DESCONTOS</td>
-                                    <td style="padding: 10px; text-align: right; font-weight: bold; color: #c00;">- ${utils._formatarValor(calc.totalDescontos)}</td>
+                                    <td style="padding: 6px; font-weight: bold;">TOTAL DESCONTOS</td>
+                                    <td style="padding: 6px; text-align: right; font-weight: bold; color: #c00;">- ${utils._formatarValor(calc.totalDescontos)}</td>
                                 </tr>
                                 
                                 <tr style="background: ${corDestaque}; color: white;">
-                                    <td style="padding: 12px; font-weight: bold; font-size: 11pt;">VALOR LÍQUIDO</td>
-                                    <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 12pt;">${utils._formatarValor(calc.liquido)}</td>
+                                    <td style="padding: 8px; font-weight: bold; font-size: 9pt;">VALOR LÍQUIDO</td>
+                                    <td style="padding: 8px; text-align: right; font-weight: bold; font-size: 10pt;">${utils._formatarValor(calc.liquido)}</td>
                                 </tr>
                             </tbody>
                         </table>
                         
                         <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
-                        <div style="margin-top: 30px;">
-                            <p style="margin: 0 0 15px 0; font-size: 10pt;">${textoDataProcessamento}</p>
+                        <div style="margin-top: 30px; text-align: center;">
+                            <p style="margin: 0 0 20px 0; font-size: 9pt; color: #555;">${textoDataProcessamento}</p>
                             
-                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            <p style="margin: 0 0 10px 0; font-size: 9pt; font-weight: 600; color: #333;">A Direcção</p>
                             
                             <!-- CARIMBO DA EMPRESA -->
-                            <div style="margin-top: 5px;">
+                            <div style="display: inline-block;">
                                 ${empresa.carimbo ? `
                                     <img src="${empresa.carimbo}" 
                                          alt="Carimbo" 
                                          crossorigin="anonymous"
                                          style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
                                 ` : `
-                                    <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
-                                        <span style="font-size: 8pt; color: #999;">Carimbo</span>
+                                    <div style="width: 130px; height: 50px; border: 1px dashed #ccc; display: inline-flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 7pt; color: #999;">Carimbo</span>
                                     </div>
                                 `}
                             </div>
@@ -700,15 +700,15 @@ const ModelosRecibo = {
                                      style="max-width: ${cfg.cabecalhoLogoSize}px; max-height: ${cfg.cabecalhoLogoSize}px; object-fit: contain; margin-right: 15px;">
                             ` : ''}
                             <div>
-                                <h1 style="font-size: 14pt; font-weight: 700; color: ${corDestaque}; margin: 0 0 4px 0;">${empresa.nome}</h1>
+                                <h1 style="font-size: 12pt; font-weight: 700; color: ${corDestaque}; margin: 0 0 4px 0;">${empresa.nome}</h1>
                                 <p style="font-size: 8pt; margin: 2px 0; color: #555;">NIF: ${empresa.nif}</p>
                                 <p style="font-size: 8pt; margin: 2px 0; color: #666;">${empresa.endereco?.municipio || 'Luanda'}, Angola</p>
                             </div>
                         </div>
                         
                         <!-- TÍTULO -->
-                        <div style="margin: 25px 0 20px 0;">
-                            <h2 style="font-size: 22pt; font-weight: 300; color: ${corDestaque}; margin: 0; letter-spacing: 2px; text-transform: uppercase;">Recibo de Vencimento</h2>
+                        <div style="margin: 20px 0 15px 0;">
+                            <h2 style="font-size: 16pt; font-weight: 300; color: ${corDestaque}; margin: 0; letter-spacing: 2px; text-transform: uppercase;">Recibo de Vencimento</h2>
                             <div style="width: 50px; height: 3px; background: ${corDestaque}; margin-top: 8px;"></div>
                         </div>
                         
@@ -788,27 +788,29 @@ const ModelosRecibo = {
                         </div>
                         
                         <!-- LÍQUIDO DESTACADO -->
-                        <div style="background: ${corDestaque}; color: white; padding: 15px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                            <span style="font-size: 12pt; font-weight: 300; text-transform: uppercase; letter-spacing: 1px;">Valor Líquido a Receber</span>
-                            <span style="font-size: 18pt; font-weight: bold;">${utils._formatarValor(calc.liquido)} Kz</span>
+                        <div style="background: ${corDestaque}; color: white; padding: 12px 18px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <span style="font-size: 10pt; font-weight: 300; text-transform: uppercase; letter-spacing: 1px;">Valor Líquido a Receber</span>
+                            <span style="font-size: 14pt; font-weight: bold;">${utils._formatarValor(calc.liquido)} Kz</span>
                         </div>
                         
                         <!-- RODAPÉ: DATA + DIRECÇÃO + CARIMBO -->
-                        <div style="margin-top: 20px;">
-                            <p style="font-size: 9pt; color: #666; margin: 0 0 15px 0;">${textoDataProcessamento}</p>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <p style="font-size: 9pt; color: #666; margin: 0 0 20px 0;">${textoDataProcessamento}</p>
                             
-                            <p style="margin: 0 0 10px 0; font-size: 10pt; font-weight: bold;">A Direcção</p>
+                            <p style="margin: 0 0 10px 0; font-size: 9pt; font-weight: 600; color: #333;">A Direcção</p>
                             
-                            ${empresa.carimbo ? `
-                                <img src="${empresa.carimbo}" 
-                                     alt="Carimbo" 
-                                     crossorigin="anonymous"
-                                     style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
-                            ` : `
-                                <div style="width: 150px; height: 60px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center;">
-                                    <span style="font-size: 8pt; color: #999;">Carimbo</span>
-                                </div>
-                            `}
+                            <div style="display: inline-block;">
+                                ${empresa.carimbo ? `
+                                    <img src="${empresa.carimbo}" 
+                                         alt="Carimbo" 
+                                         crossorigin="anonymous"
+                                         style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
+                                ` : `
+                                    <div style="width: 130px; height: 50px; border: 1px dashed #ccc; display: inline-flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 7pt; color: #999;">Carimbo</span>
+                                    </div>
+                                `}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -887,76 +889,76 @@ const ModelosRecibo = {
                     </div>
                     
                     <!-- CONTEÚDO -->
-                    <div style="padding: 18mm 18mm 15mm 18mm;">
+                    <div style="padding: 15mm 18mm 15mm 18mm;">
                         
                         <!-- TÍTULO -->
-                        <div style="margin-bottom: 25px;">
-                            <h2 style="font-size: 18pt; font-weight: 300; color: ${corDestaque}; margin: 0 0 5px 0; letter-spacing: 1px;">Recibo de Vencimento</h2>
-                            <div style="width: 35px; height: 2px; background: ${corDestaque};"></div>
-                            <p style="font-size: 9pt; color: #888; margin-top: 8px;">${utils._nomeMes(mesRefDate)}</p>
+                        <div style="margin-bottom: 20px;">
+                            <h2 style="font-size: 12pt; font-weight: 400; color: ${corDestaque}; margin: 0 0 5px 0; letter-spacing: 1px;">Recibo de Vencimento</h2>
+                            <div style="width: 30px; height: 2px; background: ${corDestaque};"></div>
+                            <p style="font-size: 8pt; color: #888; margin-top: 6px;">${utils._nomeMes(mesRefDate)}</p>
                         </div>
                         
                         <!-- DADOS EM GRID -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; padding: 15px; background: #fafafa; border-radius: 4px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; padding: 12px; background: #fafafa; border-radius: 4px; font-size: 8pt;">
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Nome</p>
-                                <p style="font-size: 10pt; font-weight: 600; color: ${corDestaque}; margin: 0;">${cliente.nome}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Nome</p>
+                                <p style="font-size: 9pt; font-weight: 600; color: ${corDestaque}; margin: 0;">${cliente.nome}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">B.I nº</p>
-                                <p style="font-size: 10pt; margin: 0;">${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">B.I nº</p>
+                                <p style="font-size: 9pt; margin: 0;">${cliente.documento || cliente.bi || cliente.nif || 'N/D'}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Função</p>
-                                <p style="font-size: 10pt; margin: 0;">${cliente.funcao || cliente.cargo || 'N/D'}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Função</p>
+                                <p style="font-size: 9pt; margin: 0;">${cliente.funcao || cliente.cargo || 'N/D'}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Admissão</p>
-                                <p style="font-size: 10pt; margin: 0;">${dataAdmissao}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Admissão</p>
+                                <p style="font-size: 9pt; margin: 0;">${dataAdmissao}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Pagamento</p>
-                                <p style="font-size: 10pt; margin: 0;">${dataPagamento.formatado}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Data de Pagamento</p>
+                                <p style="font-size: 9pt; margin: 0;">${dataPagamento.formatado}</p>
                             </div>
                             <div>
-                                <p style="font-size: 7pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Local de Trabalho</p>
-                                <p style="font-size: 10pt; margin: 0;">${cliente.local_trabalho || 'Sede'}</p>
+                                <p style="font-size: 6pt; color: #888; margin: 0 0 2px 0; text-transform: uppercase;">Local de Trabalho</p>
+                                <p style="font-size: 9pt; margin: 0;">${cliente.local_trabalho || 'Sede'}</p>
                             </div>
                         </div>
                         
                         <!-- VALORES EM LINHA -->
-                        <div style="margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div style="margin-bottom: 15px; font-size: 8pt;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee;">
                                 <span style="color: #666;">Vencimento Base</span>
                                 <strong>${utils._formatarValor(calc.salarioBase)}</strong>
                             </div>
                             ${calc.subsidioAlimentacao > 0 ? `
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee;">
                                 <span style="color: #666;">Subsídio Alimentação</span>
                                 <strong>${utils._formatarValor(calc.subsidioAlimentacao)}</strong>
                             </div>
                             ` : ''}
                             ${calc.subsidioTransporte > 0 ? `
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee;">
                                 <span style="color: #666;">Subsídio Transporte</span>
                                 <strong>${utils._formatarValor(calc.subsidioTransporte)}</strong>
                             </div>
                             ` : ''}
-                            <div style="display: flex; justify-content: space-between; padding: 12px 0; background: #f0f8f0; margin: 5px 0;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; background: #f0f8f0; margin: 4px 0;">
                                 <strong>Total Bruto</strong>
                                 <strong style="color: #080;">${utils._formatarValor(calc.bruto)}</strong>
                             </div>
                             
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; margin-top: 8px;">
                                 <span style="color: #666;">INSS (${calc.taxaINSS}%)</span>
                                 <span style="color: #c00;">- ${utils._formatarValor(calc.inss)}</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee;">
                                 <span style="color: #666;">IRT (${calc.taxaIRT}%)</span>
                                 <span style="color: #c00;">- ${utils._formatarValor(calc.irt)}</span>
                             </div>
                             ${calc.outrosDescontos > 0 ? `
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee;">
                                 <span style="color: #666;">Outros Descontos</span>
                                 <span style="color: #c00;">- ${utils._formatarValor(calc.outrosDescontos)}</span>
                             </div>
@@ -964,23 +966,23 @@ const ModelosRecibo = {
                         </div>
                         
                         <!-- LÍQUIDO -->
-                        <div style="display: flex; justify-content: space-between; padding: 15px; background: ${corDestaque}; color: white; border-radius: 4px; margin-bottom: 30px;">
-                            <span style="font-size: 11pt;">Valor Líquido</span>
-                            <strong style="font-size: 14pt;">${utils._formatarValor(calc.liquido)} Kz</strong>
+                        <div style="display: flex; justify-content: space-between; padding: 12px; background: ${corDestaque}; color: white; border-radius: 4px; margin-bottom: 25px; font-size: 9pt;">
+                            <span style="font-size: 9pt;">Valor Líquido</span>
+                            <strong style="font-size: 11pt;">${utils._formatarValor(calc.liquido)} Kz</strong>
                         </div>
                         
                         <!-- RODAPÉ -->
-                        <div style="text-align: center; margin-top: 30px;">
-                            <p style="font-size: 9pt; color: #888; margin: 0 0 25px 0;">${textoDataProcessamento}</p>
-                            <p style="font-size: 10pt; color: #555; margin: 0 0 15px 0; font-weight: 500;">A Direcção</p>
-                            <div style="display: flex; justify-content: center;">
+                        <div style="text-align: center; margin-top: 25px;">
+                            <p style="font-size: 8pt; color: #888; margin: 0 0 20px 0;">${textoDataProcessamento}</p>
+                            <p style="font-size: 9pt; color: #555; margin: 0 0 10px 0; font-weight: 500;">A Direcção</p>
+                            <div style="display: inline-block;">
                                 ${empresa.carimbo ? `
                                     <img src="${empresa.carimbo}" 
                                          alt="Carimbo" 
                                          crossorigin="anonymous"
                                          style="max-width: ${cfg.carimboWidth}px; max-height: ${cfg.carimboHeight}px; object-fit: contain;">
                                 ` : `
-                                    <div style="width: 150px; height: 50px; border: 1px dashed #ccc; border-radius: 4px;"></div>
+                                    <div style="width: 120px; height: 45px; border: 1px dashed #ccc; border-radius: 4px;"></div>
                                 `}
                             </div>
                         </div>
