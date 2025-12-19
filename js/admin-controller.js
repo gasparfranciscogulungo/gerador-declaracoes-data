@@ -5190,8 +5190,8 @@ function adminApp() {
         },
 
         /**
-         * Gera PDF único com todos os meses - Alta qualidade
-         * Usa container absoluto dentro de um iframe oculto para garantir renderização
+         * Gera PDF único com todos os meses
+         * Usa o preview visível na tela (mesma abordagem de gerarPDFFluxo que funciona)
          */
         async gerarReciboPDF() {
             try {
@@ -5199,9 +5199,6 @@ function adminApp() {
                     this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada');
                     return;
                 }
-
-                this.loading = true;
-                this.loadingMessage = 'Preparando recibo...';
 
                 const meses = this.gerarMesesRecibo();
                 const empresa = this.fluxoEmpresaSelecionada;
@@ -5212,103 +5209,96 @@ function adminApp() {
                 const mesNome = mesRef.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                 const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${this.formatarNomeFicheiro(empresa?.nome || 'Empresa')}_${mesNome}.pdf`;
 
-                // Criar container invisível mas na DOM (não usar transform nem position fixed)
-                const wrapper = document.createElement('div');
-                wrapper.id = 'pdf-render-wrapper';
-                wrapper.style.cssText = `
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 794px;
-                    background: white;
-                    z-index: -1;
-                    opacity: 0;
-                    pointer-events: none;
-                `;
-                
-                // Criar todas as páginas dentro do wrapper
-                meses.forEach((mesInfo, index) => {
-                    const pagina = document.createElement('div');
-                    pagina.className = 'pdf-page';
-                    pagina.style.cssText = `
-                        width: 794px;
-                        height: 1123px;
-                        background: white;
-                        overflow: hidden;
-                        box-sizing: border-box;
-                        page-break-after: ${index < meses.length - 1 ? 'always' : 'avoid'};
-                        page-break-inside: avoid;
-                    `;
-                    pagina.innerHTML = this.renderizarReciboMes(mesInfo);
-                    wrapper.appendChild(pagina);
-                });
-                
-                document.body.appendChild(wrapper);
-                
-                // Tornar visível apenas para captura
-                wrapper.style.opacity = '1';
-                wrapper.style.zIndex = '1';
-                
-                // Aguardar renderização de imagens e fontes
-                this.loadingMessage = 'Renderizando conteúdo...';
-                await new Promise(resolve => setTimeout(resolve, 800));
+                this.loading = true;
+                this.loadingMessage = 'Preparando recibo...';
 
-                // Configurações otimizadas
+                // Configurações PDF (mesmas que funcionam em gerarPDFFluxo)
                 const opcoesPDF = {
                     margin: 0,
                     filename: nomeArquivo,
-                    image: { type: 'jpeg', quality: 0.95 },
+                    image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
-                        scale: 2,
+                        scale: 1.5,
                         useCORS: true,
-                        allowTaint: true,
-                        logging: true, // Ativar logs para debug
-                        backgroundColor: '#ffffff',
                         letterRendering: true,
-                        onclone: function(clonedDoc) {
-                            // Garantir que o clone está visível
-                            const wrapper = clonedDoc.getElementById('pdf-render-wrapper');
-                            if (wrapper) {
-                                wrapper.style.opacity = '1';
-                                wrapper.style.zIndex = '99999';
-                                wrapper.style.position = 'absolute';
-                                wrapper.style.top = '0';
-                                wrapper.style.left = '0';
-                            }
-                        }
+                        logging: false,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123
                     },
                     jsPDF: { 
-                        unit: 'px', 
-                        format: [794, 1123],
+                        unit: 'mm', 
+                        format: 'a4', 
                         orientation: 'portrait',
-                        compress: true,
-                        hotfixes: ['px_scaling']
-                    },
-                    pagebreak: { 
-                        mode: ['css', 'legacy'],
-                        before: '.page-break-before',
-                        after: '.page-break-after',
-                        avoid: '.page-break-avoid'
+                        compress: true
                     }
                 };
 
-                this.loadingMessage = 'Gerando PDF...';
-                
-                // Gerar PDF
-                await html2pdf().set(opcoesPDF).from(wrapper).save();
+                if (meses.length === 1) {
+                    // Uma página: usar preview visível diretamente
+                    const previewElement = document.getElementById('preview-render');
+                    if (!previewElement) {
+                        throw new Error('Preview não encontrado');
+                    }
 
-                // Limpar
-                document.body.removeChild(wrapper);
+                    const container = document.createElement('div');
+                    container.innerHTML = previewElement.innerHTML;
+                    container.style.cssText = `
+                        width: 210mm;
+                        min-height: 297mm;
+                        max-height: 297mm;
+                        background: white;
+                        overflow: hidden;
+                    `;
+                    document.body.appendChild(container);
+
+                    this.loadingMessage = 'Gerando PDF...';
+                    await html2pdf().set(opcoesPDF).from(container).save();
+                    document.body.removeChild(container);
+
+                } else {
+                    // Múltiplas páginas: gerar cada uma e combinar
+                    this.loadingMessage = 'Gerando PDF com múltiplas páginas...';
+                    
+                    // Criar container com todas as páginas
+                    const container = document.createElement('div');
+                    container.style.cssText = 'background: white;';
+                    
+                    for (let i = 0; i < meses.length; i++) {
+                        const mesInfo = meses[i];
+                        const pagina = document.createElement('div');
+                        pagina.innerHTML = this.renderizarReciboMes(mesInfo);
+                        pagina.style.cssText = `
+                            width: 210mm;
+                            min-height: 297mm;
+                            max-height: 297mm;
+                            background: white;
+                            overflow: hidden;
+                            page-break-after: ${i < meses.length - 1 ? 'always' : 'avoid'};
+                        `;
+                        container.appendChild(pagina);
+                    }
+                    
+                    document.body.appendChild(container);
+                    
+                    // Configurações para múltiplas páginas
+                    const opcoesMulti = {
+                        ...opcoesPDF,
+                        pagebreak: { mode: ['css', 'legacy'] }
+                    };
+                    
+                    await html2pdf().set(opcoesMulti).from(container).save();
+                    document.body.removeChild(container);
+                }
 
                 this.loading = false;
                 this.showAlert('success', `✅ PDF gerado com ${meses.length} página(s)!`);
 
             } catch (error) {
                 console.error('Erro ao gerar PDF:', error);
-                // Limpar wrapper se existir
-                const wrapper = document.getElementById('pdf-render-wrapper');
-                if (wrapper) document.body.removeChild(wrapper);
-                
                 this.loading = false;
                 this.showAlert('error', '❌ Erro ao gerar PDF: ' + error.message);
             }
@@ -5316,7 +5306,7 @@ function adminApp() {
 
         /**
          * Gera PDFs separados (individuais ou ZIP)
-         * Usa mesma abordagem do gerarReciboPDF para consistência
+         * Usa mesma abordagem simplificada que funciona
          */
         async gerarRecibosZIP() {
             try {
@@ -5346,85 +5336,61 @@ function adminApp() {
                     this.showAlert('info', '📥 Gerando PDFs individuais...');
                 }
 
+                // Configurações PDF (mesmas que funcionam)
+                const opcoesPDF = {
+                    margin: 0,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        windowHeight: 1123,
+                        width: 794,
+                        height: 1123
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+
                 for (let i = 0; i < meses.length; i++) {
                     this.loadingMessage = `Gerando PDF ${i + 1} de ${meses.length}...`;
                     
                     const mesInfo = meses[i];
                     
-                    // Criar wrapper usando mesma abordagem que funciona
-                    const wrapper = document.createElement('div');
-                    wrapper.id = `pdf-zip-wrapper-${i}`;
-                    wrapper.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 794px;
-                        background: white;
-                        z-index: 1;
-                    `;
-                    
-                    // Criar página A4 em pixels
-                    const pagina = document.createElement('div');
-                    pagina.style.cssText = `
-                        width: 794px;
-                        height: 1123px;
+                    // Criar container simples
+                    const container = document.createElement('div');
+                    container.innerHTML = this.renderizarReciboMes(mesInfo);
+                    container.style.cssText = `
+                        width: 210mm;
+                        min-height: 297mm;
+                        max-height: 297mm;
                         background: white;
                         overflow: hidden;
-                        box-sizing: border-box;
                     `;
-                    pagina.innerHTML = this.renderizarReciboMes(mesInfo);
-                    wrapper.appendChild(pagina);
-                    document.body.appendChild(wrapper);
-
-                    // Aguardar renderização de imagens
-                    await new Promise(resolve => setTimeout(resolve, 600));
+                    document.body.appendChild(container);
 
                     const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                     const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
 
-                    // Configurações otimizadas - mesmas do gerarReciboPDF
-                    const opcoesPDF = {
-                        margin: 0,
-                        filename: nomeArquivo,
-                        image: { type: 'jpeg', quality: 0.95 },
-                        html2canvas: { 
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
-                            logging: true,
-                            backgroundColor: '#ffffff',
-                            letterRendering: true,
-                            onclone: function(clonedDoc) {
-                                const w = clonedDoc.getElementById(`pdf-zip-wrapper-${i}`);
-                                if (w) {
-                                    w.style.opacity = '1';
-                                    w.style.zIndex = '99999';
-                                    w.style.position = 'absolute';
-                                    w.style.top = '0';
-                                    w.style.left = '0';
-                                }
-                            }
-                        },
-                        jsPDF: { 
-                            unit: 'px', 
-                            format: [794, 1123],
-                            orientation: 'portrait',
-                            compress: true,
-                            hotfixes: ['px_scaling']
-                        }
-                    };
-
                     if (temJSZip) {
                         // Gerar blob para ZIP
-                        const pdfBlob = await html2pdf().set(opcoesPDF).from(wrapper).outputPdf('blob');
+                        const pdfBlob = await html2pdf().set({...opcoesPDF, filename: nomeArquivo}).from(container).outputPdf('blob');
                         zip.file(nomeArquivo, pdfBlob);
                     } else {
                         // Download direto
-                        await html2pdf().set(opcoesPDF).from(wrapper).save();
-                        await new Promise(resolve => setTimeout(resolve, 600));
+                        await html2pdf().set({...opcoesPDF, filename: nomeArquivo}).from(container).save();
+                        await new Promise(resolve => setTimeout(resolve, 500));
                     }
 
-                    document.body.removeChild(wrapper);
+                    document.body.removeChild(container);
                 }
 
                 if (temJSZip) {
@@ -5446,8 +5412,6 @@ function adminApp() {
 
             } catch (error) {
                 console.error('Erro ao gerar ZIP:', error);
-                // Limpar wrappers se existirem
-                document.querySelectorAll('[id^="pdf-zip-wrapper-"]').forEach(el => el.remove());
                 this.loading = false;
                 this.showAlert('error', '❌ Erro ao gerar: ' + error.message);
             }
