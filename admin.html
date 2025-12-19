@@ -4893,7 +4893,7 @@
                     </span>
                 </div>
                 
-                <!-- Botões Desktop Only -->
+                <!-- Botões Desktop Only - DECLARAÇÕES -->
                 <template x-if="!['nif', 'atestado', 'recibo', 'combo'].includes(tipoPreview)">
                     <div class="hidden lg:flex items-center gap-3">
                         <button @click="visualizarPDFNovaAba()" 
@@ -4910,6 +4910,45 @@
                                 class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 active:to-indigo-800 transition-all font-bold shadow-lg hover:shadow-xl">
                             <i class="bi bi-download mr-2"></i>
                             <span x-text="fluxoEtapa === 4 ? 'Gerar PDF' : 'Baixar PDF'"></span>
+                        </button>
+                    </div>
+                </template>
+
+                <!-- Botões Desktop Only - RECIBOS -->
+                <template x-if="tipoPreview === 'recibo'">
+                    <div class="hidden lg:flex items-center gap-2">
+                        <!-- Seletor de Quantidade de Meses -->
+                        <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg" :class="darkMode ? 'bg-gray-700' : 'bg-gray-100'">
+                            <span class="text-xs font-medium" :class="darkMode ? 'text-gray-300' : 'text-gray-600'">Meses:</span>
+                            <button @click="previewConfig.quantidadeMeses = 1" 
+                                    :class="previewConfig.quantidadeMeses === 1 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                    class="w-7 h-7 rounded text-xs font-bold transition-colors">1</button>
+                            <button @click="previewConfig.quantidadeMeses = 2" 
+                                    :class="previewConfig.quantidadeMeses === 2 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                    class="w-7 h-7 rounded text-xs font-bold transition-colors">2</button>
+                            <button @click="previewConfig.quantidadeMeses = 3" 
+                                    :class="previewConfig.quantidadeMeses === 3 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')"
+                                    class="w-7 h-7 rounded text-xs font-bold transition-colors">3</button>
+                        </div>
+
+                        <button @click="gerarReciboNovaAba()" 
+                                class="px-3 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-md text-sm">
+                            <i class="bi bi-window mr-1"></i>Nova Aba
+                        </button>
+                        
+                        <button @click="imprimirRecibo()" 
+                                class="px-3 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-md text-sm">
+                            <i class="bi bi-printer mr-1"></i>Imprimir
+                        </button>
+                        
+                        <button @click="gerarReciboPDF()" 
+                                class="px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all font-bold shadow-lg text-sm">
+                            <i class="bi bi-download mr-1"></i>PDF Único
+                        </button>
+
+                        <button @click="gerarRecibosZIP()" 
+                                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-bold shadow-lg text-sm">
+                            <i class="bi bi-file-zip mr-1"></i>ZIP
                         </button>
                     </div>
                 </template>
@@ -5000,6 +5039,127 @@
             <!-- Botão Principal Flutuante -->
             <button @click="menuFlutuanteMobile = !menuFlutuanteMobile"
                     class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl flex items-center justify-center transition-all active:scale-95 hover:shadow-3xl touch-manipulation"
+                    :class="menuFlutuanteMobile ? 'rotate-45' : 'rotate-0'">
+                <i :class="menuFlutuanteMobile ? 'bi-x' : 'bi-plus'" 
+                   class="text-white text-3xl font-bold transition-transform"></i>
+            </button>
+        </div>
+    </template>
+
+    <!-- ===================================================================== -->
+    <!-- MENU FLUTUANTE MOBILE - RECIBOS -->
+    <!-- ===================================================================== -->
+    <template x-if="modalPreviewModelo && tipoPreview === 'recibo'">
+        <div class="lg:hidden fixed bottom-6 right-4 z-50">
+            
+            <!-- Menu de Opções Recibo -->
+            <div x-show="menuFlutuanteMobile"
+                 @click.away="menuFlutuanteMobile = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+                 :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+                 class="absolute bottom-20 right-0 w-64 rounded-2xl shadow-2xl border-2 overflow-hidden mb-2">
+                
+                <!-- Header -->
+                <div class="px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500">
+                    <p class="text-white font-bold text-sm">📄 Recibo de Vencimento</p>
+                    <p class="text-white/80 text-xs">Gerar documentos</p>
+                </div>
+
+                <!-- Seletor de Meses -->
+                <div class="p-3 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-200'">
+                    <p class="text-xs font-medium mb-2" :class="darkMode ? 'text-gray-400' : 'text-gray-600'">Quantidade de Meses:</p>
+                    <div class="flex gap-2">
+                        <button @click="previewConfig.quantidadeMeses = 1" 
+                                :class="previewConfig.quantidadeMeses === 1 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700')"
+                                class="flex-1 py-2 rounded-lg text-sm font-bold transition-colors">1 mês</button>
+                        <button @click="previewConfig.quantidadeMeses = 2" 
+                                :class="previewConfig.quantidadeMeses === 2 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700')"
+                                class="flex-1 py-2 rounded-lg text-sm font-bold transition-colors">2 meses</button>
+                        <button @click="previewConfig.quantidadeMeses = 3" 
+                                :class="previewConfig.quantidadeMeses === 3 ? 'bg-orange-500 text-white' : (darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700')"
+                                class="flex-1 py-2 rounded-lg text-sm font-bold transition-colors">3 meses</button>
+                    </div>
+                </div>
+
+                <!-- Opções -->
+                <div class="p-2 space-y-1">
+                    <!-- Nova Aba -->
+                    <button @click="gerarReciboNovaAba(); menuFlutuanteMobile = false" 
+                            :class="darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'"
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors touch-manipulation">
+                        <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-window text-white"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <p :class="darkMode ? 'text-gray-100' : 'text-gray-900'" class="font-semibold text-sm">Nova Aba</p>
+                            <p class="text-xs text-gray-500">Visualizar</p>
+                        </div>
+                    </button>
+                    
+                    <!-- Imprimir -->
+                    <button @click="imprimirRecibo(); menuFlutuanteMobile = false" 
+                            :class="darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'"
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors touch-manipulation">
+                        <div class="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-printer text-white"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <p :class="darkMode ? 'text-gray-100' : 'text-gray-900'" class="font-semibold text-sm">Imprimir</p>
+                            <p class="text-xs text-gray-500">Impressora</p>
+                        </div>
+                    </button>
+                    
+                    <!-- PDF Único -->
+                    <button @click="gerarReciboPDF(); menuFlutuanteMobile = false" 
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 transition-all touch-manipulation">
+                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-download text-white"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <p class="text-white font-bold text-sm">PDF Único</p>
+                            <p class="text-white/80 text-xs" x-text="previewConfig.quantidadeMeses + ' página(s)'"></p>
+                        </div>
+                    </button>
+
+                    <!-- PDFs Separados (ZIP) -->
+                    <button @click="gerarRecibosZIP(); menuFlutuanteMobile = false" 
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 transition-all touch-manipulation">
+                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-file-zip text-white"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <p class="text-white font-bold text-sm">ZIP Separados</p>
+                            <p class="text-white/80 text-xs" x-text="previewConfig.quantidadeMeses + ' ficheiro(s)'"></p>
+                        </div>
+                    </button>
+                </div>
+                
+                <!-- Ferramentas -->
+                <div :class="darkMode ? 'bg-gray-700' : 'bg-gray-200'" class="h-px mx-2"></div>
+                <div class="p-2">
+                    <button @click="mostrarPersonalizacao = true; menuFlutuanteMobile = false" 
+                            :class="darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'"
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors touch-manipulation">
+                        <div class="w-9 h-9 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0">
+                            <i class="bi bi-sliders text-white"></i>
+                        </div>
+                        <div class="text-left flex-1">
+                            <p :class="darkMode ? 'text-gray-100' : 'text-gray-900'" class="font-semibold text-sm">Editar Recibo</p>
+                            <p class="text-xs text-gray-500">Valores e estilo</p>
+                        </div>
+                        <i class="bi bi-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Botão Principal Flutuante - RECIBO -->
+            <button @click="menuFlutuanteMobile = !menuFlutuanteMobile"
+                    class="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 shadow-2xl flex items-center justify-center transition-all active:scale-95 hover:shadow-3xl touch-manipulation"
                     :class="menuFlutuanteMobile ? 'rotate-45' : 'rotate-0'">
                 <i :class="menuFlutuanteMobile ? 'bi-x' : 'bi-plus'" 
                    class="text-white text-3xl font-bold transition-transform"></i>

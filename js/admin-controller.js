@@ -4904,6 +4904,358 @@ function adminApp() {
             
             console.log('✅ Preview de Recibo aberto com layout:', this.layoutReciboAtivo);
         },
+
+        // ========== FUNÇÕES DE GERAÇÃO DE PDF PARA RECIBOS ==========
+
+        /**
+         * Gera dia de pagamento aleatório entre 5 e 10
+         */
+        gerarDiaPagamentoAleatorio(diaBase = 8) {
+            const minDia = Math.max(5, diaBase - 2);
+            const maxDia = Math.min(10, diaBase + 2);
+            return Math.floor(Math.random() * (maxDia - minDia + 1)) + minDia;
+        },
+
+        /**
+         * Gera array de meses para recibos múltiplos
+         */
+        gerarMesesRecibo() {
+            const meses = [];
+            const quantidade = parseInt(this.previewConfig.quantidadeMeses) || 1;
+            const mesRef = this.previewConfig.mesReferencia 
+                ? new Date(this.previewConfig.mesReferencia + '-01') 
+                : new Date();
+            
+            const diaBase = parseInt(this.previewConfig.diaPagamento) || 8;
+            
+            for (let i = 0; i < quantidade; i++) {
+                const mesTrabalhado = new Date(mesRef);
+                mesTrabalhado.setMonth(mesTrabalhado.getMonth() - i);
+                
+                // Mês de pagamento (mês seguinte ao trabalhado)
+                const mesPagamento = new Date(mesTrabalhado);
+                mesPagamento.setMonth(mesPagamento.getMonth() + 1);
+                
+                // Dia aleatório entre 5-10 baseado no diaBase
+                const diaPagamento = i === 0 ? diaBase : this.gerarDiaPagamentoAleatorio(diaBase);
+                mesPagamento.setDate(diaPagamento);
+                
+                meses.push({
+                    mesTrabalhado: mesTrabalhado,
+                    mesPagamento: mesPagamento,
+                    mesNome: mesTrabalhado.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' }),
+                    dataPagamento: mesPagamento.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })
+                });
+            }
+            
+            return meses;
+        },
+
+        /**
+         * Formata nome do ficheiro com primeiras letras maiúsculas
+         */
+        formatarNomeFicheiro(texto) {
+            return texto
+                .split(' ')
+                .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
+                .join('_')
+                .replace(/[^a-zA-Z0-9_]/g, '');
+        },
+
+        /**
+         * Renderiza recibo para um mês específico
+         */
+        renderizarReciboMes(mesInfo) {
+            const empresa = this.getEmpresaExemplo();
+            const cliente = this.getClienteExemplo();
+            const layout = this.layoutReciboAtivo || 'executivo';
+            
+            // Criar config específico para este mês
+            const configMes = {
+                ...this.previewConfig,
+                mesReferencia: mesInfo.mesTrabalhado.toISOString().slice(0, 7),
+                dataPagamentoFormatada: mesInfo.dataPagamento
+            };
+            
+            if (typeof ModelosRecibo !== 'undefined' && ModelosRecibo[layout]) {
+                return ModelosRecibo[layout].renderizar(empresa, cliente, configMes);
+            }
+            
+            return '<div style="padding: 50px; text-align: center;">Erro ao renderizar recibo</div>';
+        },
+
+        /**
+         * Gera recibo em nova aba
+         */
+        gerarReciboNovaAba() {
+            const meses = this.gerarMesesRecibo();
+            const empresa = this.fluxoEmpresaSelecionada;
+            
+            let htmlCompleto = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Recibo de Vencimento - ${empresa?.nome || 'Empresa'}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        @page { size: A4; margin: 0; }
+                        body { margin: 0; padding: 0; }
+                        .pagina { 
+                            width: 210mm; 
+                            min-height: 297mm; 
+                            page-break-after: always; 
+                            background: white;
+                        }
+                        .pagina:last-child { page-break-after: avoid; }
+                        @media print {
+                            .pagina { page-break-after: always; }
+                        }
+                    </style>
+                </head>
+                <body>
+            `;
+            
+            meses.forEach((mesInfo, index) => {
+                htmlCompleto += `<div class="pagina">${this.renderizarReciboMes(mesInfo)}</div>`;
+            });
+            
+            htmlCompleto += '</body></html>';
+            
+            const novaAba = window.open('', '_blank');
+            novaAba.document.write(htmlCompleto);
+            novaAba.document.close();
+            
+            this.showAlert('success', `✅ ${meses.length} recibo(s) aberto(s) em nova aba!`);
+        },
+
+        /**
+         * Imprime recibo(s)
+         */
+        imprimirRecibo() {
+            const meses = this.gerarMesesRecibo();
+            const empresa = this.fluxoEmpresaSelecionada;
+            
+            let htmlCompleto = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Recibo - ${empresa?.nome || 'Empresa'}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        @page { size: A4; margin: 0; }
+                        body { margin: 0; padding: 0; }
+                        .pagina { 
+                            width: 210mm; 
+                            min-height: 297mm; 
+                            page-break-after: always; 
+                            background: white;
+                        }
+                        .pagina:last-child { page-break-after: avoid; }
+                    </style>
+                </head>
+                <body>
+            `;
+            
+            meses.forEach((mesInfo) => {
+                htmlCompleto += `<div class="pagina">${this.renderizarReciboMes(mesInfo)}</div>`;
+            });
+            
+            htmlCompleto += '</body></html>';
+            
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.contentWindow.document.open();
+            iframe.contentWindow.document.write(htmlCompleto);
+            iframe.contentWindow.document.close();
+            
+            iframe.contentWindow.onload = () => {
+                iframe.contentWindow.print();
+                setTimeout(() => document.body.removeChild(iframe), 1000);
+            };
+            
+            this.showAlert('info', `🖨️ Enviando ${meses.length} recibo(s) para impressão...`);
+        },
+
+        /**
+         * Gera PDF único com todos os meses
+         */
+        async gerarReciboPDF() {
+            try {
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada');
+                    return;
+                }
+
+                this.loading = true;
+                this.loadingMessage = 'Gerando PDF do recibo...';
+
+                const meses = this.gerarMesesRecibo();
+                const empresa = this.fluxoEmpresaSelecionada;
+                const cliente = this.fluxoClienteSelecionado;
+                
+                // Container para múltiplas páginas
+                const container = document.createElement('div');
+                
+                meses.forEach((mesInfo) => {
+                    const pagina = document.createElement('div');
+                    pagina.innerHTML = this.renderizarReciboMes(mesInfo);
+                    pagina.style.cssText = `
+                        width: 210mm;
+                        min-height: 297mm;
+                        background: white;
+                        page-break-after: always;
+                    `;
+                    container.appendChild(pagina);
+                });
+                
+                document.body.appendChild(container);
+
+                // Nome do ficheiro
+                const mesRef = meses[0].mesTrabalhado;
+                const mesNome = mesRef.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
+                const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${this.formatarNomeFicheiro(empresa?.nome || 'Empresa')}_${mesNome}.pdf`;
+
+                const opcoesPDF = {
+                    margin: 0,
+                    filename: nomeArquivo,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait'
+                    },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                };
+
+                await html2pdf().set(opcoesPDF).from(container).save();
+
+                document.body.removeChild(container);
+                this.loading = false;
+                this.showAlert('success', `✅ PDF gerado: ${nomeArquivo}`);
+
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                this.loading = false;
+                this.showAlert('error', '❌ Erro ao gerar PDF');
+            }
+        },
+
+        /**
+         * Gera PDFs separados em ZIP
+         */
+        async gerarRecibosZIP() {
+            try {
+                if (typeof html2pdf === 'undefined') {
+                    this.showAlert('error', '❌ Biblioteca html2pdf.js não carregada');
+                    return;
+                }
+
+                const meses = this.gerarMesesRecibo();
+                
+                if (meses.length === 1) {
+                    // Se for só 1 mês, gera PDF normal
+                    await this.gerarReciboPDF();
+                    return;
+                }
+
+                this.loading = true;
+                this.loadingMessage = `Gerando ${meses.length} PDFs...`;
+
+                const empresa = this.fluxoEmpresaSelecionada;
+                const cliente = this.fluxoClienteSelecionado;
+
+                // Verificar se JSZip está disponível
+                if (typeof JSZip === 'undefined') {
+                    // Se não tiver JSZip, gera PDFs individuais para download
+                    this.showAlert('info', '📥 Gerando PDFs individuais...');
+                    
+                    for (let i = 0; i < meses.length; i++) {
+                        const mesInfo = meses[i];
+                        const container = document.createElement('div');
+                        container.innerHTML = this.renderizarReciboMes(mesInfo);
+                        container.style.cssText = 'width: 210mm; min-height: 297mm; background: white;';
+                        document.body.appendChild(container);
+
+                        const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
+                        const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
+
+                        await html2pdf().set({
+                            margin: 0,
+                            filename: nomeArquivo,
+                            image: { type: 'jpeg', quality: 0.95 },
+                            html2canvas: { scale: 1.5, useCORS: true },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        }).from(container).save();
+
+                        document.body.removeChild(container);
+                        
+                        // Pequeno delay entre downloads
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+
+                    this.loading = false;
+                    this.showAlert('success', `✅ ${meses.length} PDFs gerados!`);
+                    return;
+                }
+
+                // Com JSZip disponível, criar arquivo ZIP
+                const zip = new JSZip();
+                
+                for (let i = 0; i < meses.length; i++) {
+                    this.loadingMessage = `Gerando PDF ${i + 1} de ${meses.length}...`;
+                    
+                    const mesInfo = meses[i];
+                    const container = document.createElement('div');
+                    container.innerHTML = this.renderizarReciboMes(mesInfo);
+                    container.style.cssText = 'width: 210mm; min-height: 297mm; background: white;';
+                    document.body.appendChild(container);
+
+                    const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
+                    const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
+
+                    const pdfBlob = await html2pdf().set({
+                        margin: 0,
+                        image: { type: 'jpeg', quality: 0.95 },
+                        html2canvas: { scale: 1.5, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).from(container).outputPdf('blob');
+
+                    zip.file(nomeArquivo, pdfBlob);
+                    document.body.removeChild(container);
+                }
+
+                this.loadingMessage = 'Compactando ZIP...';
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                
+                // Download do ZIP
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(zipBlob);
+                link.download = `Recibos_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${this.formatarNomeFicheiro(empresa?.nome || 'Empresa')}.zip`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                this.loading = false;
+                this.showAlert('success', `✅ ZIP com ${meses.length} recibos gerado!`);
+
+            } catch (error) {
+                console.error('Erro ao gerar ZIP:', error);
+                this.loading = false;
+                this.showAlert('error', '❌ Erro ao gerar ZIP');
+            }
+        },
         
         /**
          * Gera PDF dentro do fluxo do wizard
