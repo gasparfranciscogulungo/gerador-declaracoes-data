@@ -4910,10 +4910,9 @@ function adminApp() {
         /**
          * Gera dia de pagamento aleatório entre 5 e 10
          */
-        gerarDiaPagamentoAleatorio(diaBase = 8) {
-            const minDia = Math.max(5, diaBase - 2);
-            const maxDia = Math.min(10, diaBase + 2);
-            return Math.floor(Math.random() * (maxDia - minDia + 1)) + minDia;
+        gerarDiaPagamentoAleatorio() {
+            // Gera número aleatório entre 5 e 10 (inclusive)
+            return Math.floor(Math.random() * 6) + 5;
         },
 
         /**
@@ -4936,13 +4935,19 @@ function adminApp() {
                 const mesPagamento = new Date(mesTrabalhado);
                 mesPagamento.setMonth(mesPagamento.getMonth() + 1);
                 
-                // Dia aleatório entre 5-10 baseado no diaBase
-                const diaPagamento = i === 0 ? diaBase : this.gerarDiaPagamentoAleatorio(diaBase);
+                // Primeiro mês usa dia escolhido, outros usam dia aleatório 5-10
+                let diaPagamento;
+                if (i === 0) {
+                    diaPagamento = diaBase;
+                } else {
+                    diaPagamento = this.gerarDiaPagamentoAleatorio();
+                }
                 mesPagamento.setDate(diaPagamento);
                 
                 meses.push({
                     mesTrabalhado: mesTrabalhado,
                     mesPagamento: mesPagamento,
+                    diaPagamento: diaPagamento,
                     mesNome: mesTrabalhado.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' }),
                     dataPagamento: mesPagamento.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })
                 });
@@ -4985,41 +4990,142 @@ function adminApp() {
         },
 
         /**
-         * Gera recibo em nova aba
+         * Gera recibo em nova aba - Visualização profissional
          */
         gerarReciboNovaAba() {
             const meses = this.gerarMesesRecibo();
             const empresa = this.fluxoEmpresaSelecionada;
+            const cliente = this.fluxoClienteSelecionado;
             
             let htmlCompleto = `
                 <!DOCTYPE html>
-                <html>
+                <html lang="pt">
                 <head>
-                    <title>Recibo de Vencimento - ${empresa?.nome || 'Empresa'}</title>
+                    <title>Recibo de Vencimento - ${cliente?.nome || 'Colaborador'} - ${empresa?.nome || 'Empresa'}</title>
                     <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
                         @page { size: A4; margin: 0; }
-                        body { margin: 0; padding: 0; }
-                        .pagina { 
-                            width: 210mm; 
-                            min-height: 297mm; 
-                            page-break-after: always; 
-                            background: white;
+                        
+                        body { 
+                            font-family: Arial, sans-serif;
+                            background: #1a1a2e;
+                            min-height: 100vh;
+                            padding: 20px;
                         }
-                        .pagina:last-child { page-break-after: avoid; }
+                        
+                        .container {
+                            max-width: 900px;
+                            margin: 0 auto;
+                        }
+                        
+                        .header-bar {
+                            background: linear-gradient(135deg, #f97316, #ea580c);
+                            color: white;
+                            padding: 15px 25px;
+                            border-radius: 12px;
+                            margin-bottom: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                        }
+                        
+                        .header-bar h1 { font-size: 18px; font-weight: 600; }
+                        .header-bar p { font-size: 13px; opacity: 0.9; }
+                        
+                        .btn {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            font-size: 14px;
+                            transition: all 0.2s;
+                        }
+                        .btn-print { background: #22c55e; color: white; }
+                        .btn-print:hover { background: #16a34a; }
+                        
+                        .page-wrapper {
+                            background: #0f0f23;
+                            border-radius: 12px;
+                            padding: 20px;
+                            margin-bottom: 25px;
+                            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                        }
+                        
+                        .page-label {
+                            color: #f97316;
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin-bottom: 10px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        
+                        .pagina { 
+                            width: 210mm;
+                            min-height: 297mm;
+                            max-height: 297mm;
+                            background: white;
+                            margin: 0 auto;
+                            box-shadow: 0 5px 30px rgba(0,0,0,0.4);
+                            overflow: hidden;
+                        }
+                        
                         @media print {
-                            .pagina { page-break-after: always; }
+                            body { background: white; padding: 0; }
+                            .header-bar, .page-label { display: none !important; }
+                            .page-wrapper { 
+                                background: none; 
+                                padding: 0; 
+                                margin: 0; 
+                                box-shadow: none;
+                                page-break-after: always;
+                            }
+                            .page-wrapper:last-child { page-break-after: avoid; }
+                            .pagina { box-shadow: none; }
+                            .container { max-width: none; }
+                        }
+                        
+                        @media (max-width: 768px) {
+                            body { padding: 10px; }
+                            .pagina { 
+                                width: 100%; 
+                                min-height: auto;
+                                max-height: none;
+                            }
+                            .header-bar { flex-direction: column; text-align: center; }
                         }
                     </style>
                 </head>
                 <body>
+                    <div class="container">
+                        <div class="header-bar">
+                            <div>
+                                <h1>📄 Recibo de Vencimento</h1>
+                                <p>${cliente?.nome || 'Colaborador'} • ${empresa?.nome || 'Empresa'} • ${meses.length} página(s)</p>
+                            </div>
+                            <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
             `;
             
             meses.forEach((mesInfo, index) => {
-                htmlCompleto += `<div class="pagina">${this.renderizarReciboMes(mesInfo)}</div>`;
+                htmlCompleto += `
+                        <div class="page-wrapper">
+                            <div class="page-label">📅 ${mesInfo.mesNome} • Pago em ${mesInfo.dataPagamento}</div>
+                            <div class="pagina">${this.renderizarReciboMes(mesInfo)}</div>
+                        </div>
+                `;
             });
             
-            htmlCompleto += '</body></html>';
+            htmlCompleto += `
+                    </div>
+                </body>
+                </html>
+            `;
             
             const novaAba = window.open('', '_blank');
             novaAba.document.write(htmlCompleto);
@@ -5084,7 +5190,7 @@ function adminApp() {
         },
 
         /**
-         * Gera PDF único com todos os meses
+         * Gera PDF único com todos os meses - Alta qualidade sem páginas em branco
          */
         async gerarReciboPDF() {
             try {
@@ -5102,15 +5208,17 @@ function adminApp() {
                 
                 // Container para múltiplas páginas
                 const container = document.createElement('div');
+                container.style.cssText = 'position: absolute; left: -9999px; top: 0;';
                 
-                meses.forEach((mesInfo) => {
+                meses.forEach((mesInfo, index) => {
                     const pagina = document.createElement('div');
                     pagina.innerHTML = this.renderizarReciboMes(mesInfo);
                     pagina.style.cssText = `
                         width: 210mm;
-                        min-height: 297mm;
+                        height: 297mm;
                         background: white;
-                        page-break-after: always;
+                        overflow: hidden;
+                        ${index < meses.length - 1 ? 'page-break-after: always;' : ''}
                     `;
                     container.appendChild(pagina);
                 });
@@ -5122,22 +5230,33 @@ function adminApp() {
                 const mesNome = mesRef.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                 const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${this.formatarNomeFicheiro(empresa?.nome || 'Empresa')}_${mesNome}.pdf`;
 
+                // Configurações otimizadas para qualidade + tamanho < 2MB
                 const opcoesPDF = {
                     margin: 0,
                     filename: nomeArquivo,
-                    image: { type: 'jpeg', quality: 0.95 },
+                    image: { type: 'jpeg', quality: 0.92 },
                     html2canvas: { 
-                        scale: 1.5,
+                        scale: 2, // Boa qualidade
                         useCORS: true,
                         letterRendering: true,
-                        logging: false
+                        logging: false,
+                        width: 794, // A4 em pixels (210mm)
+                        height: 1123, // A4 em pixels (297mm)
+                        windowWidth: 794,
+                        windowHeight: 1123
                     },
                     jsPDF: { 
                         unit: 'mm', 
                         format: 'a4', 
-                        orientation: 'portrait'
+                        orientation: 'portrait',
+                        compress: true
                     },
-                    pagebreak: { mode: ['css', 'legacy'] }
+                    pagebreak: { 
+                        mode: ['css'],
+                        before: '.page-break-before',
+                        after: '.page-break-after',
+                        avoid: '.page-break-avoid'
+                    }
                 };
 
                 await html2pdf().set(opcoesPDF).from(container).save();
@@ -5177,6 +5296,28 @@ function adminApp() {
                 const empresa = this.fluxoEmpresaSelecionada;
                 const cliente = this.fluxoClienteSelecionado;
 
+                // Configurações otimizadas de PDF
+                const opcoesPDF = {
+                    margin: 0,
+                    image: { type: 'jpeg', quality: 0.92 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        width: 794,
+                        height: 1123,
+                        windowWidth: 794,
+                        windowHeight: 1123
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+
                 // Verificar se JSZip está disponível
                 if (typeof JSZip === 'undefined') {
                     // Se não tiver JSZip, gera PDFs individuais para download
@@ -5185,19 +5326,19 @@ function adminApp() {
                     for (let i = 0; i < meses.length; i++) {
                         const mesInfo = meses[i];
                         const container = document.createElement('div');
+                        container.style.cssText = 'position: absolute; left: -9999px; top: 0;';
                         container.innerHTML = this.renderizarReciboMes(mesInfo);
-                        container.style.cssText = 'width: 210mm; min-height: 297mm; background: white;';
+                        
+                        const pagina = container.querySelector('div') || container;
+                        pagina.style.cssText = 'width: 210mm; height: 297mm; background: white; overflow: hidden;';
                         document.body.appendChild(container);
 
                         const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                         const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
 
                         await html2pdf().set({
-                            margin: 0,
-                            filename: nomeArquivo,
-                            image: { type: 'jpeg', quality: 0.95 },
-                            html2canvas: { scale: 1.5, useCORS: true },
-                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                            ...opcoesPDF,
+                            filename: nomeArquivo
                         }).from(container).save();
 
                         document.body.removeChild(container);
@@ -5219,19 +5360,17 @@ function adminApp() {
                     
                     const mesInfo = meses[i];
                     const container = document.createElement('div');
+                    container.style.cssText = 'position: absolute; left: -9999px; top: 0;';
                     container.innerHTML = this.renderizarReciboMes(mesInfo);
-                    container.style.cssText = 'width: 210mm; min-height: 297mm; background: white;';
+                    
+                    const pagina = container.querySelector('div') || container;
+                    pagina.style.cssText = 'width: 210mm; height: 297mm; background: white; overflow: hidden;';
                     document.body.appendChild(container);
 
                     const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                     const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
 
-                    const pdfBlob = await html2pdf().set({
-                        margin: 0,
-                        image: { type: 'jpeg', quality: 0.95 },
-                        html2canvas: { scale: 1.5, useCORS: true },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    }).from(container).outputPdf('blob');
+                    const pdfBlob = await html2pdf().set(opcoesPDF).from(container).outputPdf('blob');
 
                     zip.file(nomeArquivo, pdfBlob);
                     document.body.removeChild(container);
