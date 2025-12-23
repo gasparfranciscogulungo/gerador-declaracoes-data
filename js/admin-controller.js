@@ -5224,15 +5224,10 @@ function adminApp() {
                     this.loadingMessage = `Renderizando página ${i + 1} de ${meses.length}...`;
                     const mesInfo = meses[i];
                     
-                    // Wrapper para page-break (NÃO adicionar height extra!)
+                    // Wrapper simples - SEM page-break (html2pdf calcula pela altura)
                     const pagina = document.createElement('div');
-                    pagina.className = 'pagina-recibo';
                     pagina.innerHTML = this.renderizarReciboMes(mesInfo);
-                    
-                    // Apenas page-break, sem height (o layout já tem 297mm)
-                    if (i < meses.length - 1) {
-                        pagina.style.cssText = 'page-break-after: always;';
-                    }
+                    // Não adicionar nenhum style - o layout já tem 210mm x 297mm
                     
                     container.appendChild(pagina);
                     console.log(`📄 Página ${i + 1} adicionada`);
@@ -5243,7 +5238,7 @@ function adminApp() {
                 // Aguardar imagens carregarem
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Configurações otimizadas para A4 perfeito
+                // Configurações otimizadas - SEM pagebreak (altura do layout = 297mm = 1 página)
                 const opcoesPDF = {
                     margin: 0,
                     filename: nomeArquivo,
@@ -5261,11 +5256,8 @@ function adminApp() {
                         format: 'a4', 
                         orientation: 'portrait',
                         compress: true
-                    },
-                    pagebreak: { 
-                        mode: ['css'],
-                        after: '.pagina-recibo'
                     }
+                    // SEM pagebreak - o html2pdf divide automaticamente a cada 297mm
                 };
 
                 this.loadingMessage = 'Gerando PDF...';
