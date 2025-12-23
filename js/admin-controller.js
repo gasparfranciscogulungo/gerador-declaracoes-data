@@ -5214,45 +5214,47 @@ function adminApp() {
                 this.loading = true;
                 this.loadingMessage = 'Preparando recibo...';
 
-                // Criar container SEM position absolute (isso causa página em branco!)
+                // Criar container
                 const container = document.createElement('div');
                 container.id = 'pdf-recibo-container';
-                container.style.cssText = 'background: white;';
+                container.style.cssText = 'background: white; width: 210mm;';
                 
-                // Adicionar cada página
+                // Adicionar cada página (o layout já tem 210mm x 297mm definido)
                 for (let i = 0; i < meses.length; i++) {
                     this.loadingMessage = `Renderizando página ${i + 1} de ${meses.length}...`;
                     const mesInfo = meses[i];
                     
+                    // Wrapper para page-break (NÃO adicionar height extra!)
                     const pagina = document.createElement('div');
+                    pagina.className = 'pagina-recibo';
                     pagina.innerHTML = this.renderizarReciboMes(mesInfo);
-                    pagina.style.cssText = `
-                        width: 210mm;
-                        min-height: 297mm;
-                        background: white;
-                        overflow: hidden;
-                        page-break-after: ${i < meses.length - 1 ? 'always' : 'avoid'};
-                    `;
-                    container.appendChild(pagina);
                     
+                    // Apenas page-break, sem height (o layout já tem 297mm)
+                    if (i < meses.length - 1) {
+                        pagina.style.cssText = 'page-break-after: always;';
+                    }
+                    
+                    container.appendChild(pagina);
                     console.log(`📄 Página ${i + 1} adicionada`);
                 }
                 
                 document.body.appendChild(container);
                 
                 // Aguardar imagens carregarem
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Configurações simples que funcionam
+                // Configurações otimizadas para A4 perfeito
                 const opcoesPDF = {
                     margin: 0,
                     filename: nomeArquivo,
-                    image: { type: 'jpeg', quality: 0.98 },
+                    image: { type: 'jpeg', quality: 0.95 },
                     html2canvas: { 
-                        scale: 1.5,
+                        scale: 2,
                         useCORS: true,
+                        allowTaint: true,
                         letterRendering: true,
-                        logging: false
+                        logging: false,
+                        backgroundColor: '#ffffff'
                     },
                     jsPDF: { 
                         unit: 'mm', 
@@ -5261,7 +5263,8 @@ function adminApp() {
                         compress: true
                     },
                     pagebreak: { 
-                        mode: ['css', 'legacy']
+                        mode: ['css'],
+                        after: '.pagina-recibo'
                     }
                 };
 
@@ -5314,15 +5317,17 @@ function adminApp() {
                     this.showAlert('info', '📥 Gerando PDFs individuais...');
                 }
 
-                // Configurações simples que funcionam
+                // Configurações otimizadas
                 const opcoesPDF = {
                     margin: 0,
-                    image: { type: 'jpeg', quality: 0.98 },
+                    image: { type: 'jpeg', quality: 0.95 },
                     html2canvas: { 
-                        scale: 1.5,
+                        scale: 2,
                         useCORS: true,
+                        allowTaint: true,
                         letterRendering: true,
-                        logging: false
+                        logging: false,
+                        backgroundColor: '#ffffff'
                     },
                     jsPDF: { 
                         unit: 'mm', 
@@ -5337,19 +5342,14 @@ function adminApp() {
                     
                     const mesInfo = meses[i];
                     
-                    // Criar container SEM position absolute
+                    // Criar container com width fixo (layout já tem height 297mm)
                     const container = document.createElement('div');
                     container.innerHTML = this.renderizarReciboMes(mesInfo);
-                    container.style.cssText = `
-                        width: 210mm;
-                        min-height: 297mm;
-                        background: white;
-                        overflow: hidden;
-                    `;
+                    container.style.cssText = 'width: 210mm; background: white;';
                     document.body.appendChild(container);
                     
                     // Aguardar renderização
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    await new Promise(resolve => setTimeout(resolve, 400));
 
                     const mesNome = mesInfo.mesTrabalhado.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }).replace('.', '');
                     const nomeArquivo = `Recibo_${this.formatarNomeFicheiro(cliente?.nome || 'Colaborador')}_${mesNome}.pdf`;
