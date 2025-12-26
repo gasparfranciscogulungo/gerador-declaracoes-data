@@ -17,8 +17,8 @@
  * - Líquido = Bruto - (INSS + IRT + Outros)
  * 
  * DATA DE PAGAMENTO:
- * - Empresas pagam entre dia 1 e 15 do mês seguinte
- * - Lógica automática: se mês referência = Dezembro, pagamento = Janeiro do ano seguinte
+ * - Empresas pagam entre dia 8 e 15 do MESMO mês do recibo
+ * - Ex: Recibo de Dezembro 2025 → Pagamento em 08-15 de Dezembro de 2025
  */
 
 const ModelosRecibo = {
@@ -50,16 +50,16 @@ const ModelosRecibo = {
 
     /**
      * Calcula e formata a Data de Pagamento
-     * Lógica: Empresas pagam entre dia 1 e 15 do mês seguinte ao mês de referência
+     * Lógica: Data de pagamento é no MESMO mês do recibo (dia 8-15)
      */
     _calcularDataPagamento(mesReferencia, diaPagamento = null) {
         const refDate = mesReferencia ? new Date(mesReferencia + '-01') : new Date();
         
-        // Mês seguinte ao mês de referência
+        // MESMO mês do recibo (NÃO mês seguinte)
         const mesPagamento = new Date(refDate);
-        mesPagamento.setMonth(mesPagamento.getMonth() + 1);
+        // Removido: mesPagamento.setMonth(mesPagamento.getMonth() + 1);
         
-        // Dia de pagamento (padrão: dia 8, mas pode ser 1-15)
+        // Dia de pagamento (padrão: dia 8, intervalo 8-15)
         const dia = diaPagamento || 8;
         mesPagamento.setDate(Math.min(dia, 15)); // Máximo dia 15
         
@@ -256,7 +256,7 @@ const ModelosRecibo = {
             const mesRefDate = new Date(mesRef + '-01');
             const periodoFormatado = utils._formatarPeriodo(mesRefDate);
             
-            // Data de pagamento (dia 1-15 do mês seguinte)
+            // Data de pagamento (dia 8-15 do MESMO mês)
             const diaPagamento = config.diaPagamento || 8;
             const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
             
@@ -473,7 +473,7 @@ const ModelosRecibo = {
             const mesRefDate = new Date(mesRef + '-01');
             const periodoFormatado = utils._formatarPeriodo(mesRefDate);
             
-            // Data de pagamento (dia 1-15 do mês seguinte)
+            // Data de pagamento (dia 8-15 do MESMO mês)
             const diaPagamento = config.diaPagamento || 8;
             const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
             
@@ -648,7 +648,7 @@ const ModelosRecibo = {
             const mesRefDate = new Date(mesRef + '-01');
             const periodoFormatado = utils._formatarPeriodo(mesRefDate);
             
-            // Data de pagamento (dia 1-15 do mês seguinte)
+            // Data de pagamento (dia 8-15 do MESMO mês)
             const diaPagamento = config.diaPagamento || 8;
             const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
             
@@ -835,7 +835,7 @@ const ModelosRecibo = {
             const mesRef = config.mesReferencia || new Date().toISOString().slice(0, 7);
             const mesRefDate = new Date(mesRef + '-01');
             
-            // Data de pagamento (dia 1-15 do mês seguinte)
+            // Data de pagamento (dia 8-15 do MESMO mês)
             const diaPagamento = config.diaPagamento || 8;
             const dataPagamento = utils._calcularDataPagamento(mesRef, diaPagamento);
             
