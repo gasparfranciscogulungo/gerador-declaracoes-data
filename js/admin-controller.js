@@ -4925,20 +4925,28 @@ function adminApp() {
                 ? new Date(this.previewConfig.mesReferencia + '-01') 
                 : new Date();
             
-            const diaBase = parseInt(this.previewConfig.diaPagamento) || 8;
+            // Verificar se o usuário definiu um dia de pagamento
+            const diaDefinidoPeloUsuario = this.previewConfig.diaPagamento && 
+                                           this.previewConfig.diaPagamento !== '' && 
+                                           !isNaN(parseInt(this.previewConfig.diaPagamento));
+            const diaBase = diaDefinidoPeloUsuario ? parseInt(this.previewConfig.diaPagamento) : null;
             
             for (let i = 0; i < quantidade; i++) {
                 const mesTrabalhado = new Date(mesRef);
                 mesTrabalhado.setMonth(mesTrabalhado.getMonth() - i);
                 
-                // Data de pagamento é no MESMO mês do recibo (não no mês seguinte)
+                // Data de pagamento é no MESMO mês do recibo
                 const mesPagamento = new Date(mesTrabalhado);
                 
-                // Cada mês usa dia aleatório entre 8 e 15 para parecer mais realista
+                // Lógica de dias:
+                // - Se usuário definiu dia: primeira página usa esse dia, outras são aleatórias (8-15)
+                // - Se usuário NÃO definiu: TODAS as páginas são aleatórias (8-15)
                 let diaPagamento;
-                if (i === 0) {
+                if (diaDefinidoPeloUsuario && i === 0) {
+                    // Primeira página com dia definido pelo usuário
                     diaPagamento = diaBase;
                 } else {
+                    // Páginas seguintes OU todas se não houver dia definido = aleatório 8-15
                     diaPagamento = this.gerarDiaPagamentoAleatorio();
                 }
                 mesPagamento.setDate(diaPagamento);
