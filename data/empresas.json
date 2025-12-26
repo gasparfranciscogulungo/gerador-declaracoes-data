@@ -81,6 +81,34 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2025-12-18T19:01:02.957Z"
+    },
+    {
+      "id": "empresa_1766753735316",
+      "nome": "ANSAMA COMERCIAL, LDA",
+      "nif": "5701012387",
+      "endereco": {
+        "completo": "Luanda, Edifício Sky Business -\nTalatona, zona  do CCB",
+        "rua": "Luanda",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Luanda, Edifício Sky Business -\nTalatona, zona  do CCB",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5701012387/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5701012387/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2025-12-26T12:55:35.316Z",
+      "updatedAt": "2025-12-26T12:55:35.316Z",
+      "contador": 0
     }
   ]
 }
