@@ -4908,11 +4908,11 @@ function adminApp() {
         // ========== FUNÇÕES DE GERAÇÃO DE PDF PARA RECIBOS ==========
 
         /**
-         * Gera dia de pagamento aleatório entre 5 e 10
+         * Gera dia de pagamento aleatório entre 8 e 15
          */
         gerarDiaPagamentoAleatorio() {
-            // Gera número aleatório entre 5 e 10 (inclusive)
-            return Math.floor(Math.random() * 6) + 5;
+            // Gera número aleatório entre 8 e 15 (inclusive)
+            return Math.floor(Math.random() * 8) + 8;
         },
 
         /**
@@ -4931,11 +4931,10 @@ function adminApp() {
                 const mesTrabalhado = new Date(mesRef);
                 mesTrabalhado.setMonth(mesTrabalhado.getMonth() - i);
                 
-                // Mês de pagamento (mês seguinte ao trabalhado)
+                // Data de pagamento é no MESMO mês do recibo (não no mês seguinte)
                 const mesPagamento = new Date(mesTrabalhado);
-                mesPagamento.setMonth(mesPagamento.getMonth() + 1);
                 
-                // Primeiro mês usa dia escolhido, outros usam dia aleatório 5-10
+                // Cada mês usa dia aleatório entre 8 e 15 para parecer mais realista
                 let diaPagamento;
                 if (i === 0) {
                     diaPagamento = diaBase;
