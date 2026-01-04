@@ -112,7 +112,7 @@
     },
     {
       "id": "empresa_1767568450027",
-      "nome": "GRUPO PIONEIRO LEANDRO, LDA Tipo: ",
+      "nome": "GRUPO PIONEIRO LEANDRO, LDA",
       "nif": "5417382981",
       "endereco": {
         "completo": "Rua 1 de Maio, Edifício Business Center, 5º Andar, Talatona, Luanda, Angola",
@@ -134,9 +134,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2026-01-04T23:14:10.027Z",
-      "updatedAt": "2026-01-04T23:14:10.027Z",
-      "contador": 0
+      "updatedAt": "2026-01-04T23:15:22.184Z"
     }
   ]
 }
