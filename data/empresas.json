@@ -189,6 +189,34 @@
       "createdAt": "2026-01-10T21:53:13.131Z",
       "updatedAt": "2026-01-10T21:53:13.131Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1768086544946",
+      "nome": "GRUPO ADMARTINS COMERCIO INDUST E HOTELARIA,LDA",
+      "nif": "5417165611",
+      "endereco": {
+        "completo": "Viana, Zona Industrial, Estrada Nacional EN230, Parque Comercial de Viana, Luanda – Angola.",
+        "rua": "Viana",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Viana, Zona Industrial, Estrada Nacional EN230, Parque Comercial de Viana, Luanda – Angola.",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417165611/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417165611/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2026-01-10T23:09:04.946Z",
+      "updatedAt": "2026-01-10T23:09:04.946Z",
+      "contador": 0
     }
   ]
 }
