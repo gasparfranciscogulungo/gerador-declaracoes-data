@@ -138,7 +138,7 @@
     },
     {
       "id": "empresa_1768069224170",
-      "nome": "AMITAFIUR - CONSTRUCAO CIVIL, OBRAS PUBLICAS E ENGENHARIA, LDA",
+      "nome": "AMITAFIUR - CONSTRUCAO CIVIL, LDA",
       "nif": "5000195553",
       "endereco": {
         "completo": "Talatona, Rua do Centro de Convenções, Edifício Empresarial Talatona, 2.º Andar, Sala 204, Luanda – Angola",
@@ -160,9 +160,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2026-01-10T18:20:24.170Z",
-      "updatedAt": "2026-01-10T18:20:24.170Z",
-      "contador": 0
+      "updatedAt": "2026-01-10T19:21:39.910Z"
     }
   ]
 }
