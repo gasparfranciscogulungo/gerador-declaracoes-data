@@ -221,7 +221,7 @@
       "nome": "NEOFARMA-DISTRIB. DE MED. E COSMETICOS, LDA",
       "nif": "5401110120",
       "endereco": {
-        "completo": "Camama, Jardim do Éden, Rua Direita do Camama, Edifício Jardim Business, 1.º Andar, Sala 09, Luanda – Angola",
+        "completo": "Camama, Rua Direita do Camama, Edifício Jardim Business, 1.º Andar, Sala 09, Luanda – Angola",
         "rua": "Camama",
         "edificio": "",
         "andar": "",
@@ -231,7 +231,7 @@
         "provincia": "",
         "pais": "Angola"
       },
-      "enderecoCompleto": "Camama, Jardim do Éden, Rua Direita do Camama, Edifício Jardim Business, 1.º Andar, Sala 09, Luanda – Angola",
+      "enderecoCompleto": "Camama, Rua Direita do Camama, Edifício Jardim Business, 1.º Andar, Sala 09, Luanda – Angola",
       "telefone": "",
       "email": "",
       "website": "",
@@ -240,9 +240,7 @@
       "corPrimaria": "#1e40af",
       "corSecundaria": "#64748b",
       "marcaDagua": "",
-      "createdAt": "2026-01-10T23:34:55.454Z",
-      "updatedAt": "2026-01-10T23:34:55.455Z",
-      "contador": 0
+      "updatedAt": "2026-01-10T23:37:04.066Z"
     }
   ]
 }
