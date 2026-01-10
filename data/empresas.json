@@ -161,6 +161,34 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2026-01-10T19:48:25.865Z"
+    },
+    {
+      "id": "empresa_1768081993131",
+      "nome": "AMWENGE-ENGENHARIA E CONSULTORIA , LDA",
+      "nif": "5417121592",
+      "endereco": {
+        "completo": "Benfica, Avenida Pedro de Castro Van-Dúnem Loy, Luanda – Angola",
+        "rua": "Benfica",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Benfica, Avenida Pedro de Castro Van-Dúnem Loy, Luanda – Angola",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417121592/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417121592/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2026-01-10T21:53:13.131Z",
+      "updatedAt": "2026-01-10T21:53:13.131Z",
+      "contador": 0
     }
   ]
 }
