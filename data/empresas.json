@@ -241,6 +241,34 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2026-01-10T23:37:04.066Z"
+    },
+    {
+      "id": "empresa_1768092789401",
+      "nome": "GEMAC-COMERCIO GERAL, LDA",
+      "nif": "5405065420",
+      "endereco": {
+        "completo": "Viana, Zona Industrial, Estrada Nacional EN230, Parque Empresarial de Viana, Armazém 12, Luanda – Angola",
+        "rua": "Viana",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Viana, Zona Industrial, Estrada Nacional EN230, Parque Empresarial de Viana, Armazém 12, Luanda – Angola",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5405065420/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5405065420/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2026-01-11T00:53:09.401Z",
+      "updatedAt": "2026-01-11T00:53:09.401Z",
+      "contador": 0
     }
   ]
 }
