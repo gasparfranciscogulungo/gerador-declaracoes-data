@@ -269,6 +269,34 @@
       "createdAt": "2026-01-11T00:53:09.401Z",
       "updatedAt": "2026-01-11T00:53:09.401Z",
       "contador": 0
+    },
+    {
+      "id": "empresa_1768093400858",
+      "nome": "AFRI-AGUIA - COMERCIO GERAL ,LDA",
+      "nif": "5417240559",
+      "endereco": {
+        "completo": "Belas, Kilamba, Avenida Principal, Bloco K10, Loja 03, Luanda – Angola",
+        "rua": "Belas",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Belas, Kilamba, Avenida Principal, Bloco K10, Loja 03, Luanda – Angola",
+      "telefone": "",
+      "email": "",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417240559/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417240559/carimbo.png",
+      "corPrimaria": "#1e40af",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2026-01-11T01:03:20.858Z",
+      "updatedAt": "2026-01-11T01:03:20.858Z",
+      "contador": 0
     }
   ]
 }
