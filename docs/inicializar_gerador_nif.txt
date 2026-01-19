@@ -1,0 +1,7 @@
+/home/gaspar-francisco-g/gerador-declaracoes-data/gerarpdf/venv/bin/python /home/gaspar-francisco-g/gerador-declaracoes-data/gerarpdf/app.py
+
+O Gerador de NIF está rodando em:
+
+Local: http://localhost:5000
+Rede: http://172.20.10.6:5000
+Você pode acessar agora no navegador para gerar o comprovativo de contribuinte (NIF).

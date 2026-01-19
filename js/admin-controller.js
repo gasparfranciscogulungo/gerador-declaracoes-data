@@ -156,6 +156,7 @@ function adminApp() {
         biModoPersonalizacao: 'auto_empresa', // 'auto_empresa', 'auto_so_nome', 'manual'
         mostrarPainelLayoutBI: false, // Toggle para mostrar/esconder painel de layouts
         biDataAutomatica: true, // Se true, usa data de hoje; se false, usa data manual
+        biDataManualInput: '', // Input type="date" para selecionar data
         biCorPersonalizada: '#1a365d', // Cor personalizável para layouts
         biMostrarNome: true, // Mostrar nome no PDF
         biMostrarBI: true, // Mostrar número do BI no PDF

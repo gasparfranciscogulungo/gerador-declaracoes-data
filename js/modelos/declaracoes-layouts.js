@@ -145,8 +145,12 @@ const ModelosDeclaracao = {
                 alinhamentoTexto: config.alinhamentoTexto || 'justify',
                 carimboWidth: config.carimboWidth || 180,
                 carimboHeight: config.carimboHeight || 140,
-                cabecalhoLogoSize: config.cabecalhoLogoSize || 70
+                cabecalhoLogoSize: config.cabecalhoLogoSize || 70,
+                textoDataLocal: config.textoDataLocal || ''
             };
+            
+            // Data/Local: usa manual se definido, senão automático
+            const textoDataFinal = cfg.textoDataLocal || `${empresa.endereco?.municipio || 'Luanda'}, aos ${dataAtual}`;
             
             return `
             <div style="
@@ -230,7 +234,7 @@ const ModelosDeclaracao = {
                     
                     <!-- RODAPÉ -->
                     <div style="margin-top: 45px;">
-                        <p style="margin-bottom: 35px;">${empresa.endereco?.municipio || 'Luanda'}, aos ${dataAtual}.</p>
+                        <p style="margin-bottom: 35px;">${textoDataFinal}.</p>
                         
                         <!-- ASSINATURA CENTRALIZADA -->
                         <div style="text-align: center; margin-top: 30px;">
@@ -280,8 +284,12 @@ const ModelosDeclaracao = {
                 espacamentoLinhas: config.espacamentoLinhas || 1.6,
                 carimboWidth: config.carimboWidth || 160,
                 carimboHeight: config.carimboHeight || 120,
-                cabecalhoLogoSize: config.cabecalhoLogoSize || 70
+                cabecalhoLogoSize: config.cabecalhoLogoSize || 70,
+                textoDataLocal: config.textoDataLocal || ''
             };
+            
+            // Data/Local: usa manual se definido, senão automático
+            const textoDataFinal = cfg.textoDataLocal || `${empresa.endereco?.municipio || 'Luanda'}, ${dataAtual}`;
             
             return `
                 <div style="
@@ -393,7 +401,7 @@ const ModelosDeclaracao = {
                         <!-- RODAPÉ -->
                         <div style="margin-top: 35px;">
                             <p style="color: #666; margin-bottom: 28px;">
-                                ${empresa.endereco?.municipio || 'Luanda'}, ${dataAtual}
+                                ${textoDataFinal}
                             </p>
                             
                             <!-- ASSINATURA CENTRALIZADA -->
@@ -444,8 +452,12 @@ const ModelosDeclaracao = {
                 espacamentoLinhas: config.espacamentoLinhas || 1.7,
                 carimboWidth: config.carimboWidth || 180,
                 carimboHeight: config.carimboHeight || 140,
-                cabecalhoLogoSize: config.cabecalhoLogoSize || 65
+                cabecalhoLogoSize: config.cabecalhoLogoSize || 65,
+                textoDataLocal: config.textoDataLocal || ''
             };
+            
+            // Data/Local: usa manual se definido, senão automático
+            const textoDataFinal = cfg.textoDataLocal || `${empresa.endereco?.municipio || 'Luanda'}, ${dataAtual}`;
             
             return `
                 <div style="
@@ -523,7 +535,7 @@ const ModelosDeclaracao = {
                         
                         <!-- RODAPÉ -->
                         <div style="margin-top: 40px;">
-                            <p style="color: #888; font-size: 10pt; margin-bottom: 28px;">${empresa.endereco?.municipio || 'Luanda'}, ${dataAtual}</p>
+                            <p style="color: #888; font-size: 10pt; margin-bottom: 28px;">${textoDataFinal}</p>
                             
                             <!-- ASSINATURA CENTRALIZADA -->
                             <div style="text-align: center;">
@@ -577,8 +589,12 @@ const ModelosDeclaracao = {
                 carimboWidth: config.carimboWidth || 220,
                 carimboHeight: config.carimboHeight || 170,
                 margemTopDataLocal: config.margemTopDataLocal || 35,
-                margemTopAssinatura: config.margemTopAssinatura || 25
+                margemTopAssinatura: config.margemTopAssinatura || 25,
+                textoDataLocal: config.textoDataLocal || ''
             };
+            
+            // Data/Local: usa manual se definido, senão automático
+            const textoDataFinal = cfg.textoDataLocal || `${empresa.endereco?.municipio || 'Luanda'}, aos ${dataAtual}`;
             
             return `
                 <div style="
@@ -699,7 +715,7 @@ const ModelosDeclaracao = {
                     
                     <!-- RODAPÉ -->
                     <div style="margin-top: 40px;">
-                        <p style="margin-bottom: 25px;">${empresa.endereco?.municipio || 'Luanda'}, aos ${dataAtual}.</p>
+                        <p style="margin-bottom: 25px;">${textoDataFinal}.</p>
                         
                         <!-- ASSINATURA E CARIMBO CENTRALIZADOS -->
                         <div style="text-align: center; margin-top: 25px;">
