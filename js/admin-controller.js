@@ -107,6 +107,34 @@ function adminApp() {
             usuarios: null
         },
         
+        // Sistema de Alertas Inteligentes (Histórico v2)
+        alertaHistorico: {
+            mostrar: false,
+            tipo: '', // 'multi-empresa', 'limite-documentos', 'confirmacao'
+            severidade: 'aviso', // 'info', 'aviso', 'bloqueio'
+            titulo: '',
+            mensagem: '',
+            detalhes: null,
+            callbackConfirmar: null,
+            callbackCancelar: null
+        },
+        historicoManagerV2Inicializado: false,
+        
+        // Modal de Registro Manual (Lacunas)
+        modalRegistroManual: false,
+        registroManualLoading: false,
+        registroManual: {
+            tipo_documento: 'declaracao',
+            trabalhador_id: '',
+            trabalhador_nome: '',
+            trabalhador_bi: '',
+            empresa_id: '',
+            empresa_nome: '',
+            data_geracao: '',
+            quantidade: 1,
+            notas: ''
+        },
+        
         // Computed: Colaboradores filtrados
         get colaboradoresFiltrados() {
             if (!this.pesquisaColaborador) {
@@ -458,10 +486,18 @@ function adminApp() {
             // Inicializar outros managers
             this.clienteManager = new ClienteManager();
             
-            // Inicializar HistoricoManager (SIMPLIFICADO - sem authManager)
-            if (typeof historicoManager !== 'undefined') {
-                // Skip - não precisa inicializar com authManager no modo simplificado
-                console.log('⏭️  HistoricoManager: modo simplificado');
+            // Inicializar HistoricoManagerV2 (Sistema Inteligente)
+            if (typeof historicoManagerV2 !== 'undefined') {
+                try {
+                    await historicoManagerV2.inicializar(githubAPI, null);
+                    this.historicoManagerV2Inicializado = true;
+                    console.log('✅ HistoricoManagerV2 inicializado com sucesso');
+                } catch (error) {
+                    console.warn('⚠️ Erro ao inicializar HistoricoManagerV2:', error);
+                }
+            } else if (typeof historicoManager !== 'undefined') {
+                // Fallback para versão antiga
+                console.log('⏭️  HistoricoManager: modo simplificado (v1)');
             }
             
             // Carregar TODOS os dados
@@ -3298,6 +3334,13 @@ function adminApp() {
                     return;
                 }
 
+                // 🆕 VERIFICAR ALERTAS ANTES DE GERAR (Sistema Inteligente)
+                const podeGerar = await this.verificarAlertasAntesDeGerar();
+                if (!podeGerar) {
+                    console.log('⏹️ Geração cancelada pelo usuário após alerta');
+                    return;
+                }
+
                 // Mostrar loading
                 this.loading = true;
                 this.loadingMessage = 'Gerando PDF profissional...';
@@ -3392,8 +3435,8 @@ function adminApp() {
                 
                 console.log('✅ PDF gerado e baixado com sucesso!');
 
-                // Opcional: Registrar no histórico (pode implementar depois)
-                this.registrarDownloadPDF(nomeArquivo);
+                // 🆕 Registrar no histórico v2 (Sistema Inteligente)
+                this.registrarDocumentoHistoricoV2(nomeArquivo);
 
             } catch (error) {
                 console.error('❌ Erro ao gerar PDF:', error);
@@ -3597,6 +3640,254 @@ function adminApp() {
             } catch (error) {
                 console.error('⚠️ Erro ao registrar download:', error);
                 // Não bloqueia a geração do PDF
+            }
+        },
+
+        // ========== SISTEMA DE ALERTAS INTELIGENTES ==========
+
+        /**
+         * Verifica alertas antes de gerar documento
+         * @returns {Promise<boolean>} true se pode continuar, false se deve parar
+         */
+        async verificarAlertasAntesDeGerar() {
+            // Verificar se o historicoManagerV2 está disponível
+            if (!this.historicoManagerV2Inicializado || typeof historicoManagerV2 === 'undefined') {
+                console.log('⏭️ HistoricoManagerV2 não disponível, pulando verificações');
+                return true;
+            }
+
+            const empresa = this.fluxoEmpresaSelecionada || this.getEmpresaExemplo();
+            const cliente = this.fluxoClienteSelecionado || this.getClienteExemplo();
+
+            if (!empresa?.id || !cliente?.id) {
+                console.log('⏭️ Empresa ou cliente não definido, pulando verificações');
+                return true;
+            }
+
+            try {
+                // Executar verificações
+                const verificacao = historicoManagerV2.verificarAntesDeGerar(
+                    cliente.id,
+                    cliente.nome,
+                    cliente.bi || cliente.documento,
+                    empresa.id,
+                    empresa.nome
+                );
+
+                // Se não há alertas, pode continuar
+                if (verificacao.alertas.length === 0) {
+                    return true;
+                }
+
+                // Processar alertas sequencialmente
+                for (const alerta of verificacao.alertas) {
+                    const continuar = await this.mostrarAlertaHistorico(alerta);
+                    if (!continuar) {
+                        return false; // Usuário cancelou
+                    }
+                }
+
+                return true; // Usuário confirmou todos os alertas
+            } catch (error) {
+                console.error('❌ Erro ao verificar alertas:', error);
+                return true; // Em caso de erro, permite continuar
+            }
+        },
+
+        /**
+         * Mostra alerta do histórico e aguarda resposta
+         * @returns {Promise<boolean>} true se confirmou, false se cancelou
+         */
+        mostrarAlertaHistorico(alerta) {
+            return new Promise((resolve) => {
+                // Configurar alerta
+                this.alertaHistorico = {
+                    mostrar: true,
+                    tipo: alerta.tipo,
+                    severidade: alerta.severidade,
+                    titulo: this.getTituloAlerta(alerta.tipo),
+                    mensagem: alerta.mensagem,
+                    detalhes: alerta,
+                    callbackConfirmar: () => {
+                        this.alertaHistorico.mostrar = false;
+                        resolve(true);
+                    },
+                    callbackCancelar: () => {
+                        this.alertaHistorico.mostrar = false;
+                        resolve(false);
+                    }
+                };
+            });
+        },
+
+        /**
+         * Retorna título apropriado para o tipo de alerta
+         */
+        getTituloAlerta(tipo) {
+            const titulos = {
+                'multi-empresa': '⚠️ Trabalhador em Múltiplas Empresas',
+                'limite-documentos': 'ℹ️ Limite de Documentos',
+                'confirmacao': '❓ Confirmação Necessária'
+            };
+            return titulos[tipo] || '⚠️ Atenção';
+        },
+
+        /**
+         * Fecha o modal de alerta
+         */
+        fecharAlertaHistorico() {
+            this.alertaHistorico.mostrar = false;
+            if (this.alertaHistorico.callbackCancelar) {
+                this.alertaHistorico.callbackCancelar();
+            }
+        },
+
+        /**
+         * Confirma o alerta e continua
+         */
+        confirmarAlertaHistorico() {
+            if (this.alertaHistorico.callbackConfirmar) {
+                this.alertaHistorico.callbackConfirmar();
+            }
+        },
+
+        /**
+         * Registra documento no histórico v2 após geração
+         */
+        async registrarDocumentoHistoricoV2(nomeArquivo) {
+            if (!this.historicoManagerV2Inicializado || typeof historicoManagerV2 === 'undefined') {
+                // Fallback para método antigo
+                return await this.registrarDownloadPDF(nomeArquivo);
+            }
+
+            try {
+                const empresa = this.fluxoEmpresaSelecionada || this.getEmpresaExemplo();
+                const cliente = this.fluxoClienteSelecionado || this.getClienteExemplo();
+                const tipo = this.tipoPreview || this.fluxoTipoDocumento || 'declaracao';
+                const layout = this.layoutAtivo || this.layoutReciboAtivo || 'executivo';
+
+                const registro = await historicoManagerV2.registrarDocumento({
+                    tipo_documento: tipo,
+                    layout_usado: layout,
+                    empresa_id: empresa?.id,
+                    empresa_nome: empresa?.nome,
+                    empresa_nif: empresa?.nif,
+                    trabalhador_id: cliente?.id,
+                    trabalhador_nome: cliente?.nome,
+                    trabalhador_bi: cliente?.bi || cliente?.documento,
+                    contador: empresa?.contador ? `${String(empresa.contador).padStart(3, '0')}/${new Date().getFullYear()}` : '',
+                    dados_documento: {
+                        empresa_nome: empresa?.nome,
+                        empresa_nif: empresa?.nif,
+                        trabalhador_nome: cliente?.nome,
+                        trabalhador_bi: cliente?.bi || cliente?.documento,
+                        trabalhador_funcao: cliente?.funcao,
+                        salario_base: cliente?.salario_base,
+                        moeda: cliente?.moeda || 'AKZ',
+                        arquivo: nomeArquivo
+                    },
+                    origem: 'automatico'
+                });
+
+                console.log('✅ Documento registrado no histórico v2:', registro.id);
+                return registro;
+            } catch (error) {
+                console.error('❌ Erro ao registrar no histórico v2:', error);
+                // Fallback para método antigo
+                return await this.registrarDownloadPDF(nomeArquivo);
+            }
+        },
+
+        // ========== REGISTRO MANUAL DE LACUNAS ==========
+
+        /**
+         * Abre modal de registro manual
+         */
+        abrirRegistroManual() {
+            // Resetar formulário
+            this.registroManual = {
+                tipo_documento: 'declaracao',
+                trabalhador_id: '',
+                trabalhador_nome: '',
+                trabalhador_bi: '',
+                empresa_id: '',
+                empresa_nome: '',
+                data_geracao: new Date().toISOString().split('T')[0],
+                quantidade: 1,
+                notas: ''
+            };
+            this.modalRegistroManual = true;
+        },
+
+        /**
+         * Preenche dados do trabalhador selecionado no registro manual
+         */
+        selecionarTrabalhadorRegistroManual(trabalhador) {
+            this.registroManual.trabalhador_id = trabalhador.id;
+            this.registroManual.trabalhador_nome = trabalhador.nome;
+            this.registroManual.trabalhador_bi = trabalhador.bi || trabalhador.documento || '';
+        },
+
+        /**
+         * Preenche dados da empresa selecionada no registro manual
+         */
+        selecionarEmpresaRegistroManual(empresa) {
+            this.registroManual.empresa_id = empresa.id;
+            this.registroManual.empresa_nome = empresa.nome;
+        },
+
+        /**
+         * Salva registro manual no histórico
+         */
+        async salvarRegistroManual() {
+            try {
+                // Validações
+                if (!this.registroManual.trabalhador_nome) {
+                    this.showAlert('error', '❌ Informe o nome do trabalhador');
+                    return;
+                }
+                if (!this.registroManual.empresa_nome) {
+                    this.showAlert('error', '❌ Informe o nome da empresa');
+                    return;
+                }
+
+                this.registroManualLoading = true;
+
+                // Verificar se historicoManagerV2 está disponível
+                if (!this.historicoManagerV2Inicializado || typeof historicoManagerV2 === 'undefined') {
+                    this.showAlert('error', '❌ Sistema de histórico não disponível');
+                    return;
+                }
+
+                const quantidade = Math.min(Math.max(1, this.registroManual.quantidade || 1), 10);
+                const resultados = [];
+
+                // Registrar quantidade de documentos
+                for (let i = 0; i < quantidade; i++) {
+                    const registro = await historicoManagerV2.registrarManual({
+                        tipo_documento: this.registroManual.tipo_documento,
+                        trabalhador_id: this.registroManual.trabalhador_id || `TRAB-MANUAL-${Date.now()}-${i}`,
+                        trabalhador_nome: this.registroManual.trabalhador_nome,
+                        trabalhador_bi: this.registroManual.trabalhador_bi,
+                        empresa_id: this.registroManual.empresa_id || `EMP-MANUAL-${Date.now()}`,
+                        empresa_nome: this.registroManual.empresa_nome,
+                        data_geracao: this.registroManual.data_geracao,
+                        notas: this.registroManual.notas || `Registro manual - Documento ${i + 1} de ${quantidade}`
+                    });
+                    resultados.push(registro);
+                }
+
+                this.showAlert('success', `✅ ${quantidade} documento(s) registrado(s) com sucesso!`);
+                
+                // Fechar modal e atualizar histórico
+                this.modalRegistroManual = false;
+                this.carregarHistoricoAdmin();
+
+            } catch (error) {
+                console.error('❌ Erro ao salvar registro manual:', error);
+                this.showAlert('error', `❌ Erro: ${error.message}`);
+            } finally {
+                this.registroManualLoading = false;
             }
         },
 
