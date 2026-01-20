@@ -137,19 +137,31 @@ function adminApp() {
         modalCropperBI: false,
         cropperInstance: null,
         cropperFotoAtual: 1,
-    biFoto1Preview: null,
-    biFoto2Preview: null,
-    biFoto1Blob: null,
-    biFoto2Blob: null,
-    biFoto1Editada: null,
-    biFoto2Editada: null,
-    cropperControlesVisiveis: false,
+        biFoto1Preview: null,
+        biFoto2Preview: null,
+        biFoto1Blob: null,
+        biFoto2Blob: null,
+        biFoto1Editada: null,
+        biFoto2Editada: null,
+        cropperControlesVisiveis: false,
         biModoManual: false, // Se true, permite editar dados manualmente
         biDadosManuais: {
             nome: '',
             biNif: '', // BI / NIF (mesmo número em Angola)
+            empresa: '', // Para modo manual com empresa
             data: new Date().toLocaleDateString('pt-AO')
         },
+        // Layout BI - 6 opções profissionais
+        layoutBIAtivo: 'executivo', // 'executivo', 'formal', 'moderno', 'minimalista', 'simples', 'cartao'
+        biModoPersonalizacao: 'auto_empresa', // 'auto_empresa', 'auto_so_nome', 'manual'
+        mostrarPainelLayoutBI: false, // Toggle para mostrar/esconder painel de layouts
+        biDataAutomatica: true, // Se true, usa data de hoje; se false, usa data manual
+        biDataManualInput: '', // Input type="date" para selecionar data
+        biCorPersonalizada: '#1a365d', // Cor personalizável para layouts
+        biMostrarNome: true, // Mostrar nome no PDF
+        biMostrarBI: true, // Mostrar número do BI no PDF
+        biMostrarEmpresa: true, // Mostrar nome da empresa
+        biMostrarData: true, // Mostrar data no PDF
         
         // Preview de Modelo
         modeloSelecionado: null,
@@ -4247,7 +4259,8 @@ function adminApp() {
         },
         
         /**
-         * Gera o PDF do BI com as 2 fotos (PROFISSIONAL)
+         * Gera o PDF do BI com as 2 fotos - 6 LAYOUTS PROFISSIONAIS
+         * Usando jsPDF diretamente para garantir que as fotos apareçam
          */
         async gerarBIPDF() {
             if (!this.biFoto1Editada || !this.biFoto2Editada) {
@@ -4277,129 +4290,408 @@ function adminApp() {
                 const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
                 const margin = 15;
                 
-                // ========== CABEÇALHO ==========
-                pdf.setFillColor(25, 32, 103); // Azul escuro profissional
-                pdf.rect(0, 0, pageWidth, 40, 'F');
+                // Cor personalizada ou da empresa
+                const corPrimaria = this.biCorPersonalizada || this.fluxoEmpresaSelecionada?.corPrimaria || '#1a365d';
                 
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(26);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('BILHETE DE IDENTIDADE', pageWidth / 2, 18, { align: 'center' });
-                
-                pdf.setFontSize(11);
-                pdf.setFont('helvetica', 'normal');
-                
-                // Usar dados manuais se modo manual ativado, senão usar empresa/cliente do fluxo
-                if (this.biModoManual) {
-                    // Modo Manual: apenas data (sem empresa)
-                    pdf.text(this.biDadosManuais.data || new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 28, { align: 'center' });
-                } else {
-                    // Modo Automático: empresa + data
-                    pdf.text(this.fluxoEmpresaSelecionada?.nome || 'Empresa', pageWidth / 2, 28, { align: 'center' });
-                    pdf.text(new Date().toLocaleDateString('pt-AO'), pageWidth / 2, 35, { align: 'center' });
-                }
-                
-                // ========== DADOS DO TITULAR ==========
-                pdf.setTextColor(0, 0, 0);
-                pdf.setFontSize(14);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Dados do Titular', margin, 55);
-                
-                pdf.setDrawColor(25, 32, 103);
-                pdf.setLineWidth(0.5);
-                pdf.line(margin, 57, pageWidth - margin, 57);
-                
-                pdf.setFontSize(11);
-                pdf.setFont('helvetica', 'normal');
+                // Converter cor hex para RGB
+                const hexToRgb = (hex) => {
+                    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? {
+                        r: parseInt(result[1], 16),
+                        g: parseInt(result[2], 16),
+                        b: parseInt(result[3], 16)
+                    } : { r: 26, g: 54, b: 93 };
+                };
+                const rgb = hexToRgb(corPrimaria);
                 
                 // Determinar dados (manual ou automático)
                 const dadosTitular = this.biModoManual ? {
-                    nome: this.biDadosManuais.nome || 'Nome não informado',
-                    biNif: this.biDadosManuais.biNif || ''
+                    nome: this.biDadosManuais.nome || '',
+                    biNif: this.biDadosManuais.biNif || '',
+                    empresa: this.biDadosManuais.empresa || ''
                 } : {
-                    nome: this.fluxoClienteSelecionado?.nome || 'Cliente',
-                    biNif: this.fluxoClienteSelecionado?.bi || this.fluxoClienteSelecionado?.nif || ''
+                    nome: this.fluxoClienteSelecionado?.nome || '',
+                    biNif: this.fluxoClienteSelecionado?.documento || this.fluxoClienteSelecionado?.bi || this.fluxoClienteSelecionado?.nif || '',
+                    empresa: this.fluxoEmpresaSelecionada?.nome || ''
                 };
                 
-                let yPos = 67;
+                // Data: automática ou manual
+                const dataDocumento = this.biDataAutomatica 
+                    ? new Date().toLocaleDateString('pt-AO')
+                    : (this.biDadosManuais.data || new Date().toLocaleDateString('pt-AO'));
                 
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Nome Completo:', margin, yPos);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(dadosTitular.nome, margin + 45, yPos);
-                yPos += 7;
+                // Selecionar layout
+                const layout = this.layoutBIAtivo || 'executivo';
                 
-                if (dadosTitular.biNif) {
+                console.log('🎨 Gerando BI com layout:', layout);
+                
+                // ====================================================================
+                // LAYOUT: EXECUTIVO - Corporativo com cabeçalho robusto e dados laterais
+                // ====================================================================
+                if (layout === 'executivo') {
+                    // Cabeçalho largo
+                    pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                    pdf.rect(0, 0, pageWidth, 40, 'F');
+                    
+                    // Faixa secundária dourada/clara
+                    pdf.setFillColor(Math.min(rgb.r + 60, 255), Math.min(rgb.g + 60, 255), Math.min(rgb.b + 60, 255));
+                    pdf.rect(0, 40, pageWidth, 4, 'F');
+                    
+                    // Título grande
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(26);
                     pdf.setFont('helvetica', 'bold');
-                    pdf.text('BI / NIF:', margin, yPos);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text(dadosTitular.biNif, margin + 45, yPos);
-                    yPos += 7;
+                    pdf.text('DOCUMENTO DE IDENTIFICAÇÃO', pageWidth / 2, 18, { align: 'center' });
+                    
+                    // Empresa
+                    if (this.biMostrarEmpresa && dadosTitular.empresa) {
+                        pdf.setFontSize(11);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(dadosTitular.empresa, pageWidth / 2, 30, { align: 'center' });
+                    }
+                    
+                    // Data no cabeçalho
+                    if (this.biMostrarData) {
+                        pdf.setFontSize(9);
+                        pdf.text(dataDocumento, pageWidth / 2, 37, { align: 'center' });
+                    }
+                    
+                    // Área de dados à esquerda
+                    let yPos = 55;
+                    pdf.setTextColor(rgb.r, rgb.g, rgb.b);
+                    
+                    if (this.biMostrarNome && dadosTitular.nome) {
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text('NOME DO TITULAR', margin, yPos);
+                        pdf.setFontSize(16);
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text(dadosTitular.nome, margin, yPos + 7);
+                        yPos += 18;
+                    }
+                    
+                    if (this.biMostrarBI && dadosTitular.biNif) {
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(rgb.r, rgb.g, rgb.b);
+                        pdf.text('NÚMERO DO BI', margin, yPos);
+                        pdf.setFontSize(14);
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(dadosTitular.biNif, margin, yPos + 7);
+                        yPos += 20;
+                    }
+                    
+                    // Fotos empilhadas SEM bordas
+                    const fotoWidth = 160;
+                    const fotoHeight = 92;
+                    const fotoX = (pageWidth - fotoWidth) / 2;
+                    
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    yPos += fotoHeight + 10;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Rodapé
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(120, 120, 120);
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.text('Documento para fins de identificação interna', pageWidth / 2, pageHeight - 10, { align: 'center' });
                 }
                 
-                // ========== FOTO 1 (FRENTE) - Em cima ==========
-                yPos += 3;
-                pdf.setFontSize(11);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Fotografia Frontal', margin, yPos);
-                yPos += 4;
+                // ====================================================================
+                // LAYOUT: FORMAL - Minimalista elegante com linha fina no topo
+                // ====================================================================
+                else if (layout === 'formal') {
+                    // Linha fina no topo
+                    pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                    pdf.rect(0, 0, pageWidth, 8, 'F');
+                    
+                    // Título centralizado
+                    pdf.setTextColor(rgb.r, rgb.g, rgb.b);
+                    pdf.setFontSize(22);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('BILHETE DE IDENTIDADE', pageWidth / 2, 28, { align: 'center' });
+                    
+                    // Linha decorativa abaixo do título
+                    pdf.setDrawColor(rgb.r, rgb.g, rgb.b);
+                    pdf.setLineWidth(0.8);
+                    pdf.line(60, 34, pageWidth - 60, 34);
+                    
+                    // Empresa centralizada
+                    if (this.biMostrarEmpresa && dadosTitular.empresa) {
+                        pdf.setFontSize(11);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(dadosTitular.empresa, pageWidth / 2, 45, { align: 'center' });
+                    }
+                    
+                    // Área de dados centralizada
+                    let yPos = 60;
+                    
+                    // Nome em caixa
+                    if (this.biMostrarNome && dadosTitular.nome) {
+                        pdf.setFillColor(248, 248, 248);
+                        pdf.rect(margin, yPos - 5, pageWidth - (margin * 2), 18, 'F');
+                        pdf.setFontSize(16);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text(dadosTitular.nome, pageWidth / 2, yPos + 6, { align: 'center' });
+                        yPos += 22;
+                    }
+                    
+                    // BI
+                    if (this.biMostrarBI && dadosTitular.biNif) {
+                        pdf.setFontSize(11);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(80, 80, 80);
+                        pdf.text(`BI: ${dadosTitular.biNif}`, pageWidth / 2, yPos, { align: 'center' });
+                        yPos += 15;
+                    }
+                    
+                    // Fotos empilhadas
+                    const fotoWidth = 155;
+                    const fotoHeight = 90;
+                    const fotoX = (pageWidth - fotoWidth) / 2;
+                    
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    yPos += fotoHeight + 10;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Data e linha no rodapé
+                    if (this.biMostrarData) {
+                        pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                        pdf.rect(0, pageHeight - 8, pageWidth, 8, 'F');
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(dataDocumento, pageWidth / 2, pageHeight - 14, { align: 'center' });
+                    }
+                }
                 
-                // Dimensões equilibradas para foto 1 (proporção confortável 3:2)
-                const foto1Width = 140; // mm - Largura moderada
-                const foto1Height = 90; // mm - Altura proporcional
-                const foto1X = (pageWidth - foto1Width) / 2; // Centralizar horizontalmente
-                const foto1Y = yPos;
+                // ====================================================================
+                // LAYOUT: MODERNO - Design contemporâneo com faixa lateral
+                // ====================================================================
+                else if (layout === 'moderno') {
+                    // Faixa lateral esquerda
+                    pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                    pdf.rect(0, 0, 25, pageHeight, 'F');
+                    
+                    // Texto vertical na faixa
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'bold');
+                    // Rotacionar texto
+                    pdf.text('IDENTIFICAÇÃO', 8, pageHeight / 2, { angle: 90 });
+                    
+                    // Título
+                    pdf.setTextColor(rgb.r, rgb.g, rgb.b);
+                    pdf.setFontSize(28);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('BI', 40, 30);
+                    
+                    // Subtítulo
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('Bilhete de Identidade', 40, 40);
+                    
+                    // Linha horizontal
+                    pdf.setDrawColor(rgb.r, rgb.g, rgb.b);
+                    pdf.setLineWidth(3);
+                    pdf.line(40, 48, 120, 48);
+                    
+                    // Dados
+                    let yPos = 65;
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    if (this.biMostrarNome && dadosTitular.nome) {
+                        pdf.setFontSize(18);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(dadosTitular.nome, 40, yPos);
+                        yPos += 10;
+                    }
+                    
+                    if (this.biMostrarBI && dadosTitular.biNif) {
+                        pdf.setFontSize(11);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(dadosTitular.biNif, 40, yPos);
+                        yPos += 8;
+                    }
+                    
+                    if (this.biMostrarEmpresa && dadosTitular.empresa) {
+                        pdf.setFontSize(10);
+                        pdf.text(dadosTitular.empresa, 40, yPos);
+                        yPos += 15;
+                    }
+                    
+                    // Fotos empilhadas com estilo moderno
+                    const fotoWidth = 150;
+                    const fotoHeight = 85;
+                    const fotoX = 40;
+                    
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    yPos += fotoHeight + 10;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Data no canto
+                    if (this.biMostrarData) {
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(150, 150, 150);
+                        pdf.text(dataDocumento, pageWidth - margin, pageHeight - 10, { align: 'right' });
+                    }
+                }
                 
-                pdf.addImage(this.biFoto1Editada, 'JPEG', foto1X, foto1Y, foto1Width, foto1Height, '', 'FAST');
+                // ====================================================================
+                // LAYOUT: MINIMALISTA - Clean, elegante, pouco texto
+                // ====================================================================
+                else if (layout === 'minimalista') {
+                    // Apenas nome no topo (se habilitado)
+                    let yPos = 30;
+                    
+                    if (this.biMostrarNome && dadosTitular.nome) {
+                        pdf.setTextColor(50, 50, 50);
+                        pdf.setFontSize(20);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(dadosTitular.nome, pageWidth / 2, yPos, { align: 'center' });
+                        yPos += 12;
+                    }
+                    
+                    if (this.biMostrarBI && dadosTitular.biNif) {
+                        pdf.setFontSize(11);
+                        pdf.setTextColor(120, 120, 120);
+                        pdf.text(dadosTitular.biNif, pageWidth / 2, yPos, { align: 'center' });
+                        yPos += 20;
+                    }
+                    
+                    // Linha fina
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.3);
+                    pdf.line(60, yPos, pageWidth - 60, yPos);
+                    yPos += 15;
+                    
+                    // Fotos grandes centralizadas
+                    const fotoWidth = 160;
+                    const fotoHeight = 95;
+                    const fotoX = (pageWidth - fotoWidth) / 2;
+                    
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    yPos += fotoHeight + 12;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Data discreta no rodapé
+                    if (this.biMostrarData) {
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(180, 180, 180);
+                        pdf.text(dataDocumento, pageWidth / 2, pageHeight - 12, { align: 'center' });
+                    }
+                }
                 
-                // Borda ao redor da foto 1
-                pdf.setDrawColor(200, 200, 200);
-                pdf.setLineWidth(0.3);
-                pdf.rect(foto1X, foto1Y, foto1Width, foto1Height);
+                // ====================================================================
+                // LAYOUT: SIMPLES - Apenas fotos centralizadas
+                // ====================================================================
+                else if (layout === 'simples') {
+                    // Fotos grandes centralizadas sem nenhum texto
+                    const fotoWidth = 170;
+                    const fotoHeight = 115;
+                    const fotoX = (pageWidth - fotoWidth) / 2;
+                    
+                    // Foto 1 no topo
+                    const foto1Y = 25;
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, foto1Y, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Foto 2 em baixo
+                    const foto2Y = foto1Y + fotoHeight + 20;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, foto2Y, fotoWidth, fotoHeight, '', 'FAST');
+                    
+                    // Borda sutil (opcional)
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.5);
+                    pdf.rect(fotoX, foto1Y, fotoWidth, fotoHeight);
+                    pdf.rect(fotoX, foto2Y, fotoWidth, fotoHeight);
+                }
                 
-                // ========== FOTO 2 (VERSO) - Em baixo ==========
-                yPos = foto1Y + foto1Height + 6;
-                pdf.setFontSize(11);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Fotografia de Identificação', margin, yPos);
-                yPos += 4;
-                
-                // Dimensões equilibradas para foto 2 (mesma proporção da foto 1)
-                const foto2Width = 140; // mm - Mesma largura
-                const foto2Height = 90; // mm - Mesma altura
-                const foto2X = (pageWidth - foto2Width) / 2; // Centralizar horizontalmente
-                const foto2Y = yPos;
-                
-                pdf.addImage(this.biFoto2Editada, 'JPEG', foto2X, foto2Y, foto2Width, foto2Height, '', 'FAST');
-                
-                // Borda ao redor da foto 2
-                pdf.rect(foto2X, foto2Y, foto2Width, foto2Height);
-                
-                // ========== RODAPÉ ==========
-                const rodapeY = foto2Y + foto2Height + 6;
-                pdf.setFontSize(8);
-                pdf.setTextColor(100, 100, 100);
-                pdf.setFont('helvetica', 'italic');
-                pdf.text('Documento gerado automaticamente - Verificar autenticidade', pageWidth / 2, rodapeY, { align: 'center' });
+                // ====================================================================
+                // LAYOUT: ELEGANTE - Design assimétrico moderno
+                // ====================================================================
+                else if (layout === 'cartao') {
+                    // Faixa lateral esquerda fina
+                    pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                    pdf.rect(0, 0, 8, pageHeight, 'F');
+                    
+                    // Cabeçalho colorido
+                    pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+                    pdf.rect(0, 0, pageWidth, 38, 'F');
+                    
+                    // Título em branco
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(20);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Bilhete de Identidade', 20, 18);
+                    
+                    // Empresa em branco
+                    if (this.biMostrarEmpresa && dadosTitular.empresa) {
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(dadosTitular.empresa, 20, 30);
+                    }
+                    
+                    // Data no canto direito
+                    if (this.biMostrarData) {
+                        pdf.setFontSize(9);
+                        pdf.text(dataDocumento, pageWidth - 15, 30, { align: 'right' });
+                    }
+                    
+                    // Área de dados na lateral
+                    let yPos = 52;
+                    
+                    // Nome grande
+                    if (this.biMostrarNome && dadosTitular.nome) {
+                        pdf.setFontSize(18);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(30, 30, 30);
+                        pdf.text(dadosTitular.nome, 20, yPos);
+                        yPos += 10;
+                    }
+                    
+                    // BI
+                    if (this.biMostrarBI && dadosTitular.biNif) {
+                        pdf.setFontSize(11);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text(dadosTitular.biNif, 20, yPos);
+                        yPos += 12;
+                    }
+                    
+                    // Fotos empilhadas
+                    const fotoWidth = 160;
+                    const fotoHeight = 95;
+                    const fotoX = (pageWidth - fotoWidth) / 2;
+                    
+                    pdf.addImage(this.biFoto1Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                    yPos += fotoHeight + 8;
+                    pdf.addImage(this.biFoto2Editada, 'JPEG', fotoX, yPos, fotoWidth, fotoHeight, '', 'FAST');
+                }
                 
                 // ========== SALVAR PDF ==========
-                // Nome do arquivo: manual ou automático
                 let nomeArquivo;
-                if (this.biModoManual) {
-                    const nomeClean = this.biDadosManuais.nome.replace(/\s+/g, '_') || 'BI';
-                    nomeArquivo = `${nomeClean}_BI.pdf`;
+                if (this.biModoManual && dadosTitular.nome) {
+                    const nomeClean = dadosTitular.nome.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+                    nomeArquivo = `BI_${nomeClean}_${layout}.pdf`;
+                } else if (dadosTitular.empresa && dadosTitular.nome) {
+                    const empresaClean = dadosTitular.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 20);
+                    const nomeClean = dadosTitular.nome.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 20);
+                    nomeArquivo = `BI_${empresaClean}_${nomeClean}_${layout}.pdf`;
                 } else {
-                    nomeArquivo = `${this.fluxoEmpresaSelecionada?.nome || 'Empresa'}_${this.fluxoClienteSelecionado?.nome || 'Cliente'}_BI.pdf`;
+                    nomeArquivo = `BI_${layout}_${Date.now()}.pdf`;
                 }
                 
                 pdf.save(nomeArquivo);
                 
                 this.loading = false;
                 this.showAlert('success', `✅ BI gerado: ${nomeArquivo}`);
-                console.log('✅ BI PDF gerado com sucesso:', nomeArquivo);
+                console.log('✅ BI PDF gerado com layout:', layout, '| Arquivo:', nomeArquivo);
                 
-                // Limpar cache após gerar com sucesso
-                this.limparCacheBI();
+                // NÃO limpar cache - manter fotos para o usuário poder gerar novamente
                 
                 // Perguntar se deseja gerar mais documentos
                 this.perguntarGerarOutroDocumento();
@@ -4407,8 +4699,55 @@ function adminApp() {
             } catch (error) {
                 this.loading = false;
                 console.error('❌ Erro ao gerar BI:', error);
-                this.showAlert('error', 'Erro ao gerar BI em PDF');
+                this.showAlert('error', 'Erro ao gerar BI em PDF: ' + error.message);
             }
+        },
+        
+        /**
+         * Preview do BI com layout selecionado (para visualização antes de gerar)
+         */
+        renderizarPreviewBI() {
+            if (!this.biFoto1Editada || !this.biFoto2Editada) {
+                return `
+                    <div style="
+                        width: 210mm;
+                        height: 297mm;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #f8fafc;
+                        border: 2px dashed #cbd5e1;
+                    ">
+                        <div style="text-align: center; color: #64748b;">
+                            <p style="font-size: 18pt; margin: 0 0 8px 0;">📷</p>
+                            <p style="font-size: 11pt; margin: 0;">Adicione as 2 fotos para ver o preview</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Verificar se ModelosBI está disponível
+            if (typeof ModelosBI === 'undefined') {
+                return '<div style="padding: 20px; text-align: center;">Carregando modelos...</div>';
+            }
+            
+            const config = {
+                biModoPersonalizacao: this.biModoManual ? 'manual' : this.biModoPersonalizacao,
+                dadosManuais: this.biDadosManuais,
+                corDestaque: this.fluxoEmpresaSelecionada?.corPrimaria || '#1a365d',
+                fontFamily: 'Arial, Helvetica, sans-serif'
+            };
+            
+            const layoutAtivo = this.layoutBIAtivo || 'executivo';
+            
+            return ModelosBI.renderizar(
+                layoutAtivo,
+                this.fluxoEmpresaSelecionada,
+                this.fluxoClienteSelecionado,
+                this.biFoto1Editada,
+                this.biFoto2Editada,
+                config
+            );
         },
         
         /**
