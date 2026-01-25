@@ -297,34 +297,6 @@
       "createdAt": "2026-01-11T01:03:20.858Z",
       "updatedAt": "2026-01-11T01:03:20.858Z",
       "contador": 0
-    },
-    {
-      "id": "empresa_1768812713909",
-      "nome": "AMWENGE-ENGENHARIA E CONSULTORIA , LDA",
-      "nif": "5417121592",
-      "endereco": {
-        "completo": "Edifício Empresarial Talatona, Torre A, 5º Andar\nRua de Entreposto Comercial, Talatona\nLuanda, Angola",
-        "rua": "Edifício Empresarial Talatona",
-        "edificio": "",
-        "andar": "",
-        "sala": "",
-        "bairro": "",
-        "municipio": "",
-        "provincia": "",
-        "pais": "Angola"
-      },
-      "enderecoCompleto": "Edifício Empresarial Talatona, Torre A, 5º Andar\nRua de Entreposto Comercial, Talatona\nLuanda, Angola",
-      "telefone": "",
-      "email": "",
-      "website": "",
-      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417121592/logo.png",
-      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5417121592/carimbo.png",
-      "corPrimaria": "#1e40af",
-      "corSecundaria": "#64748b",
-      "marcaDagua": "",
-      "createdAt": "2026-01-19T08:51:53.909Z",
-      "updatedAt": "2026-01-19T08:51:53.909Z",
-      "contador": 0
     }
   ]
 }
