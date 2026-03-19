@@ -43,14 +43,14 @@
       "campos_extras": [],
       "carregamentos": [],
       "ativo": true,
-      "observacoes": "add admin",
+      "observacoes": "add Gaspar Francisco",
       "criado_em": "2026-03-19T04:32:10.236Z",
-      "atualizado_em": "2026-03-19T04:32:10.236Z"
+      "atualizado_em": "2026-03-19T04:33:49.332Z"
     }
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T04:32:10.236Z",
+    "atualizado_em": "2026-03-19T04:33:49.332Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
