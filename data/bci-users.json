@@ -3,7 +3,7 @@
     {
       "id": "BCI-1773887669061-YRKXIN",
       "nome": "Gaspar Francisco Gulungo",
-      "numero_bi": "000000000000000000000000",
+      "numero_bi": "010167533LA046",
       "bi_documento": {
         "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773887669061-YRKXIN/hmitguif77hynu4f_mmwux1dy.png",
         "sha": "5929026cbf324cab895cc1a1ce54aa8340f010b8",
@@ -61,12 +61,12 @@
       "ativo": true,
       "observacoes": "tettstetst st st",
       "criado_em": "2026-03-19T02:34:39.097Z",
-      "atualizado_em": "2026-03-19T02:34:39.097Z"
+      "atualizado_em": "2026-03-19T02:50:24.880Z"
     }
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T02:36:07.968Z",
+    "atualizado_em": "2026-03-19T02:50:24.881Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
