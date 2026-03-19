@@ -18,10 +18,10 @@
       "card_multicaixa": null,
       "campos_extras": [],
       "carregamentos": [],
-      "ativo": true,
+      "ativo": false,
       "observacoes": "",
       "criado_em": "2026-03-19T09:43:28.435Z",
-      "atualizado_em": "2026-03-19T09:43:28.435Z"
+      "atualizado_em": "2026-03-19T09:43:38.549Z"
     },
     {
       "id": "BCI-1773894710047-FL2TYF",
@@ -94,7 +94,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T09:43:28.435Z",
+    "atualizado_em": "2026-03-19T09:43:38.549Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
