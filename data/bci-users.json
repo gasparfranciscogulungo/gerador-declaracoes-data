@@ -94,16 +94,16 @@
               "valor": 15000
             },
             "salario_colaborador": {
-              "ativo": false,
+              "ativo": true,
               "valor": 25000
             },
             "taxi": {
-              "ativo": true,
+              "ativo": false,
               "valor": 3000
             }
           },
-          "total_descontos": 18000,
-          "lucro_liquido": 147900,
+          "total_descontos": 40000,
+          "lucro_liquido": 125900,
           "notas": "primeiro carregamento"
         }
       ],
@@ -115,7 +115,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T13:09:52.808Z",
+    "atualizado_em": "2026-03-19T15:59:31.366Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
