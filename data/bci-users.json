@@ -67,7 +67,7 @@
       "carregamentos": [
         {
           "id": "CARG-1773936352092-UP3R",
-          "fase": "carregado",
+          "fase": "cashback_retirado",
           "criado_em": "2026-03-19T16:05:52.092Z",
           "semana": 12,
           "ano": 2026,
@@ -83,11 +83,11 @@
           "lucro_bruto_cartao": 75000,
           "plataforma_saque": "meac",
           "plataforma_saque_custom": "",
-          "data_cashback": "",
-          "lucro_cashback": 0,
+          "data_cashback": "2026-03-19",
+          "lucro_cashback": 85000,
           "plataforma_cashback": "",
           "plataforma_cashback_custom": "",
-          "lucro_bruto_total": 75000,
+          "lucro_bruto_total": 160000,
           "descontos": {
             "gestor": {
               "ativo": true,
@@ -103,7 +103,7 @@
             }
           },
           "total_descontos": 15000,
-          "lucro_liquido": 60000,
+          "lucro_liquido": 145000,
           "notas": "segundo carregamento Gaspar"
         },
         {
@@ -156,7 +156,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T16:09:01.547Z",
+    "atualizado_em": "2026-03-19T16:09:40.461Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
