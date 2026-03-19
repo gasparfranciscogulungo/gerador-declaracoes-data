@@ -1,73 +1,9 @@
 {
-  "colaboradores": [
-    {
-      "id": "BCI-1773887669061-YRKXIN",
-      "nome": "Gaspar Francisco Gulungo",
-      "numero_bi": "010167533LA046",
-      "bi_documento": {
-        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773887669061-YRKXIN/hmitguif77hynu4f_mmwux1dy.png",
-        "sha": "5929026cbf324cab895cc1a1ce54aa8340f010b8",
-        "caminho": "assets/bci-docs/BCI-1773887669061-YRKXIN/hmitguif77hynu4f_mmwux1dy.png",
-        "nome_original": "Captura de tela de 2025-12-09 14-45-46.png",
-        "tipo": "image/png",
-        "tamanho": 93974,
-        "enviado_em": "2026-03-19T02:34:34.607Z"
-      },
-      "data_cadastro": "2026-03-19T02:34:39.097Z",
-      "dados_bci": {
-        "username": "testststst",
-        "senha": "tettststst",
-        "numero_conta": "testtststststststs",
-        "iban": "TETSTETETEET",
-        "telefone_conta": "95959595959595",
-        "email_conta": "gakakakk@gmail.com"
-      },
-      "card_visa": {
-        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773887669061-YRKXIN/hgv7x2d4gxt3n0pu_mmwux5nz.png",
-        "sha": "5929026cbf324cab895cc1a1ce54aa8340f010b8",
-        "caminho": "assets/bci-docs/BCI-1773887669061-YRKXIN/hgv7x2d4gxt3n0pu_mmwux5nz.png",
-        "nome_original": "Captura de tela de 2025-12-09 14-45-46.png",
-        "tipo": "image/png",
-        "tamanho": 93974,
-        "enviado_em": "2026-03-19T02:34:36.906Z"
-      },
-      "card_multicaixa": {
-        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773887669061-YRKXIN/una5e7mawymt2qqy_mmwux7fu.png",
-        "sha": "5929026cbf324cab895cc1a1ce54aa8340f010b8",
-        "caminho": "assets/bci-docs/BCI-1773887669061-YRKXIN/una5e7mawymt2qqy_mmwux7fu.png",
-        "nome_original": "Captura de tela de 2025-12-09 14-45-46.png",
-        "tipo": "image/png",
-        "tamanho": 93974,
-        "enviado_em": "2026-03-19T02:34:39.097Z"
-      },
-      "campos_extras": [
-        {
-          "titulo": "test",
-          "valor": "test"
-        }
-      ],
-      "carregamentos": [
-        {
-          "id": "CARG-1773887767968-TL6F",
-          "data": "2026-03-19",
-          "hora": "03:35",
-          "valor": "2000000",
-          "cashback_recebido": false,
-          "data_cashback": "",
-          "notas": "feito carrgamento primeira semana",
-          "registado_em": "2026-03-19T02:36:07.968Z"
-        }
-      ],
-      "ativo": true,
-      "observacoes": "tettstetst st st",
-      "criado_em": "2026-03-19T02:34:39.097Z",
-      "atualizado_em": "2026-03-19T02:50:24.880Z"
-    }
-  ],
+  "colaboradores": [],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T02:50:24.881Z",
-    "total": 1,
+    "atualizado_em": "2026-03-19T03:41:16.724Z",
+    "total": 0,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
