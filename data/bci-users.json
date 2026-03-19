@@ -90,7 +90,7 @@
           "lucro_bruto_total": 165900,
           "descontos": {
             "gestor": {
-              "ativo": false,
+              "ativo": true,
               "valor": 15000
             },
             "salario_colaborador": {
@@ -102,8 +102,8 @@
               "valor": 3000
             }
           },
-          "total_descontos": 0,
-          "lucro_liquido": 165900,
+          "total_descontos": 15000,
+          "lucro_liquido": 150900,
           "notas": "primeiro carregamento"
         }
       ],
@@ -115,7 +115,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T13:09:34.021Z",
+    "atualizado_em": "2026-03-19T13:09:37.056Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
