@@ -47,8 +47,8 @@
           "data": "2026-03-16",
           "hora": "11:36",
           "valor": "2000000",
-          "cashback_recebido": true,
-          "data_cashback": "2026-03-18",
+          "cashback_recebido": false,
+          "data_cashback": "",
           "notas": "Carregamento de 2M",
           "registado_em": "2026-03-19T04:37:45.783Z"
         },
@@ -71,7 +71,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T04:37:45.783Z",
+    "atualizado_em": "2026-03-19T04:40:24.555Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
