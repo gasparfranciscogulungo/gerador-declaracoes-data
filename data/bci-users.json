@@ -1,29 +1,6 @@
 {
   "colaboradores": [
     {
-      "id": "BCI-1773912906143-YPL1VM",
-      "nome": "test",
-      "numero_bi": "teste",
-      "bi_documento": null,
-      "data_cadastro": "2026-03-19T09:35:06.144Z",
-      "dados_bci": {
-        "username": "",
-        "senha": "",
-        "numero_conta": "",
-        "iban": "",
-        "telefone_conta": "",
-        "email_conta": ""
-      },
-      "card_visa": null,
-      "card_multicaixa": null,
-      "campos_extras": [],
-      "carregamentos": [],
-      "ativo": true,
-      "observacoes": "",
-      "criado_em": "2026-03-19T09:35:06.144Z",
-      "atualizado_em": "2026-03-19T09:35:06.144Z"
-    },
-    {
       "id": "BCI-1773894710047-FL2TYF",
       "nome": "Gaspar Francisco Gulungo",
       "numero_bi": "010167533LA046",
@@ -94,8 +71,8 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T09:35:06.144Z",
-    "total": 2,
+    "atualizado_em": "2026-03-19T09:35:33.585Z",
+    "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
