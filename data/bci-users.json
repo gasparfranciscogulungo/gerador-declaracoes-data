@@ -41,18 +41,7 @@
         "enviado_em": "2026-03-19T04:32:10.235Z"
       },
       "campos_extras": [],
-      "carregamentos": [
-        {
-          "id": "CARG-1773894894182-86NK",
-          "data": "2026-03-16",
-          "hora": "12:34",
-          "valor": "2000000",
-          "cashback_recebido": false,
-          "data_cashback": "",
-          "notas": "Carregamento Dois milhoes",
-          "registado_em": "2026-03-19T04:34:54.182Z"
-        }
-      ],
+      "carregamentos": [],
       "ativo": true,
       "observacoes": "add Gaspar Francisco",
       "criado_em": "2026-03-19T04:32:10.236Z",
@@ -61,7 +50,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T04:34:54.182Z",
+    "atualizado_em": "2026-03-19T04:35:04.841Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
