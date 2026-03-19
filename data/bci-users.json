@@ -67,7 +67,7 @@
       "carregamentos": [
         {
           "id": "CARG-1773925653975-R1TC",
-          "fase": "solicitacao",
+          "fase": "carregado",
           "criado_em": "2026-03-19T13:07:33.975Z",
           "semana": 12,
           "ano": 2026,
@@ -75,19 +75,19 @@
           "taxa_banco_pct": 2.28,
           "taxa_banco_valor": 13679.999999999998,
           "total_investimento": 613680,
-          "data_carregamento": "",
-          "hora_carregamento": "",
+          "data_carregamento": "2026-03-19",
+          "hora_carregamento": "14:07",
           "valor_carregamento_final": 600000,
           "taxa_final": 13679.999999999998,
           "total_investimento_final": 613680,
-          "lucro_bruto_cartao": 0,
-          "plataforma_saque": "",
+          "lucro_bruto_cartao": 80000,
+          "plataforma_saque": "meac",
           "plataforma_saque_custom": "",
           "data_cashback": "",
           "lucro_cashback": 0,
           "plataforma_cashback": "",
           "plataforma_cashback_custom": "",
-          "lucro_bruto_total": 0,
+          "lucro_bruto_total": 80000,
           "descontos": {
             "gestor": {
               "ativo": true,
@@ -103,7 +103,7 @@
             }
           },
           "total_descontos": 15000,
-          "lucro_liquido": 0,
+          "lucro_liquido": 65000,
           "notas": "primeiro carregamento"
         }
       ],
@@ -115,7 +115,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T13:07:33.978Z",
+    "atualizado_em": "2026-03-19T13:08:38.629Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
