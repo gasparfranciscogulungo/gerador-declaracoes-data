@@ -1,9 +1,57 @@
 {
-  "colaboradores": [],
+  "colaboradores": [
+    {
+      "id": "BCI-1773894710047-FL2TYF",
+      "nome": "Gaspar Francisco Gulungo",
+      "numero_bi": "010167533LA046",
+      "bi_documento": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773894710047-FL2TYF/e55cqduhfj0hnzlo_mmwz3y8v.pdf",
+        "sha": "340dd4d55705cbea9b2977bb7b36b6926c8da048",
+        "caminho": "assets/bci-docs/BCI-1773894710047-FL2TYF/e55cqduhfj0hnzlo_mmwz3y8v.pdf",
+        "nome_original": "BI_Gaspar_Francisco_Gulungo__executivo.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 2248830,
+        "enviado_em": "2026-03-19T04:32:04.003Z"
+      },
+      "data_cadastro": "2026-03-19T04:32:10.235Z",
+      "dados_bci": {
+        "username": "ggulungo",
+        "senha": "2005Gaspar",
+        "numero_conta": "10130951710001",
+        "iban": "000500000130951710115",
+        "telefone_conta": "946966670",
+        "email_conta": "gasparfranciscogulungo@gmail.com"
+      },
+      "card_visa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773894710047-FL2TYF/mgzan3hzcp0m3inl_mmwz490j.pdf",
+        "sha": "afba81e008c8529d5eba88e6fef253b2554d548d",
+        "caminho": "assets/bci-docs/BCI-1773894710047-FL2TYF/mgzan3hzcp0m3inl_mmwz490j.pdf",
+        "nome_original": "VISA Gaspar_Francisco_Gulungo__executivo-1.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 2288845,
+        "enviado_em": "2026-03-19T04:32:07.777Z"
+      },
+      "card_multicaixa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1773894710047-FL2TYF/e9tur8hk23bnw6bs_mmwz4bxd.pdf",
+        "sha": "24b707e7587939d1baf1718f379b646b645f3f97",
+        "caminho": "assets/bci-docs/BCI-1773894710047-FL2TYF/e9tur8hk23bnw6bs_mmwz4bxd.pdf",
+        "nome_original": "MULTICAIXA_Gaspar_Francisco_Gulungo__executivo-2.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 1349030,
+        "enviado_em": "2026-03-19T04:32:10.235Z"
+      },
+      "campos_extras": [],
+      "carregamentos": [],
+      "ativo": true,
+      "observacoes": "add admin",
+      "criado_em": "2026-03-19T04:32:10.236Z",
+      "atualizado_em": "2026-03-19T04:32:10.236Z"
+    }
+  ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T03:41:16.724Z",
-    "total": 0,
+    "atualizado_em": "2026-03-19T04:32:10.236Z",
+    "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
