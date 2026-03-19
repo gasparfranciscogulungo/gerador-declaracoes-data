@@ -63,15 +63,15 @@
           "registado_em": "2026-03-19T04:36:03.239Z"
         }
       ],
-      "ativo": false,
+      "ativo": true,
       "observacoes": "add Gaspar Francisco",
       "criado_em": "2026-03-19T04:32:10.236Z",
-      "atualizado_em": "2026-03-19T09:36:02.935Z"
+      "atualizado_em": "2026-03-19T09:36:16.216Z"
     }
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T09:36:02.935Z",
+    "atualizado_em": "2026-03-19T09:36:16.216Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
