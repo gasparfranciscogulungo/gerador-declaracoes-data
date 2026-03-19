@@ -46,7 +46,18 @@
           "valor": "test"
         }
       ],
-      "carregamentos": [],
+      "carregamentos": [
+        {
+          "id": "CARG-1773887767968-TL6F",
+          "data": "2026-03-19",
+          "hora": "03:35",
+          "valor": "2000000",
+          "cashback_recebido": false,
+          "data_cashback": "",
+          "notas": "feito carrgamento primeira semana",
+          "registado_em": "2026-03-19T02:36:07.968Z"
+        }
+      ],
       "ativo": true,
       "observacoes": "tettstetst st st",
       "criado_em": "2026-03-19T02:34:39.097Z",
@@ -55,7 +66,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T02:34:39.097Z",
+    "atualizado_em": "2026-03-19T02:36:07.968Z",
     "total": 1,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
