@@ -98,12 +98,12 @@
               "valor": 25000
             },
             "taxi": {
-              "ativo": false,
+              "ativo": true,
               "valor": 3000
             }
           },
-          "total_descontos": 40000,
-          "lucro_liquido": 125900,
+          "total_descontos": 43000,
+          "lucro_liquido": 122900,
           "notas": "primeiro carregamento"
         }
       ],
@@ -115,7 +115,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T13:09:28.035Z",
+    "atualizado_em": "2026-03-19T13:09:29.542Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
