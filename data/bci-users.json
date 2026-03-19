@@ -66,16 +66,6 @@
       "campos_extras": [],
       "carregamentos": [
         {
-          "id": "CARG-1773895065783-UQ3Y",
-          "data": "2026-03-16",
-          "hora": "11:36",
-          "valor": "2000000",
-          "cashback_recebido": true,
-          "data_cashback": "2026-03-19",
-          "notas": "Carregamento de 2M",
-          "registado_em": "2026-03-19T04:37:45.783Z"
-        },
-        {
           "id": "CARG-1773894963239-UL85",
           "data": "2026-03-10",
           "hora": "11:34",
@@ -94,7 +84,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-19T09:43:38.549Z",
+    "atualizado_em": "2026-03-19T13:07:00.449Z",
     "total": 2,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
