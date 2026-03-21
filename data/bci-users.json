@@ -22,14 +22,30 @@
         "telefone_conta": "946966800",
         "email_conta": ""
       },
-      "card_visa": null,
-      "card_multicaixa": null,
+      "card_visa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774104551146-UST0KD/diong94qtgl0w3o5_mn0h85sx.pdf",
+        "sha": "a5dfe1e4f56963f755cb5140bcfdc64c46d39800",
+        "caminho": "assets/bci-docs/BCI-1774104551146-UST0KD/diong94qtgl0w3o5_mn0h85sx.pdf",
+        "nome_original": "Mamy_Manuela_MASTERCARD_formal.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 3036360,
+        "enviado_em": "2026-03-21T15:22:34.750Z"
+      },
+      "card_multicaixa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774104551146-UST0KD/ybgw5fc3286lkcsz_mn0h8iny.pdf",
+        "sha": "5f8520b19f3587290b27b280ebc93c63f5000c02",
+        "caminho": "assets/bci-docs/BCI-1774104551146-UST0KD/ybgw5fc3286lkcsz_mn0h8iny.pdf",
+        "nome_original": "BI_Mamy_Manuela_MULTICAIXA_formal.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 2288220,
+        "enviado_em": "2026-03-21T15:22:40.785Z"
+      },
       "campos_extras": [],
       "carregamentos": [],
       "ativo": true,
-      "observacoes": "",
+      "observacoes": "ADD NEW COLABORADOR",
       "criado_em": "2026-03-21T14:49:11.146Z",
-      "atualizado_em": "2026-03-21T15:01:35.256Z"
+      "atualizado_em": "2026-03-21T15:22:40.786Z"
     },
     {
       "id": "BCI-1773913408435-8ME41V",
@@ -228,7 +244,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T15:01:35.256Z",
+    "atualizado_em": "2026-03-21T15:22:40.786Z",
     "total": 3,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
