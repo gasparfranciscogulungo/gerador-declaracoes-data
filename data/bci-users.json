@@ -8,7 +8,7 @@
       "data_cadastro": "2026-03-21T14:49:11.146Z",
       "dados_bci": {
         "username": "",
-        "senha": "",
+        "senha": "2005Gaspar",
         "numero_conta": "",
         "iban": "",
         "telefone_conta": "946966800",
@@ -21,7 +21,7 @@
       "ativo": true,
       "observacoes": "",
       "criado_em": "2026-03-21T14:49:11.146Z",
-      "atualizado_em": "2026-03-21T14:49:11.146Z"
+      "atualizado_em": "2026-03-21T14:55:48.705Z"
     },
     {
       "id": "BCI-1773913408435-8ME41V",
@@ -220,7 +220,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T14:49:11.147Z",
+    "atualizado_em": "2026-03-21T14:55:48.705Z",
     "total": 3,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
