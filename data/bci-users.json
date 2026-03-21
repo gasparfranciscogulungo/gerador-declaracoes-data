@@ -1,6 +1,53 @@
 {
   "colaboradores": [
     {
+      "id": "BCI-1774110646630-R4BTJ1",
+      "nome": "MANA MANUELA MANUEL CAMBUNDO",
+      "numero_bi": "008026017LA049",
+      "bi_documento": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110646630-R4BTJ1/1aeem4wt8mzi52il_mn0jo7zb.pdf",
+        "sha": "b2827c41aafdfcad2d6073c131d0c70760406a1b",
+        "caminho": "assets/bci-docs/BCI-1774110646630-R4BTJ1/1aeem4wt8mzi52il_mn0jo7zb.pdf",
+        "nome_original": "Dra_Manuela_BI.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 1518521,
+        "enviado_em": "2026-03-21T16:30:57.998Z"
+      },
+      "data_cadastro": "2026-03-21T16:31:11.720Z",
+      "dados_bci": {
+        "username": "",
+        "senha": "XXXXX",
+        "numero_conta": "",
+        "iban": "",
+        "telefone_conta": "935350915",
+        "email_conta": "manuelamanuelcambundo@gmail.com"
+      },
+      "card_visa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110646630-R4BTJ1/cqe2rvnx5zk065ow_mn0jogr3.pdf",
+        "sha": "079ece44f6e6f797566c6501d3e057c72d41fd37",
+        "caminho": "assets/bci-docs/BCI-1774110646630-R4BTJ1/cqe2rvnx5zk065ow_mn0jogr3.pdf",
+        "nome_original": "BI_Dra_Manuela_Cambundo_MASTERCARD_formal.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 2701585,
+        "enviado_em": "2026-03-21T16:31:06.401Z"
+      },
+      "card_multicaixa": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110646630-R4BTJ1/gkb2b3jqn4k9gezs_mn0jon8i.pdf",
+        "sha": "dc1e7c62d8051760c8e2ddf98e126a802f33e953",
+        "caminho": "assets/bci-docs/BCI-1774110646630-R4BTJ1/gkb2b3jqn4k9gezs_mn0jon8i.pdf",
+        "nome_original": "BI_Dra_Manuela_Cambundo_MULTICAIXA_formal.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 1971213,
+        "enviado_em": "2026-03-21T16:31:11.720Z"
+      },
+      "campos_extras": [],
+      "carregamentos": [],
+      "ativo": true,
+      "observacoes": "",
+      "criado_em": "2026-03-21T16:31:11.721Z",
+      "atualizado_em": "2026-03-21T16:31:11.721Z"
+    },
+    {
       "id": "BCI-1774104551146-UST0KD",
       "nome": "MANUELA ANTÓNIO FRANCISCO",
       "numero_bi": "003870158KN035",
@@ -286,8 +333,8 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T15:28:53.477Z",
-    "total": 3,
+    "atualizado_em": "2026-03-21T16:31:11.722Z",
+    "total": 4,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
