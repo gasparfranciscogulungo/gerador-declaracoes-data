@@ -25,7 +25,49 @@
       "card_visa": null,
       "card_multicaixa": null,
       "campos_extras": [],
-      "carregamentos": [],
+      "carregamentos": [
+        {
+          "id": "CARG-1774110974324-1NL4",
+          "fase": "solicitacao",
+          "criado_em": "2026-03-21T16:36:14.324Z",
+          "semana": 12,
+          "ano": 2026,
+          "valor_solicitado": 2000000,
+          "taxa_banco_pct": 2.28,
+          "taxa_banco_valor": 45600,
+          "total_investimento": 2045600,
+          "data_carregamento": "",
+          "hora_carregamento": "",
+          "valor_carregamento_final": 2000000,
+          "taxa_final": 45600,
+          "total_investimento_final": 2045600,
+          "lucro_bruto_cartao": 0,
+          "plataforma_saque": "",
+          "plataforma_saque_custom": "",
+          "data_cashback": "",
+          "lucro_cashback": 0,
+          "plataforma_cashback": "",
+          "plataforma_cashback_custom": "",
+          "lucro_bruto_total": 0,
+          "descontos": {
+            "gestor": {
+              "ativo": true,
+              "valor": 15000
+            },
+            "salario_colaborador": {
+              "ativo": false,
+              "valor": 25000
+            },
+            "taxi": {
+              "ativo": false,
+              "valor": 3000
+            }
+          },
+          "total_descontos": 15000,
+          "lucro_liquido": 0,
+          "notas": ""
+        }
+      ],
       "ativo": true,
       "observacoes": "",
       "criado_em": "2026-03-21T16:35:37.659Z",
@@ -406,7 +448,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T16:35:37.659Z",
+    "atualizado_em": "2026-03-21T16:36:14.324Z",
     "total": 5,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
