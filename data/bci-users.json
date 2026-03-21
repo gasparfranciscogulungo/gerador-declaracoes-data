@@ -1,6 +1,29 @@
 {
   "colaboradores": [
     {
+      "id": "BCI-1774104551146-UST0KD",
+      "nome": "MANUELA ANTÓNIO FRANCISCO",
+      "numero_bi": "003870158KN035",
+      "bi_documento": null,
+      "data_cadastro": "2026-03-21T14:49:11.146Z",
+      "dados_bci": {
+        "username": "",
+        "senha": "",
+        "numero_conta": "",
+        "iban": "",
+        "telefone_conta": "946966800",
+        "email_conta": ""
+      },
+      "card_visa": null,
+      "card_multicaixa": null,
+      "campos_extras": [],
+      "carregamentos": [],
+      "ativo": true,
+      "observacoes": "",
+      "criado_em": "2026-03-21T14:49:11.146Z",
+      "atualizado_em": "2026-03-21T14:49:11.146Z"
+    },
+    {
       "id": "BCI-1773913408435-8ME41V",
       "nome": "test",
       "numero_bi": "es",
@@ -197,8 +220,8 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T11:57:18.624Z",
-    "total": 2,
+    "atualizado_em": "2026-03-21T14:49:11.147Z",
+    "total": 3,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
