@@ -4,7 +4,15 @@
       "id": "BCI-1774104551146-UST0KD",
       "nome": "MANUELA ANTÓNIO FRANCISCO",
       "numero_bi": "003870158KN035",
-      "bi_documento": null,
+      "bi_documento": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774104551146-UST0KD/sfqdc03hj1of305l_mn0gh7bi.pdf",
+        "sha": "041c130ae7b9082c4ad7bed1140f1181a3c89030",
+        "caminho": "assets/bci-docs/BCI-1774104551146-UST0KD/sfqdc03hj1of305l_mn0gh7bi.pdf",
+        "nome_original": "BI_Mamy_Manuela__executivo.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 2959508,
+        "enviado_em": "2026-03-21T15:01:35.256Z"
+      },
       "data_cadastro": "2026-03-21T14:49:11.146Z",
       "dados_bci": {
         "username": "",
@@ -21,7 +29,7 @@
       "ativo": true,
       "observacoes": "",
       "criado_em": "2026-03-21T14:49:11.146Z",
-      "atualizado_em": "2026-03-21T14:55:48.705Z"
+      "atualizado_em": "2026-03-21T15:01:35.256Z"
     },
     {
       "id": "BCI-1773913408435-8ME41V",
@@ -220,7 +228,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T14:55:48.705Z",
+    "atualizado_em": "2026-03-21T15:01:35.256Z",
     "total": 3,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
