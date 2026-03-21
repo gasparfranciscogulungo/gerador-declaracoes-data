@@ -1,6 +1,37 @@
 {
   "colaboradores": [
     {
+      "id": "BCI-1774110920883-3E7ENO",
+      "nome": "Mana Esperança Cambundo",
+      "numero_bi": "003871412LA034",
+      "bi_documento": {
+        "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110920883-3E7ENO/iibaufdub59e7r0j_mn0ju3lf.pdf",
+        "sha": "2f2794dcc96779915752aa5a67be025b6067e7d8",
+        "caminho": "assets/bci-docs/BCI-1774110920883-3E7ENO/iibaufdub59e7r0j_mn0ju3lf.pdf",
+        "nome_original": "Dra_Esperança__BI.pdf",
+        "tipo": "application/pdf",
+        "tamanho": 1766127,
+        "enviado_em": "2026-03-21T16:35:37.658Z"
+      },
+      "data_cadastro": "2026-03-21T16:35:37.658Z",
+      "dados_bci": {
+        "username": "",
+        "senha": "xxxxxx",
+        "numero_conta": "",
+        "iban": "",
+        "telefone_conta": "944803040",
+        "email_conta": "esperancamanuelcambundo@gmail.com"
+      },
+      "card_visa": null,
+      "card_multicaixa": null,
+      "campos_extras": [],
+      "carregamentos": [],
+      "ativo": true,
+      "observacoes": "",
+      "criado_em": "2026-03-21T16:35:37.659Z",
+      "atualizado_em": "2026-03-21T16:35:37.659Z"
+    },
+    {
       "id": "BCI-1774110646630-R4BTJ1",
       "nome": "MANA MANUELA MANUEL CAMBUNDO",
       "numero_bi": "008026017LA049",
@@ -375,8 +406,8 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T16:31:35.662Z",
-    "total": 4,
+    "atualizado_em": "2026-03-21T16:35:37.659Z",
+    "total": 5,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
 }
