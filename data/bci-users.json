@@ -20,7 +20,7 @@
         "numero_conta": "",
         "iban": "",
         "telefone_conta": "946966800",
-        "email_conta": ""
+        "email_conta": "manuelafrancisco788@gmail.com"
       },
       "card_visa": {
         "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774104551146-UST0KD/diong94qtgl0w3o5_mn0h85sx.pdf",
@@ -87,7 +87,7 @@
       "ativo": true,
       "observacoes": "ADD NEW COLABORADOR",
       "criado_em": "2026-03-21T14:49:11.146Z",
-      "atualizado_em": "2026-03-21T15:22:40.786Z"
+      "atualizado_em": "2026-03-21T15:28:53.477Z"
     },
     {
       "id": "BCI-1773913408435-8ME41V",
@@ -286,7 +286,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-03-21T15:25:46.140Z",
+    "atualizado_em": "2026-03-21T15:28:53.477Z",
     "total": 3,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
