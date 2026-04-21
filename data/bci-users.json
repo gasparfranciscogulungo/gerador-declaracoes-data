@@ -317,6 +317,47 @@
       "campos_extras": [],
       "carregamentos": [
         {
+          "id": "CARG-1776808505961-OBSV",
+          "fase": "solicitacao",
+          "criado_em": "2026-04-21T21:55:05.961Z",
+          "semana": 17,
+          "ano": 2026,
+          "valor_solicitado": 2000000,
+          "taxa_banco_pct": 2.28,
+          "taxa_banco_valor": 45600,
+          "total_investimento": 2045600,
+          "data_carregamento": "",
+          "hora_carregamento": "",
+          "valor_carregamento_final": 2000000,
+          "taxa_final": 45600,
+          "total_investimento_final": 2045600,
+          "lucro_bruto_cartao": 0,
+          "plataforma_saque": "",
+          "plataforma_saque_custom": "",
+          "data_cashback": "",
+          "lucro_cashback": 0,
+          "plataforma_cashback": "",
+          "plataforma_cashback_custom": "",
+          "lucro_bruto_total": 0,
+          "descontos": {
+            "gestor": {
+              "ativo": true,
+              "valor": 15000
+            },
+            "salario_colaborador": {
+              "ativo": false,
+              "valor": 25000
+            },
+            "taxi": {
+              "ativo": false,
+              "valor": 3000
+            }
+          },
+          "total_descontos": 15000,
+          "lucro_liquido": 0,
+          "notas": ""
+        },
+        {
           "id": "CARG-1774094162037-NFNP",
           "fase": "cashback_retirado",
           "criado_em": "2026-03-21T11:56:02.037Z",
@@ -448,7 +489,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-04-21T21:54:46.812Z",
+    "atualizado_em": "2026-04-21T21:55:05.962Z",
     "total": 5,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
