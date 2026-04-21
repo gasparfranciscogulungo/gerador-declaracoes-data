@@ -75,7 +75,7 @@
     },
     {
       "id": "BCI-1774110646630-R4BTJ1",
-      "nome": "MANA MANUELA MANUEL CAMBUNDO",
+      "nome": "MANUELA MANUEL CAMBUNDO",
       "numero_bi": "008026017LA049",
       "bi_documento": {
         "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110646630-R4BTJ1/1aeem4wt8mzi52il_mn0jo7zb.pdf",
@@ -160,7 +160,7 @@
       "ativo": true,
       "observacoes": "",
       "criado_em": "2026-03-21T16:31:11.721Z",
-      "atualizado_em": "2026-03-21T16:31:11.721Z"
+      "atualizado_em": "2026-04-21T21:54:46.812Z"
     },
     {
       "id": "BCI-1774104551146-UST0KD",
@@ -448,7 +448,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-04-21T21:54:38.506Z",
+    "atualizado_em": "2026-04-21T21:54:46.812Z",
     "total": 5,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
