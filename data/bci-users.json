@@ -2,7 +2,7 @@
   "colaboradores": [
     {
       "id": "BCI-1774110920883-3E7ENO",
-      "nome": "Mana Esperança Cambundo",
+      "nome": "Esperança Cambundo",
       "numero_bi": "003871412LA034",
       "bi_documento": {
         "url": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/bci-docs/BCI-1774110920883-3E7ENO/iibaufdub59e7r0j_mn0ju3lf.pdf",
@@ -71,7 +71,7 @@
       "ativo": true,
       "observacoes": "",
       "criado_em": "2026-03-21T16:35:37.659Z",
-      "atualizado_em": "2026-03-21T16:35:37.659Z"
+      "atualizado_em": "2026-04-21T21:54:38.505Z"
     },
     {
       "id": "BCI-1774110646630-R4BTJ1",
@@ -448,7 +448,7 @@
   ],
   "_metadata": {
     "versao": "1.0.0",
-    "atualizado_em": "2026-04-21T21:53:56.424Z",
+    "atualizado_em": "2026-04-21T21:54:38.506Z",
     "total": 5,
     "descricao": "Base de dados BCI — Informações sensíveis de colaboradores"
   }
