@@ -323,6 +323,34 @@
       "corSecundaria": "#64748b",
       "marcaDagua": "",
       "updatedAt": "2026-10-13T23:08:55.005Z"
+    },
+    {
+      "id": "empresa_1791958472138",
+      "nome": "C.C.B CONEXÕES NO RADAR",
+      "nif": "5003471217",
+      "endereco": {
+        "completo": "Viana - Sapu 2 - Ulengo Center - Luanda - Angola",
+        "rua": "Viana - Sapu 2 - Ulengo Center - Luanda - Angola",
+        "edificio": "",
+        "andar": "",
+        "sala": "",
+        "bairro": "",
+        "municipio": "",
+        "provincia": "",
+        "pais": "Angola"
+      },
+      "enderecoCompleto": "Viana - Sapu 2 - Ulengo Center - Luanda - Angola",
+      "telefone": "244 926 789 379",
+      "email": "ccbconexoesnoradarcomercio@gmail.com",
+      "website": "",
+      "logo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5003471217/logo.png",
+      "carimbo": "https://raw.githubusercontent.com/gasparfranciscogulungo/gerador-declaracoes-data/master/assets/empresas/5003471217/carimbo.png",
+      "corPrimaria": "#000040",
+      "corSecundaria": "#64748b",
+      "marcaDagua": "",
+      "createdAt": "2026-10-14T06:14:32.138Z",
+      "updatedAt": "2026-10-14T06:14:32.138Z",
+      "contador": 0
     }
   ]
 }
